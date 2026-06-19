@@ -2,21 +2,18 @@
 export const HERO_DESIGN_WIDTH_PX = 1440;
 export const HERO_DESIGN_HEIGHT_PX = 853;
 
-/** Match navbar horizontal inset. */
+/** Match navbar horizontal inset (header only — hero canvas is full 1440). */
 export const HERO_PADDING_LEFT_PX = 87;
 export const HERO_PADDING_RIGHT_PX = 93;
-
-/** Nudge photo collage + arc right; CTA buttons stay at Figma coordinates. */
-export const HERO_COLLAGE_SHIFT_X_PX = 32;
 
 export const HERO_ASSETS = {
   shapeTextArc: '/assets/hero/shape-text-arc.png',
   layerLeft: '/assets/hero/hero-layer-left.png',
   layerCenter: '/assets/hero/hero-layer-center.png',
   layerRight: '/assets/hero/hero-layer-right.png',
-  decorationCameraLarge: '/assets/hero/decoration-camera-large.png',
-  decorationCameraSmall: '/assets/hero/decoration-camera-small.png',
-  decorationCameraMid: '/assets/hero/decoration-camera-mid.png',
+  decorationStar: '/assets/hero/decoration-star.png',
+  decorationBunny: '/assets/hero/decoration-bunny.png',
+  musicNotes: '/assets/hero/music-notes.png',
 } as const;
 
 export interface HeroImageCrop {
@@ -35,12 +32,21 @@ export interface HeroLayerPlacement {
   zIndex: number;
   crop?: HeroImageCrop;
   flip?: boolean;
+  offsetYPx?: number;
+  scale?: number;
+  scaleOrigin?: string;
 }
+
+/** Nudge left arc wing up — «SHAPE» side in `layerLeft`. */
+export const HERO_LAYER_LEFT_OFFSET_Y_PX = -125;
+
+/** Scale for «SHAPE YOUR CHILDHOOD» headline (left wing + right arc). */
+export const HERO_HEADLINE_SCALE = 0.9;
 
 /** Photo collage layers — paint order back → front (Figma `9:590`). */
 export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
   {
-    /** Figma node 68:2329 — center collage layer. */
+    /** Figma node 68:2329 — girl (center). */
     assetKey: 'layerCenter',
     leftPx: 584,
     topPx: 157,
@@ -50,7 +56,7 @@ export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
     crop: { widthPercent: 104.38, heightPercent: 110.37, leftPercent: 0, topPercent: 0 },
   },
   {
-    /** Figma node 68:2328 — right collage layer (flipped per Figma). */
+    /** Figma node 68:2328 — boy accent (right, flipped). */
     assetKey: 'layerRight',
     leftPx: 791,
     topPx: 204,
@@ -61,13 +67,16 @@ export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
     crop: { widthPercent: 201.31, heightPercent: 171.65, leftPercent: -50.65, topPercent: -37.22 },
   },
   {
-    /** Figma node 68:2331 — boy + left collage wing. */
+    /** Figma node 68:2331 — boy + left text wing. */
     assetKey: 'layerLeft',
     leftPx: 102,
     topPx: 249,
     widthPx: 721,
     heightPx: 655,
     zIndex: 50,
+    offsetYPx: HERO_LAYER_LEFT_OFFSET_Y_PX,
+    scale: HERO_HEADLINE_SCALE,
+    scaleOrigin: 'top left',
     crop: { widthPercent: 100, heightPercent: 110.08, leftPercent: 0, topPercent: -6.64 },
   },
 ];
@@ -76,48 +85,24 @@ export interface HeroDecorationPlacement {
   assetKey: keyof typeof HERO_ASSETS;
   leftPx: number;
   topPx: number;
-  sizePx: number;
-  innerSizePx: number;
-  rotateDeg: number;
+  widthPx: number;
+  heightPx: number;
+  rotateDeg?: number;
   flipY?: boolean;
   zIndex: number;
 }
 
-export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
-  {
-    /** Figma node 77:2723 — large clay camera (top-right). */
-    assetKey: 'decorationCameraLarge',
-    leftPx: 1032.64,
-    topPx: 13.64,
-    sizePx: 375.168,
-    innerSizePx: 273.164,
-    rotateDeg: -58.8,
-    zIndex: 10,
-  },
-  {
-    /** Figma node 77:2724 — small clay camera (top-left). */
-    assetKey: 'decorationCameraSmall',
-    leftPx: 211,
-    topPx: 150,
-    sizePx: 173.795,
-    innerSizePx: 124.147,
-    rotateDeg: 53.16,
-    zIndex: 55,
-  },
-  {
-    /** Figma node 77:2748 — mid clay camera (center). */
-    assetKey: 'decorationCameraMid',
-    leftPx: 646,
-    topPx: 237,
-    sizePx: 157.955,
-    innerSizePx: 122.629,
-    rotateDeg: 159.38,
-    flipY: true,
-    zIndex: 60,
-  },
-];
+/** Floating clay icons — enable when assets are exported to public/assets/hero/. */
+export const HERO_DECORATIONS: HeroDecorationPlacement[] = [];
 
-/** Arc headline group `77:2826` — centered above collage. */
+/** Fine-tune arc overlay — «Y» aligned with beanie. */
+export const HERO_ARC_OFFSET_X_PX = 198;
+export const HERO_ARC_OFFSET_Y_PX = -36;
+
+/** Arc sits above photos and left text wing. */
+export const HERO_ARC_Z_INDEX = 100;
+
+/** Arc headline group `77:2826`. */
 export const HERO_ARC_PLACEMENT = {
   topPx: 0,
   widthPx: 772,

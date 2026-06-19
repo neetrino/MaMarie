@@ -2,12 +2,14 @@ import Image from 'next/image';
 import {
   HERO_ASSETS,
   HERO_DECORATIONS,
+  heroPctH,
+  heroPctW,
   heroPctX,
   heroPctY,
 } from '../../constants/hero';
 
 /**
- * Rotated clay camera decorations from Figma hero frame.
+ * Floating clay decorations (star, bunny, music notes).
  */
 export function HeroDecorations() {
   return (
@@ -15,7 +17,7 @@ export function HeroDecorations() {
       {HERO_DECORATIONS.map((item) => {
         const transform = [
           item.flipY ? 'scaleY(-1)' : '',
-          `rotate(${item.rotateDeg}deg)`,
+          item.rotateDeg !== undefined ? `rotate(${item.rotateDeg}deg)` : '',
         ]
           .filter(Boolean)
           .join(' ');
@@ -23,28 +25,24 @@ export function HeroDecorations() {
         return (
           <div
             key={item.assetKey}
-            className="pointer-events-none absolute flex items-center justify-center"
+            className="pointer-events-none absolute"
             style={{
               left: heroPctX(item.leftPx),
               top: heroPctY(item.topPx),
-              width: item.sizePx,
-              height: item.sizePx,
+              width: heroPctW(item.widthPx),
+              height: heroPctH(item.heightPx),
               zIndex: item.zIndex,
+              transform: transform || undefined,
             }}
           >
-            <div className="flex-none" style={{ transform }}>
-              <div
-                className="relative"
-                style={{ width: item.innerSizePx, height: item.innerSizePx }}
-              >
-                <Image
-                  src={HERO_ASSETS[item.assetKey]}
-                  alt=""
-                  fill
-                  sizes={`${item.innerSizePx}px`}
-                  className="object-cover"
-                />
-              </div>
+            <div className="relative h-full w-full">
+              <Image
+                src={HERO_ASSETS[item.assetKey]}
+                alt=""
+                fill
+                sizes={`${item.widthPx}px`}
+                className="object-contain"
+              />
             </div>
           </div>
         );
