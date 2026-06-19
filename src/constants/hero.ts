@@ -122,6 +122,7 @@ export interface HeroDecorationPlacement {
   widthPx: number;
   heightPx: number;
   rotateDeg?: number;
+  flipX?: boolean;
   flipY?: boolean;
   zIndex: number;
 }
@@ -129,6 +130,9 @@ export interface HeroDecorationPlacement {
 /** Bunny decoration — Figma `camera101` base size was 158px. */
 export const HERO_BUNNY_FIGMA_SIZE_PX = 158;
 export const HERO_BUNNY_SIZE_PX = 120;
+export const HERO_BUNNY_ROTATE_DEG = 380;
+export const HERO_BUNNY_OFFSET_X_PX = -14;
+export const HERO_BUNNY_OFFSET_Y_PX = -14;
 
 /** Clay star — Figma `camera51` base size was 375.2px. */
 export const HERO_STAR_FIGMA_SIZE_PX = 375.2;
@@ -175,10 +179,12 @@ export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
   {
     /** Bunny — Figma `camera101` slot. */
     assetKey: 'decorationBunny',
-    leftPx: 646 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2,
-    topPx: 237 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2,
+    leftPx: 646 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2 + HERO_BUNNY_OFFSET_X_PX,
+    topPx: 237 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2 + HERO_BUNNY_OFFSET_Y_PX,
     widthPx: HERO_BUNNY_SIZE_PX,
     heightPx: HERO_BUNNY_SIZE_PX,
+    rotateDeg: HERO_BUNNY_ROTATE_DEG,
+    flipX: true,
     zIndex: HERO_DECORATION_FRONT_Z_INDEX,
   },
 ];

@@ -16,6 +16,7 @@ export function HeroDecorations() {
     <>
       {HERO_DECORATIONS.map((item) => {
         const transform = [
+          item.flipX ? 'scaleX(-1)' : '',
           item.flipY ? 'scaleY(-1)' : '',
           item.rotateDeg !== undefined ? `rotate(${item.rotateDeg}deg)` : '',
         ]

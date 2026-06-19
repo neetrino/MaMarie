@@ -8,10 +8,13 @@ import {
   ABOUT_US_CARD_LARGE_PADDING_Y_PX,
   ABOUT_US_CARD_LARGE_RADIUS_PX,
   ABOUT_US_CARD_LARGE_WIDTH_PX,
+  ABOUT_US_LARGE_CARD_LOGO_OFFSET_TOP_PX,
+  ABOUT_US_LARGE_CARD_TEXT_SIZE_PX,
   ABOUT_US_CARD_SMALL_PADDING_X_PX,
   ABOUT_US_CARD_SMALL_PADDING_Y_PX,
   ABOUT_US_CARD_SMALL_RADIUS_PX,
   ABOUT_US_CARD_SMALL_WIDTH_PX,
+  ABOUT_US_CARD_LOGO_TEXT_GAP_PX,
   ABOUT_US_CONTENT_GAP_PX,
   ABOUT_US_LARGE_DECORATIONS,
   ABOUT_US_LOGO_CROP_HEIGHT_PERCENT,
@@ -24,6 +27,9 @@ import {
   ABOUT_US_RIGHT_COLUMN_HEIGHT_PX,
   ABOUT_US_RIGHT_COLUMN_WIDTH_PX,
   ABOUT_US_SMALL_CARD_DECORATIONS,
+  ABOUT_US_SMALL_CARD_LOGO_HEIGHT_PX,
+  ABOUT_US_SMALL_CARD_LOGO_OFFSET_TOP_PX,
+  ABOUT_US_SMALL_CARD_LOGO_WIDTH_PX,
   ABOUT_US_TEXT_COLOR,
   ABOUT_US_TEXT_LINE_HEIGHT_LARGE_PX,
   ABOUT_US_TEXT_LINE_HEIGHT_PX,
@@ -33,11 +39,17 @@ import {
 } from '../../constants/about-us-section';
 import { useTranslation } from '../../lib/i18n-client';
 
-function AboutUsBrandLogo() {
+function AboutUsBrandLogo({
+  widthPx = ABOUT_US_LOGO_WIDTH_PX,
+  heightPx = ABOUT_US_LOGO_HEIGHT_PX,
+}: {
+  widthPx?: number;
+  heightPx?: number;
+}) {
   return (
     <div
       className="relative shrink-0 overflow-hidden"
-      style={{ width: ABOUT_US_LOGO_WIDTH_PX, height: ABOUT_US_LOGO_HEIGHT_PX }}
+      style={{ width: widthPx, height: heightPx }}
     >
       <div
         className="pointer-events-none absolute max-w-none"
@@ -52,7 +64,7 @@ function AboutUsBrandLogo() {
           src={ABOUT_US_ASSETS.logoInline}
           alt=""
           fill
-          sizes={`${ABOUT_US_LOGO_WIDTH_PX}px`}
+          sizes={`${widthPx}px`}
           className="object-cover"
         />
       </div>
@@ -68,6 +80,7 @@ function AboutUsDecoration({
   imageSrc: string;
 }) {
   const transform = [
+    layout.flipX ? 'scaleX(-1)' : '',
     layout.flipY ? 'scaleY(-1)' : '',
     layout.rotateDeg !== undefined ? `rotate(${layout.rotateDeg}deg)` : '',
   ]
@@ -105,10 +118,21 @@ function AboutUsSmallCard({ text }: { text: string }) {
         paddingBottom: ABOUT_US_CARD_SMALL_PADDING_Y_PX,
       }}
     >
-      <div className="flex flex-wrap items-start" style={{ gap: 4 }}>
-        <AboutUsBrandLogo />
+      <div className="flow-root">
+        <div
+          className="float-left"
+          style={{
+            marginTop: ABOUT_US_SMALL_CARD_LOGO_OFFSET_TOP_PX,
+            marginRight: ABOUT_US_CARD_LOGO_TEXT_GAP_PX,
+          }}
+        >
+          <AboutUsBrandLogo
+            widthPx={ABOUT_US_SMALL_CARD_LOGO_WIDTH_PX}
+            heightPx={ABOUT_US_SMALL_CARD_LOGO_HEIGHT_PX}
+          />
+        </div>
         <p
-          className="min-w-0 flex-1 font-normal"
+          className="m-0 font-normal"
           style={{
             color: ABOUT_US_TEXT_COLOR,
             fontSize: ABOUT_US_TEXT_SIZE_PX,
@@ -147,13 +171,21 @@ function AboutUsLargeCard({ text }: { text: string }) {
           paddingBottom: ABOUT_US_CARD_LARGE_PADDING_Y_PX,
         }}
       >
-        <div className="flex flex-wrap items-start" style={{ gap: 4 }}>
-          <AboutUsBrandLogo />
+        <div className="flow-root">
+          <div
+            className="float-left"
+            style={{
+              marginTop: ABOUT_US_LARGE_CARD_LOGO_OFFSET_TOP_PX,
+              marginRight: ABOUT_US_CARD_LOGO_TEXT_GAP_PX,
+            }}
+          >
+            <AboutUsBrandLogo />
+          </div>
           <p
-            className="min-w-0 flex-1 font-normal"
+            className="m-0 font-normal"
             style={{
               color: ABOUT_US_TEXT_COLOR,
-              fontSize: ABOUT_US_TEXT_SIZE_PX,
+              fontSize: ABOUT_US_LARGE_CARD_TEXT_SIZE_PX,
               lineHeight: `${ABOUT_US_TEXT_LINE_HEIGHT_LARGE_PX}px`,
               letterSpacing: `${ABOUT_US_TEXT_TRACKING_LARGE_PX}px`,
             }}
