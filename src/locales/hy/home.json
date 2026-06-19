@@ -1,7 +1,13 @@
 {
   "hero": {
     "ctaShopNow": "Գնել հիմա",
-    "ctaNewCollection": "Նոր հավաքածու"
+    "ctaNewCollection": "Նոր հավաքածու",
+    "bottomPill": {
+      "label": "Hero slides",
+      "tab1": "1",
+      "tab2": "2",
+      "tab3": "3"
+    }
   },
   "bestProducts": {
     "title": "Լավագույն ապրանքները"

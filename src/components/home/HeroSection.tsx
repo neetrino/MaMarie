@@ -1,8 +1,8 @@
 import {
+  HERO_BOTTOM_PILL_PLACEMENT,
   HERO_CONTENT_MAX_HEIGHT_PX,
   HERO_CONTENT_MAX_WIDTH_PX,
   HERO_CONTENT_MIN_HEIGHT_PX,
-  HERO_CTA_PLACEMENT,
   HERO_CTA_Z_INDEX,
   HERO_DESIGN_HEIGHT_PX,
   HERO_DESIGN_WIDTH_PX,
@@ -13,7 +13,7 @@ import {
   heroPctY,
 } from '../../constants/hero';
 import { HeroArcOverlay } from './HeroArcOverlay';
-import { HeroCtaButtons } from './HeroCtaButtons';
+import { HeroBottomPill } from './HeroBottomPill';
 import { HeroDecorations } from './HeroDecorations';
 import { HeroLayerImage } from './HeroLayerImage';
 import { HomePageSection } from './HomeSectionShell';
@@ -44,25 +44,25 @@ export function HeroSection() {
 
         <HeroDecorations />
 
+        <HeroArcOverlay />
+
         <div
           className="absolute hidden sm:block"
           style={{
-            left: heroPctX(HERO_CTA_PLACEMENT.leftPx),
-            top: heroPctY(HERO_CTA_PLACEMENT.topPx),
+            left: heroPctX(HERO_BOTTOM_PILL_PLACEMENT.leftPx),
+            top: heroPctY(HERO_BOTTOM_PILL_PLACEMENT.topPx),
             zIndex: HERO_CTA_Z_INDEX,
           }}
         >
-          <HeroCtaButtons />
+          <HeroBottomPill />
         </div>
 
         <div
-          className="absolute bottom-8 left-0 right-0 flex justify-center sm:hidden"
+          className="absolute bottom-4 left-0 right-0 flex justify-center sm:hidden"
           style={{ zIndex: HERO_CTA_Z_INDEX }}
         >
-          <HeroCtaButtons />
+          <HeroBottomPill />
         </div>
-
-        <HeroArcOverlay />
       </div>
     </HomePageSection>
   );

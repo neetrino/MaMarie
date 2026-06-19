@@ -1,3 +1,4 @@
+import { BRAND_COLORS } from './brand';
 import { HOME_SECTION_CONTENT_MAX_WIDTH_PX } from './home-sections';
 
 /** Figma hero artboard — frame `9:590` (1440×853). */
@@ -202,23 +203,47 @@ export const HERO_ARC_PLACEMENT = {
 /** Fine-tune right arc — «YOUR CHILDHOOD». */
 export const HERO_ARC_OFFSET_X_PX = -20;
 
-/** CTA row — Figma `.buttons`. */
-export const HERO_CTA_PLACEMENT = {
-  leftPx: 850,
-  topPx: 645,
-  heightPx: 64,
-} as const;
+/** Figma node `1:59` / `.button4` — frosted carousel pill (bottom of hero). */
+export const HERO_BOTTOM_PILL_WIDTH_PX = 401;
+export const HERO_BOTTOM_PILL_HEIGHT_PX = 64;
+export const HERO_BOTTOM_PILL_BG_COLOR = 'rgba(255, 255, 255, 0.38)';
+export const HERO_BOTTOM_PILL_BACKDROP_BLUR_PX = 8;
+export const HERO_BOTTOM_PILL_FONT_SIZE_PX = 16;
+export const HERO_BOTTOM_PILL_LINE_HEIGHT_PX = 28;
+export const HERO_BOTTOM_PILL_TEXT_COLOR = '#ffffff';
+export const HERO_BOTTOM_PILL_PRIMARY_BG_COLOR = BRAND_COLORS.pink;
+export const HERO_BOTTOM_PILL_PRIMARY_INSET_SHADOW =
+  'inset 0px -4px 8px 0px rgba(0, 0, 0, 0.27), inset 0px 4px 4px 0px rgba(255, 255, 255, 0.4), inset 0px 20px 40px -10px rgba(164, 60, 18, 0.2)';
+export const HERO_BOTTOM_PILL_ACTIVE_TOP_PX = 7;
+export const HERO_BOTTOM_PILL_INNER_ACTIVE_WIDTH_PX = 152;
+export const HERO_BOTTOM_PILL_INNER_ACTIVE_HEIGHT_PX = 50;
+export const HERO_BOTTOM_PILL_INDICATOR_INSET_X_PX = 11;
+export const HERO_BOTTOM_PILL_SLIDE_MS = 300;
+export const HERO_BOTTOM_PILL_TAB_COUNT = 3;
+export const HERO_BOTTOM_PILL_TAB_WIDTH_PX = HERO_BOTTOM_PILL_WIDTH_PX / HERO_BOTTOM_PILL_TAB_COUNT;
 
-export const HERO_CTA_PRIMARY_WIDTH_PX = 152;
-export const HERO_CTA_SECONDARY_WIDTH_PX = 198;
-export const HERO_CTA_GAP_PX = 7;
+export const HERO_BOTTOM_PILL_TAB_KEYS = [
+  'home.hero.bottomPill.tab1',
+  'home.hero.bottomPill.tab2',
+  'home.hero.bottomPill.tab3',
+] as const;
 
-/** Bottom pill row — Figma `.button4` (carousel placeholder). */
+/** Sliding pink indicator position for the active tab. */
+export function getHeroBottomPillIndicator(activeIndex: number): { leftPx: number; widthPx: number } {
+  const tabWidthPx = HERO_BOTTOM_PILL_TAB_WIDTH_PX;
+  const maxWidthPx = tabWidthPx - HERO_BOTTOM_PILL_INDICATOR_INSET_X_PX * 2;
+  const widthPx = Math.min(HERO_BOTTOM_PILL_INNER_ACTIVE_WIDTH_PX, Math.max(maxWidthPx, 0));
+  const leftPx = activeIndex * tabWidthPx + (tabWidthPx - widthPx) / 2;
+
+  return { leftPx, widthPx };
+}
+
+/** Bottom pill placement — Figma `.button4`. */
 export const HERO_BOTTOM_PILL_PLACEMENT = {
   leftPx: 516,
   topPx: 743,
-  widthPx: 401,
-  heightPx: 64,
+  widthPx: HERO_BOTTOM_PILL_WIDTH_PX,
+  heightPx: HERO_BOTTOM_PILL_HEIGHT_PX,
 } as const;
 
 export function heroPctX(px: number): string {

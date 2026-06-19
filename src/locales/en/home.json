@@ -1,7 +1,13 @@
 {
   "hero": {
     "ctaShopNow": "Shop now",
-    "ctaNewCollection": "New collection"
+    "ctaNewCollection": "New collection",
+    "bottomPill": {
+      "label": "Hero slides",
+      "tab1": "1",
+      "tab2": "2",
+      "tab3": "3"
+    }
   },
   "bestProducts": {
     "title": "Best products"
