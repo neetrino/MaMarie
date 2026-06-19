@@ -192,8 +192,37 @@
     "category": "Бакалея"
   },
   "footer": {
+    "description": "Ведущая онлайн-платформа Армении для премиальной электроники и бытовой техники с 2010 года. Качество, которому можно доверять.",
+    "companyTitle": "Компания",
+    "supportTitle": "Поддержка",
+    "contactsTitle": "Контакты",
+    "company": {
+      "shop": "Магазин",
+      "about": "О нас",
+      "partners": "Партнёры",
+      "categories": "Категории",
+      "contact": "Контакты"
+    },
+    "support": {
+      "deliveryReturns": "Доставка и возврат",
+      "installment": "Условия рассрочки",
+      "warranty": "Официальная гарантия",
+      "privacy": "Политика конфиденциальности",
+      "faq": "Частые вопросы"
+    },
+    "phone": "+374 10 000 000",
+    "email": "info@marco.am",
+    "address": "ул. Абовяна 1/1, Ереван, Армения",
+    "copyrightPrefix": "Copyright © {year} | Все права защищены | Создано ",
+    "copyrightCompany": "Neetrino IT Company",
+    "copyrightSuffix": "",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "whatsapp": "WhatsApp"
+    },
     "shop": "Магазин",
-    "description": "Профессиональная платформа электронной коммерции для современного опыта покупок.",
     "quickLinks": "Быстрые ссылки",
     "legal": "Юридическая информация",
     "contactInfo": "Контактная информация",

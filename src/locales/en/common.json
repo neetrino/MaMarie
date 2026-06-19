@@ -195,8 +195,37 @@
     "category": "Grocery"
   },
   "footer": {
+    "description": "Armenia's leading online platform for premium electronics and home appliances since 2010. Quality you can trust.",
+    "companyTitle": "Company",
+    "supportTitle": "Support",
+    "contactsTitle": "Contacts",
+    "company": {
+      "shop": "Shop",
+      "about": "About us",
+      "partners": "Partners",
+      "categories": "Categories",
+      "contact": "Contact"
+    },
+    "support": {
+      "deliveryReturns": "Delivery & Returns",
+      "installment": "Installment terms",
+      "warranty": "Official warranty",
+      "privacy": "Privacy policy",
+      "faq": "FAQ"
+    },
+    "phone": "+374 10 000 000",
+    "email": "info@marco.am",
+    "address": "1/1 Abovyan St., Yerevan, Armenia",
+    "copyrightPrefix": "Copyright © {year} | All rights reserved | Created by ",
+    "copyrightCompany": "Neetrino IT Company",
+    "copyrightSuffix": "",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "whatsapp": "WhatsApp"
+    },
     "shop": "Shop",
-    "description": "Professional e-commerce platform for modern shopping experience.",
     "quickLinks": "Quick Links",
     "legal": "Legal",
     "contactInfo": "Contact Information",

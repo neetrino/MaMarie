@@ -193,8 +193,37 @@
     "category": "Մթերք"
   },
   "footer": {
+    "description": "Հայաստանի առաջատար առցանց հարթակը պրեմիում էլեկտրոնիկայի և կենցաղային տեխնիկայի համար սկսած 2010 թվականից: Որակ, որին կարող եք վստահել:",
+    "companyTitle": "Ընկերություն",
+    "supportTitle": "Աջակցություն",
+    "contactsTitle": "Կոնտակտներ",
+    "company": {
+      "shop": "Խանութ",
+      "about": "Մեր մասին",
+      "partners": "Գործընկերներ",
+      "categories": "Կատեգորիաներ",
+      "contact": "Կապ"
+    },
+    "support": {
+      "deliveryReturns": "Առաքում և Վերադարձ",
+      "installment": "Ապառիկի պայմաններ",
+      "warranty": "Պաշտոնական երաշխիք",
+      "privacy": "Գաղտնիության քաղաքականություն",
+      "faq": "Հաճախ տրվող հարցեր"
+    },
+    "phone": "+374 10 000 000",
+    "email": "info@marco.am",
+    "address": "Աբովյան փող. 1/1, Երևան, Հայաստան",
+    "copyrightPrefix": "Copyright © {year} | Բոլոր իրավունքները պաշտպանված են | Ստեղծվել է ",
+    "copyrightCompany": "Neetrino IT Company",
+    "copyrightSuffix": " կողմից",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "whatsapp": "WhatsApp"
+    },
     "shop": "Խանութ",
-    "description": "Պրոֆեսիոնալ էլեկտրոնային առևտրի հարթակ ժամանակակից գնումների փորձի համար:",
     "quickLinks": "Արագ հղումներ",
     "legal": "Իրավական",
     "contactInfo": "Կոնտակտային տեղեկատվություն",
