@@ -11,9 +11,11 @@ export const HERO_ASSETS = {
   layerLeft: '/assets/hero/hero-layer-left.png',
   layerCenter: '/assets/hero/hero-layer-center.png',
   layerRight: '/assets/hero/hero-layer-right.png',
-  decorationStar: '/assets/hero/decoration-star.png',
-  decorationBunny: '/assets/hero/decoration-bunny.png',
-  musicNotes: '/assets/hero/music-notes.png',
+  decorationCameraLarge: '/assets/hero/decoration-camera-large.png',
+  /** Clay bunny — exported as `decoration-camera-mid.png`. */
+  decorationBunny: '/assets/hero/decoration-camera-mid.png',
+  /** Clay melody notes — exported as `decoration-camera-small.png`. */
+  musicNotes: '/assets/hero/decoration-camera-small.png',
 } as const;
 
 export interface HeroImageCrop {
@@ -30,54 +32,67 @@ export interface HeroLayerPlacement {
   widthPx: number;
   heightPx: number;
   zIndex: number;
+  objectFit?: 'cover' | 'contain';
   crop?: HeroImageCrop;
   flip?: boolean;
   offsetYPx?: number;
+  offsetXPx?: number;
   scale?: number;
   scaleOrigin?: string;
 }
 
-/** Nudge left arc wing up — «SHAPE» side in `layerLeft`. */
-export const HERO_LAYER_LEFT_OFFSET_Y_PX = -125;
+/** Shared kid photo frame — girl (68:2329) and boy (68:2328). */
+export const HERO_KID_PHOTO_WIDTH_PX = 490;
+export const HERO_KID_PHOTO_HEIGHT_PX = 696;
 
-/** Scale for «SHAPE YOUR CHILDHOOD» headline (left wing + right arc). */
-export const HERO_HEADLINE_SCALE = 0.9;
+/** Extra scale — boy PNG has more padding than girl. */
+export const HERO_LAYER_RIGHT_SCALE = 1.38;
 
-/** Photo collage layers — paint order back → front (Figma `9:590`). */
+/** Nudge boy down. */
+export const HERO_LAYER_RIGHT_OFFSET_Y_PX = 140;
+
+/** Nudge boy left. */
+export const HERO_LAYER_RIGHT_OFFSET_X_PX = -50;
+
+/** Photo collage layers — paint order back → front (Figma frame `9:590`). */
 export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
   {
-    /** Figma node 68:2329 — girl (center). */
+    /** Figma `af0b019…` — girl (68:2329). */
     assetKey: 'layerCenter',
     leftPx: 584,
     topPx: 157,
-    widthPx: 490,
-    heightPx: 696,
+    widthPx: HERO_KID_PHOTO_WIDTH_PX,
+    heightPx: HERO_KID_PHOTO_HEIGHT_PX,
     zIndex: 20,
-    crop: { widthPercent: 104.38, heightPercent: 110.37, leftPercent: 0, topPercent: 0 },
   },
   {
-    /** Figma node 68:2328 — boy accent (right, flipped). */
+    /** Figma `chatgptImageJun102026At` — boy (68:2328), matched visually to girl. */
     assetKey: 'layerRight',
-    leftPx: 791,
+    leftPx: 377,
     topPx: 204,
-    widthPx: 414,
-    heightPx: 649,
+    widthPx: HERO_KID_PHOTO_WIDTH_PX,
+    heightPx: HERO_KID_PHOTO_HEIGHT_PX,
     zIndex: 30,
+    offsetXPx: HERO_LAYER_RIGHT_OFFSET_X_PX,
+    offsetYPx: HERO_LAYER_RIGHT_OFFSET_Y_PX,
     flip: true,
-    crop: { widthPercent: 201.31, heightPercent: 171.65, leftPercent: -50.65, topPercent: -37.22 },
+    scale: HERO_LAYER_RIGHT_SCALE,
+    scaleOrigin: 'center bottom',
+    crop: {
+      widthPercent: 118,
+      heightPercent: 118,
+      leftPercent: -9,
+      topPercent: -14,
+    },
   },
   {
-    /** Figma node 68:2331 — boy + left text wing. */
+    /** Figma `chatgptImageJun102026At3` — boy + left «SHAPE» wing (68:2331). */
     assetKey: 'layerLeft',
     leftPx: 102,
     topPx: 249,
     widthPx: 721,
     heightPx: 655,
     zIndex: 50,
-    offsetYPx: HERO_LAYER_LEFT_OFFSET_Y_PX,
-    scale: HERO_HEADLINE_SCALE,
-    scaleOrigin: 'top left',
-    crop: { widthPercent: 100, heightPercent: 110.08, leftPercent: 0, topPercent: -6.64 },
   },
 ];
 
@@ -92,34 +107,86 @@ export interface HeroDecorationPlacement {
   zIndex: number;
 }
 
-/** Floating clay icons — enable when assets are exported to public/assets/hero/. */
-export const HERO_DECORATIONS: HeroDecorationPlacement[] = [];
+/** Bunny decoration — Figma `camera101` base size was 158px. */
+export const HERO_BUNNY_FIGMA_SIZE_PX = 158;
+export const HERO_BUNNY_SIZE_PX = 120;
 
-/** Fine-tune arc overlay — «Y» aligned with beanie. */
-export const HERO_ARC_OFFSET_X_PX = 198;
-export const HERO_ARC_OFFSET_Y_PX = -36;
+/** Clay star — Figma `camera51` base size was 375.2px. */
+export const HERO_STAR_FIGMA_SIZE_PX = 375.2;
+export const HERO_STAR_SIZE_PX = 330;
+export const HERO_STAR_ROTATE_DEG = 310;
 
-/** Arc sits above photos and left text wing. */
-export const HERO_ARC_Z_INDEX = 100;
+/** Melody notes rotation — Figma `camera91`. */
+export const HERO_MELODY_ROTATE_DEG = 50;
 
-/** Arc headline group `77:2826`. */
+/** Nudge melody notes up. */
+export const HERO_MELODY_OFFSET_Y_PX = -24;
+
+/** Clay decorations — Figma `camera51`, `camera91`, `camera101`. */
+export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
+  {
+    /** Clay star — Figma `camera51`. */
+    assetKey: 'decorationCameraLarge',
+    leftPx: 1032.64 + (HERO_STAR_FIGMA_SIZE_PX - HERO_STAR_SIZE_PX) / 2,
+    topPx: 13.64 + (HERO_STAR_FIGMA_SIZE_PX - HERO_STAR_SIZE_PX) / 2,
+    widthPx: HERO_STAR_SIZE_PX,
+    heightPx: HERO_STAR_SIZE_PX,
+    rotateDeg: HERO_STAR_ROTATE_DEG,
+    zIndex: 5,
+  },
+  {
+    /** Melody notes — Figma `camera91` slot. */
+    assetKey: 'musicNotes',
+    leftPx: 211,
+    topPx: 150 + HERO_MELODY_OFFSET_Y_PX,
+    widthPx: 173.8,
+    heightPx: 173.8,
+    rotateDeg: HERO_MELODY_ROTATE_DEG,
+    zIndex: 55,
+  },
+  {
+    /** Bunny — Figma `camera101` slot. */
+    assetKey: 'decorationBunny',
+    leftPx: 646 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2,
+    topPx: 237 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2,
+    widthPx: HERO_BUNNY_SIZE_PX,
+    heightPx: HERO_BUNNY_SIZE_PX,
+    zIndex: 60,
+  },
+];
+
+/** Arc sits between center/right photos and left wing — Figma paint order. */
+export const HERO_ARC_Z_INDEX = 40;
+
+/** Arc headline — Figma `chatgptImageJun102026At2` (77:2826). */
 export const HERO_ARC_PLACEMENT = {
-  topPx: 0,
-  widthPx: 772,
-  heightPx: 708,
-  leftPx: 334,
+  leftPx: 629,
+  topPx: 55,
+  widthPx: 628,
+  heightPx: 590,
 } as const;
 
-/** CTA row `68:2315`. */
+/** Fine-tune right arc — «YOUR CHILDHOOD». */
+export const HERO_ARC_OFFSET_X_PX = -20;
+
+/** CTA row — Figma `.buttons`. */
 export const HERO_CTA_PLACEMENT = {
-  leftPx: 791,
+  leftPx: 850,
   topPx: 645,
   heightPx: 64,
 } as const;
 
 export const HERO_CTA_PRIMARY_WIDTH_PX = 152;
 export const HERO_CTA_SECONDARY_WIDTH_PX = 198;
-export const HERO_CTA_GAP_PX = 16;
+export const HERO_CTA_GAP_PX = 7;
+
+/** Bottom pill row — Figma `.button4` (carousel placeholder). */
+export const HERO_BOTTOM_PILL_PLACEMENT = {
+  leftPx: 516,
+  topPx: 743,
+  widthPx: 401,
+  heightPx: 64,
+} as const;
 
 export function heroPctX(px: number): string {
   return `${(px / HERO_DESIGN_WIDTH_PX) * 100}%`;

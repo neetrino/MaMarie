@@ -40,19 +40,58 @@ function layerTransform(layer: HeroLayerPlacement): string | undefined {
   return parts.length > 0 ? parts.join(' ') : undefined;
 }
 
+function isSimpleContainLayer(layer: HeroLayerPlacement): boolean {
+  return layer.objectFit === 'contain' && layer.crop === undefined;
+}
+
 /**
  * Absolutely positioned hero image layer with optional Figma crop offsets.
  */
 export function HeroLayerImage({ layer }: HeroLayerImageProps) {
   const src = HERO_ASSETS[layer.assetKey];
-  const crop = layer.crop ?? DEFAULT_CROP;
   const transform = layerTransform(layer);
+
+  if (isSimpleContainLayer(layer)) {
+    const overflowClass =
+      layer.scale !== undefined && layer.scale > 1 ? 'overflow-visible' : 'overflow-hidden';
+
+    return (
+      <div
+        className={`pointer-events-none absolute max-w-full ${overflowClass}`}
+        style={{
+          left: heroPctX(layer.leftPx + (layer.offsetXPx ?? 0)),
+          top: heroPctY(layer.topPx + (layer.offsetYPx ?? 0)),
+          width: heroPctW(layer.widthPx),
+          height: heroPctH(layer.heightPx),
+          zIndex: layer.zIndex,
+          transform,
+          transformOrigin: layer.scaleOrigin,
+        }}
+      >
+        <Image
+          src={src}
+          alt=""
+          width={layer.widthPx}
+          height={layer.heightPx}
+          priority={layer.assetKey === 'layerRight'}
+          sizes={`${layer.widthPx}px`}
+          className="h-full w-full max-w-full object-contain mix-blend-screen"
+        />
+      </div>
+    );
+  }
+
+  const crop = layer.crop ?? DEFAULT_CROP;
+  const objectFit = layer.objectFit ?? 'cover';
+  const objectFitClass = objectFit === 'contain' ? 'object-contain' : 'object-cover';
+  const overflowClass =
+    layer.scale !== undefined && layer.scale > 1 ? 'overflow-visible' : 'overflow-hidden';
 
   return (
     <div
-      className="pointer-events-none absolute overflow-hidden"
+      className={`pointer-events-none absolute ${overflowClass}`}
       style={{
-        left: heroPctX(layer.leftPx),
+        left: heroPctX(layer.leftPx + (layer.offsetXPx ?? 0)),
         top: heroPctY(layer.topPx + (layer.offsetYPx ?? 0)),
         width: heroPctW(layer.widthPx),
         height: heroPctH(layer.heightPx),
@@ -69,7 +108,7 @@ export function HeroLayerImage({ layer }: HeroLayerImageProps) {
             fill
             priority={layer.assetKey === 'layerCenter'}
             sizes={`${layer.widthPx}px`}
-            className="object-cover mix-blend-screen"
+            className={`${objectFitClass} mix-blend-screen`}
           />
         </div>
       </div>
