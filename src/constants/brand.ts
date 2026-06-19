@@ -19,6 +19,19 @@ export const BRAND_ASSETS = {
 export const LOGO_WIDTH_PX = 78;
 export const LOGO_HEIGHT_PX = 89;
 
+/** Desktop navbar horizontal inset (Figma). */
+export const HEADER_PADDING_LEFT_PX = 87;
+export const HEADER_PADDING_RIGHT_PX = 93;
+
+/** Nav link typography (Montserrat arm). */
+export const HEADER_NAV_FONT_SIZE_PX = 17;
+export const HEADER_NAV_LINE_HEIGHT_PX = 26;
+export const HEADER_NAV_LETTER_SPACING_PX = -0.31;
+export const HEADER_NAV_LINK_GAP_PX = 24;
+
+/** Gap between right-side navbar pills (search / language / currency). */
+export const HEADER_ACTIONS_GAP_PX = 10;
+
 /** i18n keys under `common.navigation.*` */
 export type HeaderNavKey = 'home' | 'shop' | 'categories' | 'about' | 'partners' | 'contact';
 

@@ -2,8 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { HEADER_NAV_ITEMS, type HeaderNavKey, getHeaderNavTranslationKey } from '../../constants/brand';
+import {
+  HEADER_NAV_ITEMS,
+  HEADER_NAV_FONT_SIZE_PX,
+  HEADER_NAV_LETTER_SPACING_PX,
+  HEADER_NAV_LINE_HEIGHT_PX,
+  HEADER_NAV_LINK_GAP_PX,
+  type HeaderNavKey,
+  getHeaderNavTranslationKey,
+} from '../../constants/brand';
 import { useTranslation } from '../../lib/i18n-client';
+
+const navLinkTypographyStyle = {
+  fontSize: HEADER_NAV_FONT_SIZE_PX,
+  lineHeight: `${HEADER_NAV_LINE_HEIGHT_PX}px`,
+  letterSpacing: `${HEADER_NAV_LETTER_SPACING_PX}px`,
+} as const;
 
 function resolveNavActive(
   labelKey: HeaderNavKey,
@@ -30,7 +44,11 @@ export function HeaderNavLinks() {
   const hasCategoryFilter = Boolean(searchParams?.get('category'));
 
   return (
-    <nav aria-label={t('common.navigation.mainNavigation')} className="flex items-center gap-6">
+    <nav
+      aria-label={t('common.navigation.mainNavigation')}
+      className="flex items-center"
+      style={{ gap: HEADER_NAV_LINK_GAP_PX }}
+    >
       {HEADER_NAV_ITEMS.map(({ href, labelKey }) => {
         const active = resolveNavActive(labelKey, pathname, hasCategoryFilter);
 
@@ -38,11 +56,12 @@ export function HeaderNavLinks() {
           <Link
             key={labelKey}
             href={href}
-            className={`whitespace-nowrap text-base leading-6 tracking-[-0.31px] transition-colors ${
+            className={`relative inline-block whitespace-nowrap text-left transition-colors ${
               active
                 ? 'font-bold text-brand-pink'
                 : 'font-normal text-brand-brown hover:text-brand-pink'
             }`}
+            style={navLinkTypographyStyle}
           >
             {t(getHeaderNavTranslationKey(labelKey))}
           </Link>
