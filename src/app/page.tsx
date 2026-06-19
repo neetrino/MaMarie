@@ -1,3 +1,4 @@
+import { AboutUsSection } from '../components/home/AboutUsSection';
 import { BestProductsSection } from '../components/home/BestProductsSection';
 import { HeroSection } from '../components/home/HeroSection';
 import { SaleSection } from '../components/home/SaleSection';
@@ -10,6 +11,7 @@ export default function HomePage() {
       <BestProductsSection />
       <SaleSection />
       <WhyUsSection />
+      <AboutUsSection />
     </div>
   );
 }
