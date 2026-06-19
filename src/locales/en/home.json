@@ -3,6 +3,9 @@
     "ctaShopNow": "Shop now",
     "ctaNewCollection": "New collection"
   },
+  "bestProducts": {
+    "title": "Best products"
+  },
   "hero_title": "Welcome to Shop",
   "hero_subtitle": "Discover amazing products and exclusive offers. Shop the latest trends and find everything you need in one place.",
   "hero_button_products": "PRODUCTS",

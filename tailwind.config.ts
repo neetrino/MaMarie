@@ -22,6 +22,7 @@ const config: Config = {
           brown: '#57423b',
           muted: '#4b5563',
           'on-pink': '#f5f5f5',
+          sky: '#c2ddf9',
         },
       },
       fontFamily: {
