@@ -5,7 +5,7 @@ export const HEADER_HOME_SCROLL_THRESHOLD_PX = 12;
 export const HEADER_HOME_OVERLAY_TOP_PX = 0;
 
 /** Nudge homepage navbar up (negative px = higher on screen). */
-export const HEADER_HOME_OFFSET_Y_PX = -10;
+export const HEADER_HOME_OFFSET_Y_PX = -16;
 
 /** Vertical padding on desktop nav row (smaller = navbar sits higher). */
 export const HEADER_DESKTOP_ROW_PADDING_Y_PX = 0;

@@ -1,6 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import type { ComponentProps } from 'react';
+import { usePathname } from 'next/navigation';
+import type { ComponentProps, MouseEvent } from 'react';
 import {
   BRAND_ASSETS,
   LOGO_HEADER_HEIGHT_PX,
@@ -32,8 +35,24 @@ const LOGO_FOOTPRINT: Record<BrandLogoSize, { widthPx: number; heightPx: number 
   },
 };
 
-export function BrandLogoLink({ className = '', size = 'default', ...rest }: BrandLogoLinkProps) {
+export function BrandLogoLink({
+  className = '',
+  size = 'default',
+  onClick,
+  ...rest
+}: BrandLogoLinkProps) {
+  const pathname = usePathname() ?? '';
   const { widthPx, heightPx } = LOGO_FOOTPRINT[size];
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented || pathname !== '/') {
+      return;
+    }
+
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <Link
@@ -42,6 +61,7 @@ export function BrandLogoLink({ className = '', size = 'default', ...rest }: Bra
       aria-label="MAMARIE"
       className={`relative block shrink-0 ${className}`}
       style={{ width: widthPx, height: heightPx }}
+      onClick={handleClick}
       {...rest}
     >
       <Image
