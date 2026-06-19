@@ -1,0 +1,72 @@
+import {
+  HOME_SECTION_CHEVRON_SIZE_PX,
+  HOME_SECTION_CONTENT_MAX_WIDTH_PX,
+  HOME_SECTION_LINK_FONT_SIZE_PX,
+  HOME_SECTION_LINK_GAP_PX,
+  HOME_SECTION_LINK_LINE_HEIGHT_PX,
+  HOME_SECTION_MAX_WIDTH_PX,
+  HOME_SECTION_PADDING_LEFT_PX,
+  HOME_SECTION_PADDING_RIGHT_PX,
+} from './home-sections';
+
+/** Figma node `1:98` / heading `1:99` — «ԶԵՂՉ» sale section. */
+export const SALE_SECTION_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
+
+/** Figma: sale section follows featured section with no extra gap. */
+export const SALE_SECTION_OFFSET_TOP_PX = 0;
+
+export const SALE_SECTION_PADDING_LEFT_PX = HOME_SECTION_PADDING_LEFT_PX;
+export const SALE_SECTION_PADDING_RIGHT_PX = HOME_SECTION_PADDING_RIGHT_PX;
+export const SALE_HEADING_PADDING_Y_PX = 7;
+export const SALE_HEADING_MIN_HEIGHT_PX = 94;
+
+export const SALE_TITLE_FONT_SIZE_PX = 50;
+export const SALE_TITLE_LINE_HEIGHT_PX = 80;
+
+export const SALE_HEADING_COLOR = '#ef95aa';
+
+export const SALE_LINK_FONT_SIZE_PX = HOME_SECTION_LINK_FONT_SIZE_PX;
+export const SALE_LINK_LINE_HEIGHT_PX = HOME_SECTION_LINK_LINE_HEIGHT_PX;
+export const SALE_LINK_GAP_PX = HOME_SECTION_LINK_GAP_PX;
+export const SALE_CHEVRON_SIZE_PX = HOME_SECTION_CHEVRON_SIZE_PX;
+
+export const SALE_SECTION_ASSETS = {
+  chevronRight: '/assets/home/icon-chevron-right-pink.svg',
+  bannerDresses: '/assets/home/sale-banner-dresses.png',
+} as const;
+
+/** Figma node `1:105` — promo banner below sale heading. */
+export const SALE_BANNER_OFFSET_TOP_PX = 0;
+export const SALE_BANNER_HEIGHT_PX = 391;
+export const SALE_BANNER_MAX_WIDTH_PX = HOME_SECTION_CONTENT_MAX_WIDTH_PX;
+export const SALE_BANNER_RADIUS_PX = 30;
+export const SALE_BANNER_GRADIENT =
+  'linear-gradient(147.735deg, #ef95aa 16.061%, #f9e490 81.311%)';
+
+export const SALE_BANNER_CONTENT_LEFT_PX = 106;
+export const SALE_BANNER_CONTENT_TOP_PX = 64;
+export const SALE_BANNER_CONTENT_WIDTH_PX = 512;
+
+export const SALE_BANNER_TITLE_SIZE_PX = 56;
+export const SALE_BANNER_TITLE_LINE_HEIGHT_PX = 61;
+
+export const SALE_BANNER_SUBTITLE_SIZE_PX = 16;
+export const SALE_BANNER_SUBTITLE_LINE_HEIGHT_PX = 24;
+export const SALE_BANNER_SUBTITLE_MAX_WIDTH_PX = 375;
+export const SALE_BANNER_SUBTITLE_OFFSET_TOP_PX = 139;
+
+export const SALE_BANNER_CTA_OFFSET_TOP_PX = 203.19;
+export const SALE_BANNER_CTA_WIDTH_PX = 243;
+export const SALE_BANNER_CTA_HEIGHT_PX = 60;
+export const SALE_BANNER_CTA_TEXT_SIZE_PX = 18;
+export const SALE_BANNER_CTA_TEXT_LINE_HEIGHT_PX = 28;
+export const SALE_BANNER_CTA_TEXT_COLOR = '#ff7f50';
+export const SALE_BANNER_CTA_INSET_SHADOW =
+  'inset 0px -4px 8px 0px rgba(0,0,0,0.1), inset 0px 4px 4px 0px rgba(255,255,255,0.4), inset 0px 20px 40px 0px rgba(164,60,18,0.2)';
+
+export const SALE_BANNER_IMAGE_LEFT_PX = 446;
+export const SALE_BANNER_IMAGE_TOP_PX = -83;
+export const SALE_BANNER_IMAGE_WIDTH_PX = 1018;
+export const SALE_BANNER_IMAGE_HEIGHT_PX = 819;
+export const SALE_BANNER_IMAGE_CROP_HEIGHT_PERCENT = 124.3;
+export const SALE_BANNER_IMAGE_CROP_TOP_PERCENT = -6.53;

@@ -64,17 +64,16 @@ function HeaderNavRows() {
 function HomeHeaderContent({ showPill }: { showPill: boolean }) {
   return (
     <div className="relative w-full">
-      {showPill ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 animate-header-pill-in rounded-full bg-white shadow-[0_4px_24px_rgba(87,66,59,0.12)]"
-          style={{
-            left: HEADER_PILL_SHELL_PADDING_X_PX,
-            right: HEADER_PILL_SHELL_PADDING_X_PX,
-            animationDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
-          }}
-        />
-      ) : null}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 z-0 rounded-full bg-white shadow-[0_4px_24px_rgba(87,66,59,0.12)] transition-opacity ease-out"
+        style={{
+          left: HEADER_PILL_SHELL_PADDING_X_PX,
+          right: HEADER_PILL_SHELL_PADDING_X_PX,
+          opacity: showPill ? 1 : 0,
+          transitionDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
+        }}
+      />
 
       <div className="relative z-10">
         <HeaderNavRows />

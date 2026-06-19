@@ -16,7 +16,12 @@ export function useHomeHeaderScrolled(isHome: boolean): boolean {
     }
 
     const updateScrollState = () => {
-      setIsScrolled(window.scrollY > HEADER_HOME_SCROLL_THRESHOLD_PX);
+      const scrollTop =
+        window.scrollY ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+      setIsScrolled(scrollTop > HEADER_HOME_SCROLL_THRESHOLD_PX);
     };
 
     updateScrollState();

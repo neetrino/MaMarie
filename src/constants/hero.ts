@@ -1,6 +1,15 @@
+import { HOME_SECTION_CONTENT_MAX_WIDTH_PX } from './home-sections';
+
 /** Figma hero artboard — frame `9:590` (1440×853). */
 export const HERO_DESIGN_WIDTH_PX = 1440;
 export const HERO_DESIGN_HEIGHT_PX = 853;
+
+/** Hero canvas matches homepage content column (`HOME_SECTION_CONTENT_MAX_WIDTH_PX`). */
+export const HERO_CANVAS_MAX_WIDTH_PX = HOME_SECTION_CONTENT_MAX_WIDTH_PX;
+export const HERO_CANVAS_MAX_HEIGHT_PX = Math.round(
+  HERO_CANVAS_MAX_WIDTH_PX * (HERO_DESIGN_HEIGHT_PX / HERO_DESIGN_WIDTH_PX),
+);
+export const HERO_CANVAS_MIN_HEIGHT_PX = Math.round(520 * (HERO_CANVAS_MAX_WIDTH_PX / HERO_DESIGN_WIDTH_PX));
 
 /** Match navbar horizontal inset (header only — hero canvas is full 1440). */
 export const HERO_PADDING_LEFT_PX = 87;
@@ -9,16 +18,12 @@ export const HERO_PADDING_RIGHT_PX = 93;
 /** Nudge entire hero section down. */
 export const HERO_SECTION_OFFSET_Y_PX = 32;
 
-/** Scale entire hero artboard content (photos, text, CTAs, decorations). */
-export const HERO_CONTENT_SCALE = 0.91;
+/** @deprecated Use `HERO_CANVAS_MAX_WIDTH_PX` — kept for layer math compatibility. */
+export const HERO_CONTENT_SCALE = HERO_CANVAS_MAX_WIDTH_PX / HERO_DESIGN_WIDTH_PX;
 
-export const HERO_CONTENT_MAX_WIDTH_PX = Math.round(
-  HERO_DESIGN_WIDTH_PX * HERO_CONTENT_SCALE,
-);
-export const HERO_CONTENT_MAX_HEIGHT_PX = Math.round(
-  HERO_DESIGN_HEIGHT_PX * HERO_CONTENT_SCALE,
-);
-export const HERO_CONTENT_MIN_HEIGHT_PX = Math.round(520 * HERO_CONTENT_SCALE);
+export const HERO_CONTENT_MAX_WIDTH_PX = HERO_CANVAS_MAX_WIDTH_PX;
+export const HERO_CONTENT_MAX_HEIGHT_PX = HERO_CANVAS_MAX_HEIGHT_PX;
+export const HERO_CONTENT_MIN_HEIGHT_PX = HERO_CANVAS_MIN_HEIGHT_PX;
 
 export const HERO_ASSETS = {
   shapeTextArc: '/assets/hero/shape-text-arc.png',

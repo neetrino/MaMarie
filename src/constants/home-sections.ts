@@ -1,5 +1,30 @@
 /** Figma MAMARIE-DEV node `1:65` — «Best products» section heading. */
-export const BEST_PRODUCTS_SECTION_MAX_WIDTH_PX = 1440;
+export const HOME_SECTION_MAX_WIDTH_PX = 1440;
+export const BEST_PRODUCTS_SECTION_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
+
+/** Shared homepage content width — sale banner reference (`1:105`). */
+export const HOME_SECTION_CONTENT_MAX_WIDTH_PX = 1354;
+export const HOME_SECTION_PADDING_LEFT_PX = 43;
+export const HOME_SECTION_PADDING_RIGHT_PX = 26;
+
+export function homeSectionColumnWidthPx(
+  columnCount: number,
+  gapPx: number,
+  contentWidthPx: number = HOME_SECTION_CONTENT_MAX_WIDTH_PX,
+): number {
+  return (contentWidthPx - (columnCount - 1) * gapPx) / columnCount;
+}
+
+export const HOME_SECTION_TITLE_FONT_SIZE_PX = 50;
+export const HOME_SECTION_LINK_FONT_SIZE_PX = 16;
+export const HOME_SECTION_LINK_LINE_HEIGHT_PX = 24;
+export const HOME_SECTION_LINK_GAP_PX = 10;
+export const HOME_SECTION_CHEVRON_SIZE_PX = 16;
+
+/** Shared section heading row — aligns «See all» across homepage blocks. */
+export const HOME_SECTION_HEADING_PADDING_Y_PX = 7;
+export const HOME_SECTION_HEADING_MIN_HEIGHT_PX = 94;
+export const HOME_SECTION_HEADING_TITLE_LINE_HEIGHT_PX = 80;
 
 /** Space below hero before section heading. */
 export const BEST_PRODUCTS_SECTION_OFFSET_TOP_PX = 24;
@@ -9,25 +34,39 @@ export const BEST_PRODUCTS_GRID_OFFSET_TOP_PX = 75;
 export const BEST_PRODUCTS_CARD_GAP_PX = 8;
 export const BEST_PRODUCTS_CARD_COUNT = 4;
 
-/** Figma node `1:73` — product card. */
-export const HOME_PRODUCT_CARD_WIDTH_PX = 344;
-export const HOME_PRODUCT_CARD_HEIGHT_PX = 352;
-export const HOME_PRODUCT_CARD_RADIUS_PX = 30;
+/** Figma node `1:73` — product card (scaled to fit content row). */
+export const HOME_PRODUCT_CARD_DESIGN_WIDTH_PX = 344;
+export const HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX = 352;
+export const HOME_PRODUCT_CARD_WIDTH_PX = homeSectionColumnWidthPx(
+  BEST_PRODUCTS_CARD_COUNT,
+  BEST_PRODUCTS_CARD_GAP_PX,
+);
+export const HOME_PRODUCT_CARD_HEIGHT_PX = Math.round(
+  HOME_PRODUCT_CARD_WIDTH_PX * (HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX / HOME_PRODUCT_CARD_DESIGN_WIDTH_PX),
+);
+export const HOME_PRODUCT_CARD_LAYOUT_SCALE =
+  HOME_PRODUCT_CARD_WIDTH_PX / HOME_PRODUCT_CARD_DESIGN_WIDTH_PX;
+
+function scaleProductCardPx(value: number): number {
+  return value * HOME_PRODUCT_CARD_LAYOUT_SCALE;
+}
+
+export const HOME_PRODUCT_CARD_RADIUS_PX = scaleProductCardPx(30);
 export const HOME_PRODUCT_CARD_BG = '#f9e490';
 
-export const HOME_PRODUCT_CARD_IMAGE_LEFT_PX = 8;
-export const HOME_PRODUCT_CARD_IMAGE_TOP_PX = -46;
-export const HOME_PRODUCT_CARD_IMAGE_WIDTH_PX = 334;
-export const HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX = 268;
+export const HOME_PRODUCT_CARD_IMAGE_LEFT_PX = scaleProductCardPx(8);
+export const HOME_PRODUCT_CARD_IMAGE_TOP_PX = scaleProductCardPx(-46);
+export const HOME_PRODUCT_CARD_IMAGE_WIDTH_PX = scaleProductCardPx(334);
+export const HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX = scaleProductCardPx(268);
 
-export const HOME_PRODUCT_CARD_PANEL_WIDTH_PX = 330;
-export const HOME_PRODUCT_CARD_PANEL_HEIGHT_PX = 130;
-export const HOME_PRODUCT_CARD_PANEL_TOP_PX = 215;
-export const HOME_PRODUCT_CARD_PANEL_RADIUS_PX = 25;
+export const HOME_PRODUCT_CARD_PANEL_WIDTH_PX = scaleProductCardPx(330);
+export const HOME_PRODUCT_CARD_PANEL_HEIGHT_PX = scaleProductCardPx(130);
+export const HOME_PRODUCT_CARD_PANEL_TOP_PX = scaleProductCardPx(215);
+export const HOME_PRODUCT_CARD_PANEL_RADIUS_PX = scaleProductCardPx(25);
 
-export const HOME_PRODUCT_CARD_HEART_SIZE_PX = 34;
-export const HOME_PRODUCT_CARD_HEART_TOP_PX = 17;
-export const HOME_PRODUCT_CARD_HEART_RIGHT_PX = 15;
+export const HOME_PRODUCT_CARD_HEART_SIZE_PX = scaleProductCardPx(34);
+export const HOME_PRODUCT_CARD_HEART_TOP_PX = scaleProductCardPx(17);
+export const HOME_PRODUCT_CARD_HEART_RIGHT_PX = scaleProductCardPx(15);
 
 export const HOME_PRODUCT_CARD_TITLE_SIZE_PX = 18;
 export const HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX = 16;
@@ -56,19 +95,19 @@ export const BEST_PRODUCTS_PLACEHOLDER_SUBTITLE = 'Բաճկոն';
 export const BEST_PRODUCTS_PLACEHOLDER_PRICE_AMD = 14000;
 export const BEST_PRODUCTS_PLACEHOLDER_COMPARE_PRICE_AMD = 22000;
 
-export const BEST_PRODUCTS_SECTION_PADDING_LEFT_PX = 19;
-export const BEST_PRODUCTS_SECTION_PADDING_RIGHT_PX = 26;
-export const BEST_PRODUCTS_HEADING_PADDING_Y_PX = 7;
-export const BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX = 64;
+export const BEST_PRODUCTS_SECTION_PADDING_LEFT_PX = HOME_SECTION_PADDING_LEFT_PX;
+export const BEST_PRODUCTS_SECTION_PADDING_RIGHT_PX = HOME_SECTION_PADDING_RIGHT_PX;
+export const BEST_PRODUCTS_HEADING_PADDING_Y_PX = HOME_SECTION_HEADING_PADDING_Y_PX;
+export const BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX = HOME_SECTION_HEADING_MIN_HEIGHT_PX;
 
-export const BEST_PRODUCTS_TITLE_FONT_SIZE_PX = 50;
-export const BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX = 50;
+export const BEST_PRODUCTS_TITLE_FONT_SIZE_PX = HOME_SECTION_TITLE_FONT_SIZE_PX;
+export const BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX = HOME_SECTION_HEADING_TITLE_LINE_HEIGHT_PX;
 
-export const BEST_PRODUCTS_LINK_FONT_SIZE_PX = 16;
-export const BEST_PRODUCTS_LINK_LINE_HEIGHT_PX = 24;
-export const BEST_PRODUCTS_LINK_GAP_PX = 10;
+export const BEST_PRODUCTS_LINK_FONT_SIZE_PX = HOME_SECTION_LINK_FONT_SIZE_PX;
+export const BEST_PRODUCTS_LINK_LINE_HEIGHT_PX = HOME_SECTION_LINK_LINE_HEIGHT_PX;
+export const BEST_PRODUCTS_LINK_GAP_PX = HOME_SECTION_LINK_GAP_PX;
 
-export const BEST_PRODUCTS_CHEVRON_SIZE_PX = 16;
+export const BEST_PRODUCTS_CHEVRON_SIZE_PX = HOME_SECTION_CHEVRON_SIZE_PX;
 
 export const BEST_PRODUCTS_HEADING_COLOR = '#c2ddf9';
 

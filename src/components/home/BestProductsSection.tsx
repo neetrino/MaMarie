@@ -2,14 +2,14 @@ import { unstable_cache } from 'next/cache';
 import { DEFAULT_LANGUAGE } from '../../lib/language';
 import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
-import { BEST_PRODUCTS_CARD_COUNT } from '../../constants/home-sections';
-import { BestProductsHeading } from './BestProductsHeading';
-import { BestProductsGrid } from './BestProductsGrid';
+import { BEST_PRODUCTS_CARD_COUNT, BEST_PRODUCTS_SECTION_OFFSET_TOP_PX } from '../../constants/home-sections';
+import { BestProductsBlock } from './BestProductsBlock';
 import {
   fillBestProductsRow,
   getBestProductsFallbackList,
   mapToHomeProductCard,
 } from './best-products-data';
+import { HomePageSection } from './HomeSectionShell';
 
 const BEST_PRODUCTS_REVALIDATE_SECONDS = 600;
 
@@ -37,9 +37,8 @@ export async function BestProductsSection() {
   const products = fillBestProductsRow(await getBestProductsCached(DEFAULT_LANGUAGE));
 
   return (
-    <>
-      <BestProductsHeading />
-      <BestProductsGrid products={products} />
-    </>
+    <HomePageSection offsetTopPx={BEST_PRODUCTS_SECTION_OFFSET_TOP_PX}>
+      <BestProductsBlock products={products} />
+    </HomePageSection>
   );
 }

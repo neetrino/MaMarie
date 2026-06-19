@@ -6,6 +6,45 @@
   "bestProducts": {
     "title": "Best products"
   },
+  "sale": {
+    "title": "SALE",
+    "banner": {
+      "title": "Get 20% Off Your First Order",
+      "subtitle": "Join the Mamarie family and dress your little ones in premium style with our welcome discount.",
+      "cta": "Claim My Discount"
+    }
+  },
+  "whyUs": {
+    "title": "WHY US",
+    "card1": {
+      "titleLine1": "Soft",
+      "titleLine2": "and safe",
+      "descLine1": "Free express delivery",
+      "descLine2": "on all orders over $150",
+      "descLine3": "for your little ones."
+    },
+    "card2": {
+      "titleLine1": "Soft",
+      "titleLine2": "and safe",
+      "descLine1": "Free express delivery",
+      "descLine2": "on all orders over $150",
+      "descLine3": "for your little ones."
+    },
+    "card3": {
+      "titleLine1": "Soft",
+      "titleLine2": "and safe",
+      "descLine1": "Free express delivery",
+      "descLine2": "on all orders over $150",
+      "descLine3": "for your little ones."
+    },
+    "card4": {
+      "titleLine1": "Soft",
+      "titleLine2": "and safe",
+      "descLine1": "Free express delivery",
+      "descLine2": "on all orders over $150",
+      "descLine3": "for your little ones."
+    }
+  },
   "hero_title": "Welcome to Shop",
   "hero_subtitle": "Discover amazing products and exclusive offers. Shop the latest trends and find everything you need in one place.",
   "hero_button_products": "PRODUCTS",
