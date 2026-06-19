@@ -1,8 +1,12 @@
 import {
+  HERO_CONTENT_MAX_HEIGHT_PX,
+  HERO_CONTENT_MAX_WIDTH_PX,
+  HERO_CONTENT_MIN_HEIGHT_PX,
   HERO_CTA_PLACEMENT,
   HERO_DESIGN_HEIGHT_PX,
   HERO_DESIGN_WIDTH_PX,
   HERO_PHOTO_LAYERS,
+  HERO_SECTION_OFFSET_Y_PX,
   heroPctX,
   heroPctY,
 } from '../../constants/hero';
@@ -16,14 +20,19 @@ import { HeroLayerImage } from './HeroLayerImage';
  */
 export function HeroSection() {
   return (
-    <section aria-label="Hero" className="w-full bg-white">
+    <section
+      aria-label="Hero"
+      className="w-full bg-white"
+      style={{ paddingTop: HERO_SECTION_OFFSET_Y_PX }}
+    >
       <div className="mx-auto w-full max-w-[1440px]">
         <div
           className="relative mx-auto w-full overflow-hidden [container-type:size]"
           style={{
             aspectRatio: `${HERO_DESIGN_WIDTH_PX} / ${HERO_DESIGN_HEIGHT_PX}`,
-            maxHeight: HERO_DESIGN_HEIGHT_PX,
-            minHeight: 520,
+            maxWidth: HERO_CONTENT_MAX_WIDTH_PX,
+            maxHeight: HERO_CONTENT_MAX_HEIGHT_PX,
+            minHeight: HERO_CONTENT_MIN_HEIGHT_PX,
           }}
         >
           {HERO_PHOTO_LAYERS.map((layer) => (

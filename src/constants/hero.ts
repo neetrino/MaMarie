@@ -6,6 +6,20 @@ export const HERO_DESIGN_HEIGHT_PX = 853;
 export const HERO_PADDING_LEFT_PX = 87;
 export const HERO_PADDING_RIGHT_PX = 93;
 
+/** Nudge entire hero section down. */
+export const HERO_SECTION_OFFSET_Y_PX = 32;
+
+/** Scale entire hero artboard content (photos, text, CTAs, decorations). */
+export const HERO_CONTENT_SCALE = 0.91;
+
+export const HERO_CONTENT_MAX_WIDTH_PX = Math.round(
+  HERO_DESIGN_WIDTH_PX * HERO_CONTENT_SCALE,
+);
+export const HERO_CONTENT_MAX_HEIGHT_PX = Math.round(
+  HERO_DESIGN_HEIGHT_PX * HERO_CONTENT_SCALE,
+);
+export const HERO_CONTENT_MIN_HEIGHT_PX = Math.round(520 * HERO_CONTENT_SCALE);
+
 export const HERO_ASSETS = {
   shapeTextArc: '/assets/hero/shape-text-arc.png',
   layerLeft: '/assets/hero/hero-layer-left.png',
@@ -122,6 +136,12 @@ export const HERO_MELODY_ROTATE_DEG = 50;
 /** Nudge melody notes up. */
 export const HERO_MELODY_OFFSET_Y_PX = -24;
 
+/** Back-layer clay icons — behind photo collage. */
+export const HERO_DECORATION_BACK_Z_INDEX = 5;
+
+/** Front-layer clay icons — above photos. */
+export const HERO_DECORATION_FRONT_Z_INDEX = 60;
+
 /** Clay decorations — Figma `camera51`, `camera91`, `camera101`. */
 export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
   {
@@ -132,7 +152,7 @@ export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
     widthPx: HERO_STAR_SIZE_PX,
     heightPx: HERO_STAR_SIZE_PX,
     rotateDeg: HERO_STAR_ROTATE_DEG,
-    zIndex: 5,
+    zIndex: HERO_DECORATION_BACK_Z_INDEX,
   },
   {
     /** Melody notes — Figma `camera91` slot. */
@@ -142,7 +162,7 @@ export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
     widthPx: 173.8,
     heightPx: 173.8,
     rotateDeg: HERO_MELODY_ROTATE_DEG,
-    zIndex: 55,
+    zIndex: HERO_DECORATION_BACK_Z_INDEX,
   },
   {
     /** Bunny — Figma `camera101` slot. */
@@ -151,7 +171,7 @@ export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
     topPx: 237 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2,
     widthPx: HERO_BUNNY_SIZE_PX,
     heightPx: HERO_BUNNY_SIZE_PX,
-    zIndex: 60,
+    zIndex: HERO_DECORATION_FRONT_Z_INDEX,
   },
 ];
 

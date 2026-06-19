@@ -1,7 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ComponentProps } from 'react';
-import { BRAND_ASSETS, LOGO_HEIGHT_PX, LOGO_WIDTH_PX } from '../constants/brand';
+import {
+  BRAND_ASSETS,
+  LOGO_HEIGHT_PX,
+  LOGO_HEADER_HEIGHT_PX,
+  LOGO_HEADER_WIDTH_PX,
+  LOGO_WIDTH_PX,
+  logoWidthForHeight,
+} from '../constants/brand';
 
 export type BrandLogoSize = 'default' | 'mobile' | 'compact';
 
@@ -10,20 +17,30 @@ export type BrandLogoLinkProps = Omit<ComponentProps<typeof Link>, 'href' | 'chi
   size?: BrandLogoSize;
 };
 
-const SIZE_CLASS: Record<BrandLogoSize, string> = {
-  default: 'h-[89px] w-[78px]',
-  mobile: 'h-14 w-[62px]',
-  compact: 'h-9 w-9',
+const LOGO_MOBILE_HEIGHT_PX = 56;
+const LOGO_COMPACT_HEIGHT_PX = 36;
+
+const LOGO_FOOTPRINT: Record<BrandLogoSize, { widthPx: number; heightPx: number }> = {
+  default: { widthPx: LOGO_HEADER_WIDTH_PX, heightPx: LOGO_HEADER_HEIGHT_PX },
+  mobile: {
+    widthPx: logoWidthForHeight(LOGO_MOBILE_HEIGHT_PX),
+    heightPx: LOGO_MOBILE_HEIGHT_PX,
+  },
+  compact: {
+    widthPx: logoWidthForHeight(LOGO_COMPACT_HEIGHT_PX),
+    heightPx: LOGO_COMPACT_HEIGHT_PX,
+  },
 };
 
 export function BrandLogoLink({ className = '', size = 'default', ...rest }: BrandLogoLinkProps) {
-  const sizeClass = SIZE_CLASS[size];
+  const { widthPx, heightPx } = LOGO_FOOTPRINT[size];
 
   return (
     <Link
       href="/"
       title="MAMARIE"
-      className={`relative flex flex-shrink-0 items-center overflow-hidden ${sizeClass} ${className}`}
+      className={`relative block flex-shrink-0 ${className}`}
+      style={{ width: widthPx, height: heightPx }}
       {...rest}
     >
       <Image
@@ -31,8 +48,8 @@ export function BrandLogoLink({ className = '', size = 'default', ...rest }: Bra
         alt="MAMARIE"
         width={LOGO_WIDTH_PX}
         height={LOGO_HEIGHT_PX}
-        className="absolute left-0 top-0 h-full w-[198%] max-w-none object-left"
         priority={size === 'default'}
+        className="h-full w-full object-contain object-left"
       />
     </Link>
   );

@@ -16,8 +16,23 @@ export const BRAND_ASSETS = {
   iconChevron: '/assets/brand/icon-chevron.svg',
 } as const;
 
-export const LOGO_WIDTH_PX = 78;
-export const LOGO_HEIGHT_PX = 89;
+/** Source logo dimensions (`logo.png`). */
+export const LOGO_SOURCE_WIDTH_PX = 666;
+export const LOGO_SOURCE_HEIGHT_PX = 375;
+
+/** Intrinsic dimensions for Next.js `Image`. */
+export const LOGO_WIDTH_PX = LOGO_SOURCE_WIDTH_PX;
+export const LOGO_HEIGHT_PX = LOGO_SOURCE_HEIGHT_PX;
+
+/** Navbar logo display height (Figma header). */
+export const LOGO_HEADER_HEIGHT_PX = 76;
+
+/** Width for a given logo display height, preserving aspect ratio. */
+export function logoWidthForHeight(heightPx: number): number {
+  return Math.round((heightPx * LOGO_SOURCE_WIDTH_PX) / LOGO_SOURCE_HEIGHT_PX);
+}
+
+export const LOGO_HEADER_WIDTH_PX = logoWidthForHeight(LOGO_HEADER_HEIGHT_PX);
 
 /** Desktop navbar horizontal inset (Figma). */
 export const HEADER_PADDING_LEFT_PX = 87;
