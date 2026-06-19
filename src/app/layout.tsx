@@ -1,17 +1,21 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { ConditionalHeader } from '../components/ConditionalHeader';
 import { ConditionalFooter } from '../components/ConditionalFooter';
 import { MobileBottomNav } from '../components/MobileBottomNav';
 
-const inter = Inter({ subsets: ['latin'] });
+const montserrat = Montserrat({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '700'],
+  variable: '--font-montserrat',
+});
 
 export const metadata: Metadata = {
-  title: 'Shop - Professional E-commerce',
-  description: 'Modern e-commerce platform',
+  title: 'MAMARIE',
+  description: 'MAMARIE — handmade clay art & gifts',
 };
 
 export default function RootLayout({
@@ -21,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-full`}>
+      <body className={`${montserrat.variable} font-sans bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>
             <div className="flex min-h-screen flex-col pb-16 lg:pb-0">

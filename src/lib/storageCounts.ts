@@ -58,3 +58,41 @@ export function getCompareCount(): number {
   return getStoredArrayLength(COMPARE_KEY);
 }
 
+interface GuestCartLine {
+  quantity?: number;
+}
+
+interface GuestCartPayload {
+  items?: GuestCartLine[];
+  itemsCount?: number;
+}
+
+/**
+ * Retrieves cart item quantity total from localStorage (guest cart).
+ */
+export function getCartCount(): number {
+  if (typeof window === 'undefined') return 0;
+  try {
+    const stored = window.localStorage.getItem(CART_KEY);
+    if (!stored) return 0;
+
+    const parsed: GuestCartLine[] | GuestCartPayload = JSON.parse(stored);
+
+    if (Array.isArray(parsed)) {
+      return parsed.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+    }
+
+    if (typeof parsed.itemsCount === 'number') {
+      return parsed.itemsCount;
+    }
+
+    if (Array.isArray(parsed.items)) {
+      return parsed.items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+    }
+
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+

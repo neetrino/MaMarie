@@ -1,34 +1,39 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { ComponentProps } from 'react';
+import { BRAND_ASSETS, LOGO_HEIGHT_PX, LOGO_WIDTH_PX } from '../constants/brand';
+
+export type BrandLogoSize = 'default' | 'mobile' | 'compact';
 
 export type BrandLogoLinkProps = Omit<ComponentProps<typeof Link>, 'href' | 'children'> & {
-  /** Icon-sized mark for narrow sidebars (e.g. admin rail). */
-  compact?: boolean;
+  /** Logo footprint — default matches Figma header, mobile for small screens, compact for admin rail. */
+  size?: BrandLogoSize;
 };
 
-export function BrandLogoLink({ className = '', compact = false, ...rest }: BrandLogoLinkProps) {
-  if (compact) {
-    return (
-      <Link
-        href="/"
-        title="White-Shop"
-        className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-gray-900 text-[0.65rem] font-bold leading-none tracking-tight text-white transition-colors hover:bg-gray-800 ${className}`}
-        {...rest}
-      >
-        WS
-      </Link>
-    );
-  }
+const SIZE_CLASS: Record<BrandLogoSize, string> = {
+  default: 'h-[89px] w-[78px]',
+  mobile: 'h-14 w-[62px]',
+  compact: 'h-9 w-9',
+};
+
+export function BrandLogoLink({ className = '', size = 'default', ...rest }: BrandLogoLinkProps) {
+  const sizeClass = SIZE_CLASS[size];
 
   return (
     <Link
       href="/"
-      className={`group flex flex-shrink-0 items-center ${className}`}
+      title="MAMARIE"
+      className={`relative flex flex-shrink-0 items-center overflow-hidden ${sizeClass} ${className}`}
       {...rest}
     >
-      <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 group-hover:from-gray-800 group-hover:to-gray-600 sm:text-2xl">
-        White-Shop
-      </span>
+      <Image
+        src={BRAND_ASSETS.logo}
+        alt="MAMARIE"
+        width={LOGO_WIDTH_PX}
+        height={LOGO_HEIGHT_PX}
+        className="absolute left-0 top-0 h-full w-[198%] max-w-none object-left"
+        priority={size === 'default'}
+      />
     </Link>
   );
 }
