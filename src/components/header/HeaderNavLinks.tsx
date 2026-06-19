@@ -2,39 +2,41 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { HEADER_NAV_ITEMS } from '../../constants/brand';
+import { HEADER_NAV_ITEMS, type HeaderNavKey, getHeaderNavTranslationKey } from '../../constants/brand';
+import { useTranslation } from '../../lib/i18n-client';
 
 function resolveNavActive(
-  label: string,
+  labelKey: HeaderNavKey,
   pathname: string,
   hasCategoryFilter: boolean,
 ): boolean {
-  if (label === 'Գլխավոր') return pathname === '/';
-  if (label === 'Խանութ') {
+  if (labelKey === 'home') return pathname === '/';
+  if (labelKey === 'shop') {
     return pathname.startsWith('/products') && !hasCategoryFilter;
   }
-  if (label === 'Կատեգորիաներ') {
+  if (labelKey === 'categories') {
     return pathname.startsWith('/products') && hasCategoryFilter;
   }
-  if (label === 'Մեր Մասին') return pathname.startsWith('/about');
-  if (label === 'Գործընկերներ') return pathname.startsWith('/about');
-  if (label === 'Կապ') return pathname.startsWith('/contact');
+  if (labelKey === 'about') return pathname.startsWith('/about');
+  if (labelKey === 'partners') return pathname.startsWith('/about');
+  if (labelKey === 'contact') return pathname.startsWith('/contact');
   return false;
 }
 
 export function HeaderNavLinks() {
   const pathname = usePathname() ?? '';
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const hasCategoryFilter = Boolean(searchParams?.get('category'));
 
   return (
-    <nav aria-label="Main navigation" className="flex items-center gap-6">
-      {HEADER_NAV_ITEMS.map(({ href, label }) => {
-        const active = resolveNavActive(label, pathname, hasCategoryFilter);
+    <nav aria-label={t('common.navigation.mainNavigation')} className="flex items-center gap-6">
+      {HEADER_NAV_ITEMS.map(({ href, labelKey }) => {
+        const active = resolveNavActive(labelKey, pathname, hasCategoryFilter);
 
         return (
           <Link
-            key={label}
+            key={labelKey}
             href={href}
             className={`whitespace-nowrap text-base leading-6 tracking-[-0.31px] transition-colors ${
               active
@@ -42,7 +44,7 @@ export function HeaderNavLinks() {
                 : 'font-normal text-brand-brown hover:text-brand-pink'
             }`}
           >
-            {label}
+            {t(getHeaderNavTranslationKey(labelKey))}
           </Link>
         );
       })}

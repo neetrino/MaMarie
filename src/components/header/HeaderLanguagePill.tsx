@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { getStoredLanguage, setStoredLanguage, type LanguageCode } from '../../lib/language';
+import {
+  DEFAULT_LANGUAGE,
+  setStoredLanguage,
+  type LanguageCode,
+} from '../../lib/language';
+import { useTranslation } from '../../lib/i18n-client';
 
 const HEADER_LANGUAGES: ReadonlyArray<{ code: LanguageCode; label: string }> = [
   { code: 'en', label: 'EN' },
@@ -12,29 +17,36 @@ const HEADER_LANGUAGES: ReadonlyArray<{ code: LanguageCode; label: string }> = [
 /** Matches currency chevron / dropdown animation timing. */
 const LANGUAGE_SLIDE_ANIMATION_MS = 300;
 
+/** AM tab index — used when stored language is not shown in the header switcher. */
+const ARMENIAN_TAB_INDEX = HEADER_LANGUAGES.findIndex(({ code }) => code === DEFAULT_LANGUAGE);
+
+function resolveHeaderLanguageTabIndex(lang: LanguageCode): number {
+  const index = HEADER_LANGUAGES.findIndex(({ code }) => code === lang);
+  return index >= 0 ? index : ARMENIAN_TAB_INDEX;
+}
+
 export function HeaderLanguagePill() {
-  const [currentLang, setCurrentLang] = useState<LanguageCode>(getStoredLanguage());
+  const { t, lang } = useTranslation();
+  const [slideAnimationEnabled, setSlideAnimationEnabled] = useState(false);
 
   const activeIndex = useMemo(
-    () => HEADER_LANGUAGES.findIndex(({ code }) => code === currentLang),
-    [currentLang],
+    () => resolveHeaderLanguageTabIndex(lang),
+    [lang],
   );
 
+  // Enable slider animation only after hydration + localStorage sync (avoids mismatch jump).
   useEffect(() => {
-    const handleLanguageUpdate = () => {
-      setCurrentLang(getStoredLanguage());
-    };
-
-    window.addEventListener('language-updated', handleLanguageUpdate);
+    const frameId = requestAnimationFrame(() => {
+      setSlideAnimationEnabled(true);
+    });
     return () => {
-      window.removeEventListener('language-updated', handleLanguageUpdate);
+      cancelAnimationFrame(frameId);
     };
   }, []);
 
   const handleLanguageChange = (langCode: LanguageCode) => {
-    if (langCode === currentLang) return;
+    if (langCode === lang) return;
 
-    setCurrentLang(langCode);
     setStoredLanguage(langCode, { skipReload: true });
 
     window.setTimeout(() => {
@@ -46,32 +58,35 @@ export function HeaderLanguagePill() {
     <div
       className="relative grid h-[41px] grid-cols-3 items-center rounded-[22px] bg-brand-yellow p-1"
       role="group"
-      aria-label="Language"
+      aria-label={t('common.navigation.language')}
     >
       <span
         aria-hidden
-        className="absolute bottom-1 top-1 left-1 rounded-[18px] bg-brand-pink transition-transform ease-in-out"
+        className="absolute bottom-1 top-1 left-1 rounded-[18px] bg-brand-pink ease-in-out"
         style={{
           width: 'calc((100% - 8px) / 3)',
           transform: `translateX(calc(${activeIndex} * 100%))`,
-          transitionDuration: `${LANGUAGE_SLIDE_ANIMATION_MS}ms`,
+          transitionProperty: 'transform',
+          transitionDuration: slideAnimationEnabled ? `${LANGUAGE_SLIDE_ANIMATION_MS}ms` : '0ms',
         }}
       />
 
       {HEADER_LANGUAGES.map(({ code, label }) => {
-        const isActive = code === currentLang;
+        const isActive = code === lang;
 
         return (
           <button
             key={code}
             type="button"
             onClick={() => handleLanguageChange(code)}
-            className={`relative z-10 min-w-[34px] rounded-[18px] px-2.5 py-1.5 text-sm font-medium leading-[15px] transition-colors duration-300 ${
+            className={`relative z-10 min-w-[34px] rounded-[18px] px-2.5 py-1.5 text-sm font-medium leading-[15px] transition-colors ${
               isActive ? 'text-brand-on-pink' : 'text-brand-muted hover:text-brand-brown'
             }`}
-            style={{ transitionDuration: `${LANGUAGE_SLIDE_ANIMATION_MS}ms` }}
+            style={{
+              transitionDuration: slideAnimationEnabled ? `${LANGUAGE_SLIDE_ANIMATION_MS}ms` : '0ms',
+            }}
             aria-pressed={isActive}
-            aria-label={`Switch to ${label}`}
+            aria-label={`${t('common.navigation.language')}: ${label}`}
           >
             {label}
           </button>

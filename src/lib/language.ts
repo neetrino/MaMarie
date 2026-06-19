@@ -10,8 +10,11 @@ export type LanguageCode = keyof typeof LANGUAGES;
 
 const LANGUAGE_STORAGE_KEY = 'shop_language';
 
+/** MAMARIE default storefront language. */
+export const DEFAULT_LANGUAGE: LanguageCode = 'hy';
+
 export function getStoredLanguage(): LanguageCode {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return DEFAULT_LANGUAGE;
   try {
     const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (stored && stored in LANGUAGES) {
@@ -20,7 +23,7 @@ export function getStoredLanguage(): LanguageCode {
   } catch {
     // Ignore errors
   }
-  return 'en';
+  return DEFAULT_LANGUAGE;
 }
 
 export function setStoredLanguage(language: LanguageCode, options?: { skipReload?: boolean }): void {

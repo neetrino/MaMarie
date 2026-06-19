@@ -19,17 +19,25 @@ export const BRAND_ASSETS = {
 export const LOGO_WIDTH_PX = 78;
 export const LOGO_HEIGHT_PX = 89;
 
+/** i18n keys under `common.navigation.*` */
+export type HeaderNavKey = 'home' | 'shop' | 'categories' | 'about' | 'partners' | 'contact';
+
 export interface HeaderNavItem {
   href: string;
-  label: string;
+  labelKey: HeaderNavKey;
 }
 
-/** Primary desktop navbar links (Armenian labels from Figma). */
+/** Primary desktop navbar links — labels come from locale files. */
 export const HEADER_NAV_ITEMS: HeaderNavItem[] = [
-  { href: '/', label: 'Գլխավոր' },
-  { href: '/products', label: 'Խանութ' },
-  { href: '/products', label: 'Կատեգորիաներ' },
-  { href: '/about', label: 'Մեր Մասին' },
-  { href: '/about', label: 'Գործընկերներ' },
-  { href: '/contact', label: 'Կապ' },
+  { href: '/', labelKey: 'home' },
+  { href: '/products', labelKey: 'shop' },
+  { href: '/products', labelKey: 'categories' },
+  { href: '/about', labelKey: 'about' },
+  { href: '/about', labelKey: 'partners' },
+  { href: '/contact', labelKey: 'contact' },
 ];
+
+/** Maps nav item to translation path in common.json */
+export function getHeaderNavTranslationKey(labelKey: HeaderNavKey): string {
+  return `common.navigation.${labelKey}`;
+}
