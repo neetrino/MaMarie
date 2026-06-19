@@ -77,7 +77,7 @@ export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
     topPx: 157,
     widthPx: HERO_KID_PHOTO_WIDTH_PX,
     heightPx: HERO_KID_PHOTO_HEIGHT_PX,
-    zIndex: 20,
+    zIndex: 2,
   },
   {
     /** Figma `chatgptImageJun102026At` — boy (68:2328), matched visually to girl. */
@@ -86,7 +86,7 @@ export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
     topPx: 204,
     widthPx: HERO_KID_PHOTO_WIDTH_PX,
     heightPx: HERO_KID_PHOTO_HEIGHT_PX,
-    zIndex: 30,
+    zIndex: 3,
     offsetXPx: HERO_LAYER_RIGHT_OFFSET_X_PX,
     offsetYPx: HERO_LAYER_RIGHT_OFFSET_Y_PX,
     flip: true,
@@ -106,7 +106,7 @@ export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
     topPx: 249,
     widthPx: 721,
     heightPx: 655,
-    zIndex: 50,
+    zIndex: 5,
   },
 ];
 
@@ -136,11 +136,14 @@ export const HERO_MELODY_ROTATE_DEG = 50;
 /** Nudge melody notes up. */
 export const HERO_MELODY_OFFSET_Y_PX = -24;
 
-/** Back-layer clay icons — behind photo collage. */
-export const HERO_DECORATION_BACK_Z_INDEX = 5;
+/** Hero section sits below fixed header (z-50) and must not paint over page content. */
+export const HERO_SECTION_Z_INDEX = 0;
 
-/** Front-layer clay icons — above photos. */
-export const HERO_DECORATION_FRONT_Z_INDEX = 60;
+/** Local paint order inside hero canvas only (never use global values like 50+). */
+export const HERO_DECORATION_BACK_Z_INDEX = 1;
+export const HERO_DECORATION_FRONT_Z_INDEX = 6;
+export const HERO_ARC_Z_INDEX = 4;
+export const HERO_CTA_Z_INDEX = 7;
 
 /** Clay decorations — Figma `camera51`, `camera91`, `camera101`. */
 export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
@@ -176,7 +179,6 @@ export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
 ];
 
 /** Arc sits between center/right photos and left wing — Figma paint order. */
-export const HERO_ARC_Z_INDEX = 40;
 
 /** Arc headline — Figma `chatgptImageJun102026At2` (77:2826). */
 export const HERO_ARC_PLACEMENT = {

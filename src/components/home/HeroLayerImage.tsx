@@ -52,12 +52,9 @@ export function HeroLayerImage({ layer }: HeroLayerImageProps) {
   const transform = layerTransform(layer);
 
   if (isSimpleContainLayer(layer)) {
-    const overflowClass =
-      layer.scale !== undefined && layer.scale > 1 ? 'overflow-visible' : 'overflow-hidden';
-
     return (
       <div
-        className={`pointer-events-none absolute max-w-full ${overflowClass}`}
+        className="pointer-events-none absolute max-w-full overflow-hidden"
         style={{
           left: heroPctX(layer.leftPx + (layer.offsetXPx ?? 0)),
           top: heroPctY(layer.topPx + (layer.offsetYPx ?? 0)),
@@ -84,12 +81,10 @@ export function HeroLayerImage({ layer }: HeroLayerImageProps) {
   const crop = layer.crop ?? DEFAULT_CROP;
   const objectFit = layer.objectFit ?? 'cover';
   const objectFitClass = objectFit === 'contain' ? 'object-contain' : 'object-cover';
-  const overflowClass =
-    layer.scale !== undefined && layer.scale > 1 ? 'overflow-visible' : 'overflow-hidden';
 
   return (
     <div
-      className={`pointer-events-none absolute ${overflowClass}`}
+      className="pointer-events-none absolute overflow-hidden"
       style={{
         left: heroPctX(layer.leftPx + (layer.offsetXPx ?? 0)),
         top: heroPctY(layer.topPx + (layer.offsetYPx ?? 0)),
