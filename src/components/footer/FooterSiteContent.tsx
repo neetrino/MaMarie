@@ -1,9 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import {
   FOOTER_COMPANY_COLUMN_WIDTH_PX,
   FOOTER_COMPANY_LINKS,
   FOOTER_CONTENT_GAP_PX,
+  FOOTER_COPYRIGHT_COMPANY_HREF,
   FOOTER_NAV_GAP_PX,
   FOOTER_SUPPORT_COLUMN_WIDTH_PX,
   FOOTER_SUPPORT_LINKS,
@@ -49,7 +51,14 @@ export function FooterSiteContent() {
         }}
       >
         {t('common.footer.copyrightPrefix').replace('{year}', String(year))}
-        <span className="font-bold">{t('common.footer.copyrightCompany')}</span>
+        <Link
+          href={FOOTER_COPYRIGHT_COMPANY_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold transition-opacity hover:opacity-80"
+        >
+          {t('common.footer.copyrightCompany')}
+        </Link>
         {t('common.footer.copyrightSuffix')}
       </p>
     </div>

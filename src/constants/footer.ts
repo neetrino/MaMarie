@@ -7,6 +7,12 @@ export const FOOTER_CONTENT_MAX_WIDTH_PX = 1326;
 export const FOOTER_PADDING_X_PX = 57;
 export const FOOTER_PADDING_Y_PX = 31;
 export const FOOTER_BORDER_RADIUS_TOP_PX = 30;
+/** Pull footer up so transparent top reveals section bg in rounded corner wedges. */
+export const FOOTER_TOP_OVERLAP_PX = FOOTER_BORDER_RADIUS_TOP_PX;
+/** Extra yellow visible above the rounded body (overlap alone hid the top edge). */
+export const FOOTER_TOP_VISIBLE_EXTRA_PX = 20;
+/** Yellow layer inset from footer top — only corner wedges stay transparent. */
+export const FOOTER_YELLOW_TOP_PX = FOOTER_TOP_OVERLAP_PX - FOOTER_TOP_VISIBLE_EXTRA_PX;
 export const FOOTER_BG_COLOR = BRAND_COLORS.yellow;
 export const FOOTER_DECORATION_Z_INDEX = 0;
 export const FOOTER_CONTENT_Z_INDEX = 10;
@@ -14,7 +20,7 @@ export const FOOTER_CONTENT_Z_INDEX = 10;
 export const FOOTER_STRAWBERRY_Z_INDEX = 20;
 
 export const FOOTER_NAV_GAP_PX = 133;
-export const FOOTER_CONTENT_GAP_PX = 25;
+export const FOOTER_CONTENT_GAP_PX = 35;
 export const FOOTER_NAV_HEIGHT_PX = 239;
 
 export const FOOTER_BRAND_COLUMN_WIDTH_PX = 257;
@@ -153,3 +159,4 @@ export const FOOTER_SOCIAL_LINKS: FooterSocialLink[] = [
 
 export const FOOTER_PHONE_HREF = 'tel:+37410000000';
 export const FOOTER_EMAIL_HREF = 'mailto:info@marco.am';
+export const FOOTER_COPYRIGHT_COMPANY_HREF = 'https://neetrino.com';

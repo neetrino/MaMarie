@@ -8,26 +8,43 @@ import {
   FOOTER_PADDING_X_PX,
   FOOTER_PADDING_Y_PX,
   FOOTER_STRAWBERRY_Z_INDEX,
+  FOOTER_TOP_OVERLAP_PX,
+  FOOTER_YELLOW_TOP_PX,
 } from '../constants/footer';
 import { FooterStarDecoration, FooterStrawberryDecoration } from './footer/FooterDecorations';
 import { FooterSiteContent } from './footer/FooterSiteContent';
 
-/** Site footer — Figma node `1:166`. */
+/**
+ * Site footer — Figma node `1:166`.
+ * Top corner wedges stay transparent (`FOOTER_YELLOW_TOP_PX` inset) so the section above
+ * fills the rounded corners; extra yellow strip keeps the footer top edge visible.
+ */
 export function Footer() {
   return (
     <footer
-      className="relative w-full overflow-visible"
+      className="relative z-20 w-full overflow-visible"
       style={{
+        marginTop: -FOOTER_TOP_OVERLAP_PX,
         paddingTop: FOOTER_PADDING_Y_PX,
         paddingBottom: FOOTER_PADDING_Y_PX,
-        backgroundColor: FOOTER_BG_COLOR,
-        borderTopLeftRadius: FOOTER_BORDER_RADIUS_TOP_PX,
-        borderTopRightRadius: FOOTER_BORDER_RADIUS_TOP_PX,
+        backgroundColor: 'transparent',
       }}
     >
       <div
-        className="pointer-events-none absolute inset-0 overflow-hidden"
+        className="pointer-events-none absolute bottom-0 left-0 right-0"
         style={{
+          top: FOOTER_YELLOW_TOP_PX,
+          zIndex: FOOTER_DECORATION_Z_INDEX,
+          backgroundColor: FOOTER_BG_COLOR,
+          borderTopLeftRadius: FOOTER_BORDER_RADIUS_TOP_PX,
+          borderTopRightRadius: FOOTER_BORDER_RADIUS_TOP_PX,
+        }}
+      />
+
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 right-0 overflow-hidden"
+        style={{
+          top: FOOTER_YELLOW_TOP_PX,
           zIndex: FOOTER_DECORATION_Z_INDEX,
           borderTopLeftRadius: FOOTER_BORDER_RADIUS_TOP_PX,
           borderTopRightRadius: FOOTER_BORDER_RADIUS_TOP_PX,

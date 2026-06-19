@@ -7,6 +7,7 @@ import {
   ABOUT_US_SECTION_PADDING_TOP_PX,
   ABOUT_US_ASSETS,
 } from '../../constants/about-us-section';
+import { FOOTER_TOP_OVERLAP_PX } from '../../constants/footer';
 import { HOME_SECTION_MAX_WIDTH_PX, HOME_SECTION_PADDING_LEFT_PX, HOME_SECTION_PADDING_RIGHT_PX } from '../../constants/home-sections';
 import { AboutUsSectionBlock } from './AboutUsSectionBlock';
 
@@ -16,13 +17,20 @@ import { AboutUsSectionBlock } from './AboutUsSectionBlock';
 export function AboutUsSection() {
   return (
     <section
-      className="relative w-full overflow-hidden bg-white"
+      className="relative w-full overflow-visible bg-white"
       style={{
         paddingTop: ABOUT_US_SECTION_OFFSET_TOP_PX,
         minHeight: ABOUT_US_SECTION_MIN_HEIGHT_PX,
       }}
     >
-      <div className="absolute inset-0 left-1/2 w-screen -translate-x-1/2">
+      <div
+        className="absolute left-1/2 w-screen -translate-x-1/2"
+        style={{
+          top: 0,
+          bottom: -FOOTER_TOP_OVERLAP_PX,
+          left: '50%',
+        }}
+      >
         <Image
           src={ABOUT_US_ASSETS.sectionBg}
           alt=""
@@ -34,7 +42,7 @@ export function AboutUsSection() {
       </div>
 
       <div
-        className="relative mx-auto w-full"
+        className="relative z-10 mx-auto w-full"
         style={{
           maxWidth: HOME_SECTION_MAX_WIDTH_PX,
           paddingLeft: HOME_SECTION_PADDING_LEFT_PX,
