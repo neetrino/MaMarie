@@ -40,11 +40,17 @@ function FooterContactRow({
   const body = (
     <>
       <span
-        className="relative block shrink-0"
+        className="relative flex shrink-0 items-center justify-center"
         style={{ width: iconSizePx, height: iconSizePx }}
         aria-hidden
       >
-        <Image src={iconSrc} alt="" fill sizes={`${iconSizePx}px`} />
+        <Image
+          src={iconSrc}
+          alt=""
+          fill
+          sizes={`${iconSizePx}px`}
+          className="object-contain object-center"
+        />
       </span>
       <span
         className={textClassName}
@@ -72,7 +78,7 @@ function FooterContactRow({
   }
 
   return (
-    <div className="flex items-start" style={{ gap: FOOTER_CONTACT_ROW_GAP_PX }}>
+    <div className="flex items-center" style={{ gap: FOOTER_CONTACT_ROW_GAP_PX }}>
       {body}
     </div>
   );

@@ -47,6 +47,7 @@ export const FOOTER_LOGO_CROP_LEFT_PERCENT = -7.56;
 export const FOOTER_LOGO_CROP_TOP_PERCENT = -53.74;
 
 export const FOOTER_SOCIAL_GAP_PX = 22;
+export const FOOTER_SOCIAL_MARGIN_TOP_PX = 12;
 export const FOOTER_SOCIAL_ICON_FACEBOOK_WIDTH_PX = 11;
 export const FOOTER_SOCIAL_ICON_FACEBOOK_HEIGHT_PX = 19;
 export const FOOTER_SOCIAL_ICON_SIZE_PX = 19;
@@ -93,7 +94,7 @@ export const FOOTER_ASSETS = {
   iconLinkedin: '/assets/footer/icon-linkedin.svg',
   iconWhatsapp: '/assets/footer/icon-whatsapp.svg',
   iconPhone: '/assets/footer/icon-phone.svg',
-  iconMail: '/assets/footer/icon-mail.svg',
+  iconMail: '/assets/footer/icon-mail.png',
   iconLocation: '/assets/footer/icon-location.svg',
 } as const;
 

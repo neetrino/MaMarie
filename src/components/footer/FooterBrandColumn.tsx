@@ -15,6 +15,7 @@ import {
   FOOTER_LOGO_WIDTH_PX,
   FOOTER_SOCIAL_GAP_PX,
   FOOTER_SOCIAL_LINKS,
+  FOOTER_SOCIAL_MARGIN_TOP_PX,
   FOOTER_TEXT_COLOR,
   FOOTER_TEXT_SIZE_PX,
 } from '../../constants/footer';
@@ -73,7 +74,10 @@ export function FooterBrandColumn() {
         {t('common.footer.description')}
       </p>
 
-      <div className="flex items-center" style={{ gap: FOOTER_SOCIAL_GAP_PX }}>
+      <div
+        className="flex items-center"
+        style={{ gap: FOOTER_SOCIAL_GAP_PX, marginTop: FOOTER_SOCIAL_MARGIN_TOP_PX }}
+      >
         {FOOTER_SOCIAL_LINKS.map((social) => (
           <Link
             key={social.labelKey}
