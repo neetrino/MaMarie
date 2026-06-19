@@ -9,30 +9,30 @@ export const BRAND_COLORS = {
 
 /** Static brand assets exported from Figma. */
 export const BRAND_ASSETS = {
-  logo: '/assets/brand/logo.png',
+  /** Figma MAMARIE-DEV node `1:162` — navbar clay wordmark. */
+  logoNavbar: '/assets/brand/logo-inline.png',
   iconSearch: '/assets/brand/icon-search.svg',
   iconHeart: '/assets/brand/icon-heart.svg',
   iconCart: '/assets/brand/icon-cart.svg',
   iconChevron: '/assets/brand/icon-chevron.svg',
 } as const;
 
-/** Source logo dimensions (`logo.png`). */
-export const LOGO_SOURCE_WIDTH_PX = 666;
-export const LOGO_SOURCE_HEIGHT_PX = 375;
+/** Source art for navbar logo (`logo-inline.png`, Figma `1:162`). */
+export const LOGO_NAVBAR_SOURCE_SIZE_PX = 1254;
 
 /** Intrinsic dimensions for Next.js `Image`. */
-export const LOGO_WIDTH_PX = LOGO_SOURCE_WIDTH_PX;
-export const LOGO_HEIGHT_PX = LOGO_SOURCE_HEIGHT_PX;
+export const LOGO_WIDTH_PX = LOGO_NAVBAR_SOURCE_SIZE_PX;
+export const LOGO_HEIGHT_PX = LOGO_NAVBAR_SOURCE_SIZE_PX;
 
-/** Navbar logo display height (Figma header). */
-export const LOGO_HEADER_HEIGHT_PX = 76;
+/** Navbar display height — full wordmark visible via `object-contain`. */
+export const LOGO_HEADER_HEIGHT_PX = 120;
 
-/** Width for a given logo display height, preserving aspect ratio. */
-export function logoWidthForHeight(heightPx: number): number {
-  return Math.round((heightPx * LOGO_SOURCE_WIDTH_PX) / LOGO_SOURCE_HEIGHT_PX);
+/** Square source — display width matches height. */
+export function logoNavbarWidthForHeight(heightPx: number): number {
+  return heightPx;
 }
 
-export const LOGO_HEADER_WIDTH_PX = logoWidthForHeight(LOGO_HEADER_HEIGHT_PX);
+export const LOGO_HEADER_WIDTH_PX = logoNavbarWidthForHeight(LOGO_HEADER_HEIGHT_PX);
 
 /** Desktop navbar horizontal inset (Figma). */
 export const HEADER_PADDING_LEFT_PX = 87;
