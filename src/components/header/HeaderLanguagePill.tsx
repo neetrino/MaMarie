@@ -46,12 +46,7 @@ export function HeaderLanguagePill() {
 
   const handleLanguageChange = (langCode: LanguageCode) => {
     if (langCode === lang) return;
-
-    setStoredLanguage(langCode, { skipReload: true });
-
-    window.setTimeout(() => {
-      window.location.reload();
-    }, LANGUAGE_SLIDE_ANIMATION_MS);
+    setStoredLanguage(langCode);
   };
 
   return (
