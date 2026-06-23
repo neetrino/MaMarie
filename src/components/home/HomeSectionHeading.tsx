@@ -60,7 +60,7 @@ export function HomeSectionHeadingRow({
 
       <Link
         href={seeAllHref}
-        className="inline-flex shrink-0 items-center font-bold transition-opacity hover:opacity-80"
+        className="group inline-flex shrink-0 items-center font-bold transition-transform duration-300 ease-out hover:-translate-y-0.5 focus-visible:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0"
         style={{
           gap: HOME_SECTION_LINK_GAP_PX,
           color,
@@ -75,7 +75,7 @@ export function HomeSectionHeadingRow({
           width={HOME_SECTION_CHEVRON_SIZE_PX}
           height={HOME_SECTION_CHEVRON_SIZE_PX}
           aria-hidden
-          className="shrink-0"
+          className="shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-focus-visible:translate-x-0"
         />
       </Link>
     </div>
