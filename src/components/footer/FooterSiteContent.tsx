@@ -5,8 +5,9 @@ import {
   FOOTER_COMPANY_COLUMN_WIDTH_PX,
   FOOTER_COMPANY_LINKS,
   FOOTER_CONTENT_GAP_PX,
+  FOOTER_CONTENT_MAX_WIDTH_PX,
   FOOTER_COPYRIGHT_COMPANY_HREF,
-  FOOTER_NAV_GAP_PX,
+  FOOTER_COPYRIGHT_OFFSET_X_PX,
   FOOTER_SUPPORT_COLUMN_WIDTH_PX,
   FOOTER_SUPPORT_LINKS,
   FOOTER_TEXT_COLOR,
@@ -24,10 +25,7 @@ export function FooterSiteContent() {
 
   return (
     <div className="relative z-10 flex w-full flex-col items-center" style={{ gap: FOOTER_CONTENT_GAP_PX }}>
-      <div
-        className="flex w-full flex-col flex-wrap gap-10 lg:flex-row lg:flex-nowrap lg:items-start"
-        style={{ rowGap: 40, columnGap: FOOTER_NAV_GAP_PX }}
-      >
+      <div className="flex w-full flex-col flex-wrap gap-10 lg:flex-row lg:flex-nowrap lg:items-start lg:justify-between">
         <FooterBrandColumn />
         <FooterLinksColumn
           titleKey="common.footer.companyTitle"
@@ -43,8 +41,11 @@ export function FooterSiteContent() {
       </div>
 
       <p
-        className="w-full text-center font-normal"
+        className="text-center font-normal"
         style={{
+          width: FOOTER_CONTENT_MAX_WIDTH_PX,
+          maxWidth: '100%',
+          marginLeft: FOOTER_COPYRIGHT_OFFSET_X_PX,
           color: FOOTER_TEXT_COLOR,
           fontSize: FOOTER_TEXT_SIZE_PX,
           lineHeight: `${FOOTER_TEXT_LINE_HEIGHT_PX}px`,

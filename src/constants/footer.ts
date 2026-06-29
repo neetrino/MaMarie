@@ -6,6 +6,10 @@ export const FOOTER_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
 export const FOOTER_CONTENT_MAX_WIDTH_PX = 1326;
 export const FOOTER_HEIGHT_PX = 507;
 export const FOOTER_PADDING_X_PX = 82;
+/** Copyright block inset from footer edge — Figma x=57 on 1440px (`51:492`). */
+export const FOOTER_COPYRIGHT_INSET_X_PX = (FOOTER_MAX_WIDTH_PX - FOOTER_CONTENT_MAX_WIDTH_PX) / 2;
+/** Shift copyright left from padded wrapper so it sits on the footer center line. */
+export const FOOTER_COPYRIGHT_OFFSET_X_PX = FOOTER_COPYRIGHT_INSET_X_PX - FOOTER_PADDING_X_PX;
 /** Content inset from yellow background top (Figma y=102). */
 export const FOOTER_PADDING_TOP_PX = 102;
 export const FOOTER_PADDING_BOTTOM_PX = 45;
@@ -22,7 +26,6 @@ export const FOOTER_CONTENT_Z_INDEX = 10;
 /** Strawberry clay — above footer content, may extend past top edge (Figma `1:225`). */
 export const FOOTER_STRAWBERRY_Z_INDEX = 20;
 
-export const FOOTER_NAV_GAP_PX = 133;
 /** Gap from payment badges bottom to copyright (Figma y=360 → y=442). */
 export const FOOTER_CONTENT_GAP_PX = 82;
 
@@ -50,6 +53,7 @@ export const FOOTER_LOGO_CROP_LEFT_PERCENT = -7.56;
 export const FOOTER_LOGO_CROP_TOP_PERCENT = -53.74;
 
 export const FOOTER_SOCIAL_GAP_PX = 22;
+export const FOOTER_SOCIAL_MARGIN_TOP_PX = 7;
 export const FOOTER_SOCIAL_ICON_FACEBOOK_WIDTH_PX = 11;
 export const FOOTER_SOCIAL_ICON_FACEBOOK_HEIGHT_PX = 19;
 export const FOOTER_SOCIAL_ICON_SIZE_PX = 19;
