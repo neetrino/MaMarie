@@ -42,7 +42,8 @@ export const WHY_US_CARD_TITLE_LINE_HEIGHT_PX = 24;
 export const WHY_US_CARD_DESCRIPTION_SIZE_PX = 14;
 export const WHY_US_CARD_DESCRIPTION_LINE_HEIGHT_PX = 20;
 export const WHY_US_CARD_DESCRIPTION_COLOR = 'rgba(0, 0, 0, 0.79)';
-export const WHY_US_CARD_TEXT_MAX_WIDTH_PX = scaleWhyUsPx(316);
+export const WHY_US_CARD_TEXT_BLOCK_WIDTH_PX = scaleWhyUsPx(316);
+export const WHY_US_CARD_DESCRIPTION_WIDTH_PX = WHY_US_CARD_TEXT_BLOCK_WIDTH_PX;
 
 export const WHY_US_ASSETS = {
   card1: '/assets/home/why-us/card-1.png',
@@ -90,8 +91,9 @@ export interface WhyUsCardLayout {
   imageSrc: string;
   imageLayout: WhyUsCardImageLayout;
   sectionGapPx: number;
-  textGapPx: number;
+  titleDescriptionGapPx: number;
   titleMaxWidthPx: number;
+  titleMinHeightPx: number;
 }
 
 export const WHY_US_CARD_LAYOUTS: WhyUsCardLayout[] = [
@@ -99,8 +101,9 @@ export const WHY_US_CARD_LAYOUTS: WhyUsCardLayout[] = [
     id: '01',
     imageSrc: WHY_US_ASSETS.card1,
     sectionGapPx: 23,
-    textGapPx: 23,
+    titleDescriptionGapPx: 23,
     titleMaxWidthPx: 259,
+    titleMinHeightPx: 48,
     imageLayout: {
       kind: 'fill',
       leftPx: 54,
@@ -113,8 +116,9 @@ export const WHY_US_CARD_LAYOUTS: WhyUsCardLayout[] = [
     id: '02',
     imageSrc: WHY_US_ASSETS.card2,
     sectionGapPx: 19,
-    textGapPx: 19,
+    titleDescriptionGapPx: 19,
     titleMaxWidthPx: 273,
+    titleMinHeightPx: 48,
     imageLayout: {
       kind: 'crop',
       leftPx: 9,
@@ -131,8 +135,9 @@ export const WHY_US_CARD_LAYOUTS: WhyUsCardLayout[] = [
     id: '03',
     imageSrc: WHY_US_ASSETS.card3,
     sectionGapPx: 19,
-    textGapPx: 19,
+    titleDescriptionGapPx: 19,
     titleMaxWidthPx: 273,
+    titleMinHeightPx: 48,
     imageLayout: {
       kind: 'crop',
       leftPx: 0,
@@ -149,8 +154,9 @@ export const WHY_US_CARD_LAYOUTS: WhyUsCardLayout[] = [
     id: '04',
     imageSrc: WHY_US_ASSETS.card4,
     sectionGapPx: 19,
-    textGapPx: 33,
+    titleDescriptionGapPx: 33,
     titleMaxWidthPx: 273,
+    titleMinHeightPx: 24,
     imageLayout: {
       kind: 'rotated',
       wrapperLeftPx: -75,

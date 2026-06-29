@@ -58,7 +58,7 @@ export function WhyUsSectionBlock() {
       />
 
       <div
-        className="flex w-full overflow-x-auto pb-4 lg:overflow-visible"
+        className="flex w-full items-start justify-center overflow-x-auto pb-4 lg:overflow-visible"
         style={{
           paddingTop: WHY_US_GRID_OFFSET_TOP_PX,
           gap: WHY_US_CARD_GAP_PX,
