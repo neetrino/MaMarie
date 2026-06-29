@@ -4,29 +4,33 @@ import {
   FOOTER_CONTENT_MAX_WIDTH_PX,
   FOOTER_CONTENT_Z_INDEX,
   FOOTER_DECORATION_Z_INDEX,
+  FOOTER_HEIGHT_PX,
   FOOTER_MAX_WIDTH_PX,
+  FOOTER_PADDING_BOTTOM_PX,
+  FOOTER_PADDING_TOP_PX,
   FOOTER_PADDING_X_PX,
-  FOOTER_PADDING_Y_PX,
   FOOTER_STRAWBERRY_Z_INDEX,
   FOOTER_TOP_OVERLAP_PX,
   FOOTER_YELLOW_TOP_PX,
 } from '../constants/footer';
-import { FooterStarDecoration, FooterStrawberryDecoration } from './footer/FooterDecorations';
+import { FooterBunnyDecoration, FooterStrawberryDecoration } from './footer/FooterDecorations';
 import { FooterSiteContent } from './footer/FooterSiteContent';
 
 /**
- * Site footer — Figma node `1:166`.
+ * Site footer — Figma node `51:428`.
  * Top corner wedges stay transparent (`FOOTER_YELLOW_TOP_PX` inset) so the section above
  * fills the rounded corners; extra yellow strip keeps the footer top edge visible.
  */
 export function Footer() {
+  const contentPaddingTopPx = FOOTER_YELLOW_TOP_PX + FOOTER_PADDING_TOP_PX;
+
   return (
     <footer
       className="relative z-20 w-full overflow-visible"
       style={{
         marginTop: -FOOTER_TOP_OVERLAP_PX,
-        paddingTop: FOOTER_PADDING_Y_PX,
-        paddingBottom: FOOTER_PADDING_Y_PX,
+        paddingTop: contentPaddingTopPx,
+        paddingBottom: FOOTER_PADDING_BOTTOM_PX,
         backgroundColor: 'transparent',
       }}
     >
@@ -35,6 +39,7 @@ export function Footer() {
         style={{
           top: FOOTER_YELLOW_TOP_PX,
           zIndex: FOOTER_DECORATION_Z_INDEX,
+          minHeight: FOOTER_HEIGHT_PX,
           backgroundColor: FOOTER_BG_COLOR,
           borderTopLeftRadius: FOOTER_BORDER_RADIUS_TOP_PX,
           borderTopRightRadius: FOOTER_BORDER_RADIUS_TOP_PX,
@@ -46,11 +51,12 @@ export function Footer() {
         style={{
           top: FOOTER_YELLOW_TOP_PX,
           zIndex: FOOTER_DECORATION_Z_INDEX,
+          minHeight: FOOTER_HEIGHT_PX,
           borderTopLeftRadius: FOOTER_BORDER_RADIUS_TOP_PX,
           borderTopRightRadius: FOOTER_BORDER_RADIUS_TOP_PX,
         }}
       >
-        <FooterStarDecoration />
+        <FooterBunnyDecoration />
       </div>
 
       <div

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import {
   FOOTER_ASSETS,
-  FOOTER_STAR_DECORATION,
+  FOOTER_BUNNY_DECORATION,
   FOOTER_STRAWBERRY_DECORATION,
   type FooterDecorationLayout,
 } from '../../constants/footer';
@@ -13,6 +13,9 @@ function FooterDecoration({
   layout: FooterDecorationLayout;
   imageSrc: string;
 }) {
+  const scaleX = layout.scaleX ?? 1;
+  const scaleY = layout.scaleY ?? 1;
+
   return (
     <div
       aria-hidden
@@ -29,7 +32,7 @@ function FooterDecoration({
         style={{
           width: layout.imageSizePx,
           height: layout.imageSizePx,
-          transform: `rotate(${layout.rotateDeg}deg)`,
+          transform: `scale(${scaleX}, ${scaleY}) rotate(${layout.rotateDeg}deg)`,
         }}
       >
         <Image
@@ -44,14 +47,14 @@ function FooterDecoration({
   );
 }
 
-/** Star — clipped inside footer, behind content. */
-export function FooterStarDecoration() {
+/** Bunny — clipped inside footer, behind content (Figma `51:430`). */
+export function FooterBunnyDecoration() {
   return (
-    <FooterDecoration layout={FOOTER_STAR_DECORATION} imageSrc={FOOTER_ASSETS.decoStar} />
+    <FooterDecoration layout={FOOTER_BUNNY_DECORATION} imageSrc={FOOTER_ASSETS.decoBunny} />
   );
 }
 
-/** Strawberry — above footer content, may overlap section above. */
+/** Strawberry — above footer content, may overlap section above (Figma `51:429`). */
 export function FooterStrawberryDecoration() {
   return (
     <FooterDecoration layout={FOOTER_STRAWBERRY_DECORATION} imageSrc={FOOTER_ASSETS.decoCamera} />

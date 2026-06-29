@@ -5,21 +5,23 @@ import Link from 'next/link';
 import {
   FOOTER_ASSETS,
   FOOTER_CONTACT_COLUMN_WIDTH_PX,
+  FOOTER_CONTACT_HEADING_TO_ROWS_GAP_PX,
   FOOTER_CONTACT_ICON_LOCATION_SIZE_PX,
   FOOTER_CONTACT_ICON_MAIL_SIZE_PX,
   FOOTER_CONTACT_ICON_PHONE_SIZE_PX,
+  FOOTER_CONTACT_ITEMS_GAP_PX,
   FOOTER_CONTACT_ROW_GAP_PX,
   FOOTER_EMAIL_HREF,
   FOOTER_HEADING_COLOR,
   FOOTER_HEADING_LETTER_SPACING_PX,
-  FOOTER_LINKS_COLUMN_GAP_PX,
-  FOOTER_LINKS_ITEM_GAP_PX,
+  FOOTER_PAYMENT_MARGIN_TOP_PX,
   FOOTER_PHONE_HREF,
   FOOTER_TEXT_COLOR,
   FOOTER_TEXT_LINE_HEIGHT_PX,
   FOOTER_TEXT_SIZE_PX,
 } from '../../constants/footer';
 import { useTranslation } from '../../lib/i18n-client';
+import { FooterPaymentBadges } from './FooterPaymentBadges';
 
 interface FooterContactRowProps {
   iconSrc: string;
@@ -27,6 +29,7 @@ interface FooterContactRowProps {
   href?: string;
   label: string;
   fontWeight?: 'normal' | 'medium';
+  align?: 'center' | 'start';
 }
 
 function FooterContactRow({
@@ -35,8 +38,10 @@ function FooterContactRow({
   href,
   label,
   fontWeight = 'normal',
+  align = 'center',
 }: FooterContactRowProps) {
   const textClassName = fontWeight === 'medium' ? 'font-medium' : 'font-normal';
+  const alignClassName = align === 'start' ? 'items-start' : 'items-center';
   const body = (
     <>
       <span
@@ -69,7 +74,7 @@ function FooterContactRow({
     return (
       <Link
         href={href}
-        className="flex items-center transition-opacity hover:opacity-80"
+        className={`flex ${alignClassName} transition-opacity hover:opacity-80`}
         style={{ gap: FOOTER_CONTACT_ROW_GAP_PX }}
       >
         {body}
@@ -78,7 +83,7 @@ function FooterContactRow({
   }
 
   return (
-    <div className="flex items-center" style={{ gap: FOOTER_CONTACT_ROW_GAP_PX }}>
+    <div className={`flex ${alignClassName}`} style={{ gap: FOOTER_CONTACT_ROW_GAP_PX }}>
       {body}
     </div>
   );
@@ -88,10 +93,7 @@ export function FooterContactColumn() {
   const { t } = useTranslation();
 
   return (
-    <div
-      className="flex shrink-0 flex-col items-start"
-      style={{ width: FOOTER_CONTACT_COLUMN_WIDTH_PX, gap: FOOTER_LINKS_COLUMN_GAP_PX }}
-    >
+    <div className="flex shrink-0 flex-col items-start" style={{ width: FOOTER_CONTACT_COLUMN_WIDTH_PX }}>
       <p
         className="font-bold uppercase"
         style={{
@@ -104,7 +106,13 @@ export function FooterContactColumn() {
         {t('common.footer.contactsTitle')}
       </p>
 
-      <div className="flex flex-col items-start" style={{ gap: FOOTER_LINKS_ITEM_GAP_PX }}>
+      <div
+        className="flex w-full flex-col items-start"
+        style={{
+          marginTop: FOOTER_CONTACT_HEADING_TO_ROWS_GAP_PX,
+          gap: FOOTER_CONTACT_ITEMS_GAP_PX,
+        }}
+      >
         <FooterContactRow
           iconSrc={FOOTER_ASSETS.iconPhone}
           iconSizePx={FOOTER_CONTACT_ICON_PHONE_SIZE_PX}
@@ -122,7 +130,12 @@ export function FooterContactColumn() {
           iconSrc={FOOTER_ASSETS.iconLocation}
           iconSizePx={FOOTER_CONTACT_ICON_LOCATION_SIZE_PX}
           label={t('common.footer.address')}
+          align="start"
         />
+      </div>
+
+      <div style={{ marginTop: FOOTER_PAYMENT_MARGIN_TOP_PX }}>
+        <FooterPaymentBadges />
       </div>
     </div>
   );
