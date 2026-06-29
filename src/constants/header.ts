@@ -18,3 +18,8 @@ export const HEADER_PILL_SHELL_PADDING_X_PX = 16;
 
 /** Fixed pill height — narrower than full nav row, vertically centered on scroll. */
 export const HEADER_PILL_SHELL_HEIGHT_PX = 70;
+
+/** Figma `51:335` — login pill next to currency (Component 7). */
+export const HEADER_LOGIN_PILL_WIDTH_PX = 46;
+export const HEADER_LOGIN_PILL_HEIGHT_PX = 41;
+export const HEADER_LOGIN_ICON_SIZE_PX = 25;

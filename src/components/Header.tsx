@@ -19,6 +19,7 @@ import { BrandLogoLink } from './BrandLogoLink';
 import { HeaderActionIcons } from './header/HeaderActionIcons';
 import { HeaderCurrencyPill } from './header/HeaderCurrencyPill';
 import { HeaderLanguagePill } from './header/HeaderLanguagePill';
+import { HeaderLoginPill } from './header/HeaderLoginPill';
 import { HeaderNavLinks } from './header/HeaderNavLinks';
 import { useHomeHeaderScrolled } from './header/useHomeHeaderScrolled';
 
@@ -45,6 +46,7 @@ function HeaderDesktopNav() {
         <HeaderActionIcons />
         <HeaderLanguagePill />
         <HeaderCurrencyPill />
+        <HeaderLoginPill />
       </div>
     </>
   );

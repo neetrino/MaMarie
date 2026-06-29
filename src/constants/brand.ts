@@ -15,6 +15,8 @@ export const BRAND_ASSETS = {
   iconHeart: '/assets/brand/icon-heart.svg',
   iconCart: '/assets/brand/icon-cart.svg',
   iconChevron: '/assets/brand/icon-chevron.svg',
+  /** Figma `51:335` — heroicons outline login. */
+  iconLogin: '/assets/brand/icon-login.svg',
 } as const;
 
 /** Source art for navbar logo (`logo-inline.png`, Figma `1:162`). */
