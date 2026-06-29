@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Export hero PNGs from Figma Dev Mode (localhost asset server).
-# Open MAMARIE.fig in Figma Desktop with Dev Mode, select frame 9:590, then run:
+# Open MAMARIE-DEV in Figma Desktop with Dev Mode, select frame 51:329, then run:
 #   bash scripts/download-hero-assets.sh
 
 set -euo pipefail
@@ -17,12 +17,12 @@ download() {
   curl -fsSL "${BASE}/${hash}.png" -o "${DEST}/${filename}"
 }
 
-download "kids-photo.png" "0ea98d945bfb0e9757480f2af705db54da4cb6b5"
-download "hero-layer-left.png" "279fdc56283443a8a28d9915c0e540a16e989920"
-download "hero-layer-center.png" "0c9be628b0a4aa425a565eb9371cf540fc6862e1"
-download "hero-layer-right.png" "1231d9bee514f06de2f44e761e3e3d0250bfd703"
-download "decoration-camera-large.png" "43ef112343b5e98c159330c6efc009dad74e8aa1"
-download "decoration-camera-small.png" "a416adb4158e1b5417403b0c29563c2a8cea0fa2"
+download "hero-pink-arch.png" "4225c7a49399c60f19ad26b95535a4e01bee7aee"
+download "hero-main-composite.png" "37593d1cb53981dcdb45427f167b3faa5c6ad062"
+download "hero-left-wing.png" "6a7dab3ac5305995c3111bda81c0ed2f6ff4197e"
+download "decoration-strawberry.png" "87142ae76696ba0208734972db39a7f19077e422"
+download "decoration-carrot.png" "9fb5cb9413d6bebbf44621805e17720fcb087df9"
 download "decoration-camera-mid.png" "86037946116d5d410418eb4e501c7270b9e2c3f5"
+download "decoration-camera-small.png" "a416adb4158e1b5417403b0c29563c2a8cea0fa2"
 
-echo "Done. Arc text: export node 77:2826 as PNG → public/assets/hero/shape-text-arc.png"
+echo "Done."

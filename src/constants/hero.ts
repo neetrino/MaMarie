@@ -1,7 +1,7 @@
 import { BRAND_COLORS } from './brand';
 import { HOME_SECTION_CONTENT_MAX_WIDTH_PX } from './home-sections';
 
-/** Figma hero artboard — frame `9:590` (1440×853). */
+/** Figma hero artboard — frame `51:329` (1440×853). */
 export const HERO_DESIGN_WIDTH_PX = 1440;
 export const HERO_DESIGN_HEIGHT_PX = 853;
 
@@ -12,239 +12,165 @@ export const HERO_CANVAS_MAX_HEIGHT_PX = Math.round(
 );
 export const HERO_CANVAS_MIN_HEIGHT_PX = Math.round(520 * (HERO_CANVAS_MAX_WIDTH_PX / HERO_DESIGN_WIDTH_PX));
 
-/** Match navbar horizontal inset (header only — hero canvas is full 1440). */
-export const HERO_PADDING_LEFT_PX = 87;
-export const HERO_PADDING_RIGHT_PX = 93;
-
-/** Nudge entire hero section down. */
+/** Nudge entire hero section down (below fixed header). */
 export const HERO_SECTION_OFFSET_Y_PX = 32;
-
-/** @deprecated Use `HERO_CANVAS_MAX_WIDTH_PX` — kept for layer math compatibility. */
-export const HERO_CONTENT_SCALE = HERO_CANVAS_MAX_WIDTH_PX / HERO_DESIGN_WIDTH_PX;
 
 export const HERO_CONTENT_MAX_WIDTH_PX = HERO_CANVAS_MAX_WIDTH_PX;
 export const HERO_CONTENT_MAX_HEIGHT_PX = HERO_CANVAS_MAX_HEIGHT_PX;
 export const HERO_CONTENT_MIN_HEIGHT_PX = HERO_CANVAS_MIN_HEIGHT_PX;
 
 export const HERO_ASSETS = {
-  shapeTextArc: '/assets/hero/shape-text-arc.png',
-  layerLeft: '/assets/hero/hero-layer-left.png',
-  layerCenter: '/assets/hero/hero-layer-center.png',
-  layerRight: '/assets/hero/hero-layer-right.png',
-  decorationCameraLarge: '/assets/hero/decoration-camera-large.png',
-  /** Clay bunny — exported as `decoration-camera-mid.png`. */
+  /** Figma `51:332` — girl + pink «SHAPE YOUR» arch. */
+  pinkArch: '/assets/hero/hero-pink-arch.png',
+  mainComposite: '/assets/hero/hero-main-composite.png',
+  leftWing: '/assets/hero/hero-left-wing.png',
   decorationBunny: '/assets/hero/decoration-camera-mid.png',
-  /** Clay melody notes — exported as `decoration-camera-small.png`. */
-  musicNotes: '/assets/hero/decoration-camera-small.png',
+  decorationStrawberry: '/assets/hero/decoration-strawberry.png',
+  decorationMelody: '/assets/hero/decoration-camera-small.png',
+  decorationCarrot: '/assets/hero/decoration-carrot.png',
 } as const;
 
-export interface HeroImageCrop {
-  widthPercent: number;
-  heightPercent: number;
-  leftPercent: number;
-  topPercent: number;
-}
-
-export interface HeroLayerPlacement {
+export interface HeroFlatPlacement {
+  kind: 'flat';
   assetKey: keyof typeof HERO_ASSETS;
   leftPx: number;
   topPx: number;
   widthPx: number;
   heightPx: number;
   zIndex: number;
-  objectFit?: 'cover' | 'contain';
-  crop?: HeroImageCrop;
-  flip?: boolean;
-  offsetYPx?: number;
-  offsetXPx?: number;
-  scale?: number;
-  scaleOrigin?: string;
+  /** Figma `51:333` — `object-bottom` + fill frame. */
+  objectFit?: 'fill' | 'contain' | 'cover';
+  objectPosition?: 'bottom' | 'center';
+  priority?: boolean;
 }
 
-/** Shared kid photo frame — girl (68:2329) and boy (68:2328). */
-export const HERO_KID_PHOTO_WIDTH_PX = 490;
-export const HERO_KID_PHOTO_HEIGHT_PX = 696;
+export interface HeroRotatedPlacement {
+  kind: 'rotated';
+  assetKey: keyof typeof HERO_ASSETS;
+  leftPx: number;
+  topPx: number;
+  containerWidthPx: number;
+  containerHeightPx: number;
+  imageWidthPx: number;
+  imageHeightPx: number;
+  rotateDeg: number;
+  flipY?: boolean;
+  zIndex: number;
+  objectPosition?: 'bottom' | 'cover';
+  priority?: boolean;
+}
 
-/** Extra scale — boy PNG has more padding than girl. */
-export const HERO_LAYER_RIGHT_SCALE = 1.38;
+export type HeroSceneLayer = HeroFlatPlacement | HeroRotatedPlacement;
 
-/** Nudge boy down. */
-export const HERO_LAYER_RIGHT_OFFSET_Y_PX = 140;
-
-/** Nudge boy left. */
-export const HERO_LAYER_RIGHT_OFFSET_X_PX = -50;
-
-/** Photo collage layers — paint order back → front (Figma frame `9:590`). */
-export const HERO_PHOTO_LAYERS: HeroLayerPlacement[] = [
+/** Hero scene layers — paint order back → front (Figma frame `51:329`). */
+export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
   {
-    /** Figma `af0b019…` — girl (68:2329). */
-    assetKey: 'layerCenter',
-    leftPx: 584,
-    topPx: 157,
-    widthPx: HERO_KID_PHOTO_WIDTH_PX,
-    heightPx: HERO_KID_PHOTO_HEIGHT_PX,
+    kind: 'rotated',
+    assetKey: 'decorationBunny',
+    leftPx: 720,
+    topPx: 238,
+    containerWidthPx: 251.608,
+    containerHeightPx: 251.608,
+    imageWidthPx: 188.1,
+    imageHeightPx: 188.1,
+    rotateDeg: -153.94,
+    flipY: true,
+    zIndex: 1,
+  },
+  {
+    kind: 'rotated',
+    assetKey: 'decorationStrawberry',
+    leftPx: 357,
+    topPx: 42,
+    containerWidthPx: 332.217,
+    containerHeightPx: 332.217,
+    imageWidthPx: 248.831,
+    imageHeightPx: 248.831,
+    rotateDeg: -64.25,
     zIndex: 2,
   },
   {
-    /** Figma `chatgptImageJun102026At` — boy (68:2328), matched visually to girl. */
-    assetKey: 'layerRight',
-    leftPx: 377,
-    topPx: 204,
-    widthPx: HERO_KID_PHOTO_WIDTH_PX,
-    heightPx: HERO_KID_PHOTO_HEIGHT_PX,
+    /** Figma `51:332` — pink «SHAPE YOUR» arch behind composite. */
+    kind: 'rotated',
+    assetKey: 'pinkArch',
+    leftPx: 455,
+    topPx: -27,
+    containerWidthPx: 970.455,
+    containerHeightPx: 936.881,
+    imageWidthPx: 798.426,
+    imageHeightPx: 750.114,
+    rotateDeg: -15.57,
     zIndex: 3,
-    offsetXPx: HERO_LAYER_RIGHT_OFFSET_X_PX,
-    offsetYPx: HERO_LAYER_RIGHT_OFFSET_Y_PX,
-    flip: true,
-    scale: HERO_LAYER_RIGHT_SCALE,
-    scaleOrigin: 'center bottom',
-    crop: {
-      widthPercent: 118,
-      heightPercent: 118,
-      leftPercent: -9,
-      topPercent: -14,
-    },
+    priority: true,
   },
   {
-    /** Figma `chatgptImageJun102026At3` — boy + left «SHAPE» wing (68:2331). */
-    assetKey: 'layerLeft',
-    leftPx: 102,
-    topPx: 249,
-    widthPx: 721,
-    heightPx: 655,
+    /** Figma `51:333` — girl + ottomans (893×538). */
+    kind: 'flat',
+    assetKey: 'mainComposite',
+    leftPx: 282,
+    topPx: 158,
+    widthPx: 893,
+    heightPx: 538,
+    zIndex: 4,
+    objectFit: 'fill',
+    objectPosition: 'bottom',
+    priority: true,
+  },
+  {
+    kind: 'rotated',
+    assetKey: 'decorationMelody',
+    leftPx: 179.41,
+    topPx: 124.41,
+    containerWidthPx: 167.982,
+    containerHeightPx: 167.982,
+    imageWidthPx: 124.147,
+    imageHeightPx: 124.147,
+    rotateDeg: 28.09,
     zIndex: 5,
   },
+  {
+    kind: 'rotated',
+    assetKey: 'leftWing',
+    leftPx: -26.26,
+    topPx: 114.99,
+    containerWidthPx: 839.692,
+    containerHeightPx: 850.998,
+    imageWidthPx: 604.736,
+    imageHeightPx: 634.95,
+    rotateDeg: -29.66,
+    zIndex: 6,
+    objectPosition: 'bottom',
+  },
+  {
+    kind: 'rotated',
+    assetKey: 'decorationCarrot',
+    leftPx: 1038,
+    topPx: 565,
+    containerWidthPx: 175.211,
+    containerHeightPx: 175.211,
+    imageWidthPx: 137.966,
+    imageHeightPx: 137.966,
+    rotateDeg: 71.1,
+    zIndex: 7,
+  },
 ];
-
-export interface HeroDecorationPlacement {
-  assetKey: keyof typeof HERO_ASSETS;
-  leftPx: number;
-  topPx: number;
-  widthPx: number;
-  heightPx: number;
-  rotateDeg?: number;
-  flipX?: boolean;
-  flipY?: boolean;
-  zIndex: number;
-}
-
-/** Bunny decoration — Figma `camera101` base size was 158px. */
-export const HERO_BUNNY_FIGMA_SIZE_PX = 158;
-export const HERO_BUNNY_SIZE_PX = 120;
-export const HERO_BUNNY_ROTATE_DEG = 380;
-export const HERO_BUNNY_OFFSET_X_PX = -14;
-export const HERO_BUNNY_OFFSET_Y_PX = -14;
-
-/** Clay star — Figma `camera51` base size was 375.2px. */
-export const HERO_STAR_FIGMA_SIZE_PX = 375.2;
-export const HERO_STAR_SIZE_PX = 330;
-export const HERO_STAR_ROTATE_DEG = 310;
-
-/** Melody notes rotation — Figma `camera91`. */
-export const HERO_MELODY_ROTATE_DEG = 50;
-
-/** Nudge melody notes up. */
-export const HERO_MELODY_OFFSET_Y_PX = -24;
 
 /** Hero section sits below fixed header (z-50) and must not paint over page content. */
 export const HERO_SECTION_Z_INDEX = 0;
+export const HERO_CTA_Z_INDEX = 8;
 
-/** Local paint order inside hero canvas only (never use global values like 50+). */
-export const HERO_DECORATION_BACK_Z_INDEX = 1;
-export const HERO_DECORATION_FRONT_Z_INDEX = 6;
-export const HERO_ARC_Z_INDEX = 4;
-export const HERO_CTA_Z_INDEX = 7;
-
-/** Clay decorations — Figma `camera51`, `camera91`, `camera101`. */
-export const HERO_DECORATIONS: HeroDecorationPlacement[] = [
-  {
-    /** Clay star — Figma `camera51`. */
-    assetKey: 'decorationCameraLarge',
-    leftPx: 1032.64 + (HERO_STAR_FIGMA_SIZE_PX - HERO_STAR_SIZE_PX) / 2,
-    topPx: 13.64 + (HERO_STAR_FIGMA_SIZE_PX - HERO_STAR_SIZE_PX) / 2,
-    widthPx: HERO_STAR_SIZE_PX,
-    heightPx: HERO_STAR_SIZE_PX,
-    rotateDeg: HERO_STAR_ROTATE_DEG,
-    zIndex: HERO_DECORATION_BACK_Z_INDEX,
-  },
-  {
-    /** Melody notes — Figma `camera91` slot. */
-    assetKey: 'musicNotes',
-    leftPx: 211,
-    topPx: 150 + HERO_MELODY_OFFSET_Y_PX,
-    widthPx: 173.8,
-    heightPx: 173.8,
-    rotateDeg: HERO_MELODY_ROTATE_DEG,
-    zIndex: HERO_DECORATION_BACK_Z_INDEX,
-  },
-  {
-    /** Bunny — Figma `camera101` slot. */
-    assetKey: 'decorationBunny',
-    leftPx: 646 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2 + HERO_BUNNY_OFFSET_X_PX,
-    topPx: 237 + (HERO_BUNNY_FIGMA_SIZE_PX - HERO_BUNNY_SIZE_PX) / 2 + HERO_BUNNY_OFFSET_Y_PX,
-    widthPx: HERO_BUNNY_SIZE_PX,
-    heightPx: HERO_BUNNY_SIZE_PX,
-    rotateDeg: HERO_BUNNY_ROTATE_DEG,
-    flipX: true,
-    zIndex: HERO_DECORATION_FRONT_Z_INDEX,
-  },
-];
-
-/** Arc sits between center/right photos and left wing — Figma paint order. */
-
-/** Arc headline — Figma `chatgptImageJun102026At2` (77:2826). */
-export const HERO_ARC_PLACEMENT = {
-  leftPx: 629,
-  topPx: 55,
-  widthPx: 628,
-  heightPx: 590,
-} as const;
-
-/** Fine-tune right arc — «YOUR CHILDHOOD». */
-export const HERO_ARC_OFFSET_X_PX = -20;
-
-/** Figma node `1:59` / `.button4` — frosted carousel pill (bottom of hero). */
-export const HERO_BOTTOM_PILL_WIDTH_PX = 401;
-export const HERO_BOTTOM_PILL_HEIGHT_PX = 64;
-export const HERO_BOTTOM_PILL_BG_COLOR = 'rgba(255, 255, 255, 0.38)';
-export const HERO_BOTTOM_PILL_BACKDROP_BLUR_PX = 8;
-export const HERO_BOTTOM_PILL_FONT_SIZE_PX = 16;
-export const HERO_BOTTOM_PILL_LINE_HEIGHT_PX = 28;
-export const HERO_BOTTOM_PILL_TEXT_COLOR = '#ffffff';
-export const HERO_BOTTOM_PILL_PRIMARY_BG_COLOR = BRAND_COLORS.pink;
-export const HERO_BOTTOM_PILL_PRIMARY_INSET_SHADOW =
+/** Gender CTA buttons — Figma nodes `51:338`–`51:342`. */
+export const HERO_GENDER_BUTTONS_TOP_PX = 763;
+export const HERO_GENDER_BUTTONS_GAP_PX = 31;
+export const HERO_GENDER_BUTTON_HEIGHT_PX = 56;
+export const HERO_GENDER_BUTTON_GIRLS_WIDTH_PX = 183;
+export const HERO_GENDER_BUTTON_PADDING_X_PX = 59;
+export const HERO_GENDER_BUTTON_FONT_SIZE_PX = 16;
+export const HERO_GENDER_BUTTON_LINE_HEIGHT_PX = 28;
+export const HERO_GENDER_BUTTON_GIRLS_BG_COLOR = BRAND_COLORS.pink;
+export const HERO_GENDER_BUTTON_BOYS_BG_COLOR = '#5281e1';
+export const HERO_GENDER_BUTTON_INSET_SHADOW =
   'inset 0px -4px 8px 0px rgba(0, 0, 0, 0.27), inset 0px 4px 4px 0px rgba(255, 255, 255, 0.4), inset 0px 20px 40px -10px rgba(164, 60, 18, 0.2)';
-export const HERO_BOTTOM_PILL_ACTIVE_TOP_PX = 7;
-export const HERO_BOTTOM_PILL_INNER_ACTIVE_WIDTH_PX = 152;
-export const HERO_BOTTOM_PILL_INNER_ACTIVE_HEIGHT_PX = 50;
-export const HERO_BOTTOM_PILL_INDICATOR_INSET_X_PX = 11;
-export const HERO_BOTTOM_PILL_SLIDE_MS = 300;
-export const HERO_BOTTOM_PILL_TAB_COUNT = 3;
-export const HERO_BOTTOM_PILL_TAB_WIDTH_PX = HERO_BOTTOM_PILL_WIDTH_PX / HERO_BOTTOM_PILL_TAB_COUNT;
-
-export const HERO_BOTTOM_PILL_TAB_KEYS = [
-  'home.hero.bottomPill.tab1',
-  'home.hero.bottomPill.tab2',
-  'home.hero.bottomPill.tab3',
-] as const;
-
-/** Sliding pink indicator position for the active tab. */
-export function getHeroBottomPillIndicator(activeIndex: number): { leftPx: number; widthPx: number } {
-  const tabWidthPx = HERO_BOTTOM_PILL_TAB_WIDTH_PX;
-  const maxWidthPx = tabWidthPx - HERO_BOTTOM_PILL_INDICATOR_INSET_X_PX * 2;
-  const widthPx = Math.min(HERO_BOTTOM_PILL_INNER_ACTIVE_WIDTH_PX, Math.max(maxWidthPx, 0));
-  const leftPx = activeIndex * tabWidthPx + (tabWidthPx - widthPx) / 2;
-
-  return { leftPx, widthPx };
-}
-
-/** Bottom pill placement — Figma `.button4`. */
-export const HERO_BOTTOM_PILL_PLACEMENT = {
-  leftPx: 516,
-  topPx: 743,
-  widthPx: HERO_BOTTOM_PILL_WIDTH_PX,
-  heightPx: HERO_BOTTOM_PILL_HEIGHT_PX,
-} as const;
 
 export function heroPctX(px: number): string {
   return `${(px / HERO_DESIGN_WIDTH_PX) * 100}%`;

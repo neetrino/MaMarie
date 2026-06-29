@@ -2,11 +2,10 @@
   "hero": {
     "ctaShopNow": "Shop now",
     "ctaNewCollection": "New collection",
-    "bottomPill": {
-      "label": "Hero slides",
-      "tab1": "1",
-      "tab2": "2",
-      "tab3": "3"
+    "genderButtons": {
+      "label": "Shop by gender",
+      "girls": "Girls",
+      "boys": "Boys"
     }
   },
   "bestProducts": {

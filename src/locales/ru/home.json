@@ -2,11 +2,10 @@
   "hero": {
     "ctaShopNow": "Купить сейчас",
     "ctaNewCollection": "Новая коллекция",
-    "bottomPill": {
-      "label": "Слайды hero",
-      "tab1": "1",
-      "tab2": "2",
-      "tab3": "3"
+    "genderButtons": {
+      "label": "Покупки по полу",
+      "girls": "Девочки",
+      "boys": "Мальчики"
     }
   },
   "bestProducts": {
