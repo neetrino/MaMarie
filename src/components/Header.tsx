@@ -22,6 +22,7 @@ import { HeaderActionIcons } from './header/HeaderActionIcons';
 import { HeaderCurrencyPill } from './header/HeaderCurrencyPill';
 import { HeaderLanguagePill } from './header/HeaderLanguagePill';
 import { HeaderLoginPill } from './header/HeaderLoginPill';
+import { HeaderMobileActions } from './header/HeaderMobileActions';
 import { HeaderNavLinks } from './header/HeaderNavLinks';
 import { useHeaderScrolled } from './header/useHomeHeaderScrolled';
 
@@ -57,8 +58,9 @@ function HeaderDesktopNav() {
 function HeaderNavRows() {
   return (
     <>
-      <div className="flex h-16 w-full items-center lg:hidden" style={headerInsetStyle}>
+      <div className="flex h-20 w-full items-end justify-between lg:hidden" style={headerInsetStyle}>
         <BrandLogoLink size="mobile" />
+        <HeaderMobileActions />
       </div>
 
       <div

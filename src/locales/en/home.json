@@ -11,6 +11,24 @@
   "bestProducts": {
     "title": "Best products"
   },
+  "mobile": {
+    "forYou": "For you",
+    "searchPlaceholder": "Search…",
+    "heroSale": {
+      "label": "Sale",
+      "discount": "20%",
+      "cta": "See more"
+    },
+    "addToCart": "Add",
+    "testimonials": {
+      "quote1": "\"My daughter absolutely loves Mamarie clothes. The quality is amazing!\"",
+      "author1": "Ani S.",
+      "quote2": "\"Armenia's best kids clothing brand. Fast delivery, perfect quality.\"",
+      "author2": "Tigran K.",
+      "promoBadge": "LIMITED TIME",
+      "promoTitle": "Get 20% off your first order"
+    }
+  },
   "sale": {
     "title": "SALE",
     "banner": {

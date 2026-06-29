@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BrandChevronDown } from './BrandChevronDown';
 import {
   CURRENCIES,
-  getStoredCurrency,
   setStoredCurrency,
   type CurrencyCode,
 } from '../../lib/currency';
+import { useCurrency } from '../hooks/useCurrency';
 
 /** Chevron footprint — slightly larger than Figma base (18px). */
 const CURRENCY_CHEVRON_WIDTH_PX = 22;
@@ -19,7 +19,7 @@ const CURRENCY_PILL_MIN_WIDTH_PX = 77;
 const CURRENCY_DROPDOWN_ANIMATION_MS = 300;
 
 export function HeaderCurrencyPill() {
-  const [currency, setCurrency] = useState<CurrencyCode>(getStoredCurrency());
+  const currency = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isDropdownExpanded, setIsDropdownExpanded] = useState(false);
@@ -79,18 +79,6 @@ export function HeaderCurrencyPill() {
   }, [currency, syncTriggerWidth]);
 
   useEffect(() => {
-    const handleCurrencyUpdate = () => {
-      setCurrency(getStoredCurrency());
-      syncTriggerWidth();
-    };
-
-    window.addEventListener('currency-updated', handleCurrencyUpdate);
-    return () => {
-      window.removeEventListener('currency-updated', handleCurrencyUpdate);
-    };
-  }, [syncTriggerWidth]);
-
-  useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -114,7 +102,6 @@ export function HeaderCurrencyPill() {
   const handleSelect = (code: CurrencyCode) => {
     if (code !== currency) {
       setStoredCurrency(code);
-      setCurrency(code);
     }
     closeDropdown();
   };

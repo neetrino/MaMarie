@@ -11,8 +11,10 @@ export function ConditionalFooter() {
     return null;
   }
   return (
-    <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
-      <Footer />
-    </LazyWhenVisible>
+    <div className="hidden lg:block">
+      <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
+        <Footer />
+      </LazyWhenVisible>
+    </div>
   );
 }

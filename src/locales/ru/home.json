@@ -11,6 +11,24 @@
   "bestProducts": {
     "title": "Лучшие товары"
   },
+  "mobile": {
+    "forYou": "Для вас",
+    "searchPlaceholder": "Поиск…",
+    "heroSale": {
+      "label": "Sale",
+      "discount": "20%",
+      "cta": "Подробнее"
+    },
+    "addToCart": "Добавить",
+    "testimonials": {
+      "quote1": "«Моя дочь обожает одежду Mamarie. Качество отличное!»",
+      "author1": "Ани С.",
+      "quote2": "«Лучший детский бренд в Армении. Быстрая доставка, идеальное качество.»",
+      "author2": "Тигран К.",
+      "promoBadge": "ОГРАНИЧЕННОЕ ВРЕМЯ",
+      "promoTitle": "Получите 20% скидку на первый заказ"
+    }
+  },
   "sale": {
     "title": "РАСПРОДАЖА",
     "banner": {
