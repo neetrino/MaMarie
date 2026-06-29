@@ -1,22 +1,32 @@
 import { BRAND_COLORS } from './brand';
-import { HOME_SECTION_CONTENT_MAX_WIDTH_PX } from './home-sections';
+import {
+  HOME_SECTION_MAX_WIDTH_PX,
+  HOME_SECTION_PADDING_LEFT_PX,
+  HOME_SECTION_PADDING_RIGHT_PX,
+} from './home-sections';
 
 /** Figma hero artboard — frame `51:329` (1440×853). */
 export const HERO_DESIGN_WIDTH_PX = 1440;
 export const HERO_DESIGN_HEIGHT_PX = 853;
 
-/** Hero canvas matches homepage content column (`HOME_SECTION_CONTENT_MAX_WIDTH_PX`). */
-export const HERO_CANVAS_MAX_WIDTH_PX = HOME_SECTION_CONTENT_MAX_WIDTH_PX;
+/** Hero canvas — full Figma artboard width, slightly wider than the 1354px content column. */
+export const HERO_CANVAS_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
+/** Bleed into section shell padding so the 1440px canvas fits the padded frame. */
+export const HERO_CANVAS_HORIZONTAL_BLEED_LEFT_PX = HOME_SECTION_PADDING_LEFT_PX;
+export const HERO_CANVAS_HORIZONTAL_BLEED_RIGHT_PX = HOME_SECTION_PADDING_RIGHT_PX;
+export const HERO_CANVAS_HORIZONTAL_BLEED_TOTAL_PX =
+  HERO_CANVAS_HORIZONTAL_BLEED_LEFT_PX + HERO_CANVAS_HORIZONTAL_BLEED_RIGHT_PX;
 export const HERO_CANVAS_MAX_HEIGHT_PX = Math.round(
   HERO_CANVAS_MAX_WIDTH_PX * (HERO_DESIGN_HEIGHT_PX / HERO_DESIGN_WIDTH_PX),
 );
 export const HERO_CANVAS_MIN_HEIGHT_PX = Math.round(520 * (HERO_CANVAS_MAX_WIDTH_PX / HERO_DESIGN_WIDTH_PX));
 
-/** Nudge entire hero section down — 0 lets art extend under transparent navbar. */
-export const HERO_SECTION_OFFSET_Y_PX = 0;
+/** Nudge entire hero section up (negative px = higher on screen). */
+export const HERO_SECTION_OFFSET_Y_PX = -56;
 
-/** Shift all hero scene layers + CTAs down within the canvas. */
-export const HERO_SCENE_OFFSET_Y_PX = 28;
+/** Shift hero scene layers + CTAs within the canvas (design px; negative Y = up, positive X = right). */
+export const HERO_SCENE_OFFSET_X_PX = 16;
+export const HERO_SCENE_OFFSET_Y_PX = -12;
 
 export const HERO_CONTENT_MAX_WIDTH_PX = HERO_CANVAS_MAX_WIDTH_PX;
 export const HERO_CONTENT_MAX_HEIGHT_PX = HERO_CANVAS_MAX_HEIGHT_PX;
@@ -179,8 +189,8 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
   },
 ];
 
-/** Gender CTA buttons — Figma nodes `51:338`–`51:342`. */
-export const HERO_GENDER_BUTTONS_TOP_PX = 763;
+/** Pin CTAs to the bottom of the visible artboard (just above arch overflow). */
+export const HERO_GENDER_BUTTONS_BOTTOM_OFFSET_PX = HERO_SCENE_OVERFLOW_BOTTOM_PX - 2;
 export const HERO_GENDER_BUTTONS_GAP_PX = 31;
 export const HERO_GENDER_BUTTON_HEIGHT_PX = 56;
 export const HERO_GENDER_BUTTON_GIRLS_WIDTH_PX = 183;
