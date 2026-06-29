@@ -55,17 +55,26 @@ export const PRODUCTS_CATALOG_PILL_RADIUS_PX = 30;
 export const PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX = 231;
 export const PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX = 16;
 export const PRODUCTS_CATALOG_SORT_ICON_SIZE_PX = 16;
+export const PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX = 25;
 export const PRODUCTS_CATALOG_ASSETS = {
   sortSliders: '/assets/products/icon-sort-sliders.svg',
 } as const;
 
-/** Catalog toolbar view modes — list + 3-column grid. */
-export const PRODUCTS_CATALOG_VIEW_MODES = ['list', 'grid-3'] as const;
+/** Catalog toolbar view modes — list, 3-column grid, 4-column grid (Figma `51:666`). */
+export const PRODUCTS_CATALOG_VIEW_MODES = ['list', 'grid-3', 'grid-4'] as const;
 export type ProductsCatalogViewMode = (typeof PRODUCTS_CATALOG_VIEW_MODES)[number];
 export const PRODUCTS_CATALOG_DEFAULT_VIEW_MODE: ProductsCatalogViewMode = 'grid-3';
 
+/** Four-column card width — fits same row as three 344px cards. */
+export const PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX = Math.floor(
+  (PRODUCTS_CATALOG_CARD_WIDTH_PX * PRODUCTS_CATALOG_CARD_COLUMNS +
+    PRODUCTS_CATALOG_CARD_GAP_PX * (PRODUCTS_CATALOG_CARD_COLUMNS - 1) -
+    PRODUCTS_CATALOG_CARD_GAP_PX * (4 - 1)) /
+    4,
+);
+
 export function normalizeProductsCatalogViewMode(value: string | null): ProductsCatalogViewMode {
-  if (value === 'list' || value === 'grid-3') {
+  if (value === 'list' || value === 'grid-3' || value === 'grid-4') {
     return value;
   }
   return PRODUCTS_CATALOG_DEFAULT_VIEW_MODE;

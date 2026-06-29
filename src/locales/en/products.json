@@ -36,7 +36,8 @@
     "viewModes": {
       "list": "List View",
       "grid2": "Grid View 2x2",
-      "grid3": "Grid View 3x3"
+      "grid3": "Grid View 3x3",
+      "grid4": "Grid View 4x4"
     },
     "filters": "Filters",
     "sortProducts": "Sort Products"

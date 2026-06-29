@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import {
   PRODUCTS_CATALOG_CARD_GAP_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+  PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   PRODUCTS_CATALOG_CTA_BG,
   PRODUCTS_CATALOG_CTA_HEIGHT_PX,
@@ -89,6 +90,13 @@ export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null
     setSortedProducts(sorted.map(mapToHomeProductCard));
   }, [products, sortBy]);
 
+  const cardWidthPx =
+    viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX : PRODUCTS_CATALOG_CARD_WIDTH_PX;
+  const cardHeightPx =
+    viewMode === 'grid-4'
+      ? Math.round(cardWidthPx * (PRODUCTS_CATALOG_CARD_HEIGHT_PX / PRODUCTS_CATALOG_CARD_WIDTH_PX))
+      : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
+
   if (sortedProducts.length === 0) {
     return (
       <div className="py-12 text-center">
@@ -106,8 +114,8 @@ export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null
           <HomeProductCard
             key={product.id}
             product={product}
-            layoutWidthPx={PRODUCTS_CATALOG_CARD_WIDTH_PX}
-            layoutHeightPx={PRODUCTS_CATALOG_CARD_HEIGHT_PX}
+            layoutWidthPx={cardWidthPx}
+            layoutHeightPx={cardHeightPx}
           />
         ))}
       </div>

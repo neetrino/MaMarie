@@ -13,6 +13,7 @@ import {
   PRODUCTS_CATALOG_SORT_PILL_BG,
   PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
   PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX,
+  PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
   PRODUCTS_CATALOG_VIEW_PILL_BG,
   PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
   PRODUCTS_CATALOG_VIEW_MODES,
@@ -24,30 +25,66 @@ import { useTranslation } from '../lib/i18n-client';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
+const VIEW_MODE_LABEL_KEYS: Record<ProductsCatalogViewMode, string> = {
+  list: 'list',
+  'grid-3': 'grid3',
+  'grid-4': 'grid4',
+};
+
+const VIEW_ICON_VIEWBOX = '0 0 25.4294 25';
+const GRID4_DOT_CENTERS_X = [2.054, 9.161, 16.268, 23.376] as const;
+const GRID4_DOT_CENTERS_Y = [2.054, 9.241, 16.429, 22.946] as const;
+const GRID4_DOT_RADIUS = 2.054;
+const GRID3_DOT_CENTERS_X = [2.764, 12.715, 22.665] as const;
+const GRID3_DOT_CENTERS_Y = [2.764, 12.5, 22.236] as const;
+const GRID3_DOT_RADIUS = 2.764;
+const LIST_BAR_WIDTH = 24;
+const LIST_BAR_HEIGHT = 3.5;
+const LIST_BAR_RADIUS = LIST_BAR_HEIGHT / 2;
+const LIST_BAR_X = (25.4294 - LIST_BAR_WIDTH) / 2;
+const LIST_BAR_Y = [0.75, 10.75, 20.75] as const;
+
 function ViewModeIcon({ mode, active }: { mode: ProductsCatalogViewMode; active: boolean }) {
   const color = active ? '#57423b' : 'rgba(87, 66, 59, 0.45)';
+  const iconSize = PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX;
 
   if (mode === 'list') {
     return (
-      <svg width="28" height="21" viewBox="0 0 28 21" fill="none" aria-hidden>
-        <line x1="2" y1="4" x2="26" y2="4" stroke={color} strokeWidth="2" strokeLinecap="round" />
-        <line x1="2" y1="10.5" x2="26" y2="10.5" stroke={color} strokeWidth="2" strokeLinecap="round" />
-        <line x1="2" y1="17" x2="26" y2="17" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+        {LIST_BAR_Y.map((y) => (
+          <rect
+            key={y}
+            x={LIST_BAR_X}
+            y={y}
+            width={LIST_BAR_WIDTH}
+            height={LIST_BAR_HEIGHT}
+            rx={LIST_BAR_RADIUS}
+            fill={color}
+          />
+        ))}
+      </svg>
+    );
+  }
+
+  if (mode === 'grid-3') {
+    return (
+      <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+        {GRID3_DOT_CENTERS_X.flatMap((cx) =>
+          GRID3_DOT_CENTERS_Y.map((cy) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={GRID3_DOT_RADIUS} fill={color} />
+          )),
+        )}
       </svg>
     );
   }
 
   return (
-    <svg width="25" height="25" viewBox="0 0 25 25" fill="none" aria-hidden>
-      <circle cx="5" cy="5" r="1.8" fill={color} />
-      <circle cx="12.5" cy="5" r="1.8" fill={color} />
-      <circle cx="20" cy="5" r="1.8" fill={color} />
-      <circle cx="5" cy="12.5" r="1.8" fill={color} />
-      <circle cx="12.5" cy="12.5" r="1.8" fill={color} />
-      <circle cx="20" cy="12.5" r="1.8" fill={color} />
-      <circle cx="5" cy="20" r="1.8" fill={color} />
-      <circle cx="12.5" cy="20" r="1.8" fill={color} />
-      <circle cx="20" cy="20" r="1.8" fill={color} />
+    <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+      {GRID4_DOT_CENTERS_X.flatMap((cx) =>
+        GRID4_DOT_CENTERS_Y.map((cy) => (
+          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={GRID4_DOT_RADIUS} fill={color} />
+        )),
+      )}
     </svg>
   );
 }
@@ -139,9 +176,13 @@ function ProductsHeaderContent() {
             key={mode}
             type="button"
             onClick={() => handleViewModeChange(mode)}
-            aria-label={t(`products.header.viewModes.${mode === 'grid-3' ? 'grid3' : 'list'}`)}
+            aria-label={t(`products.header.viewModes.${VIEW_MODE_LABEL_KEYS[mode]}`)}
             aria-pressed={viewMode === mode}
-            className="transition-opacity hover:opacity-80"
+            className="inline-flex items-center justify-center transition-opacity hover:opacity-80"
+            style={{
+              width: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
+              height: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
+            }}
           >
             <ViewModeIcon mode={mode} active={viewMode === mode} />
           </button>
