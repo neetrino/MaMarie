@@ -1,7 +1,18 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ProductCard } from './ProductCard';
+import {
+  PRODUCTS_CATALOG_CARD_GAP_PX,
+  PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+  PRODUCTS_CATALOG_CARD_WIDTH_PX,
+  PRODUCTS_CATALOG_CTA_BG,
+  PRODUCTS_CATALOG_CTA_HEIGHT_PX,
+  PRODUCTS_CATALOG_CTA_INSET_SHADOW,
+  PRODUCTS_CATALOG_CTA_WIDTH_PX,
+} from '../constants/products-catalog';
+import { mapToHomeProductCard } from './home/best-products-data';
+import { HomeProductCard, type HomeProductCardData } from './home/HomeProductCard';
 import { useTranslation } from '../lib/i18n-client';
 
 interface Product {
@@ -24,38 +35,35 @@ type ViewMode = 'list' | 'grid-2' | 'grid-3';
 interface ProductsGridProps {
   products: Product[];
   sortBy?: string;
+  loadMoreHref?: string | null;
 }
 
-export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps) {
+export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null }: ProductsGridProps) {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('grid-2');
-  const [sortedProducts, setSortedProducts] = useState<Product[]>(products);
+  const [sortedProducts, setSortedProducts] = useState<HomeProductCardData[]>([]);
 
-  // Load view mode from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('products-view-mode');
     if (stored && ['list', 'grid-2', 'grid-3'].includes(stored)) {
       setViewMode(stored as ViewMode);
     } else {
-      // Default to grid-2 if nothing stored
       setViewMode('grid-2');
       localStorage.setItem('products-view-mode', 'grid-2');
     }
   }, []);
 
-  // Listen for view mode changes
   useEffect(() => {
-    const handleViewModeChange = (_event: CustomEvent) => {
-      setViewMode((_event as CustomEvent).detail);
+    const handleViewModeChange = (event: CustomEvent<ViewMode>) => {
+      setViewMode(event.detail);
     };
 
-    window.addEventListener('view-mode-changed', handleViewModeChange as (_event: Event) => void);
+    window.addEventListener('view-mode-changed', handleViewModeChange as EventListener);
     return () => {
-      window.removeEventListener('view-mode-changed', handleViewModeChange as (_event: Event) => void);
+      window.removeEventListener('view-mode-changed', handleViewModeChange as EventListener);
     };
   }, []);
 
-  // Sort products
   useEffect(() => {
     const sorted = [...products];
 
@@ -73,48 +81,50 @@ export function ProductsGrid({ products, sortBy = 'default' }: ProductsGridProps
         sorted.sort((a, b) => b.title.localeCompare(a.title));
         break;
       default:
-        // Keep original order
         break;
     }
 
-    setSortedProducts(sorted);
+    setSortedProducts(sorted.map(mapToHomeProductCard));
   }, [products, sortBy]);
-
-  // Get grid classes based on view mode
-  const getGridClasses = () => {
-    switch (viewMode) {
-      case 'list':
-        return 'grid grid-cols-1 gap-4';
-      case 'grid-2':
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3';
-      case 'grid-3':
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4';
-      default:
-        return 'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4';
-    }
-  };
 
   if (sortedProducts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">{t('products.grid.noProducts')}</p>
+      <div className="py-12 text-center">
+        <p className="text-lg text-[#757571]">{t('products.grid.noProducts')}</p>
       </div>
     );
   }
-
   return (
-    <div className={getGridClasses()}>
-      {sortedProducts.map((product) => (
-        <ProductCard 
-          key={product.id} 
-          product={{
-            ...product,
-            compareAtPrice: product.compareAtPrice ?? undefined
-          }} 
-          viewMode={viewMode} 
-        />
-      ))}
+    <div className="flex flex-col items-center">
+      <div
+        className="flex w-full flex-wrap justify-center lg:justify-start"
+        style={{ gap: PRODUCTS_CATALOG_CARD_GAP_PX }}
+      >
+        {sortedProducts.map((product) => (
+          <HomeProductCard
+            key={product.id}
+            product={product}
+            layoutWidthPx={PRODUCTS_CATALOG_CARD_WIDTH_PX}
+            layoutHeightPx={PRODUCTS_CATALOG_CARD_HEIGHT_PX}
+          />
+        ))}
+      </div>
+
+      {loadMoreHref ? (
+        <Link
+          href={loadMoreHref}
+          className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
+          style={{
+            width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
+            height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
+            borderRadius: 9999,
+            backgroundColor: PRODUCTS_CATALOG_CTA_BG,
+            boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
+          }}
+        >
+          {t('products.catalog.seeAll')}
+        </Link>
+      ) : null}
     </div>
   );
 }
-

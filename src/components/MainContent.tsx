@@ -38,6 +38,12 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
+  if (pathname.startsWith('/products')) {
+    return (
+      <main className="flex-1 w-full bg-white">{children}</main>
+    );
+  }
+
   return (
     <main
       className="flex-1 w-full pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"

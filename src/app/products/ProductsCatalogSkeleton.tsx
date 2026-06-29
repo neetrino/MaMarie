@@ -1,31 +1,51 @@
-const GRID =
-  'grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4';
+import {
+  PRODUCTS_CATALOG_MAIN_GAP_PX,
+  PRODUCTS_CATALOG_MAX_WIDTH_PX,
+  PRODUCTS_CATALOG_PADDING_LEFT_PX,
+  PRODUCTS_CATALOG_PADDING_RIGHT_PX,
+  PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
+} from '../../constants/products-catalog';
 
 /**
  * Shell for /products while catalog data streams in (layout-stable, no spinners).
  */
 export function ProductsCatalogSkeleton() {
   return (
-    <div className="w-full max-w-full animate-pulse" aria-busy="true" aria-label="Loading products">
-      <div className="max-w-7xl mx-auto pl-2 sm:pl-4 md:pl-6 lg:pl-8 pr-4 sm:pr-6 lg:pr-8 flex flex-col lg:flex-row gap-8">
-        <aside className="w-64 hidden lg:block flex-shrink-0 self-start lg:sticky lg:top-24 lg:z-10 bg-gray-50 rounded-xl">
-          <div className="p-4 space-y-4">
-            <div className="h-24 rounded-lg bg-neutral-200" />
-            <div className="h-32 rounded-lg bg-neutral-200" />
-            <div className="h-28 rounded-lg bg-neutral-200" />
+    <div
+      className="mx-auto w-full animate-pulse"
+      style={{
+        maxWidth: PRODUCTS_CATALOG_MAX_WIDTH_PX,
+        paddingLeft: PRODUCTS_CATALOG_PADDING_LEFT_PX,
+        paddingRight: PRODUCTS_CATALOG_PADDING_RIGHT_PX,
+      }}
+      aria-busy="true"
+      aria-label="Loading products"
+    >
+      <div className="pb-6 pt-2">
+        <div className="h-8 w-48 rounded bg-neutral-200" />
+      </div>
+
+      <div className="flex flex-col lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+        <aside
+          className="hidden shrink-0 lg:block"
+          style={{ width: PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX }}
+          aria-hidden
+        >
+          <div className="flex flex-col gap-5">
+            <div className="h-28 rounded-2xl bg-neutral-200" />
+            <div className="h-36 rounded-2xl bg-neutral-200" />
+            <div className="h-32 rounded-2xl bg-neutral-200" />
           </div>
         </aside>
-        <div className="flex-1 min-w-0 w-full py-4">
-          <div className={GRID}>
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="rounded-lg border border-neutral-200 bg-white overflow-hidden">
-                <div className="aspect-square bg-neutral-200" />
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-neutral-200 rounded w-4/5" />
-                  <div className="h-3 bg-neutral-200 rounded w-1/2" />
-                  <div className="h-5 bg-neutral-200 rounded w-1/3" />
-                </div>
-              </div>
+
+        <div className="min-w-0 flex-1 py-2">
+          <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="rounded-[30px] bg-[#f9e490]/60"
+                style={{ width: 344, height: 371 }}
+              />
             ))}
           </div>
         </div>

@@ -44,6 +44,20 @@
   "grid": {
     "noProducts": "Ապրանքներ չգտնվեցին։"
   },
+  "catalog": {
+    "title": "Տեսականի",
+    "sortBy": "Դասավորել ըստ",
+    "seeAll": "Տեսնել բոլորը",
+    "cancelFilters": "Չեղարկել",
+    "filters": {
+      "category": "Կատեգորիա",
+      "size": "Չափս (սմ)",
+      "price": "Գին",
+      "color": "Գույն",
+      "all": "Բոլորը",
+      "sizeNote": "Եվրոպական չափսային աղյուսակ"
+    }
+  },
   "mobileFilters": {
     "title": "Ֆիլտրեր",
     "close": "Փակել ֆիլտրերը"

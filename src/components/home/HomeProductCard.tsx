@@ -76,6 +76,8 @@ export interface HomeProductCardData {
 
 interface HomeProductCardProps {
   product: HomeProductCardData;
+  layoutWidthPx?: number;
+  layoutHeightPx?: number;
 }
 
 function resolveComparePrice(product: HomeProductCardData): number | null {
@@ -114,7 +116,7 @@ function buildCardCssVars(): CSSProperties {
   } as CSSProperties;
 }
 
-export function HomeProductCard({ product }: HomeProductCardProps) {
+export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: HomeProductCardProps) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const currency = useCurrency();
@@ -157,10 +159,13 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
     addToCart({ origin, imageUrl: product.image });
   };
 
+  const cardWidth = layoutWidthPx ?? HOME_PRODUCT_CARD_WIDTH_PX;
+  const cardHeight = layoutHeightPx ?? HOME_PRODUCT_CARD_HEIGHT_PX;
+
   return (
     <article
       className="home-product-card relative shrink-0"
-      style={{ width: HOME_PRODUCT_CARD_WIDTH_PX, height: HOME_PRODUCT_CARD_HEIGHT_PX, ...buildCardCssVars() }}
+      style={{ width: cardWidth, height: cardHeight, ...buildCardCssVars() }}
     >
       <div
         className="home-product-card-surface relative h-full w-full overflow-visible"

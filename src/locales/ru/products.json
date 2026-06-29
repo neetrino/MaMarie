@@ -44,6 +44,20 @@
   "grid": {
     "noProducts": "Товары не найдены."
   },
+  "catalog": {
+    "title": "Каталог",
+    "sortBy": "Сортировать по",
+    "seeAll": "Смотреть все",
+    "cancelFilters": "Отменить",
+    "filters": {
+      "category": "Категория",
+      "size": "Размер (см)",
+      "price": "Цена",
+      "color": "Цвет",
+      "all": "Все",
+      "sizeNote": "Европейская размерная сетка"
+    }
+  },
   "mobileFilters": {
     "title": "Фильтры",
     "close": "Закрыть фильтры"

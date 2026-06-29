@@ -9,11 +9,14 @@ import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCod
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
 
+type PriceFilterVariant = 'default' | 'catalog';
+
 interface PriceFilterProps {
   currentMinPrice?: string;
   currentMaxPrice?: string;
   category?: string;
   search?: string;
+  variant?: PriceFilterVariant;
 }
 
 interface PriceRange {
@@ -23,7 +26,12 @@ interface PriceRange {
   stepSizePerCurrency?: Partial<Record<CurrencyCode, number>> | null;
 }
 
-export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: PriceFilterProps) {
+export function PriceFilter({
+  currentMinPrice,
+  currentMaxPrice,
+  category,
+  variant = 'default',
+}: PriceFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
@@ -228,15 +236,27 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
   const minPercentage = getPercentage(safeMinPrice);
   const maxPercentage = getPercentage(safeMaxPrice);
 
-  return (
-    <Card className="p-4 mb-6">
-      <h3 className="text-base font-bold text-gray-800 mb-4 text-center uppercase tracking-wide">{t('products.filters.price.title')}</h3>
-      
-      {/* Range Slider */}
-      <div className="mb-4">
+  const sliderTrackClass =
+    variant === 'catalog'
+      ? 'relative h-[3px] cursor-pointer rounded-full bg-[#ebebeb]'
+      : 'relative h-1 bg-gray-200 cursor-pointer';
+
+  const activeRangeClass =
+    variant === 'catalog'
+      ? 'absolute h-[3px] rounded-full bg-[#5281e1]'
+      : 'absolute h-1 bg-sky-400';
+
+  const handleClass =
+    variant === 'catalog'
+      ? 'absolute z-10 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-[#5281e1] bg-white active:cursor-grabbing'
+      : 'absolute cursor-grab active:cursor-grabbing z-10';
+
+  const sliderContent = (
+    <>
+      <div className={variant === 'catalog' ? 'mb-4' : 'mb-4'}>
         <div
           ref={sliderRef}
-          className="relative h-1 bg-gray-200 cursor-pointer"
+          className={sliderTrackClass}
           onMouseDown={(e) => {
             const rect = sliderRef.current?.getBoundingClientRect();
             if (!rect) return;
@@ -259,19 +279,22 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
             }
           }}
         >
-          {/* Active range - light blue */}
           <div
-            className="absolute h-1 bg-sky-400"
+            className={activeRangeClass}
             style={{
               left: `${minPercentage}%`,
               width: `${maxPercentage - minPercentage}%`,
             }}
           />
-          
-          {/* Min handle - T-shaped marker */}
+
           <div
-            className="absolute cursor-grab active:cursor-grabbing z-10"
-            style={{ left: `${minPercentage}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+            className={handleClass}
+            style={{
+              left: `${minPercentage}%`,
+              top: '50%',
+              transform: variant === 'catalog' ? undefined : 'translate(-50%, -50%)',
+              boxShadow: variant === 'catalog' ? '0px 2px 6px rgba(82, 129, 225, 0.4)' : undefined,
+            }}
             onMouseDown={(e) => {
               e.stopPropagation();
               handleMouseDown('min');
@@ -281,14 +304,17 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
               handleMouseDown('min');
             }}
           >
-            {/* T-shaped marker - vertical line extending above and below the horizontal line */}
-            <div className="w-1 h-5 bg-sky-400" />
+            {variant === 'default' ? <div className="h-5 w-1 bg-sky-400" /> : null}
           </div>
-          
-          {/* Max handle - T-shaped marker */}
+
           <div
-            className="absolute cursor-grab active:cursor-grabbing z-10"
-            style={{ left: `${maxPercentage}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+            className={handleClass}
+            style={{
+              left: `${maxPercentage}%`,
+              top: '50%',
+              transform: variant === 'catalog' ? undefined : 'translate(-50%, -50%)',
+              boxShadow: variant === 'catalog' ? '0px 2px 6px rgba(82, 129, 225, 0.4)' : undefined,
+            }}
             onMouseDown={(e) => {
               e.stopPropagation();
               handleMouseDown('max');
@@ -298,19 +324,46 @@ export function PriceFilter({ currentMinPrice, currentMaxPrice, category }: Pric
               handleMouseDown('max');
             }}
           >
-            {/* T-shaped marker - vertical line extending above and below the horizontal line */}
-            <div className="w-1 h-5 bg-sky-400" />
+            {variant === 'default' ? <div className="h-5 w-1 bg-sky-400" /> : null}
           </div>
         </div>
       </div>
 
-      {/* Price Display */}
-      <div className="text-gray-700 text-center">
-        <span className="text-sm text-gray-500">{t('products.filters.price.priceLabel')} </span>
-        <span className="text-sm font-semibold text-gray-900">
-          {formatPrice(Number(safeMinPrice) || 0)} - {formatPrice(Number(safeMaxPrice) || 100000)}
-        </span>
-      </div>
+      {variant === 'catalog' ? (
+        <div className="flex items-center gap-4">
+          <div className="rounded-[14px] bg-[#f5f7ff] px-3 py-2">
+            <span className="text-sm font-bold text-[#5281e1]">
+              {formatPrice(Number(safeMinPrice) || 0)}
+            </span>
+          </div>
+          <span className="h-px w-4 bg-[#ddd]" aria-hidden />
+          <div className="rounded-[14px] bg-[#f5f7ff] px-3 py-2">
+            <span className="text-sm font-bold text-[#5281e1]">
+              {formatPrice(Number(safeMaxPrice) || 100000)}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center text-gray-700">
+          <span className="text-sm text-gray-500">{t('products.filters.price.priceLabel')} </span>
+          <span className="text-sm font-semibold text-gray-900">
+            {formatPrice(Number(safeMinPrice) || 0)} - {formatPrice(Number(safeMaxPrice) || 100000)}
+          </span>
+        </div>
+      )}
+    </>
+  );
+
+  if (variant === 'catalog') {
+    return <div>{sliderContent}</div>;
+  }
+
+  return (
+    <Card className="mb-6 p-4">
+      <h3 className="mb-4 text-center text-base font-bold uppercase tracking-wide text-gray-800">
+        {t('products.filters.price.title')}
+      </h3>
+      {sliderContent}
     </Card>
   );
 }

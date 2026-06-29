@@ -9,12 +9,15 @@ import { getColorHex } from '../lib/colorMap';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
 
+type ColorFilterVariant = 'default' | 'catalog';
+
 interface ColorFilterProps {
   category?: string;
   search?: string;
   minPrice?: string;
   maxPrice?: string;
   selectedColors?: string[];
+  variant?: ColorFilterVariant;
 }
 
 interface ColorOption {
@@ -25,7 +28,14 @@ interface ColorOption {
   colors?: string[] | null;
 }
 
-export function ColorFilter({ category, search, minPrice, maxPrice, selectedColors = [] }: ColorFilterProps) {
+export function ColorFilter({
+  category,
+  search,
+  minPrice,
+  maxPrice,
+  selectedColors = [],
+  variant = 'default',
+}: ColorFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
@@ -102,12 +112,57 @@ export function ColorFilter({ category, search, minPrice, maxPrice, selectedColo
   };
 
   if (loading) {
+    if (variant === 'catalog') {
+      return <div className="text-sm text-[#555]">{t('products.filters.color.loading')}</div>;
+    }
     return (
       <Card className="p-4 mb-6">
         <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">{t('products.filters.color.title')}</h3>
         <div className="text-sm text-gray-500">{t('products.filters.color.loading')}</div>
       </Card>
     );
+  }
+
+  const catalogContent =
+    colors.length === 0 ? (
+      <div className="py-2 text-sm text-[#555]">{t('products.filters.color.noColors')}</div>
+    ) : (
+      <div className="grid grid-cols-4 gap-x-2.5 gap-y-3">
+        {colors.map((color) => {
+          const isSelected = selected.includes(color.value);
+          const colorHex =
+            color.colors && Array.isArray(color.colors) && color.colors.length > 0
+              ? color.colors[0]
+              : getColorHex(color.label);
+          const hasImage = color.imageUrl && color.imageUrl.trim() !== '';
+
+          return (
+            <button
+              key={color.value}
+              type="button"
+              onClick={() => handleColorToggle(color.value)}
+              aria-pressed={isSelected}
+              aria-label={color.label}
+              className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-105 ${
+                isSelected ? 'border-[#57423b] ring-2 ring-[#57423b]/20' : 'border-[#e8e8e8]'
+              }`}
+              style={hasImage ? undefined : { backgroundColor: colorHex }}
+            >
+              {hasImage ? (
+                <img
+                  src={color.imageUrl!}
+                  alt=""
+                  className="h-full w-full rounded-full object-cover"
+                />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+    );
+
+  if (variant === 'catalog') {
+    return <div>{catalogContent}</div>;
   }
 
   return (

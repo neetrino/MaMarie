@@ -44,6 +44,20 @@
   "grid": {
     "noProducts": "No products found."
   },
+  "catalog": {
+    "title": "Catalog",
+    "sortBy": "Sort by",
+    "seeAll": "See all",
+    "cancelFilters": "Cancel",
+    "filters": {
+      "category": "Category",
+      "size": "Size (cm)",
+      "price": "Price",
+      "color": "Color",
+      "all": "All",
+      "sizeNote": "European size chart"
+    }
+  },
   "mobileFilters": {
     "title": "Filters",
     "close": "Close Filters"
