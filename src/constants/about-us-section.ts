@@ -129,6 +129,9 @@ export const ABOUT_US_YELLOW_CARD_DECORATIONS: Array<
   },
 ];
 
+/** Bow / bird (`51:422`) — tilt reduced so beak points at story copy below. */
+export const ABOUT_US_STORY_BOW_ROTATE_DEG = 248;
+
 export const ABOUT_US_STORY_DECORATIONS: Array<
   AboutUsDecorationLayout & { imageSrc: string }
 > = [
@@ -145,7 +148,7 @@ export const ABOUT_US_STORY_DECORATIONS: Array<
     topPx: 0,
     wrapperSizePx: 207.282,
     imageSizePx: 161.045,
-    rotateDeg: 110.52,
+    rotateDeg: ABOUT_US_STORY_BOW_ROTATE_DEG,
     flipY: true,
     zIndex: ABOUT_US_FOREGROUND_DECORATION_Z_INDEX,
     imageSrc: ABOUT_US_ASSETS.decoBow,
