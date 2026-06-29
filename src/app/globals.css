@@ -255,3 +255,10 @@
   margin-top: 0.25rem;
 }
 
+/* Figma `74:875` — reserve space above fixed mobile bottom nav (not on desktop). */
+@media (max-width: 1023px) {
+  .layout-shell-mobile-bottom-clearance {
+    padding-bottom: max(114px, env(safe-area-inset-bottom, 0px));
+  }
+}
+

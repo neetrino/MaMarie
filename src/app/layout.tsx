@@ -3,10 +3,10 @@ import type { Metadata, Viewport } from 'next';
 import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
+import { ConditionalMobileBottomNav } from '../components/ConditionalMobileBottomNav';
 import { ConditionalHeader } from '../components/ConditionalHeader';
 import { ConditionalFooter } from '../components/ConditionalFooter';
 import { MainContent } from '../components/MainContent';
-import { MobileBottomNav } from '../components/MobileBottomNav';
 import { NAV_LINKS } from '../constants/nav-links';
 
 const montserrat = Montserrat({
@@ -36,12 +36,12 @@ export default function RootLayout({
       <body className={`${montserrat.variable} font-sans bg-white text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>
-            <div className="flex min-h-screen flex-col pb-16 max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pb-0">
+            <div className="layout-shell-mobile-bottom-clearance flex min-h-screen flex-col max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pb-0">
               <ConditionalHeader navLinks={NAV_LINKS} />
               <MainContent>{children}</MainContent>
               <ConditionalFooter />
-              <MobileBottomNav />
             </div>
+            <ConditionalMobileBottomNav />
           </ClientProviders>
         </Suspense>
       </body>

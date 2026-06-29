@@ -1,0 +1,122 @@
+/**
+ * Mobile bottom nav — Figma `74:875`.
+ * Bar flush to viewport bottom; rounded top corners only.
+ */
+.shell {
+  --bottom-nav-design-width: 375;
+  --bottom-nav-shell-height: 114px;
+  --bottom-nav-bar-height: 76px;
+  --bottom-nav-bar-radius: 30px;
+  --bottom-nav-bar-top: 38px;
+  --bottom-nav-shadow: 0 4px 7px rgb(0 0 0 / 11%);
+}
+
+.root {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  height: calc(var(--bottom-nav-shell-height) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .root {
+    display: none;
+  }
+}
+
+.frame {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: var(--bottom-nav-shell-height);
+}
+
+.bar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: var(--bottom-nav-bar-height);
+  border-radius: var(--bottom-nav-bar-radius) var(--bottom-nav-bar-radius) 0 0;
+  background-color: #fff;
+  box-shadow: var(--bottom-nav-shadow);
+}
+
+.notch {
+  position: absolute;
+  top: var(--bottom-nav-bar-top);
+  left: calc(100% * 12 / var(--bottom-nav-design-width));
+  width: calc(100% * 110 / var(--bottom-nav-design-width));
+  height: 56px;
+  pointer-events: none;
+}
+
+.activeBubble {
+  position: absolute;
+  top: 29px;
+  left: calc(100% * 39 / var(--bottom-nav-design-width));
+  width: calc(100% * 56 / var(--bottom-nav-design-width));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: var(--color-brand-pink, #ef95aa);
+  pointer-events: none;
+}
+
+.slot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  pointer-events: auto;
+  text-decoration: none;
+}
+
+.homeSlot {
+  top: 37px;
+  left: calc(100% * 28 / var(--bottom-nav-design-width));
+  width: calc(100% * 78 / var(--bottom-nav-design-width));
+  height: 40px;
+}
+
+.itemSlot {
+  top: 56px;
+  width: calc(100% * 78 / var(--bottom-nav-design-width));
+  height: 40px;
+}
+
+.itemSlotCart {
+  left: calc(100% * 110 / var(--bottom-nav-design-width));
+}
+
+.itemSlotWishlist {
+  left: calc(100% * 189 / var(--bottom-nav-design-width));
+}
+
+.itemSlotProfile {
+  left: calc(100% * 268 / var(--bottom-nav-design-width));
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 16px;
+  min-width: 16px;
+  border-radius: 9999px;
+  background-color: #ef4444;
+  padding-inline: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  color: #fff;
+  text-align: center;
+}
+
+.homeInactiveIcon {
+  color: #5d5d5d;
+}
