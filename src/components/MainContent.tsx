@@ -1,0 +1,49 @@
+'use client';
+
+import type { CSSProperties, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import {
+  HEADER_CONTENT_CLEARANCE_DESKTOP_PX,
+  HEADER_CONTENT_CLEARANCE_MOBILE_PX,
+} from '../constants/header';
+
+interface MainContentProps {
+  children: ReactNode;
+}
+
+const headerClearanceVars = {
+  ['--header-clearance-mobile']: `${HEADER_CONTENT_CLEARANCE_MOBILE_PX}px`,
+  ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px`,
+} as CSSProperties;
+
+/**
+ * Wraps page content with top clearance for the fixed navbar.
+ * Home hero and admin routes are excluded — hero sits under the transparent bar.
+ */
+export function MainContent({ children }: MainContentProps) {
+  const pathname = usePathname() ?? '';
+
+  if (pathname === '/' || pathname.startsWith('/supersudo')) {
+    return <main className="flex-1 w-full">{children}</main>;
+  }
+
+  if (pathname.startsWith('/profile')) {
+    return (
+      <main
+        className="flex-1 w-full md:pt-[var(--header-clearance-desktop)]"
+        style={{ ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px` }}
+      >
+        {children}
+      </main>
+    );
+  }
+
+  return (
+    <main
+      className="flex-1 w-full pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+      style={headerClearanceVars}
+    >
+      {children}
+    </main>
+  );
+}

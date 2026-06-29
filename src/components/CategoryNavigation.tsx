@@ -9,7 +9,6 @@ import { useCategoryScroll } from './CategoryNavigation/hooks/useCategoryScroll'
 import { CategoryItem } from './CategoryNavigation/CategoryItem';
 import { CategoryScrollButtons } from './CategoryNavigation/CategoryScrollButtons';
 import { CategoryNavigationLoading } from './CategoryNavigation/CategoryNavigationLoading';
-import type { Category } from './CategoryNavigation/utils';
 
 function CategoryNavigationContent() {
   const router = useRouter();
@@ -56,14 +55,8 @@ function CategoryNavigationContent() {
     return <CategoryNavigationLoading />;
   }
 
-  // Add "All" category at the beginning
-  const allCategoriesWithAll = [
-    { id: 'all', slug: 'all', title: t('products.categoryNavigation.all'), fullPath: 'all', children: [] } as Category,
-    ...categories
-  ];
-
   // Limit to first 10 categories for horizontal navigation
-  const displayCategories = allCategoriesWithAll.slice(0, 10);
+  const displayCategories = categories.slice(0, 10);
 
   return (
     <div className="bg-white border-b border-gray-200 py-3 sm:py-4 md:py-6 w-full">
@@ -82,9 +75,7 @@ function CategoryNavigationContent() {
             style={{ scrollBehavior: 'smooth' }}
           >
             {displayCategories.map((category) => {
-              const isActive = category.slug === 'all' 
-                ? !currentCategory 
-                : currentCategory === category.slug;
+              const isActive = currentCategory === category.slug;
               const product = categoryProducts[category.slug];
 
               return (

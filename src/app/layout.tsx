@@ -5,6 +5,7 @@ import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
 import { ConditionalHeader } from '../components/ConditionalHeader';
 import { ConditionalFooter } from '../components/ConditionalFooter';
+import { MainContent } from '../components/MainContent';
 import { MobileBottomNav } from '../components/MobileBottomNav';
 
 const montserrat = Montserrat({
@@ -30,9 +31,7 @@ export default function RootLayout({
           <ClientProviders>
             <div className="flex min-h-screen flex-col pb-16 lg:pb-0">
               <ConditionalHeader />
-              <main className="flex-1 w-full">
-                {children}
-              </main>
+              <MainContent>{children}</MainContent>
               <ConditionalFooter />
               <MobileBottomNav />
             </div>

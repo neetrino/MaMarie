@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
 import {
   HEADER_ACTIONS_GAP_PX,
@@ -24,7 +23,7 @@ import { HeaderCurrencyPill } from './header/HeaderCurrencyPill';
 import { HeaderLanguagePill } from './header/HeaderLanguagePill';
 import { HeaderLoginPill } from './header/HeaderLoginPill';
 import { HeaderNavLinks } from './header/HeaderNavLinks';
-import { useHomeHeaderScrolled } from './header/useHomeHeaderScrolled';
+import { useHeaderScrolled } from './header/useHomeHeaderScrolled';
 
 const headerInsetStyle = {
   paddingLeft: HEADER_PADDING_LEFT_PX,
@@ -72,7 +71,7 @@ function HeaderNavRows() {
   );
 }
 
-function HomeHeaderContent({ showPill }: { showPill: boolean }) {
+function OverlayHeaderContent({ showPill }: { showPill: boolean }) {
   return (
     <div className="relative w-full">
       <div
@@ -101,17 +100,7 @@ function HomeHeaderContent({ showPill }: { showPill: boolean }) {
 }
 
 export function Header() {
-  const pathname = usePathname() ?? '';
-  const isHome = pathname === '/';
-  const isScrolled = useHomeHeaderScrolled(isHome);
-
-  if (!isHome) {
-    return (
-      <header className="sticky top-0 z-50 w-full bg-white">
-        <HeaderNavRows />
-      </header>
-    );
-  }
+  const isScrolled = useHeaderScrolled();
 
   return (
     <header
@@ -121,7 +110,7 @@ export function Header() {
         transform: `translateY(${HEADER_HOME_OFFSET_Y_PX}px)`,
       }}
     >
-      <HomeHeaderContent showPill={isScrolled} />
+      <OverlayHeaderContent showPill={isScrolled} />
     </header>
   );
 }

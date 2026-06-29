@@ -4,17 +4,12 @@ import { useEffect, useState } from 'react';
 import { HEADER_HOME_SCROLL_THRESHOLD_PX } from '../../constants/header';
 
 /**
- * Returns true when the homepage has scrolled past the hero overlay threshold.
+ * Returns true when the page has scrolled past the navbar pill threshold.
  */
-export function useHomeHeaderScrolled(isHome: boolean): boolean {
+export function useHeaderScrolled(): boolean {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    if (!isHome) {
-      setIsScrolled(false);
-      return;
-    }
-
     const updateScrollState = () => {
       const scrollTop =
         window.scrollY ||
@@ -30,7 +25,7 @@ export function useHomeHeaderScrolled(isHome: boolean): boolean {
     return () => {
       window.removeEventListener('scroll', updateScrollState);
     };
-  }, [isHome]);
+  }, []);
 
   return isScrolled;
 }

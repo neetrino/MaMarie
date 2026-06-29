@@ -214,7 +214,7 @@ export async function ProductsCatalog({
   return (
     <>
       <div className={PAGE_CONTAINER}>
-        <ProductsHeader total={productsData.meta.total} perPage={productsData.meta.limit} />
+        <ProductsHeader />
       </div>
 
       <div className="max-w-7xl mx-auto pl-2 sm:pl-4 md:pl-6 lg:pl-8 pr-4 sm:pr-6 lg:pr-8 flex flex-col lg:flex-row gap-8">

@@ -7,18 +7,7 @@ import { useTranslation } from '../lib/i18n-client';
 type ViewMode = 'list' | 'grid-2' | 'grid-3';
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
-interface ProductsHeaderProps {
-  /**
-   * Ընդհանուր ապրանքների քանակը՝ բոլոր էջերում (from API meta.total)
-   */
-  total: number;
-  /**
-   * Մի էջում ցուցադրվող ապրանքների քանակը (from API meta.limit)
-   */
-  perPage: number;
-}
-
-function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
+function ProductsHeaderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
@@ -135,10 +124,9 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4">
       {/* Desktop: All elements in one horizontal line */}
       <div className="hidden sm:flex sm:items-center sm:justify-between sm:gap-4">
-        {/* Left side: Clear filters + All products title */}
         <div className="flex items-center gap-4">
           {hasActiveFilters && (
             <button
@@ -165,10 +153,6 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
               <span>{t('products.header.clearFilters')}</span>
             </button>
           )}
-          
-          <h1 className="text-xl font-bold text-gray-900">
-            {t('products.header.allProducts').replace('{total}', total.toString())}
-          </h1>
         </div>
 
         {/* Right side: Show + View toggles + Sort */}
@@ -291,13 +275,7 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
 
       {/* Mobile: Stacked layout */}
       <div className="sm:hidden flex flex-col gap-4">
-        {/* Top: All Products Title + Show dropdown */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">
-            {t('products.header.allProducts').replace('{total}', total.toString())}
-          </h1>
-          
-          {/* Show dropdown - Top right */}
+        <div className="flex items-center justify-end">
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-600">{t('products.header.show')}</span>
             <select
@@ -418,16 +396,16 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
   );
 }
 
-export function ProductsHeader(props: ProductsHeaderProps) {
+export function ProductsHeader() {
   return (
     <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4">
         <div className="flex justify-end items-center">
           <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
         </div>
       </div>
     }>
-      <ProductsHeaderContent {...props} />
+      <ProductsHeaderContent />
     </Suspense>
   );
 }
