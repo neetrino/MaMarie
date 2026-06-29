@@ -15,13 +15,12 @@ import {
   PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX,
   PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
   PRODUCTS_CATALOG_VIEW_PILL_BG,
-  PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
   PRODUCTS_CATALOG_VIEW_MODES,
-  normalizeProductsCatalogViewMode,
   type ProductsCatalogViewMode,
 } from '../constants/products-catalog';
 import { MOBILE_FILTERS_EVENT } from '../lib/events';
 import { useTranslation } from '../lib/i18n-client';
+import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
@@ -100,7 +99,7 @@ function ProductsHeaderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ProductsCatalogViewMode>(PRODUCTS_CATALOG_DEFAULT_VIEW_MODE);
+  const { viewMode, setViewMode } = useProductsCatalogViewMode();
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
@@ -112,15 +111,6 @@ function ProductsHeaderContent() {
     { value: 'name-asc', label: t('products.header.sort.nameAsc') },
     { value: 'name-desc', label: t('products.header.sort.nameDesc') },
   ];
-
-  useEffect(() => {
-    const stored = localStorage.getItem('products-view-mode');
-    const mode = normalizeProductsCatalogViewMode(stored);
-    setViewMode(mode);
-    if (stored !== mode) {
-      localStorage.setItem('products-view-mode', mode);
-    }
-  }, []);
 
   useEffect(() => {
     const sortParam = searchParams.get('sort') as SortOption;
@@ -141,8 +131,6 @@ function ProductsHeaderContent() {
 
   const handleViewModeChange = (mode: ProductsCatalogViewMode) => {
     setViewMode(mode);
-    localStorage.setItem('products-view-mode', mode);
-    window.dispatchEvent(new CustomEvent('view-mode-changed', { detail: mode }));
   };
 
   const handleSortChange = (option: SortOption) => {

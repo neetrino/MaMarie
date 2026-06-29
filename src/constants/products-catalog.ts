@@ -69,7 +69,9 @@ export const PRODUCTS_CATALOG_ASSETS = {
 /** Catalog toolbar view modes — list, 3-column grid, 4-column grid (Figma `51:666`). */
 export const PRODUCTS_CATALOG_VIEW_MODES = ['list', 'grid-3', 'grid-4'] as const;
 export type ProductsCatalogViewMode = (typeof PRODUCTS_CATALOG_VIEW_MODES)[number];
-export const PRODUCTS_CATALOG_DEFAULT_VIEW_MODE: ProductsCatalogViewMode = 'grid-3';
+/** Default — middle (2nd) icon in the view toolbar; user choice is persisted in localStorage. */
+export const PRODUCTS_CATALOG_DEFAULT_VIEW_MODE: ProductsCatalogViewMode =
+  PRODUCTS_CATALOG_VIEW_MODES[1];
 
 /** Four-column card width — fits same row as three 344px cards. */
 export const PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX = Math.floor(

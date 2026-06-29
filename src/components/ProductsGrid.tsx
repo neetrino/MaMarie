@@ -11,13 +11,11 @@ import {
   PRODUCTS_CATALOG_CTA_HEIGHT_PX,
   PRODUCTS_CATALOG_CTA_INSET_SHADOW,
   PRODUCTS_CATALOG_CTA_WIDTH_PX,
-  PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
-  normalizeProductsCatalogViewMode,
-  type ProductsCatalogViewMode,
 } from '../constants/products-catalog';
 import { mapToHomeProductCard } from './home/best-products-data';
 import { HomeProductCard, type HomeProductCardData } from './home/HomeProductCard';
 import { useTranslation } from '../lib/i18n-client';
+import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
 interface Product {
   id: string;
@@ -34,8 +32,6 @@ interface Product {
   defaultVariantId?: string | null;
 }
 
-type ViewMode = ProductsCatalogViewMode;
-
 interface ProductsGridProps {
   products: Product[];
   sortBy?: string;
@@ -44,28 +40,8 @@ interface ProductsGridProps {
 
 export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null }: ProductsGridProps) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ViewMode>(PRODUCTS_CATALOG_DEFAULT_VIEW_MODE);
+  const { viewMode } = useProductsCatalogViewMode();
   const [sortedProducts, setSortedProducts] = useState<HomeProductCardData[]>([]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('products-view-mode');
-    const mode = normalizeProductsCatalogViewMode(stored);
-    setViewMode(mode);
-    if (stored !== mode) {
-      localStorage.setItem('products-view-mode', mode);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleViewModeChange = (event: CustomEvent<ViewMode>) => {
-      setViewMode(event.detail);
-    };
-
-    window.addEventListener('view-mode-changed', handleViewModeChange as EventListener);
-    return () => {
-      window.removeEventListener('view-mode-changed', handleViewModeChange as EventListener);
-    };
-  }, []);
 
   useEffect(() => {
     const sorted = [...products];
