@@ -13,9 +13,6 @@ export const HEADER_DESKTOP_ROW_PADDING_Y_PX = 0;
 /** Pill fade-in duration (ms). */
 export const HEADER_PILL_APPEAR_DURATION_MS = 500;
 
-/** Horizontal inset of pill background — content keeps Figma 87/93px inset. */
-export const HEADER_PILL_SHELL_PADDING_X_PX = 57;
-
 /** Fixed pill height — narrower than full nav row, vertically centered on scroll. */
 export const HEADER_PILL_SHELL_HEIGHT_PX = 70;
 

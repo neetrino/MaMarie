@@ -13,9 +13,12 @@ import {
   HEADER_HOME_OVERLAY_TOP_PX,
   HEADER_PILL_APPEAR_DURATION_MS,
   HEADER_PILL_SHELL_HEIGHT_PX,
-  HEADER_PILL_SHELL_PADDING_X_PX,
 } from '../constants/header';
 import { BrandLogoLink } from './BrandLogoLink';
+import {
+  HomeContentHorizontalFrame,
+  HomeSectionContent,
+} from './home/HomeSectionShell';
 import { HeaderActionIcons } from './header/HeaderActionIcons';
 import { HeaderCurrencyPill } from './header/HeaderCurrencyPill';
 import { HeaderLanguagePill } from './header/HeaderLanguagePill';
@@ -74,17 +77,21 @@ function HomeHeaderContent({ showPill }: { showPill: boolean }) {
     <div className="relative w-full">
       <div
         aria-hidden
-        className="pointer-events-none absolute z-0 rounded-full bg-white shadow-[0_4px_24px_rgba(87,66,59,0.12)] transition-opacity ease-out"
-        style={{
-          left: HEADER_PILL_SHELL_PADDING_X_PX,
-          right: HEADER_PILL_SHELL_PADDING_X_PX,
-          top: '50%',
-          height: HEADER_PILL_SHELL_HEIGHT_PX,
-          transform: 'translateY(-50%)',
-          opacity: showPill ? 1 : 0,
-          transitionDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
-        }}
-      />
+        className="pointer-events-none absolute inset-0 z-0 flex items-center"
+      >
+        <HomeContentHorizontalFrame>
+          <HomeSectionContent>
+            <div
+              className="w-full rounded-full bg-white shadow-[0_4px_24px_rgba(87,66,59,0.12)] transition-opacity ease-out"
+              style={{
+                height: HEADER_PILL_SHELL_HEIGHT_PX,
+                opacity: showPill ? 1 : 0,
+                transitionDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
+              }}
+            />
+          </HomeSectionContent>
+        </HomeContentHorizontalFrame>
+      </div>
 
       <div className="relative z-10">
         <HeaderNavRows />

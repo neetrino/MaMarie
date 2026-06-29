@@ -6,6 +6,34 @@ import {
   HOME_SECTION_PADDING_RIGHT_PX,
 } from '../../constants/home-sections';
 
+interface HomeContentHorizontalFrameProps {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}
+
+/** 1440px shell + section padding — shared by homepage blocks and header pill track. */
+export function HomeContentHorizontalFrame({
+  children,
+  className = 'w-full',
+  style,
+}: HomeContentHorizontalFrameProps) {
+  return (
+    <div
+      className="mx-auto w-full"
+      style={{
+        maxWidth: HOME_SECTION_MAX_WIDTH_PX,
+        paddingLeft: HOME_SECTION_PADDING_LEFT_PX,
+        paddingRight: HOME_SECTION_PADDING_RIGHT_PX,
+      }}
+    >
+      <div className={className} style={style}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 interface HomeSectionShellProps {
   children: ReactNode;
   offsetTopPx?: number;
@@ -22,16 +50,7 @@ export function HomeSectionShell({
 }: HomeSectionShellProps) {
   return (
     <div className={className} style={{ paddingTop: offsetTopPx, ...style }}>
-      <div
-        className="mx-auto w-full"
-        style={{
-          maxWidth: HOME_SECTION_MAX_WIDTH_PX,
-          paddingLeft: HOME_SECTION_PADDING_LEFT_PX,
-          paddingRight: HOME_SECTION_PADDING_RIGHT_PX,
-        }}
-      >
-        {children}
-      </div>
+      <HomeContentHorizontalFrame>{children}</HomeContentHorizontalFrame>
     </div>
   );
 }
