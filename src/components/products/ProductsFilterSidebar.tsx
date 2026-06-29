@@ -13,6 +13,7 @@ import {
   PRODUCTS_CATALOG_CTA_HEIGHT_PX,
   PRODUCTS_CATALOG_CTA_INSET_SHADOW,
   PRODUCTS_CATALOG_CTA_WIDTH_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
 } from '../../constants/products-catalog';
 import { ProductsFilterSection } from './ProductsFilterSection';
@@ -110,6 +111,7 @@ function ProductsFilterSidebarContent({
             borderRadius: 9999,
             backgroundColor: PRODUCTS_CATALOG_CTA_BG,
             boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
+            fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
           }}
         >
           {t('products.catalog.cancelFilters')}

@@ -7,6 +7,9 @@ import {
   PRODUCTS_CATALOG_FILTER_ACCENT,
   PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX,
   PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+  PRODUCTS_CATALOG_TEXT_DARK,
 } from '../constants/products-catalog';
 import { useTranslation } from '../lib/i18n-client';
 
@@ -111,8 +114,12 @@ export function ClothingTypeFilter({
           >
             <CheckboxIndicator selected={isSelected} />
             <span
-              className={isSelected ? 'font-semibold text-[#1d1c16]' : 'font-medium text-[#555]'}
-              style={{ fontSize: 12, lineHeight: '16.5px' }}
+              className={isSelected ? 'font-semibold' : 'font-medium text-[#555]'}
+              style={{
+                fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+                lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+                color: isSelected ? PRODUCTS_CATALOG_TEXT_DARK : undefined,
+              }}
             >
               {t(option.labelKey)}
             </span>

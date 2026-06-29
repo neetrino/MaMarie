@@ -8,6 +8,7 @@ import { getStoredLanguage } from '../lib/language';
 import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCode } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { PRODUCTS_CATALOG_FILTER_PRICE_FONT_SIZE_PX } from '../constants/products-catalog';
 
 type PriceFilterVariant = 'default' | 'catalog';
 
@@ -332,13 +333,19 @@ export function PriceFilter({
       {variant === 'catalog' ? (
         <div className="flex items-center gap-4">
           <div className="rounded-[14px] bg-[#f5f7ff] px-3 py-2">
-            <span className="text-sm font-bold text-[#5281e1]">
+            <span
+              className="font-bold text-[#5281e1]"
+              style={{ fontSize: PRODUCTS_CATALOG_FILTER_PRICE_FONT_SIZE_PX }}
+            >
               {formatPrice(Number(safeMinPrice) || 0)}
             </span>
           </div>
           <span className="h-px w-4 bg-[#ddd]" aria-hidden />
           <div className="rounded-[14px] bg-[#f5f7ff] px-3 py-2">
-            <span className="text-sm font-bold text-[#5281e1]">
+            <span
+              className="font-bold text-[#5281e1]"
+              style={{ fontSize: PRODUCTS_CATALOG_FILTER_PRICE_FONT_SIZE_PX }}
+            >
               {formatPrice(Number(safeMaxPrice) || 100000)}
             </span>
           </div>

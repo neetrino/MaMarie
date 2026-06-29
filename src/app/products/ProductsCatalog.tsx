@@ -13,14 +13,15 @@ import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
 import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
 import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
+import {
+  HomeContentHorizontalFrame,
+  HomeSectionContent,
+} from '../../components/home/HomeSectionShell';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
 import {
   PRODUCTS_CATALOG_MAIN_GAP_PX,
-  PRODUCTS_CATALOG_MAX_WIDTH_PX,
-  PRODUCTS_CATALOG_PADDING_LEFT_PX,
-  PRODUCTS_CATALOG_PADDING_RIGHT_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
 
@@ -212,14 +213,8 @@ export async function ProductsCatalog({
   const loadMoreHref = page < productsData.meta.totalPages ? buildPaginationUrl(page + 1) : null;
 
   return (
-    <div
-      className="mx-auto w-full"
-      style={{
-        maxWidth: PRODUCTS_CATALOG_MAX_WIDTH_PX,
-        paddingLeft: PRODUCTS_CATALOG_PADDING_LEFT_PX,
-        paddingRight: PRODUCTS_CATALOG_PADDING_RIGHT_PX,
-      }}
-    >
+    <HomeContentHorizontalFrame>
+      <HomeSectionContent>
       <div className="space-y-3 pt-2 pb-4 lg:hidden">
         <ProductsBreadcrumb />
         <ProductsHeader />
@@ -305,6 +300,7 @@ export async function ProductsCatalog({
           </div>
         </MobileFiltersDrawer>
       </ProductsFiltersProvider>
-    </div>
+      </HomeSectionContent>
+    </HomeContentHorizontalFrame>
   );
 }

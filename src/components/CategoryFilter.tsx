@@ -3,7 +3,12 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import { useCategories } from './CategoryNavigation/hooks/useCategories';
-import { PRODUCTS_CATALOG_FILTER_ACCENT } from '../constants/products-catalog';
+import {
+  PRODUCTS_CATALOG_FILTER_ACCENT,
+  PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+  PRODUCTS_CATALOG_TEXT_DARK,
+} from '../constants/products-catalog';
 
 type CategoryFilterVariant = 'default' | 'catalog';
 
@@ -68,7 +73,17 @@ export function CategoryFilter({ currentCategory, variant = 'default' }: Categor
   ];
 
   if (loading && categories.length === 0) {
-    return <p className="text-sm text-[#555]">{t('products.filters.color.loading')}</p>;
+    return (
+      <p
+        className="text-[#555]"
+        style={{
+          fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+          lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+        }}
+      >
+        {t('products.filters.color.loading')}
+      </p>
+    );
   }
 
   return (
@@ -84,8 +99,12 @@ export function CategoryFilter({ currentCategory, variant = 'default' }: Categor
           >
             <RadioIndicator selected={selected} />
             <span
-              className={selected ? 'font-semibold text-[#1d1c16]' : 'font-medium text-[#555]'}
-              style={{ fontSize: 13, lineHeight: '19.5px' }}
+              className={selected ? 'font-semibold' : 'font-medium text-[#555]'}
+              style={{
+                fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+                lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+                color: selected ? PRODUCTS_CATALOG_TEXT_DARK : undefined,
+              }}
             >
               {option.label}
             </span>

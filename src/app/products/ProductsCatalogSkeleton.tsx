@@ -1,8 +1,9 @@
 import {
+  HomeContentHorizontalFrame,
+  HomeSectionContent,
+} from '../../components/home/HomeSectionShell';
+import {
   PRODUCTS_CATALOG_MAIN_GAP_PX,
-  PRODUCTS_CATALOG_MAX_WIDTH_PX,
-  PRODUCTS_CATALOG_PADDING_LEFT_PX,
-  PRODUCTS_CATALOG_PADDING_RIGHT_PX,
   PRODUCTS_CATALOG_PILL_HEIGHT_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
   PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
@@ -14,16 +15,9 @@ import {
  */
 export function ProductsCatalogSkeleton() {
   return (
-    <div
-      className="mx-auto w-full animate-pulse"
-      style={{
-        maxWidth: PRODUCTS_CATALOG_MAX_WIDTH_PX,
-        paddingLeft: PRODUCTS_CATALOG_PADDING_LEFT_PX,
-        paddingRight: PRODUCTS_CATALOG_PADDING_RIGHT_PX,
-      }}
-      aria-busy="true"
-      aria-label="Loading products"
-    >
+    <HomeContentHorizontalFrame>
+      <HomeSectionContent>
+        <div className="animate-pulse" aria-busy="true" aria-label="Loading products">
       <div className="space-y-3 pt-2 pb-4 lg:hidden">
         <div className="h-8 w-48 rounded bg-neutral-200" />
         <div
@@ -77,6 +71,8 @@ export function ProductsCatalogSkeleton() {
           </div>
         </div>
       </div>
-    </div>
+        </div>
+      </HomeSectionContent>
+    </HomeContentHorizontalFrame>
   );
 }

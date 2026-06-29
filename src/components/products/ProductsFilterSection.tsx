@@ -9,7 +9,9 @@ import {
   PRODUCTS_CATALOG_FILTER_SECTION_RADIUS_PX,
   PRODUCTS_CATALOG_FILTER_SECTION_SHADOW,
   PRODUCTS_CATALOG_FILTER_TITLE_LETTER_SPACING_PX,
+  PRODUCTS_CATALOG_FILTER_TITLE_LINE_HEIGHT_PX,
   PRODUCTS_CATALOG_FILTER_TITLE_SIZE_PX,
+  PRODUCTS_CATALOG_TEXT_DARK,
 } from '../../constants/products-catalog';
 
 interface ProductsFilterSectionProps {
@@ -46,8 +48,8 @@ export function ProductsFilterSection({
           style={{
             fontSize: PRODUCTS_CATALOG_FILTER_TITLE_SIZE_PX,
             letterSpacing: `${PRODUCTS_CATALOG_FILTER_TITLE_LETTER_SPACING_PX}px`,
-            lineHeight: '16.5px',
-            color: '#1d1c16',
+            lineHeight: `${PRODUCTS_CATALOG_FILTER_TITLE_LINE_HEIGHT_PX}px`,
+            color: PRODUCTS_CATALOG_TEXT_DARK,
           }}
         >
           {title}

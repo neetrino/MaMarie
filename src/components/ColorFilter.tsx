@@ -8,6 +8,10 @@ import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import {
+  PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+} from '../constants/products-catalog';
 
 type ColorFilterVariant = 'default' | 'catalog';
 
@@ -113,7 +117,17 @@ export function ColorFilter({
 
   if (loading) {
     if (variant === 'catalog') {
-      return <div className="text-sm text-[#555]">{t('products.filters.color.loading')}</div>;
+      return (
+        <div
+          className="text-[#555]"
+          style={{
+            fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+            lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+          }}
+        >
+          {t('products.filters.color.loading')}
+        </div>
+      );
     }
     return (
       <Card className="p-4 mb-6">
@@ -125,7 +139,15 @@ export function ColorFilter({
 
   const catalogContent =
     colors.length === 0 ? (
-      <div className="py-2 text-sm text-[#555]">{t('products.filters.color.noColors')}</div>
+      <div
+        className="py-2 text-[#555]"
+        style={{
+          fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+          lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+        }}
+      >
+        {t('products.filters.color.noColors')}
+      </div>
     ) : (
       <div className="grid grid-cols-4 gap-x-2.5 gap-y-3">
         {colors.map((color) => {
