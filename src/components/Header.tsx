@@ -71,6 +71,10 @@ function HeaderDesktopNav() {
 
 /** Mobile navbar — Figma `74:729`: logo/actions band, search sits below in hero. */
 function MobileHeaderBar({ showPill }: { showPill: boolean }) {
+  const contentBandHeightPx = showPill
+    ? HEADER_MOBILE_PILL_HEIGHT_PX
+    : HEADER_MOBILE_NAV_BAND_HEIGHT_PX;
+
   return (
     <div
       className="grid w-full lg:hidden"
@@ -82,8 +86,7 @@ function MobileHeaderBar({ showPill }: { showPill: boolean }) {
     >
       <div
         aria-hidden
-        className="col-start-1 row-start-1 flex flex-col self-stretch"
-        style={{ paddingTop: HEADER_MOBILE_NAV_TOP_INSET_PX }}
+        className="col-start-1 row-start-1 flex flex-col justify-end self-stretch"
       >
         <div
           className={headerPillClassName}
@@ -96,12 +99,17 @@ function MobileHeaderBar({ showPill }: { showPill: boolean }) {
       </div>
 
       <div
-        className="relative z-10 col-start-1 row-start-1 flex flex-col self-stretch"
-        style={{ paddingTop: HEADER_MOBILE_NAV_TOP_INSET_PX }}
+        className={`relative z-10 col-start-1 row-start-1 flex flex-col self-stretch transition-[padding] ease-out ${
+          showPill ? 'justify-end' : ''
+        }`}
+        style={{
+          paddingTop: showPill ? 0 : HEADER_MOBILE_NAV_TOP_INSET_PX,
+          ...headerPillTransitionStyle,
+        }}
       >
         <div
           className="flex items-center justify-between"
-          style={{ height: HEADER_MOBILE_NAV_BAND_HEIGHT_PX }}
+          style={{ height: contentBandHeightPx }}
         >
           <BrandLogoLink
             size="mobile"

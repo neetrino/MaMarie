@@ -28,8 +28,10 @@ export const HEADER_MOBILE_MENU_ICON_SIZE_PX = 22;
 /** Shared bottom band — logo, actions, and scrolled pill align to this height. */
 export const HEADER_MOBILE_NAV_BAND_HEIGHT_PX = HEADER_MOBILE_LOGO_HEIGHT_PX;
 
-/** Scrolled pill on mobile — matches logo height so edges align with nav content. */
-export const HEADER_MOBILE_PILL_HEIGHT_PX = HEADER_MOBILE_NAV_BAND_HEIGHT_PX;
+/** Scrolled pill on mobile — taller than logo/actions band, bottom-aligned. */
+export const HEADER_MOBILE_PILL_EXTRA_HEIGHT_PX = 7;
+export const HEADER_MOBILE_PILL_HEIGHT_PX =
+  HEADER_MOBILE_NAV_BAND_HEIGHT_PX + HEADER_MOBILE_PILL_EXTRA_HEIGHT_PX;
 
 /** Width of language + menu button group (`40 + 11 + 40`). */
 export const HEADER_MOBILE_ACTIONS_WIDTH_PX =
