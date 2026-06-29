@@ -1,18 +1,27 @@
 'use client';
 
+import type { CSSProperties, ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Home } from 'lucide-react';
 import {
   MOBILE_BOTTOM_NAV_ASSETS,
   MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX,
+  MOBILE_BOTTOM_NAV_CIRCLE_NOTCH_HEIGHT_PX,
+  MOBILE_BOTTOM_NAV_CIRCLE_NOTCH_WIDTH_PX,
+  MOBILE_BOTTOM_NAV_DESIGN_WIDTH_PX,
+  MOBILE_BOTTOM_NAV_HOME_SLOT_HEIGHT_PX,
+  MOBILE_BOTTOM_NAV_HOME_SLOT_WIDTH_PX,
+  MOBILE_BOTTOM_NAV_INACTIVE_LAYOUTS,
   MOBILE_BOTTOM_NAV_USER_ICON_HEIGHT_PX,
   MOBILE_BOTTOM_NAV_USER_ICON_WIDTH_PX,
   MOBILE_BOTTOM_NAV_WISHLIST_ICON_SIZE_PX,
   MOBILE_BOTTOM_NAV_Z_INDEX,
+  type MobileBottomNavItemId,
+  getMobileBottomNavActiveLayout,
+  resolveMobileBottomNavActiveItem,
 } from '../../constants/mobile-bottom-nav';
 import { getCartCount, getWishlistCount } from '../../lib/storageCounts';
 import { useTranslation } from '../../lib/i18n-client';
@@ -26,7 +35,79 @@ function formatBadgeCount(count: number): string {
   return count > 99 ? '99+' : String(count);
 }
 
-/** Figma `74:875` — fixed mobile bottom navigation bar. */
+function slotLeftStyle(leftPx: number): CSSProperties {
+  return {
+    left: `calc(100% * ${leftPx} / ${MOBILE_BOTTOM_NAV_DESIGN_WIDTH_PX})`,
+  };
+}
+
+interface BottomNavItemConfig {
+  id: MobileBottomNavItemId;
+  href: string;
+  labelKey: string;
+  renderIcon: (isActive: boolean) => ReactNode;
+  badgeCount?: number;
+}
+
+function buildFrameStyle(activeItemId: MobileBottomNavItemId): CSSProperties {
+  const layout = getMobileBottomNavActiveLayout(activeItemId);
+
+  return {
+    '--bottom-nav-notch-left': layout.notchLeftPx,
+    '--bottom-nav-notch-top-px': layout.notchTopPx,
+    '--bottom-nav-notch-width': layout.notchWidthPx,
+    '--bottom-nav-notch-height-px': layout.notchHeightPx,
+  } as CSSProperties;
+}
+
+function NavSlotIcon({
+  isActive,
+  inactiveSrc,
+  activeSrc,
+  width,
+  height,
+  fullSlot,
+}: {
+  isActive: boolean;
+  inactiveSrc: string;
+  activeSrc: string;
+  width: number;
+  height: number;
+  fullSlot?: boolean;
+}) {
+  const iconClass = fullSlot ? styles.slotIcon : undefined;
+
+  return (
+    <span className={styles.iconStack} aria-hidden>
+      <Image
+        src={inactiveSrc}
+        alt=""
+        width={width}
+        height={height}
+        aria-hidden
+        className={joinClasses(
+          styles.iconLayer,
+          iconClass,
+          !isActive && styles.iconLayerVisible
+        )}
+      />
+      <Image
+        src={activeSrc}
+        alt=""
+        width={width}
+        height={height}
+        aria-hidden
+        className={joinClasses(
+          styles.iconLayer,
+          iconClass,
+          isActive && styles.iconLayerVisible
+        )}
+      />
+    </span>
+  );
+}
+
+/** Figma bottom navigation — home `74:875`, cart `109:579`, wishlist `109:600`, profile `109:621`. */
 export function MobileBottomNavBar() {
   const pathname = usePathname() ?? '';
   const { t } = useTranslation();
@@ -34,10 +115,71 @@ export function MobileBottomNavBar() {
   const [cartCount, setCartCount] = useState(0);
   const [mounted, setMounted] = useState(false);
 
-  const isHomeActive = pathname === '/';
-  const isCartActive = pathname === '/cart' || pathname.startsWith('/cart/');
-  const isWishlistActive = pathname === '/wishlist' || pathname.startsWith('/wishlist/');
-  const isProfileActive = pathname.startsWith('/profile');
+  const activeItemId = resolveMobileBottomNavActiveItem(pathname);
+  const activeLayout = activeItemId ? getMobileBottomNavActiveLayout(activeItemId) : null;
+  const frameStyle = activeItemId ? buildFrameStyle(activeItemId) : undefined;
+
+  const navItems: BottomNavItemConfig[] = [
+    {
+      id: 'home',
+      href: '/',
+      labelKey: 'common.navigation.home',
+      renderIcon: (isActive) => (
+        <NavSlotIcon
+          isActive={isActive}
+          inactiveSrc={MOBILE_BOTTOM_NAV_ASSETS.homeInactive}
+          activeSrc={MOBILE_BOTTOM_NAV_ASSETS.homeActive}
+          width={MOBILE_BOTTOM_NAV_HOME_SLOT_WIDTH_PX}
+          height={MOBILE_BOTTOM_NAV_HOME_SLOT_HEIGHT_PX}
+          fullSlot
+        />
+      ),
+    },
+    {
+      id: 'cart',
+      href: '/cart',
+      labelKey: 'common.navigation.cart',
+      badgeCount: cartCount,
+      renderIcon: (isActive) => (
+        <NavSlotIcon
+          isActive={isActive}
+          inactiveSrc={MOBILE_BOTTOM_NAV_ASSETS.iconCart}
+          activeSrc={MOBILE_BOTTOM_NAV_ASSETS.cartActive}
+          width={MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX}
+          height={MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX}
+        />
+      ),
+    },
+    {
+      id: 'wishlist',
+      href: '/wishlist',
+      labelKey: 'common.navigation.wishlist',
+      badgeCount: wishlistCount,
+      renderIcon: (isActive) => (
+        <NavSlotIcon
+          isActive={isActive}
+          inactiveSrc={MOBILE_BOTTOM_NAV_ASSETS.iconWishlist}
+          activeSrc={MOBILE_BOTTOM_NAV_ASSETS.wishlistActive}
+          width={MOBILE_BOTTOM_NAV_WISHLIST_ICON_SIZE_PX}
+          height={MOBILE_BOTTOM_NAV_WISHLIST_ICON_SIZE_PX}
+        />
+      ),
+    },
+    {
+      id: 'profile',
+      href: '/profile',
+      labelKey: 'common.navigation.profile',
+      renderIcon: (isActive) => (
+        <NavSlotIcon
+          isActive={isActive}
+          inactiveSrc={MOBILE_BOTTOM_NAV_ASSETS.iconUser}
+          activeSrc={MOBILE_BOTTOM_NAV_ASSETS.profileActive}
+          width={MOBILE_BOTTOM_NAV_USER_ICON_WIDTH_PX}
+          height={MOBILE_BOTTOM_NAV_USER_ICON_HEIGHT_PX}
+        />
+      ),
+    },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -65,88 +207,51 @@ export function MobileBottomNavBar() {
       aria-label={t('common.navigation.mainNavigation')}
       style={{ zIndex: MOBILE_BOTTOM_NAV_Z_INDEX }}
     >
-      <div className={styles.frame}>
+      <div className={styles.frame} style={frameStyle}>
         <div aria-hidden className={styles.bar} />
-        <Image
-          src={MOBILE_BOTTOM_NAV_ASSETS.subtractNotch}
-          alt=""
-          width={110}
-          height={56}
-          aria-hidden
-          className={styles.notch}
-        />
-        {isHomeActive ? <div aria-hidden className={styles.activeBubble} /> : null}
-
-        <Link
-          href="/"
-          aria-label={t('common.navigation.home')}
-          aria-current={isHomeActive ? 'page' : undefined}
-          className={joinClasses(styles.slot, styles.homeSlot)}
-        >
-          {isHomeActive ? (
-            <Image
-              src={MOBILE_BOTTOM_NAV_ASSETS.homeActive}
-              alt=""
-              width={78}
-              height={40}
-              aria-hidden
-              className="h-10 w-auto max-w-full"
-            />
-          ) : (
-            <Home className={`h-6 w-6 ${styles.homeInactiveIcon}`} aria-hidden />
-          )}
-        </Link>
-
-        <Link
-          href="/cart"
-          aria-label={t('common.navigation.cart')}
-          aria-current={isCartActive ? 'page' : undefined}
-          className={joinClasses(styles.slot, styles.itemSlot, styles.itemSlotCart)}
-        >
+        {activeLayout ? (
           <Image
-            src={MOBILE_BOTTOM_NAV_ASSETS.iconCart}
+            src={MOBILE_BOTTOM_NAV_ASSETS.circleNotch}
             alt=""
-            width={MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX}
-            height={MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX}
+            width={MOBILE_BOTTOM_NAV_CIRCLE_NOTCH_WIDTH_PX}
+            height={MOBILE_BOTTOM_NAV_CIRCLE_NOTCH_HEIGHT_PX}
             aria-hidden
+            className={styles.circleNotch}
           />
-          {cartCount > 0 ? (
-            <span className={styles.badge}>{formatBadgeCount(cartCount)}</span>
-          ) : null}
-        </Link>
+        ) : null}
 
-        <Link
-          href="/wishlist"
-          aria-label={t('common.navigation.wishlist')}
-          aria-current={isWishlistActive ? 'page' : undefined}
-          className={joinClasses(styles.slot, styles.itemSlot, styles.itemSlotWishlist)}
-        >
-          <Image
-            src={MOBILE_BOTTOM_NAV_ASSETS.iconWishlist}
-            alt=""
-            width={MOBILE_BOTTOM_NAV_WISHLIST_ICON_SIZE_PX}
-            height={MOBILE_BOTTOM_NAV_WISHLIST_ICON_SIZE_PX}
-            aria-hidden
-          />
-          {wishlistCount > 0 ? (
-            <span className={styles.badge}>{formatBadgeCount(wishlistCount)}</span>
-          ) : null}
-        </Link>
+        {navItems.map((item) => {
+          const isActive = activeItemId === item.id;
+          const inactiveLayout = MOBILE_BOTTOM_NAV_INACTIVE_LAYOUTS[item.id];
+          const slotLayout = isActive && activeLayout
+            ? {
+                leftPx: activeLayout.activeSlotLeftPx,
+                topPx: activeLayout.activeSlotTopPx,
+              }
+            : {
+                leftPx: inactiveLayout.slotLeftPx,
+                topPx: inactiveLayout.slotTopPx,
+              };
 
-        <Link
-          href="/profile"
-          aria-label={t('common.navigation.profile')}
-          aria-current={isProfileActive ? 'page' : undefined}
-          className={joinClasses(styles.slot, styles.itemSlot, styles.itemSlotProfile)}
-        >
-          <Image
-            src={MOBILE_BOTTOM_NAV_ASSETS.iconUser}
-            alt=""
-            width={MOBILE_BOTTOM_NAV_USER_ICON_WIDTH_PX}
-            height={MOBILE_BOTTOM_NAV_USER_ICON_HEIGHT_PX}
-            aria-hidden
-          />
-        </Link>
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              aria-label={t(item.labelKey)}
+              aria-current={isActive ? 'page' : undefined}
+              className={styles.slot}
+              style={{
+                ...slotLeftStyle(slotLayout.leftPx),
+                top: `${slotLayout.topPx}px`,
+              }}
+            >
+              {item.renderIcon(isActive)}
+              {item.badgeCount && item.badgeCount > 0 ? (
+                <span className={styles.badge}>{formatBadgeCount(item.badgeCount)}</span>
+              ) : null}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
