@@ -13,6 +13,8 @@ export const ABOUT_US_SECTION_OFFSET_TOP_PX = ABOUT_US_AFTER_WHY_US_GAP_PX;
 export const ABOUT_US_SECTION_MIN_HEIGHT_PX = 939 + (ABOUT_US_AFTER_WHY_US_GAP_PX - HOME_SECTION_STACK_GAP_PX);
 export const ABOUT_US_SECTION_PADDING_TOP_PX = 84;
 export const ABOUT_US_SECTION_PADDING_BOTTOM_PX = 223;
+/** Cards + decoration icons — shifted up without moving the section photo. */
+export const ABOUT_US_CONTENT_SHIFT_UP_PX = 50;
 
 export const ABOUT_US_CONTENT_OFFSET_LEFT_PX =
   463 - HOME_SECTION_PADDING_LEFT_PX;

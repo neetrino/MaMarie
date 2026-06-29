@@ -16,6 +16,7 @@ import {
   ABOUT_US_CARD_YELLOW_WIDTH_PX,
   ABOUT_US_CONTENT_GAP_PX,
   ABOUT_US_CONTENT_OFFSET_LEFT_PX,
+  ABOUT_US_CONTENT_SHIFT_UP_PX,
   ABOUT_US_LOGO_CROP_HEIGHT_PERCENT,
   ABOUT_US_LOGO_CROP_LEFT_PERCENT,
   ABOUT_US_LOGO_CROP_TOP_PERCENT,
@@ -225,7 +226,10 @@ export function AboutUsSectionBlock() {
   return (
     <div
       className="relative w-full"
-      style={{ minHeight: ABOUT_US_BLOCK_MIN_HEIGHT_PX }}
+      style={{
+        marginTop: -ABOUT_US_CONTENT_SHIFT_UP_PX,
+        minHeight: ABOUT_US_BLOCK_MIN_HEIGHT_PX - ABOUT_US_CONTENT_SHIFT_UP_PX,
+      }}
     >
       <div
         className="flex items-end"
