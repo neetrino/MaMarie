@@ -10,8 +10,11 @@ export type LanguageCode = keyof typeof LANGUAGES;
 
 const LANGUAGE_STORAGE_KEY = 'shop_language';
 
+/** MAMARIE default storefront language. */
+export const DEFAULT_LANGUAGE: LanguageCode = 'hy';
+
 export function getStoredLanguage(): LanguageCode {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return DEFAULT_LANGUAGE;
   try {
     const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (stored && stored in LANGUAGES) {
@@ -20,21 +23,25 @@ export function getStoredLanguage(): LanguageCode {
   } catch {
     // Ignore errors
   }
-  return 'en';
+  return DEFAULT_LANGUAGE;
 }
 
-export function setStoredLanguage(language: LanguageCode, options?: { skipReload?: boolean }): void {
+/** Scroll Y captured before a client-side language switch; consumed once after re-render. */
+let pendingLanguageScrollY: number | null = null;
+
+export function takePendingLanguageScrollY(): number | null {
+  const scrollY = pendingLanguageScrollY;
+  pendingLanguageScrollY = null;
+  return scrollY;
+}
+
+/** Persists locale and updates UI via `language-updated` without a full page reload. */
+export function setStoredLanguage(language: LanguageCode): void {
   if (typeof window === 'undefined') return;
   try {
+    pendingLanguageScrollY = window.scrollY;
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     window.dispatchEvent(new Event('language-updated'));
-    // Only reload if skipReload is not true
-    if (!options?.skipReload) {
-      // Use a small delay to ensure state updates are visible before reload
-      setTimeout(() => {
-        window.location.reload();
-      }, 50);
-    }
   } catch (error) {
     console.error('Failed to save language:', error);
   }

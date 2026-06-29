@@ -17,9 +17,9 @@ export function AdminSidebarBrand() {
       }`}
     >
       {collapsed ? (
-        <BrandLogoLink compact className="shrink-0" />
+        <BrandLogoLink size="compact" className="shrink-0" />
       ) : (
-        <BrandLogoLink className="min-w-0 flex-1 justify-start rounded-md px-2 py-2 hover:bg-gray-50" />
+        <BrandLogoLink size="mobile" className="min-w-0 flex-1 justify-start rounded-md px-2 py-2 hover:bg-gray-50" />
       )}
       <button
         type="button"

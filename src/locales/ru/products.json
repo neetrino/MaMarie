@@ -36,13 +36,38 @@
     "viewModes": {
       "list": "Вид списка",
       "grid2": "Вид сетки 2x2",
-      "grid3": "Вид сетки 3x3"
+      "grid3": "Вид сетки 3x3",
+      "grid4": "Вид сетки 4x4"
     },
     "filters": "Фильтры",
     "sortProducts": "Сортировать товары"
   },
   "grid": {
     "noProducts": "Товары не найдены."
+  },
+  "catalog": {
+    "title": "Каталог",
+    "sortBy": "Сортировать по",
+    "seeAll": "Смотреть все",
+    "cancelFilters": "Отменить",
+    "filters": {
+      "category": "Категория",
+      "size": "Размер (см)",
+      "price": "Цена",
+      "color": "Цвет",
+      "clothingType": "Тип одежды",
+      "all": "Все",
+      "sizeNote": "Европейская размерная сетка",
+      "clothingTypes": {
+        "dress": "Платье",
+        "romper": "Комбинезон",
+        "set": "Комплект",
+        "topPants": "Верх/Брюки",
+        "topHalfDress": "Верх/Полуплатье",
+        "topShorts": "Верх/Шорты",
+        "sportSet": "Спорт. комплект (Верх/Шорты)"
+      }
+    }
   },
   "mobileFilters": {
     "title": "Фильтры",

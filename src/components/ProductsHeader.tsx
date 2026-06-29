@@ -1,32 +1,108 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import {
+  PRODUCTS_CATALOG_ASSETS,
+  PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX,
+  PRODUCTS_CATALOG_FILTER_CHEVRON_SRC,
+  PRODUCTS_CATALOG_PILL_HEIGHT_PX,
+  PRODUCTS_CATALOG_PILL_RADIUS_PX,
+  PRODUCTS_CATALOG_SORT_ICON_SIZE_PX,
+  PRODUCTS_CATALOG_SORT_PILL_BG,
+  PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
+  PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX,
+  PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
+  PRODUCTS_CATALOG_VIEW_PILL_BG,
+  PRODUCTS_CATALOG_VIEW_MODES,
+  type ProductsCatalogViewMode,
+} from '../constants/products-catalog';
+import { MOBILE_FILTERS_EVENT } from '../lib/events';
 import { useTranslation } from '../lib/i18n-client';
+import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
-type ViewMode = 'list' | 'grid-2' | 'grid-3';
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
-interface ProductsHeaderProps {
-  /**
-   * Ընդհանուր ապրանքների քանակը՝ բոլոր էջերում (from API meta.total)
-   */
-  total: number;
-  /**
-   * Մի էջում ցուցադրվող ապրանքների քանակը (from API meta.limit)
-   */
-  perPage: number;
+const VIEW_MODE_LABEL_KEYS: Record<ProductsCatalogViewMode, string> = {
+  list: 'list',
+  'grid-3': 'grid3',
+  'grid-4': 'grid4',
+};
+
+const VIEW_ICON_VIEWBOX = '0 0 25.4294 25';
+const GRID4_DOT_CENTERS_X = [2.054, 9.161, 16.268, 23.376] as const;
+const GRID4_DOT_CENTERS_Y = [2.054, 9.241, 16.429, 22.946] as const;
+const GRID4_DOT_RADIUS = 2.054;
+const GRID3_DOT_CENTERS_X = [2.764, 12.715, 22.665] as const;
+const GRID3_DOT_CENTERS_Y = [2.764, 12.5, 22.236] as const;
+const GRID3_DOT_RADIUS = 2.764;
+const LIST_BAR_WIDTH = 24;
+const LIST_BAR_HEIGHT = 3.5;
+const LIST_BAR_RADIUS = LIST_BAR_HEIGHT / 2;
+const LIST_BAR_X = (25.4294 - LIST_BAR_WIDTH) / 2;
+const LIST_BAR_Y = [0.75, 10.75, 20.75] as const;
+
+function ViewModeIcon({ mode, active }: { mode: ProductsCatalogViewMode; active: boolean }) {
+  const color = active ? '#57423b' : 'rgba(87, 66, 59, 0.45)';
+  const iconSize = PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX;
+
+  if (mode === 'list') {
+    return (
+      <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+        {LIST_BAR_Y.map((y) => (
+          <rect
+            key={y}
+            x={LIST_BAR_X}
+            y={y}
+            width={LIST_BAR_WIDTH}
+            height={LIST_BAR_HEIGHT}
+            rx={LIST_BAR_RADIUS}
+            fill={color}
+          />
+        ))}
+      </svg>
+    );
+  }
+
+  if (mode === 'grid-3') {
+    return (
+      <svg
+        width={iconSize}
+        height={iconSize}
+        viewBox={VIEW_ICON_VIEWBOX}
+        fill="none"
+        overflow="visible"
+        aria-hidden
+      >
+        {GRID3_DOT_CENTERS_X.flatMap((cx) =>
+          GRID3_DOT_CENTERS_Y.map((cy) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={GRID3_DOT_RADIUS} fill={color} />
+          )),
+        )}
+      </svg>
+    );
+  }
+
+  return (
+    <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+      {GRID4_DOT_CENTERS_X.flatMap((cx) =>
+        GRID4_DOT_CENTERS_Y.map((cy) => (
+          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={GRID4_DOT_RADIUS} fill={color} />
+        )),
+      )}
+    </svg>
+  );
 }
 
-function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
+function ProductsHeaderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ViewMode>('grid-2');
+  const { viewMode, setViewMode } = useProductsCatalogViewMode();
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
-  const mobileSortDropdownRef = useRef<HTMLDivElement>(null);
 
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: 'default', label: t('products.header.sort.default') },
@@ -36,399 +112,152 @@ function ProductsHeaderContent({ total, perPage }: ProductsHeaderProps) {
     { value: 'name-desc', label: t('products.header.sort.nameDesc') },
   ];
 
-  // Per page: default 12 when not in URL (proper pagination)
-  const limitFromUrl = searchParams.get('limit');
-  const parsedLimit = limitFromUrl ? parseInt(limitFromUrl, 10) : null;
-  const currentLimit = parsedLimit && parsedLimit >= 10 && parsedLimit <= 200
-    ? parsedLimit
-    : 12;
-
-  const hasActiveFilters = (() => {
-    const filterKeys = ['search', 'category', 'minPrice', 'maxPrice', 'colors', 'sizes', 'brand'];
-    return filterKeys.some((key) => !!searchParams.get(key));
-  })();
-
-  // Load view mode from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('products-view-mode');
-    if (stored && ['list', 'grid-2', 'grid-3'].includes(stored)) {
-      setViewMode(stored as ViewMode);
-    } else {
-      // Default to grid-2 if nothing stored
-      setViewMode('grid-2');
-      localStorage.setItem('products-view-mode', 'grid-2');
-    }
-  }, []);
-
-  // Load sort from URL params
   useEffect(() => {
     const sortParam = searchParams.get('sort') as SortOption;
-    if (sortParam && sortOptions.some(opt => opt.value === sortParam)) {
+    if (sortParam && sortOptions.some((opt) => opt.value === sortParam)) {
       setSortBy(sortParam);
     }
   }, [searchParams]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      const isClickInsideDesktop = sortDropdownRef.current?.contains(target);
-      const isClickInsideMobile = mobileSortDropdownRef.current?.contains(target);
-      
-      if (!isClickInsideDesktop && !isClickInsideMobile) {
+      if (!sortDropdownRef.current?.contains(event.target as Node)) {
         setShowSortDropdown(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleViewModeChange = (mode: ViewMode) => {
+  const handleViewModeChange = (mode: ProductsCatalogViewMode) => {
     setViewMode(mode);
-    localStorage.setItem('products-view-mode', mode);
-    // Dispatch event to update grid layout
-    window.dispatchEvent(new CustomEvent('view-mode-changed', { detail: mode }));
   };
 
   const handleSortChange = (option: SortOption) => {
     setSortBy(option);
     setShowSortDropdown(false);
-    
-    // Update URL with sort parameter
     const params = new URLSearchParams(searchParams.toString());
     if (option === 'default') {
       params.delete('sort');
     } else {
       params.set('sort', option);
     }
-    // Reset to page 1 when sorting changes
     params.delete('page');
-    
     router.push(`/products?${params.toString()}`);
   };
 
-  const handleClearFilters = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    const filterKeys = ['search', 'category', 'minPrice', 'maxPrice', 'colors', 'sizes', 'brand'];
-
-    filterKeys.forEach((key) => params.delete(key));
-    // Reset page when filters are cleared
-    params.delete('page');
-
-    const queryString = params.toString();
-    router.push(queryString ? `/products?${queryString}` : '/products');
-  };
-
-  const handleLimitChange = (value: string | number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
-    if (!Number.isNaN(numValue) && numValue >= 10 && numValue <= 200) {
-      params.set('limit', numValue.toString());
-    } else {
-      params.set('limit', '12');
-    }
-    params.delete('page');
-    router.replace(`/products?${params.toString()}`, { scroll: false });
-  };
+  const currentSortLabel = t('products.catalog.sortBy');
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
-      {/* Desktop: All elements in one horizontal line */}
-      <div className="hidden sm:flex sm:items-center sm:justify-between sm:gap-4">
-        {/* Left side: Clear filters + All products title */}
-        <div className="flex items-center gap-4">
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={handleClearFilters}
-              className="inline-flex items-center gap-2 text-sm text-gray-900 hover:text-gray-700 transition-colors"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-gray-900"
-              >
-                <path
-                  d="M12 4L4 12M4 4L12 12"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>{t('products.header.clearFilters')}</span>
-            </button>
-          )}
-          
-          <h1 className="text-xl font-bold text-gray-900">
-            {t('products.header.allProducts').replace('{total}', total.toString())}
-          </h1>
-        </div>
+    <div className="flex items-center justify-end gap-3">
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new Event(MOBILE_FILTERS_EVENT))}
+        className="inline-flex items-center gap-2 rounded-full border border-[#e8e8e8] bg-white px-4 py-2 text-sm font-medium text-[#57423b] lg:hidden"
+      >
+        {t('products.header.filters')}
+      </button>
 
-        {/* Right side: Show + View toggles + Sort */}
-        <div className="flex items-center gap-4">
-          {/* Show dropdown */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-900">{t('products.header.show')}</span>
-            <select
-              value={String(currentLimit)}
-              onChange={(event) => handleLimitChange(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 min-w-[70px]"
-            >
-              <option value="12">12</option>
-              <option value="24">24</option>
-              <option value="48">48</option>
-              <option value="96">96</option>
-            </select>
-          </div>
-
-          {/* View Mode Icons: List, Grid (2x2), and Grid (3x3) */}
-          <div className="flex items-center gap-1">
-            {/* List View */}
-            <button
-              onClick={() => handleViewModeChange('list')}
-              className={`rounded-lg p-2 transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-400 hover:text-gray-600'
-              }`}
-              aria-label={t('products.header.viewModes.list')}
-            >
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <line x1="3" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="3" y1="15" x2="17" y2="15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </button>
-            
-            {/* Grid View (2x2) */}
-            <button
-              onClick={() => handleViewModeChange('grid-2')}
-              className={`rounded-lg p-2 transition-all ${
-                viewMode === 'grid-2'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-              }`}
-              aria-label={t('products.header.viewModes.grid2')}
-            >
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="2" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                <rect x="11" y="2" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                <rect x="2" y="11" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                <rect x="11" y="11" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-              </svg>
-            </button>
-
-            {/* Grid View (3x3) */}
-            <button
-              onClick={() => handleViewModeChange('grid-3')}
-              className={`rounded-lg p-2 transition-all ${
-                viewMode === 'grid-3'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-              }`}
-              aria-label={t('products.header.viewModes.grid3')}
-            >
-              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="4" cy="4" r="1.5" fill="currentColor" />
-                <circle cx="10" cy="4" r="1.5" fill="currentColor" />
-                <circle cx="16" cy="4" r="1.5" fill="currentColor" />
-                <circle cx="4" cy="10" r="1.5" fill="currentColor" />
-                <circle cx="10" cy="10" r="1.5" fill="currentColor" />
-                <circle cx="16" cy="10" r="1.5" fill="currentColor" />
-                <circle cx="4" cy="16" r="1.5" fill="currentColor" />
-                <circle cx="10" cy="16" r="1.5" fill="currentColor" />
-                <circle cx="16" cy="16" r="1.5" fill="currentColor" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Sort dropdown */}
-          <div className="relative" ref={sortDropdownRef}>
-            <button
-              onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors text-sm text-gray-900 min-w-[160px]"
-            >
-              <span>{sortOptions.find(opt => opt.value === sortBy)?.label || t('products.header.sort.default')}</span>
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className={`transition-transform ${showSortDropdown ? 'rotate-180' : ''}`}
-              >
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            {showSortDropdown && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
-                {sortOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleSortChange(option.value)}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                      sortBy === option.value
-                        ? 'bg-gray-100 text-gray-900 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+      <div
+        className="hidden items-center gap-7 overflow-visible px-6 lg:flex"
+        style={{
+          height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
+          borderRadius: PRODUCTS_CATALOG_PILL_RADIUS_PX,
+          backgroundColor: PRODUCTS_CATALOG_VIEW_PILL_BG,
+        }}
+      >
+        {PRODUCTS_CATALOG_VIEW_MODES.map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => handleViewModeChange(mode)}
+            aria-label={t(`products.header.viewModes.${VIEW_MODE_LABEL_KEYS[mode]}`)}
+            aria-pressed={viewMode === mode}
+            className={`relative inline-flex items-center justify-center overflow-visible transition-opacity hover:opacity-80 ${mode === 'grid-3' ? 'z-10' : 'z-0'}`}
+            style={{
+              width: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
+              height: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
+            }}
+          >
+            <ViewModeIcon mode={mode} active={viewMode === mode} />
+          </button>
+        ))}
       </div>
 
-      {/* Mobile: Stacked layout */}
-      <div className="sm:hidden flex flex-col gap-4">
-        {/* Top: All Products Title + Show dropdown */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">
-            {t('products.header.allProducts').replace('{total}', total.toString())}
-          </h1>
-          
-          {/* Show dropdown - Top right */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600">{t('products.header.show')}</span>
-            <select
-              value={String(currentLimit)}
-              onChange={(event) => handleLimitChange(event.target.value)}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200"
-            >
-              <option value="12">12</option>
-              <option value="24">24</option>
-              <option value="48">48</option>
-              <option value="96">96</option>
-            </select>
-          </div>
-        </div>
+      <div className="relative" ref={sortDropdownRef}>
+        <button
+          type="button"
+          onClick={() => setShowSortDropdown((open) => !open)}
+          className="flex items-center gap-3 px-6 font-normal text-white"
+          style={{
+            height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
+            borderRadius: PRODUCTS_CATALOG_PILL_RADIUS_PX,
+            backgroundColor: PRODUCTS_CATALOG_SORT_PILL_BG,
+            width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
+            fontSize: PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX,
+            lineHeight: '24px',
+          }}
+          aria-expanded={showSortDropdown}
+        >
+          <Image
+            src={PRODUCTS_CATALOG_ASSETS.sortSliders}
+            alt=""
+            width={PRODUCTS_CATALOG_SORT_ICON_SIZE_PX}
+            height={PRODUCTS_CATALOG_SORT_ICON_SIZE_PX}
+            aria-hidden
+            className="shrink-0"
+          />
+          <span className="whitespace-nowrap">{currentSortLabel}</span>
+          <Image
+            src={PRODUCTS_CATALOG_FILTER_CHEVRON_SRC}
+            alt=""
+            width={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
+            height={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
+            aria-hidden
+            className={`ml-auto shrink-0 brightness-0 invert transition-transform duration-200 ease-in-out ${showSortDropdown ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </button>
 
-        {/* Bottom: Filters button + View Mode Icons + Sort */}
-        <div className="flex items-center justify-between gap-2">
-          {/* Left: Filters button */}
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new Event('mobile:filters-toggle'))}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors text-sm font-medium text-gray-900"
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <line x1="3" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <line x1="3" y1="15" x2="17" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <span>{t('products.header.filters')}</span>
-          </button>
-
-          {/* Right: View Mode Icons + Sort */}
-          <div className="flex items-center gap-2">
-            {/* View Mode Icons */}
-            <div className="flex items-center gap-1">
+        {showSortDropdown ? (
+          <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-[#f0f0f0] bg-white shadow-lg">
+            {sortOptions.map((option) => (
               <button
-                onClick={() => handleViewModeChange('list')}
-                className={`rounded-lg p-2 transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-400 hover:text-gray-600'
+                key={option.value}
+                type="button"
+                onClick={() => handleSortChange(option.value)}
+                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
+                  sortBy === option.value
+                    ? 'bg-[#fdf2f5] font-semibold text-[#57423b]'
+                    : 'text-[#555] hover:bg-[#fafafa]'
                 }`}
-                aria-label={t('products.header.viewModes.list')}
               >
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="3" y1="5" x2="17" y2="5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  <line x1="3" y1="15" x2="17" y2="15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                {option.label}
               </button>
-              <button
-                onClick={() => handleViewModeChange('grid-2')}
-                className={`rounded-lg p-2 transition-all ${
-                  viewMode === 'grid-2'
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                }`}
-                aria-label={t('products.header.viewModes.grid2')}
-              >
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="2" y="2" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                  <rect x="11" y="2" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                  <rect x="2" y="11" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                  <rect x="11" y="11" width="7" height="7" stroke="currentColor" strokeWidth="1.5" fill={viewMode === 'grid-2' ? 'currentColor' : 'none'} />
-                </svg>
-              </button>
-            </div>
-
-            {/* Sort icon */}
-            <div className="relative" ref={mobileSortDropdownRef}>
-              <button
-                onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors text-gray-700"
-                aria-label={t('products.header.sortProducts')}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {/* Up arrow pointing up (left side) */}
-                  <path d="M7 8L10 5L13 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                  {/* Down arrow pointing down (right side) */}
-                  <path d="M7 12L10 15L13 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                </svg>
-              </button>
-
-              {showSortDropdown && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
-                  {sortOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleSortChange(option.value)}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                        sortBy === option.value
-                          ? 'bg-gray-100 text-gray-900 font-semibold'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            ))}
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
 }
 
-export function ProductsHeader(props: ProductsHeaderProps) {
+export function ProductsHeader() {
   return (
-    <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
-        <div className="flex justify-end items-center">
-          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
+    <Suspense
+      fallback={
+        <div className="flex justify-end gap-3 animate-pulse">
+          <div
+            className="hidden rounded-[30px] bg-neutral-200 lg:block"
+            style={{ width: 182, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
+          />
+          <div
+            className="rounded-[30px] bg-neutral-200"
+            style={{ width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
+          />
         </div>
-      </div>
-    }>
-      <ProductsHeaderContent {...props} />
+      }
+    >
+      <ProductsHeaderContent />
     </Suspense>
   );
 }
-

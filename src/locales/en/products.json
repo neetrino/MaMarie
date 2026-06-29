@@ -36,13 +36,38 @@
     "viewModes": {
       "list": "List View",
       "grid2": "Grid View 2x2",
-      "grid3": "Grid View 3x3"
+      "grid3": "Grid View 3x3",
+      "grid4": "Grid View 4x4"
     },
     "filters": "Filters",
     "sortProducts": "Sort Products"
   },
   "grid": {
     "noProducts": "No products found."
+  },
+  "catalog": {
+    "title": "Catalog",
+    "sortBy": "Sort by",
+    "seeAll": "See all",
+    "cancelFilters": "Cancel",
+    "filters": {
+      "category": "Category",
+      "size": "Size (cm)",
+      "price": "Price",
+      "color": "Color",
+      "clothingType": "Clothing type",
+      "all": "All",
+      "sizeNote": "European size chart",
+      "clothingTypes": {
+        "dress": "Dress",
+        "romper": "Romper",
+        "set": "Set",
+        "topPants": "Top/Pants",
+        "topHalfDress": "Top/Half-dress",
+        "topShorts": "Top/Shorts",
+        "sportSet": "Sport set (Top/Shorts)"
+      }
+    }
   },
   "mobileFilters": {
     "title": "Filters",

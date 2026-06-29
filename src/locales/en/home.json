@@ -1,4 +1,67 @@
 {
+  "hero": {
+    "ctaShopNow": "Shop now",
+    "ctaNewCollection": "New collection",
+    "genderButtons": {
+      "label": "Shop by gender",
+      "girls": "Girls",
+      "boys": "Boys"
+    }
+  },
+  "bestProducts": {
+    "title": "Best products"
+  },
+  "mobile": {
+    "forYou": "For you",
+    "searchPlaceholder": "Search…",
+    "heroSale": {
+      "label": "Sale",
+      "discount": "20%",
+      "cta": "See more"
+    },
+    "addToCart": "Add",
+    "testimonials": {
+      "quote1": "\"My daughter absolutely loves Mamarie clothes. The quality is amazing!\"",
+      "author1": "Ani S.",
+      "quote2": "\"Armenia's best kids clothing brand. Fast delivery, perfect quality.\"",
+      "author2": "Tigran K.",
+      "promoBadge": "LIMITED TIME",
+      "promoTitle": "Get 20% off your first order"
+    }
+  },
+  "sale": {
+    "title": "SALE",
+    "banner": {
+      "title": "Get 20% Off Your First Order",
+      "subtitle": "Join the Mamarie family and dress your little ones\nin premium style with our welcome discount.",
+      "cta": "Claim My Discount"
+    }
+  },
+  "whyUs": {
+    "title": "Why Us",
+    "card1": {
+      "title": "Born from a mother's love",
+      "description": "MaMarie was born from the love story of a mother and her little Mari. Every collection carries that warmth and care."
+    },
+    "card2": {
+      "title": "For a colorful childhood",
+      "description": "We believe childhood should be bright, joyful, and full of beautiful memories. Our colors and designs are created to build exactly that world."
+    },
+    "card3": {
+      "title": "Comfort without limits",
+      "description": "Children should move freely, play, dream, and discover the world. That is why our clothes are made first and foremost for their comfort."
+    },
+    "card4": {
+      "title": "Confidence",
+      "description": "When a child grows up in love, care, and a beautiful environment, they walk more confidently toward their future. We believe every little one deserves that kind of childhood."
+    }
+  },
+  "aboutUs": {
+    "introText": "From that idea, MaMarie was born — a brand that believes clothing is more than just clothing. It is the continuation of childhood colors, freedom, comfort, and a mother's love.",
+    "storyLead": "A little girl was born — thanks to Mari.",
+    "storyBody": "When I became a mother, I realized that every choice we make for our children becomes part of their childhood. Our colors, our hugs, and the memories we create shape their world.",
+    "closingText": "We want every child to grow up feeling that the world is beautiful, safe, and full of love."
+  },
   "hero_title": "Welcome to Shop",
   "hero_subtitle": "Discover amazing products and exclusive offers. Shop the latest trends and find everything you need in one place.",
   "hero_button_products": "PRODUCTS",

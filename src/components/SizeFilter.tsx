@@ -7,6 +7,15 @@ import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import {
+  PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+  PRODUCTS_CATALOG_FILTER_NOTE_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_FILTER_NOTE_SIZE_PX,
+  PRODUCTS_CATALOG_FILTER_SIZE_CHIP_FONT_SIZE_PX,
+} from '../constants/products-catalog';
+
+type SizeFilterVariant = 'default' | 'catalog';
 
 interface SizeFilterProps {
   category?: string;
@@ -14,6 +23,7 @@ interface SizeFilterProps {
   minPrice?: string;
   maxPrice?: string;
   selectedSizes?: string[];
+  variant?: SizeFilterVariant;
 }
 
 interface SizeOption {
@@ -22,7 +32,14 @@ interface SizeOption {
 }
 
 
-export function SizeFilter({ category, search, minPrice, maxPrice, selectedSizes = [] }: SizeFilterProps) {
+export function SizeFilter({
+  category,
+  search,
+  minPrice,
+  maxPrice,
+  selectedSizes = [],
+  variant = 'default',
+}: SizeFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
@@ -99,12 +116,75 @@ export function SizeFilter({ category, search, minPrice, maxPrice, selectedSizes
   };
 
   if (loading) {
+    if (variant === 'catalog') {
+      return (
+        <div
+          className="text-[#555]"
+          style={{
+            fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+            lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+          }}
+        >
+          {t('products.filters.size.loading')}
+        </div>
+      );
+    }
     return (
       <Card className="p-4 mb-6">
         <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">{t('products.filters.size.title')}</h3>
         <div className="text-sm text-gray-500">{t('products.filters.size.loading')}</div>
       </Card>
     );
+  }
+
+  const catalogSizes = sizes.length > 0 ? sizes : [];
+  const catalogContent =
+    catalogSizes.length === 0 ? (
+      <div
+        className="py-2 text-[#555]"
+        style={{
+          fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+          lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+        }}
+      >
+        {t('products.filters.size.noSizes')}
+      </div>
+    ) : (
+      <>
+        <div className="grid grid-cols-4 gap-2">
+          {catalogSizes.map((size) => {
+            const isSelected = selected.includes(size.value);
+            return (
+              <button
+                key={size.value}
+                type="button"
+                onClick={() => handleSizeToggle(size.value)}
+                className={`flex h-[34px] items-center justify-center rounded-[14px] border-2 font-semibold transition-colors ${
+                  isSelected
+                    ? 'border-[#57423b] bg-[#ef95aa] text-[#1d1c16]'
+                    : 'border-[#e8e8e8] bg-white text-[#555] hover:border-[#d0d0d0]'
+                }`}
+                style={{ fontSize: PRODUCTS_CATALOG_FILTER_SIZE_CHIP_FONT_SIZE_PX }}
+              >
+                {size.value}
+              </button>
+            );
+          })}
+        </div>
+        <p
+          className="pt-2.5 text-[#aaa]"
+          style={{
+            fontSize: PRODUCTS_CATALOG_FILTER_NOTE_SIZE_PX,
+            lineHeight: `${PRODUCTS_CATALOG_FILTER_NOTE_LINE_HEIGHT_PX}px`,
+          }}
+        >
+          {t('products.catalog.filters.sizeNote')}
+        </p>
+      </>
+    );
+
+  if (variant === 'catalog') {
+    return <div>{catalogContent}</div>;
   }
 
   return (

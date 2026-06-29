@@ -31,7 +31,7 @@ class ProductsFindFilterService {
     filters: ProductFilters,
     bestsellerProductIds: string[]
   ): ProductWithRelations[] {
-    const { minPrice, maxPrice, colors, sizes, brand } = filters;
+    const { minPrice, maxPrice, colors, sizes, brand, clothingTypes } = filters;
 
     // Filter by price
     if (minPrice || maxPrice) {
@@ -140,6 +140,17 @@ class ProductsFindFilterService {
         
         const hasMatch = matchingVariants.length > 0;
         return hasMatch;
+      });
+    }
+
+    const clothingTypeList = normalizeFilterList(clothingTypes);
+    if (clothingTypeList.length > 0) {
+      products = products.filter((product: ProductWithRelations) => {
+        const categories = Array.isArray(product.categories) ? product.categories : [];
+        return categories.some((category) => {
+          const translations = Array.isArray(category.translations) ? category.translations : [];
+          return translations.some((translation) => clothingTypeList.includes(translation.slug));
+        });
       });
     }
 

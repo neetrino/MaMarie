@@ -1,9 +1,8 @@
-import Link from 'next/link';
 import { Suspense } from 'react';
 import { unstable_cache } from 'next/cache';
-import { Button } from '@shop/ui';
 import { getStoredLanguage } from '../../lib/language';
 import { t } from '../../lib/i18n';
+import { ClothingTypeFilter } from '../../components/ClothingTypeFilter';
 import { PriceFilter } from '../../components/PriceFilter';
 import { ColorFilter } from '../../components/ColorFilter';
 import { SizeFilter } from '../../components/SizeFilter';
@@ -12,11 +11,19 @@ import { ProductsHeader } from '../../components/ProductsHeader';
 import { ProductsGrid } from '../../components/ProductsGrid';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
+import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
+import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
+import {
+  HomeContentHorizontalFrame,
+  HomeSectionContent,
+} from '../../components/home/HomeSectionShell';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
-
-const PAGE_CONTAINER = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
+import {
+  PRODUCTS_CATALOG_MAIN_GAP_PX,
+  PRODUCTS_CATALOG_TOP_ROW_PB_PX,
+} from '../../constants/products-catalog';
 
 interface Product {
   id: string;
@@ -65,7 +72,8 @@ const getProductsCached = unstable_cache(
     maxPrice?: number,
     colors?: string,
     sizes?: string,
-    brand?: string
+    brand?: string,
+    clothingTypes?: string
   ): Promise<ProductsResponse> =>
     productsService.findAll({
       page,
@@ -78,6 +86,7 @@ const getProductsCached = unstable_cache(
       colors,
       sizes,
       brand,
+      clothingTypes,
     }) as Promise<ProductsResponse>,
   ['products-catalog-db-v1'],
   { revalidate: PRODUCTS_LIST_REVALIDATE_SECONDS }
@@ -100,6 +109,7 @@ async function getProducts(
   colors?: string,
   sizes?: string,
   brand?: string,
+  clothingTypes?: string,
   limit: number = 12
 ): Promise<ProductsResponse> {
   try {
@@ -114,7 +124,8 @@ async function getProducts(
       parseOptionalPrice(maxPrice),
       colors?.trim() || undefined,
       sizes?.trim() || undefined,
-      brand?.trim() || undefined
+      brand?.trim() || undefined,
+      clothingTypes?.trim() || undefined
     );
     if (!Array.isArray(response.data)) {
       return {
@@ -157,6 +168,7 @@ export async function ProductsCatalog({
     typeof params.colors === 'string' ? params.colors : undefined,
     typeof params.sizes === 'string' ? params.sizes : undefined,
     typeof params.brand === 'string' ? params.brand : undefined,
+    typeof params.clothingTypes === 'string' ? params.clothingTypes : undefined,
     perPage
   );
 
@@ -177,9 +189,13 @@ export async function ProductsCatalog({
   const colors = typeof params.colors === 'string' ? params.colors : undefined;
   const sizes = typeof params.sizes === 'string' ? params.sizes : undefined;
   const brands = typeof params.brand === 'string' ? params.brand : undefined;
+  const clothingTypes = typeof params.clothingTypes === 'string' ? params.clothingTypes : undefined;
   const selectedColors = colors ? colors.split(',').map((c: string) => c.trim().toLowerCase()) : [];
   const selectedSizes = sizes ? sizes.split(',').map((s: string) => s.trim()) : [];
   const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
+  const selectedClothingTypes = clothingTypes
+    ? clothingTypes.split(',').map((value: string) => value.trim())
+    : [];
 
   const buildPaginationUrl = (num: number) => {
     const q = new URLSearchParams();
@@ -192,184 +208,99 @@ export async function ProductsCatalog({
     return `/products?${q.toString()}`;
   };
 
-  const getPaginationPages = (): (number | 'ellipsis')[] => {
-    const total = productsData.meta.totalPages;
-    const current = page;
-    if (total <= 7) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
-    const set = new Set<number>([1, total, current - 1, current, current + 1]);
-    const sorted = Array.from(set).filter((p) => p >= 1 && p <= total).sort((a, b) => a - b);
-    const out: (number | 'ellipsis')[] = [];
-    for (let i = 0; i < sorted.length; i++) {
-      if (i > 0 && sorted[i]! - sorted[i - 1]! > 1) out.push('ellipsis');
-      out.push(sorted[i]!);
-    }
-    return out;
-  };
-
   const language = getStoredLanguage();
   const sortParam = typeof params.sort === 'string' ? params.sort : 'default';
+  const loadMoreHref = page < productsData.meta.totalPages ? buildPaginationUrl(page + 1) : null;
 
   return (
-    <>
-      <div className={PAGE_CONTAINER}>
-        <ProductsHeader total={productsData.meta.total} perPage={productsData.meta.limit} />
+    <HomeContentHorizontalFrame>
+      <HomeSectionContent>
+      <div className="space-y-3 pt-2 pb-4 lg:hidden">
+        <ProductsBreadcrumb />
+        <ProductsHeader />
       </div>
 
-      <div className="max-w-7xl mx-auto pl-2 sm:pl-4 md:pl-6 lg:pl-8 pr-4 sm:pr-6 lg:pr-8 flex flex-col lg:flex-row gap-8">
-        <ProductsFiltersProvider
-          category={typeof params.category === 'string' ? params.category : undefined}
-          search={typeof params.search === 'string' ? params.search : undefined}
-          minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-          maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-        >
-          <aside className="w-64 hidden lg:block flex-shrink-0 self-start lg:sticky lg:top-24 lg:z-10 bg-gray-50 rounded-xl">
-            <div className="p-4 space-y-6 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
-              <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
-                <PriceFilter
-                  currentMinPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  currentMaxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                />
-                <ColorFilter
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                  minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  selectedColors={selectedColors}
-                />
-                <SizeFilter
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                  minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  selectedSizes={selectedSizes}
-                />
-                <BrandFilter
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                  minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  selectedBrands={selectedBrands}
-                />
-              </Suspense>
+      <ProductsFiltersProvider
+        category={typeof params.category === 'string' ? params.category : undefined}
+        search={typeof params.search === 'string' ? params.search : undefined}
+        minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
+        maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
+      >
+        <div className="flex flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+          <ProductsFilterSidebar
+            category={typeof params.category === 'string' ? params.category : undefined}
+            search={typeof params.search === 'string' ? params.search : undefined}
+            minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
+            maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
+            selectedColors={selectedColors}
+            selectedSizes={selectedSizes}
+            selectedClothingTypes={selectedClothingTypes}
+          />
+
+          <div className="min-w-0 flex-1">
+            <div
+              className="hidden items-center justify-between gap-4 lg:flex"
+              style={{ paddingBottom: PRODUCTS_CATALOG_TOP_ROW_PB_PX }}
+            >
+              <ProductsBreadcrumb />
+              <ProductsHeader />
             </div>
-          </aside>
 
-          <div className="flex-1 min-w-0 w-full lg:w-auto py-4 overflow-x-hidden">
+            <div className="py-2">
             {normalizedProducts.length > 0 ? (
-              <>
-                <ProductsGrid products={normalizedProducts} sortBy={sortParam} />
-
-                {productsData.meta.totalPages > 1 && (
-                  <nav
-                    className="mt-10 flex flex-wrap items-center justify-center gap-2"
-                    aria-label="Pagination"
-                  >
-                    {page > 1 ? (
-                      <Link href={buildPaginationUrl(page - 1)}>
-                        <Button
-                          variant="outline"
-                          className="min-w-[90px] rounded-lg border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
-                        >
-                          {t(language, 'common.pagination.previous')}
-                        </Button>
-                      </Link>
-                    ) : (
-                      <span className="min-w-[90px] rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center text-sm font-medium text-neutral-400">
-                        {t(language, 'common.pagination.previous')}
-                      </span>
-                    )}
-
-                    <div className="flex items-center gap-1">
-                      {getPaginationPages().map((item, idx) =>
-                        item === 'ellipsis' ? (
-                          <span key={`ellipsis-${idx}`} className="px-2 text-neutral-400" aria-hidden>
-                            …
-                          </span>
-                        ) : (
-                          <span key={item}>
-                            {item === page ? (
-                              <span
-                                className="flex h-9 min-w-[2.25rem] items-center justify-center rounded-lg bg-neutral-800 px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
-                                aria-current="page"
-                              >
-                                {item}
-                              </span>
-                            ) : (
-                              <Link
-                                href={buildPaginationUrl(item)}
-                                className="flex h-9 min-w-[2.25rem] items-center justify-center rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
-                              >
-                                {item}
-                              </Link>
-                            )}
-                          </span>
-                        )
-                      )}
-                    </div>
-
-                    {page < productsData.meta.totalPages ? (
-                      <Link href={buildPaginationUrl(page + 1)}>
-                        <Button
-                          variant="outline"
-                          className="min-w-[90px] rounded-lg border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400 hover:bg-neutral-50"
-                        >
-                          {t(language, 'common.pagination.next')}
-                        </Button>
-                      </Link>
-                    ) : (
-                      <span className="min-w-[90px] rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-2 text-center text-sm font-medium text-neutral-400">
-                        {t(language, 'common.pagination.next')}
-                      </span>
-                    )}
-                  </nav>
-                )}
-              </>
+              <ProductsGrid
+                products={normalizedProducts}
+                sortBy={sortParam}
+                loadMoreHref={loadMoreHref}
+              />
             ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">{t(language, 'common.messages.noProductsFound')}</p>
+              <div className="py-12 text-center">
+                <p className="text-lg text-[#757571]">{t(language, 'common.messages.noProductsFound')}</p>
               </div>
             )}
-          </div>
-
-          <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
-            <div className="p-4 space-y-6">
-              <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
-                <PriceFilter
-                  currentMinPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  currentMaxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                />
-                <ColorFilter
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                  minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  selectedColors={selectedColors}
-                />
-                <SizeFilter
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                  minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  selectedSizes={selectedSizes}
-                />
-                <BrandFilter
-                  category={typeof params.category === 'string' ? params.category : undefined}
-                  search={typeof params.search === 'string' ? params.search : undefined}
-                  minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                  maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                  selectedBrands={selectedBrands}
-                />
-              </Suspense>
             </div>
-          </MobileFiltersDrawer>
-        </ProductsFiltersProvider>
-      </div>
-    </>
+          </div>
+        </div>
+
+        <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
+          <div className="space-y-6 p-4">
+            <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
+              <PriceFilter
+                currentMinPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
+                currentMaxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
+                category={typeof params.category === 'string' ? params.category : undefined}
+                search={typeof params.search === 'string' ? params.search : undefined}
+              />
+              <ColorFilter
+                category={typeof params.category === 'string' ? params.category : undefined}
+                search={typeof params.search === 'string' ? params.search : undefined}
+                minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
+                maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
+                selectedColors={selectedColors}
+              />
+              <SizeFilter
+                category={typeof params.category === 'string' ? params.category : undefined}
+                search={typeof params.search === 'string' ? params.search : undefined}
+                minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
+                maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
+                selectedSizes={selectedSizes}
+              />
+              <ClothingTypeFilter
+                selectedClothingTypes={selectedClothingTypes}
+                variant="catalog"
+              />
+              <BrandFilter
+                category={typeof params.category === 'string' ? params.category : undefined}
+                search={typeof params.search === 'string' ? params.search : undefined}
+                minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
+                maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
+                selectedBrands={selectedBrands}
+              />
+            </Suspense>
+          </div>
+        </MobileFiltersDrawer>
+      </ProductsFiltersProvider>
+      </HomeSectionContent>
+    </HomeContentHorizontalFrame>
   );
 }

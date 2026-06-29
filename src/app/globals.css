@@ -3,46 +3,36 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: Mirage;
+    src: url('/assets/fonts/Mirage-Expanded.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
   body {
     @apply bg-white text-gray-900;
+  }
+
+  @media (max-width: 1023px) {
+    html {
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+    }
+
+    body {
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+    }
   }
 
   button {
     @apply rounded-xl;
   }
-  
-  /* Prevent text selection and caret on all text elements */
-  p, span, div, h1, h2, h3, h4, h5, h6, 
-  li, td, th, label, strong, em, b, i, 
-  small, blockquote, pre, code, 
-  article, section, aside, header, footer, nav, main {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    caret-color: transparent !important;
-  }
-  
-  /* Allow selection in input and textarea fields */
+
   input, textarea {
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    -moz-user-select: text !important;
-    -ms-user-select: text !important;
-    caret-color: currentColor !important;
-  }
-  
-  /* Ensure caret is visible and blinking in focused inputs */
-  input:focus, textarea:focus {
-    caret-color: currentColor !important;
-  }
-  
-  /* Links should be selectable but no caret */
-  a {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
+    caret-color: currentColor;
   }
 }
 
@@ -62,6 +52,24 @@
     animation: fade-in 0.3s ease-out;
   }
 
+  @keyframes header-pill-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-header-pill-in {
+    animation-name: header-pill-in;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: forwards;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -69,6 +77,111 @@
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .mobile-home-sale-label {
+    width: 239px;
+    height: 45px;
+    font-family: Mirage;
+    font-size: 73px;
+    line-height: 45px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
+  }
+
+  .mobile-home-sale-discount {
+    font-family: Mirage;
+    font-size: 75px;
+    line-height: 45px;
+    transform: translateY(-50%);
+  }
+
+  .home-product-card {
+    --home-product-card-duration: 300ms;
+    --home-product-card-easing: cubic-bezier(0, 0, 0.58, 1);
+    --home-product-card-image-left: var(--home-product-card-image-left-default);
+    --home-product-card-image-top: var(--home-product-card-image-top-default);
+    --home-product-card-image-width: var(--home-product-card-image-width-default);
+    --home-product-card-image-height: var(--home-product-card-image-height-default);
+    --home-product-card-bg: var(--home-product-card-bg-default);
+    --home-product-card-actions-gap: var(--home-product-card-actions-gap-default);
+    --home-product-card-cart-size: var(--home-product-card-cart-size-default);
+    --home-product-card-cart-icon-size: var(--home-product-card-cart-icon-size-default);
+    --home-product-card-cart-icon-left: var(--home-product-card-cart-icon-left-default);
+    --home-product-card-cart-icon-top: var(--home-product-card-cart-icon-top-default);
+    --home-product-card-lift: 0px;
+  }
+
+  .home-product-card:hover,
+  .home-product-card:focus-within {
+    z-index: 10;
+    --home-product-card-image-left: var(--home-product-card-image-left-hover);
+    --home-product-card-image-top: var(--home-product-card-image-top-hover);
+    --home-product-card-image-width: var(--home-product-card-image-width-hover);
+    --home-product-card-image-height: var(--home-product-card-image-height-hover);
+    --home-product-card-bg: var(--home-product-card-bg-hover);
+    --home-product-card-actions-gap: var(--home-product-card-actions-gap-hover);
+    --home-product-card-cart-size: var(--home-product-card-cart-size-hover);
+    --home-product-card-cart-icon-size: var(--home-product-card-cart-icon-size-hover);
+    --home-product-card-cart-icon-left: var(--home-product-card-cart-icon-left-hover);
+    --home-product-card-cart-icon-top: var(--home-product-card-cart-icon-top-hover);
+    --home-product-card-lift: var(--home-product-card-lift-hover);
+  }
+
+  .home-product-card:hover .home-product-card-sizes,
+  .home-product-card:focus-within .home-product-card-sizes {
+    opacity: 1;
+  }
+
+  .home-product-card-surface {
+    background-color: var(--home-product-card-bg);
+    transform: translateY(var(--home-product-card-lift));
+    transition:
+      transform var(--home-product-card-duration) var(--home-product-card-easing),
+      background-color var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-image-wrap {
+    left: var(--home-product-card-image-left);
+    top: var(--home-product-card-image-top);
+    width: var(--home-product-card-image-width);
+    height: var(--home-product-card-image-height);
+    transition:
+      left var(--home-product-card-duration) var(--home-product-card-easing),
+      top var(--home-product-card-duration) var(--home-product-card-easing),
+      width var(--home-product-card-duration) var(--home-product-card-easing),
+      height var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-actions {
+    gap: var(--home-product-card-actions-gap);
+    transition: gap var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-cart {
+    width: var(--home-product-card-cart-size);
+    height: var(--home-product-card-cart-size);
+    transition:
+      width var(--home-product-card-duration) var(--home-product-card-easing),
+      height var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-cart-icon {
+    left: var(--home-product-card-cart-icon-left);
+    top: var(--home-product-card-cart-icon-top);
+    width: var(--home-product-card-cart-icon-size);
+    height: var(--home-product-card-cart-icon-size);
+    transition:
+      left var(--home-product-card-duration) var(--home-product-card-easing),
+      top var(--home-product-card-duration) var(--home-product-card-easing),
+      width var(--home-product-card-duration) var(--home-product-card-easing),
+      height var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-sizes {
+    transition: opacity var(--home-product-card-duration) var(--home-product-card-easing);
   }
 }
 
@@ -140,5 +253,12 @@
 
 .policy-page-inner li + li {
   margin-top: 0.25rem;
+}
+
+/* Figma `74:875` — reserve space above fixed mobile bottom nav (not on desktop). */
+@media (max-width: 1023px) {
+  .layout-shell-mobile-bottom-clearance {
+    padding-bottom: max(114px, env(safe-area-inset-bottom, 0px));
+  }
 }
 

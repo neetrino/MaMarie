@@ -1,15 +1,24 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Header } from './Header';
+import type { NavLinkItem } from '../constants/nav-links';
+import { SiteHeader } from './SiteHeader';
 
-export function ConditionalHeader() {
+interface ConditionalHeaderProps {
+  navLinks: readonly NavLinkItem[];
+}
+
+export function ConditionalHeader({ navLinks }: ConditionalHeaderProps) {
   const pathname = usePathname();
   if (pathname?.startsWith('/supersudo')) {
     return null;
   }
   if (pathname?.startsWith('/profile')) {
-    return <div className="hidden md:block"><Header /></div>;
+    return (
+      <div className="hidden md:block">
+        <SiteHeader navLinks={navLinks} />
+      </div>
+    );
   }
-  return <Header />;
+  return <SiteHeader navLinks={navLinks} />;
 }

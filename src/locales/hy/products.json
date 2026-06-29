@@ -36,13 +36,38 @@
     "viewModes": {
       "list": "Ցուցակի տեսք",
       "grid2": "Ցանցի տեսք 2x2",
-      "grid3": "Ցանցի տեսք 3x3"
+      "grid3": "Ցանցի տեսք 3x3",
+      "grid4": "Ցանցի տեսք 4x4"
     },
     "filters": "Ֆիլտրեր",
     "sortProducts": "Դասավորել ապրանքները"
   },
   "grid": {
     "noProducts": "Ապրանքներ չգտնվեցին։"
+  },
+  "catalog": {
+    "title": "Տեսականի",
+    "sortBy": "Դասավորել ըստ",
+    "seeAll": "Տեսնել բոլորը",
+    "cancelFilters": "Չեղարկել",
+    "filters": {
+      "category": "Կատեգորիա",
+      "size": "Չափս (սմ)",
+      "price": "Գին",
+      "color": "Գույն",
+      "clothingType": "Հագուստի տեսակ",
+      "all": "Բոլորը",
+      "sizeNote": "Եվրոպական չափսային աղյուսակ",
+      "clothingTypes": {
+        "dress": "Զգեստ",
+        "romper": "Կոմբինիզոն",
+        "set": "Սեթ",
+        "topPants": "Վերնաշապիկ/Տաբատ",
+        "topHalfDress": "Վերնաշապիկ/Կիսաշրջազգեստ",
+        "topShorts": "Վերնաշապիկ/Շորտ",
+        "sportSet": "Սպ. Սեթ (Շապիկ/Շորտ)"
+      }
+    }
   },
   "mobileFilters": {
     "title": "Ֆիլտրեր",

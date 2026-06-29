@@ -13,6 +13,7 @@ export interface ProductFilters {
   colors?: string;
   sizes?: string;
   brand?: string;
+  clothingTypes?: string;
   sort?: string;
   page?: number;
   limit?: number;
