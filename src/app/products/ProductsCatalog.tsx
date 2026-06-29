@@ -21,7 +21,7 @@ import {
   PRODUCTS_CATALOG_MAX_WIDTH_PX,
   PRODUCTS_CATALOG_PADDING_LEFT_PX,
   PRODUCTS_CATALOG_PADDING_RIGHT_PX,
-  PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
+  PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
 
 interface Product {
@@ -220,18 +220,8 @@ export async function ProductsCatalog({
         paddingRight: PRODUCTS_CATALOG_PADDING_RIGHT_PX,
       }}
     >
-      <div className="hidden lg:flex" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
-        <div
-          className="shrink-0"
-          style={{ width: PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX }}
-          aria-hidden
-        />
-        <div className="min-w-0 flex-1 pt-2">
-          <ProductsHeader />
-        </div>
-      </div>
-
-      <div className="lg:hidden pt-2">
+      <div className="space-y-3 pt-2 pb-4 lg:hidden">
+        <ProductsBreadcrumb />
         <ProductsHeader />
       </div>
 
@@ -241,7 +231,7 @@ export async function ProductsCatalog({
         minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
         maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
       >
-        <div className="flex flex-col lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+        <div className="flex flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
           <ProductsFilterSidebar
             category={typeof params.category === 'string' ? params.category : undefined}
             search={typeof params.search === 'string' ? params.search : undefined}
@@ -253,8 +243,12 @@ export async function ProductsCatalog({
           />
 
           <div className="min-w-0 flex-1">
-            <div className="pb-4 pt-2 lg:pt-0">
+            <div
+              className="hidden items-center justify-between gap-4 lg:flex"
+              style={{ paddingBottom: PRODUCTS_CATALOG_TOP_ROW_PB_PX }}
+            >
               <ProductsBreadcrumb />
+              <ProductsHeader />
             </div>
 
             <div className="py-2">

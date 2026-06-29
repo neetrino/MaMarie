@@ -3,7 +3,10 @@ import {
   PRODUCTS_CATALOG_MAX_WIDTH_PX,
   PRODUCTS_CATALOG_PADDING_LEFT_PX,
   PRODUCTS_CATALOG_PADDING_RIGHT_PX,
+  PRODUCTS_CATALOG_PILL_HEIGHT_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
+  PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
+  PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
 
 /**
@@ -21,24 +24,15 @@ export function ProductsCatalogSkeleton() {
       aria-busy="true"
       aria-label="Loading products"
     >
-      <div className="hidden lg:flex" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+      <div className="space-y-3 pt-2 pb-4 lg:hidden">
+        <div className="h-8 w-48 rounded bg-neutral-200" />
         <div
-          className="shrink-0"
-          style={{ width: PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX }}
-          aria-hidden
+          className="rounded-[30px] bg-neutral-200"
+          style={{ width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
         />
-        <div className="min-w-0 flex-1 pt-2">
-          <div className="flex justify-end pb-6">
-            <div className="h-12 w-64 rounded-full bg-neutral-200" />
-          </div>
-        </div>
       </div>
 
-      <div className="lg:hidden pt-2 pb-6">
-        <div className="h-12 w-full rounded-full bg-neutral-200" />
-      </div>
-
-      <div className="flex flex-col lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+      <div className="flex flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
         <aside
           className="hidden shrink-0 lg:block"
           style={{ width: PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX }}
@@ -53,20 +47,33 @@ export function ProductsCatalogSkeleton() {
         </aside>
 
         <div className="min-w-0 flex-1">
-          <div className="pb-4 pt-2 lg:pt-0">
+          <div
+            className="hidden items-center justify-between gap-4 lg:flex"
+            style={{ paddingBottom: PRODUCTS_CATALOG_TOP_ROW_PB_PX }}
+          >
             <div className="h-8 w-48 rounded bg-neutral-200" />
+            <div className="flex gap-3">
+              <div
+                className="rounded-[30px] bg-neutral-200"
+                style={{ width: 182, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
+              />
+              <div
+                className="rounded-[30px] bg-neutral-200"
+                style={{ width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
+              />
+            </div>
           </div>
 
           <div className="py-2">
-          <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="rounded-[30px] bg-[#f9e490]/60"
-                style={{ width: 344, height: 371 }}
-              />
-            ))}
-          </div>
+            <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="rounded-[30px] bg-[#f9e490]/60"
+                  style={{ width: 344, height: 371 }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

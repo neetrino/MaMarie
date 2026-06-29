@@ -22,6 +22,8 @@ export const PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX = HEADER_CONTENT_CLEARANCE_D
 
 export const PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX = 281;
 export const PRODUCTS_CATALOG_MAIN_GAP_PX = 52;
+/** Breadcrumb row → product grid (desktop). */
+export const PRODUCTS_CATALOG_TOP_ROW_PB_PX = 16;
 
 export const PRODUCTS_CATALOG_CARD_GAP_PX = 12;
 export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;
@@ -50,6 +52,24 @@ export const PRODUCTS_CATALOG_SORT_PILL_BG = BRAND_COLORS.pink;
 export const PRODUCTS_CATALOG_VIEW_PILL_BG = '#f3f3f3';
 export const PRODUCTS_CATALOG_PILL_HEIGHT_PX = 48;
 export const PRODUCTS_CATALOG_PILL_RADIUS_PX = 30;
+export const PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX = 231;
+export const PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX = 16;
+export const PRODUCTS_CATALOG_SORT_ICON_SIZE_PX = 16;
+export const PRODUCTS_CATALOG_ASSETS = {
+  sortSliders: '/assets/products/icon-sort-sliders.svg',
+} as const;
+
+/** Catalog toolbar view modes — list + 3-column grid. */
+export const PRODUCTS_CATALOG_VIEW_MODES = ['list', 'grid-3'] as const;
+export type ProductsCatalogViewMode = (typeof PRODUCTS_CATALOG_VIEW_MODES)[number];
+export const PRODUCTS_CATALOG_DEFAULT_VIEW_MODE: ProductsCatalogViewMode = 'grid-3';
+
+export function normalizeProductsCatalogViewMode(value: string | null): ProductsCatalogViewMode {
+  if (value === 'list' || value === 'grid-3') {
+    return value;
+  }
+  return PRODUCTS_CATALOG_DEFAULT_VIEW_MODE;
+}
 
 export const PRODUCTS_CATALOG_CTA_WIDTH_PX = 200;
 export const PRODUCTS_CATALOG_CTA_HEIGHT_PX = 56;

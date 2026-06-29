@@ -10,6 +10,9 @@ import {
   PRODUCTS_CATALOG_CTA_HEIGHT_PX,
   PRODUCTS_CATALOG_CTA_INSET_SHADOW,
   PRODUCTS_CATALOG_CTA_WIDTH_PX,
+  PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
+  normalizeProductsCatalogViewMode,
+  type ProductsCatalogViewMode,
 } from '../constants/products-catalog';
 import { mapToHomeProductCard } from './home/best-products-data';
 import { HomeProductCard, type HomeProductCardData } from './home/HomeProductCard';
@@ -30,7 +33,7 @@ interface Product {
   defaultVariantId?: string | null;
 }
 
-type ViewMode = 'list' | 'grid-2' | 'grid-3';
+type ViewMode = ProductsCatalogViewMode;
 
 interface ProductsGridProps {
   products: Product[];
@@ -40,16 +43,15 @@ interface ProductsGridProps {
 
 export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null }: ProductsGridProps) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ViewMode>('grid-2');
+  const [viewMode, setViewMode] = useState<ViewMode>(PRODUCTS_CATALOG_DEFAULT_VIEW_MODE);
   const [sortedProducts, setSortedProducts] = useState<HomeProductCardData[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem('products-view-mode');
-    if (stored && ['list', 'grid-2', 'grid-3'].includes(stored)) {
-      setViewMode(stored as ViewMode);
-    } else {
-      setViewMode('grid-2');
-      localStorage.setItem('products-view-mode', 'grid-2');
+    const mode = normalizeProductsCatalogViewMode(stored);
+    setViewMode(mode);
+    if (stored !== mode) {
+      localStorage.setItem('products-view-mode', mode);
     }
   }, []);
 
