@@ -46,7 +46,7 @@ function HeroFlatLayer({ layer }: { layer: HeroFlatPlacement }) {
         src={HERO_ASSETS[layer.assetKey]}
         alt=""
         fill
-        priority={layer.priority}
+        priority
         sizes={`${layer.widthPx}px`}
         className={flatImageClassName(layer)}
       />
@@ -98,7 +98,7 @@ function HeroRotatedLayer({ layer }: { layer: HeroRotatedPlacement }) {
           src={HERO_ASSETS[layer.assetKey]}
           alt=""
           fill
-          priority={layer.priority}
+          priority
           sizes={`${layer.imageWidthPx}px`}
           className={`max-w-none ${rotatedImageClassName(layer)}`}
         />

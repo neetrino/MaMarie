@@ -53,6 +53,8 @@ function AboutUsBrandLogo() {
       <img
         src={ABOUT_US_ASSETS.logoInline}
         alt=""
+        loading="lazy"
+        decoding="async"
         className="pointer-events-none absolute max-w-none object-cover"
         style={{
           height: `${ABOUT_US_LOGO_CROP_HEIGHT_PERCENT}%`,
@@ -103,6 +105,8 @@ function AboutUsDecoration({
         <img
           src={imageSrc}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="size-full object-cover"
           width={layout.imageSizePx}
           height={layout.imageSizePx}

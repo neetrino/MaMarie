@@ -38,6 +38,7 @@ function SaleBannerChildPhoto() {
         alt=""
         width={SALE_BANNER_CHILD_WIDTH_PX}
         height={SALE_BANNER_CHILD_HEIGHT_PX}
+        loading="lazy"
         sizes="(min-width: 768px) 628px, 0px"
         className="absolute max-w-none object-cover"
         style={{

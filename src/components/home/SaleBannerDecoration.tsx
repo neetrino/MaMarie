@@ -27,6 +27,8 @@ function SaleBannerDecorationImage() {
       <img
         alt=""
         src={SALE_SECTION_ASSETS.bannerDecoration}
+        loading="lazy"
+        decoding="async"
         className="absolute max-w-none object-cover"
         style={{
           height: `${SALE_BANNER_DECORATION_IMAGE_HEIGHT_PERCENT}%`,

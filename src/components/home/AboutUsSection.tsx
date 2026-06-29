@@ -51,6 +51,8 @@ function AboutUsSectionPhoto() {
             className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
             width={ABOUT_US_BG_IMAGE_WIDTH_PX}
             height={ABOUT_US_BG_IMAGE_HEIGHT_PX}
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>

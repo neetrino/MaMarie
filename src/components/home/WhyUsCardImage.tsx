@@ -25,6 +25,8 @@ function WhyUsCardImageFill({
     <img
       alt=""
       src={src}
+      loading="lazy"
+      decoding="async"
       className="pointer-events-none absolute max-w-none object-cover"
       style={{
         left: scalePx(layout.leftPx),
@@ -56,6 +58,8 @@ function WhyUsCardImageCrop({
       <img
         alt=""
         src={src}
+        loading="lazy"
+        decoding="async"
         className="absolute max-w-none object-cover"
         style={{
           height: `${layout.imageHeightPercent}%`,
@@ -89,6 +93,8 @@ function WhyUsCardImageRotated({
         <img
           alt=""
           src={src}
+          loading="lazy"
+          decoding="async"
           className="max-w-none object-cover"
           style={{
             width: scalePx(layout.imageSizePx),

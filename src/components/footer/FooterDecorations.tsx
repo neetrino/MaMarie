@@ -39,6 +39,7 @@ function FooterDecoration({
           src={imageSrc}
           alt=""
           fill
+          loading="lazy"
           sizes={`${Math.round(layout.imageSizePx)}px`}
           className="object-cover"
         />

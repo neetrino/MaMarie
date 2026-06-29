@@ -188,6 +188,7 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
               src={imageSrc}
               alt={product.title}
               fill
+              loading="lazy"
               sizes={`${HOME_PRODUCT_CARD_IMAGE_WIDTH_PX}px`}
               className="object-cover"
               onError={() => setImageError(true)}

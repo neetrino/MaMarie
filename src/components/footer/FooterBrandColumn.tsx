@@ -42,6 +42,7 @@ function FooterBrandLogo() {
             src={FOOTER_ASSETS.logoInline}
             alt=""
             fill
+            loading="lazy"
             sizes={`${FOOTER_LOGO_WIDTH_PX}px`}
             className="object-cover"
           />
@@ -85,7 +86,7 @@ export function FooterBrandColumn() {
             className="relative block shrink-0 transition-opacity hover:opacity-80"
             style={{ width: social.widthPx, height: social.heightPx }}
           >
-            <Image src={social.iconSrc} alt="" fill sizes={`${social.widthPx}px`} />
+            <Image src={social.iconSrc} alt="" fill loading="lazy" sizes={`${social.widthPx}px`} />
           </Link>
         ))}
       </div>
