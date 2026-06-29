@@ -68,7 +68,14 @@ function ViewModeIcon({ mode, active }: { mode: ProductsCatalogViewMode; active:
 
   if (mode === 'grid-3') {
     return (
-      <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+      <svg
+        width={iconSize}
+        height={iconSize}
+        viewBox={VIEW_ICON_VIEWBOX}
+        fill="none"
+        overflow="visible"
+        aria-hidden
+      >
         {GRID3_DOT_CENTERS_X.flatMap((cx) =>
           GRID3_DOT_CENTERS_Y.map((cy) => (
             <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={GRID3_DOT_RADIUS} fill={color} />
@@ -164,7 +171,7 @@ function ProductsHeaderContent() {
       </button>
 
       <div
-        className="hidden items-center gap-7 px-6 lg:flex"
+        className="hidden items-center gap-7 overflow-visible px-6 lg:flex"
         style={{
           height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
           borderRadius: PRODUCTS_CATALOG_PILL_RADIUS_PX,
@@ -178,7 +185,7 @@ function ProductsHeaderContent() {
             onClick={() => handleViewModeChange(mode)}
             aria-label={t(`products.header.viewModes.${VIEW_MODE_LABEL_KEYS[mode]}`)}
             aria-pressed={viewMode === mode}
-            className="inline-flex items-center justify-center transition-opacity hover:opacity-80"
+            className={`relative inline-flex items-center justify-center overflow-visible transition-opacity hover:opacity-80 ${mode === 'grid-3' ? 'z-10' : 'z-0'}`}
             style={{
               width: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
               height: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
