@@ -8,6 +8,8 @@ import {
   HERO_GENDER_BUTTON_GIRLS_BG_COLOR,
   HERO_GENDER_BUTTON_GIRLS_WIDTH_PX,
   HERO_GENDER_BUTTON_HEIGHT_PX,
+  HERO_GENDER_BUTTON_HOVER_LIFT_PX,
+  HERO_GENDER_BUTTON_HOVER_TRANSITION_MS,
   HERO_GENDER_BUTTON_INSET_SHADOW,
   HERO_GENDER_BUTTON_LINE_HEIGHT_PX,
   HERO_GENDER_BUTTON_PADDING_X_PX,
@@ -15,7 +17,7 @@ import {
 } from '../../constants/hero';
 
 const genderButtonClassName =
-  'relative flex items-center justify-center rounded-full font-bold text-white transition-opacity hover:opacity-90';
+  'relative flex items-center justify-center rounded-full font-bold text-white transition-transform ease-out hover:-translate-y-[var(--hero-btn-lift)] focus-visible:-translate-y-[var(--hero-btn-lift)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0';
 
 interface GenderButtonProps {
   href: string;
@@ -38,6 +40,8 @@ function GenderButton({ href, label, backgroundColor, widthPx }: GenderButtonPro
         fontSize: HERO_GENDER_BUTTON_FONT_SIZE_PX,
         lineHeight: `${HERO_GENDER_BUTTON_LINE_HEIGHT_PX}px`,
         boxShadow: HERO_GENDER_BUTTON_INSET_SHADOW,
+        transitionDuration: `${HERO_GENDER_BUTTON_HOVER_TRANSITION_MS}ms`,
+        ['--hero-btn-lift' as string]: `${HERO_GENDER_BUTTON_HOVER_LIFT_PX}px`,
       }}
     >
       {label}

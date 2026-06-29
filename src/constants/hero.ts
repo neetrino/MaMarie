@@ -192,6 +192,10 @@ export const HERO_GENDER_BUTTON_BOYS_BG_COLOR = '#5281e1';
 export const HERO_GENDER_BUTTON_INSET_SHADOW =
   'inset 0px -4px 8px 0px rgba(0, 0, 0, 0.27), inset 0px 4px 4px 0px rgba(255, 255, 255, 0.4), inset 0px 20px 40px -10px rgba(164, 60, 18, 0.2)';
 
+/** Subtle lift on hover — Figma clay button feel. */
+export const HERO_GENDER_BUTTON_HOVER_LIFT_PX = 4;
+export const HERO_GENDER_BUTTON_HOVER_TRANSITION_MS = 200;
+
 export function heroPctX(px: number): string {
   return `${(px / HERO_DESIGN_WIDTH_PX) * 100}%`;
 }
