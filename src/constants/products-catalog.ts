@@ -11,7 +11,7 @@ import {
 /** Figma shop page — catalog layout tokens. Horizontal insets use `HomeContentHorizontalFrame` (same as navbar pill). */
 
 /** Extra breathing room below fixed navbar — shop page only. */
-export const PRODUCTS_CATALOG_NAVBAR_GAP_EXTRA_PX = 20;
+export const PRODUCTS_CATALOG_NAVBAR_GAP_EXTRA_PX = 35;
 
 /** Top inset — content clears fixed navbar + shop-specific gap. */
 export const PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX =
