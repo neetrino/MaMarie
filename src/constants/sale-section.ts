@@ -7,13 +7,14 @@ import {
   HOME_SECTION_MAX_WIDTH_PX,
   HOME_SECTION_PADDING_LEFT_PX,
   HOME_SECTION_PADDING_RIGHT_PX,
+  HOME_SECTION_STACK_GAP_PX,
 } from './home-sections';
 
-/** Figma node `1:98` / heading `1:99` — «ԶԵՂՉ» sale section. */
+/** Figma node `51:357` — «Զեղչ» sale section heading. */
 export const SALE_SECTION_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
 
-/** Figma: sale section follows featured section with no extra gap. */
-export const SALE_SECTION_OFFSET_TOP_PX = 0;
+/** Matches hero → best products spacing. */
+export const SALE_SECTION_OFFSET_TOP_PX = HOME_SECTION_STACK_GAP_PX;
 
 export const SALE_SECTION_PADDING_LEFT_PX = HOME_SECTION_PADDING_LEFT_PX;
 export const SALE_SECTION_PADDING_RIGHT_PX = HOME_SECTION_PADDING_RIGHT_PX;
@@ -32,18 +33,19 @@ export const SALE_CHEVRON_SIZE_PX = HOME_SECTION_CHEVRON_SIZE_PX;
 
 export const SALE_SECTION_ASSETS = {
   chevronRight: '/assets/home/icon-chevron-right-pink.svg',
-  bannerDresses: '/assets/home/sale-banner-dresses.png',
+  bannerDecoration: '/assets/home/sale-banner-decoration.png',
+  bannerChild: '/assets/home/sale-banner-child.png',
 } as const;
 
-/** Figma node `1:105` — promo banner below sale heading. */
-export const SALE_BANNER_OFFSET_TOP_PX = 0;
+/** Figma node `51:363` — promo banner. */
+/** Figma `51:363` y=1730 vs section `51:356` bottom y=1673. */
+export const SALE_BANNER_OFFSET_TOP_PX = 57;
 export const SALE_BANNER_HEIGHT_PX = 391;
 export const SALE_BANNER_MAX_WIDTH_PX = HOME_SECTION_CONTENT_MAX_WIDTH_PX;
 export const SALE_BANNER_RADIUS_PX = 30;
-export const SALE_BANNER_GRADIENT =
-  'linear-gradient(147.735deg, #ef95aa 16.061%, #f9e490 81.311%)';
+export const SALE_BANNER_BG = '#ef95aa';
 
-export const SALE_BANNER_CONTENT_LEFT_PX = 106;
+export const SALE_BANNER_CONTENT_LEFT_PX = 57;
 export const SALE_BANNER_CONTENT_TOP_PX = 64;
 export const SALE_BANNER_CONTENT_WIDTH_PX = 512;
 
@@ -74,9 +76,31 @@ export const SALE_BANNER_CTA_TEXT_COLOR = '#ff7f50';
 export const SALE_BANNER_CTA_INSET_SHADOW =
   'inset 0px -4px 8px 0px rgba(0,0,0,0.1), inset 0px 4px 4px 0px rgba(255,255,255,0.4), inset 0px 20px 40px 0px rgba(164,60,18,0.2)';
 
-export const SALE_BANNER_IMAGE_LEFT_PX = 446;
-export const SALE_BANNER_IMAGE_TOP_PX = -83;
-export const SALE_BANNER_IMAGE_WIDTH_PX = 1018;
-export const SALE_BANNER_IMAGE_HEIGHT_PX = 819;
-export const SALE_BANNER_IMAGE_CROP_HEIGHT_PERCENT = 124.3;
-export const SALE_BANNER_IMAGE_CROP_TOP_PERCENT = -6.53;
+/** Figma `51:364` — rotated decoration behind copy. */
+export const SALE_BANNER_DECORATION_LEFT_PX = 215;
+export const SALE_BANNER_DECORATION_TOP_PX = -112;
+export const SALE_BANNER_DECORATION_WRAPPER_WIDTH_PX = 924.403;
+export const SALE_BANNER_DECORATION_WRAPPER_HEIGHT_PX = 615.326;
+export const SALE_BANNER_DECORATION_INNER_WIDTH_PX = 849;
+export const SALE_BANNER_DECORATION_INNER_HEIGHT_PX = 386;
+export const SALE_BANNER_DECORATION_INNER_WIDTH_RATIO =
+  SALE_BANNER_DECORATION_INNER_WIDTH_PX / SALE_BANNER_DECORATION_WRAPPER_WIDTH_PX;
+export const SALE_BANNER_DECORATION_INNER_HEIGHT_RATIO =
+  SALE_BANNER_DECORATION_INNER_HEIGHT_PX / SALE_BANNER_DECORATION_WRAPPER_HEIGHT_PX;
+export const SALE_BANNER_DECORATION_ROTATE_DEG = 16.83;
+export const SALE_BANNER_DECORATION_Z_INDEX = 1;
+export const SALE_BANNER_DECORATION_IMAGE_HEIGHT_PERCENT = 183.09;
+export const SALE_BANNER_DECORATION_IMAGE_WIDTH_PERCENT = 105.15;
+export const SALE_BANNER_DECORATION_IMAGE_LEFT_PERCENT = -5.15;
+export const SALE_BANNER_DECORATION_IMAGE_TOP_PERCENT = -36.78;
+
+/** Figma `51:370` — child photo on the right. */
+export const SALE_BANNER_CHILD_LEFT_PX = 703;
+export const SALE_BANNER_CHILD_TOP_PX = 2;
+export const SALE_BANNER_CHILD_WIDTH_PX = 628;
+export const SALE_BANNER_CHILD_HEIGHT_PX = 649;
+export const SALE_BANNER_CHILD_RADIUS_PX = 7;
+export const SALE_BANNER_CHILD_Z_INDEX = 2;
+export const SALE_BANNER_CHILD_IMAGE_HEIGHT_PERCENT = 145.31;
+export const SALE_BANNER_CHILD_IMAGE_LEFT_PERCENT = 5.14;
+export const SALE_BANNER_CHILD_IMAGE_TOP_PERCENT = -35.8;

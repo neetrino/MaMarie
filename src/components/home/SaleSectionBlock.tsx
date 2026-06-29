@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import {
+  SALE_BANNER_BG,
   SALE_BANNER_CONTENT_LEFT_PX,
   SALE_BANNER_CONTENT_TOP_PX,
   SALE_BANNER_CONTENT_WIDTH_PX,
@@ -14,14 +14,7 @@ import {
   SALE_BANNER_CTA_TEXT_LINE_HEIGHT_PX,
   SALE_BANNER_CTA_TEXT_SIZE_PX,
   SALE_BANNER_CTA_WIDTH_PX,
-  SALE_BANNER_GRADIENT,
   SALE_BANNER_HEIGHT_PX,
-  SALE_BANNER_IMAGE_CROP_HEIGHT_PERCENT,
-  SALE_BANNER_IMAGE_CROP_TOP_PERCENT,
-  SALE_BANNER_IMAGE_HEIGHT_PX,
-  SALE_BANNER_IMAGE_LEFT_PX,
-  SALE_BANNER_IMAGE_TOP_PX,
-  SALE_BANNER_IMAGE_WIDTH_PX,
   SALE_BANNER_MAX_WIDTH_PX,
   SALE_BANNER_OFFSET_TOP_PX,
   SALE_BANNER_RADIUS_PX,
@@ -37,46 +30,17 @@ import {
   SALE_BANNER_TITLE_SIZE_PX,
   SALE_BANNER_TITLE_SIZE_HY_PX,
   SALE_HEADING_COLOR,
+  SALE_HEADING_MIN_HEIGHT_PX,
+  SALE_HEADING_PADDING_Y_PX,
   SALE_SECTION_ASSETS,
+  SALE_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/sale-section';
 import { useTranslation } from '../../lib/i18n-client';
 import { HomeSectionHeadingRow } from './HomeSectionHeading';
+import { SaleBannerVisuals } from './SaleBannerVisuals';
 
 function saleBannerPct(valuePx: number, basePx: number): string {
   return `${(valuePx / basePx) * 100}%`;
-}
-
-function SaleBannerImage() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute hidden md:block"
-      style={{
-        left: saleBannerPct(SALE_BANNER_IMAGE_LEFT_PX, SALE_BANNER_MAX_WIDTH_PX),
-        top: saleBannerPct(SALE_BANNER_IMAGE_TOP_PX, SALE_BANNER_HEIGHT_PX),
-        width: saleBannerPct(SALE_BANNER_IMAGE_WIDTH_PX, SALE_BANNER_MAX_WIDTH_PX),
-        height: saleBannerPct(SALE_BANNER_IMAGE_HEIGHT_PX, SALE_BANNER_HEIGHT_PX),
-      }}
-    >
-      <div
-        className="absolute relative max-w-none overflow-hidden"
-        style={{
-          height: `${SALE_BANNER_IMAGE_CROP_HEIGHT_PERCENT}%`,
-          width: '100%',
-          top: `${SALE_BANNER_IMAGE_CROP_TOP_PERCENT}%`,
-        }}
-      >
-        <Image
-          src={SALE_SECTION_ASSETS.bannerDresses}
-          alt=""
-          fill
-          sizes="(min-width: 768px) 760px, 0px"
-          className="object-cover"
-          priority={false}
-        />
-      </div>
-    </div>
-  );
 }
 
 export function SaleSectionBlock() {
@@ -108,6 +72,9 @@ export function SaleSectionBlock() {
         seeAllLabel={t('common.search.seeAll')}
         color={SALE_HEADING_COLOR}
         chevronSrc={SALE_SECTION_ASSETS.chevronRight}
+        titleLineHeightPx={SALE_TITLE_LINE_HEIGHT_PX}
+        minHeightPx={SALE_HEADING_MIN_HEIGHT_PX}
+        headingPaddingYPx={SALE_HEADING_PADDING_Y_PX}
       />
 
       <section
@@ -117,10 +84,10 @@ export function SaleSectionBlock() {
           marginTop: SALE_BANNER_OFFSET_TOP_PX,
           minHeight: SALE_BANNER_HEIGHT_PX,
           borderRadius: SALE_BANNER_RADIUS_PX,
-          background: SALE_BANNER_GRADIENT,
+          backgroundColor: SALE_BANNER_BG,
         }}
       >
-        <SaleBannerImage />
+        <SaleBannerVisuals />
 
         <div
           className="absolute z-10 max-w-full"

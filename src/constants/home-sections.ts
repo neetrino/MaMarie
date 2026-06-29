@@ -26,8 +26,11 @@ export const HOME_SECTION_HEADING_PADDING_Y_PX = 7;
 export const HOME_SECTION_HEADING_MIN_HEIGHT_PX = 94;
 export const HOME_SECTION_HEADING_TITLE_LINE_HEIGHT_PX = 80;
 
-/** Space below hero before section heading — Figma `51:343` y=919 vs hero `51:329` bottom 862. */
-export const BEST_PRODUCTS_SECTION_OFFSET_TOP_PX = 120;
+/** Vertical gap between stacked homepage sections. */
+export const HOME_SECTION_STACK_GAP_PX = 100;
+
+/** Space below hero before section heading. */
+export const BEST_PRODUCTS_SECTION_OFFSET_TOP_PX = HOME_SECTION_STACK_GAP_PX;
 
 /** Product cards row — Figma `Frame 472`. */
 export const BEST_PRODUCTS_GRID_OFFSET_TOP_PX = 75;
