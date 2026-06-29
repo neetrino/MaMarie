@@ -1,12 +1,22 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Languages, Menu, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import {
+  BRAND_ASSETS,
   getHeaderNavTranslationKey,
   HEADER_NAV_ITEMS,
 } from '../../constants/brand';
+import {
+  HEADER_MOBILE_ACTION_BUTTON_SIZE_PX,
+  HEADER_MOBILE_ACTIONS_GAP_PX,
+  HEADER_MOBILE_LANGUAGE_ICON_SIZE_PX,
+  HEADER_MOBILE_MENU_ICON_SIZE_PX,
+  HEADER_MOBILE_PILL_CONTENT_INSET_PX,
+  HEADER_PILL_APPEAR_DURATION_MS,
+} from '../../constants/header';
 import {
   setStoredLanguage,
   type LanguageCode,
@@ -22,10 +32,12 @@ const HEADER_LANGUAGES: ReadonlyArray<{ code: LanguageCode; label: string }> = [
 function MobileIconButton({
   label,
   onClick,
+  showPill,
   children,
 }: {
   label: string;
   onClick: () => void;
+  showPill?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -33,14 +45,21 @@ function MobileIconButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-brand-brown transition-opacity hover:opacity-80"
+      className={`flex shrink-0 items-center justify-center rounded-full transition-[opacity,background-color] hover:opacity-80 ${
+        showPill ? 'bg-transparent' : 'bg-white'
+      }`}
+      style={{
+        width: HEADER_MOBILE_ACTION_BUTTON_SIZE_PX,
+        height: HEADER_MOBILE_ACTION_BUTTON_SIZE_PX,
+      }}
     >
       {children}
     </button>
   );
 }
 
-export function HeaderMobileActions() {
+/** Figma `74:729` — language globe and hamburger menu buttons. */
+export function HeaderMobileActions({ showPill = false }: { showPill?: boolean }) {
   const { t, lang } = useTranslation();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -67,15 +86,31 @@ export function HeaderMobileActions() {
 
   return (
     <>
-      <div className="relative flex items-center gap-2.5">
+      <div
+        className="relative flex items-center transition-transform ease-out"
+        style={{
+          gap: HEADER_MOBILE_ACTIONS_GAP_PX,
+          transform: showPill
+            ? `translateX(-${HEADER_MOBILE_PILL_CONTENT_INSET_PX}px)`
+            : 'translateX(0)',
+          transitionDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
+        }}
+      >
         <MobileIconButton
           label={t('common.navigation.language')}
+          showPill={showPill}
           onClick={() => {
             setLanguageOpen((open) => !open);
             setMenuOpen(false);
           }}
         >
-          <Languages className="h-6 w-6" />
+          <Image
+            src={BRAND_ASSETS.iconLanguageMobile}
+            alt=""
+            width={HEADER_MOBILE_LANGUAGE_ICON_SIZE_PX}
+            height={HEADER_MOBILE_LANGUAGE_ICON_SIZE_PX}
+            aria-hidden
+          />
         </MobileIconButton>
 
         {languageOpen ? (
@@ -101,12 +136,19 @@ export function HeaderMobileActions() {
 
         <MobileIconButton
           label={t('common.navigation.catalog')}
+          showPill={showPill}
           onClick={() => {
             setMenuOpen(true);
             setLanguageOpen(false);
           }}
         >
-          <Menu className="h-[22px] w-[22px]" />
+          <Image
+            src={BRAND_ASSETS.iconMenuMobile}
+            alt=""
+            width={HEADER_MOBILE_MENU_ICON_SIZE_PX}
+            height={HEADER_MOBILE_MENU_ICON_SIZE_PX}
+            aria-hidden
+          />
         </MobileIconButton>
       </div>
 

@@ -1,4 +1,5 @@
 import { LOGO_HEADER_HEIGHT_PX } from './brand';
+import { MOBILE_HOME_HORIZONTAL_PADDING_PX } from './mobile-home';
 
 /** Scroll distance before home navbar switches to pill mode. */
 export const HEADER_HOME_SCROLL_THRESHOLD_PX = 12;
@@ -9,14 +10,54 @@ export const HEADER_HOME_OVERLAY_TOP_PX = 0;
 /** Nudge homepage navbar up (negative px = higher on screen). */
 export const HEADER_HOME_OFFSET_Y_PX = -16;
 
-/** Mobile nav row height — matches `h-16` in `HeaderNavRows`. */
-export const HEADER_MOBILE_NAV_HEIGHT_PX = 64;
+/** Figma `74:729` — mobile top navbar layout. */
+/** Matches mobile hero horizontal inset (`MOBILE_HOME_HORIZONTAL_PADDING_PX`). */
+export const HEADER_MOBILE_PADDING_X_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
+export const HEADER_MOBILE_NAV_ROW_HEIGHT_PX = 80;
+export const HEADER_MOBILE_LOGO_WIDTH_PX = 98;
+export const HEADER_MOBILE_LOGO_HEIGHT_PX = 49;
+/** Figma `74:731` — image crop inside the mobile logo frame. */
+export const HEADER_MOBILE_LOGO_CROP_WIDTH_PERCENT = 100.05;
+export const HEADER_MOBILE_LOGO_CROP_HEIGHT_PERCENT = 114.27;
+export const HEADER_MOBILE_LOGO_CROP_TOP_PERCENT = 0.01;
+export const HEADER_MOBILE_ACTION_BUTTON_SIZE_PX = 40;
+export const HEADER_MOBILE_ACTIONS_GAP_PX = 11;
+export const HEADER_MOBILE_LANGUAGE_ICON_SIZE_PX = 24;
+export const HEADER_MOBILE_MENU_ICON_SIZE_PX = 22;
+
+/** Shared bottom band — logo, actions, and scrolled pill align to this height. */
+export const HEADER_MOBILE_NAV_BAND_HEIGHT_PX = HEADER_MOBILE_LOGO_HEIGHT_PX;
+
+/** Scrolled pill on mobile — matches logo height so edges align with nav content. */
+export const HEADER_MOBILE_PILL_HEIGHT_PX = HEADER_MOBILE_NAV_BAND_HEIGHT_PX;
+
+/** Width of language + menu button group (`40 + 11 + 40`). */
+export const HEADER_MOBILE_ACTIONS_WIDTH_PX =
+  HEADER_MOBILE_ACTION_BUTTON_SIZE_PX * 2 + HEADER_MOBILE_ACTIONS_GAP_PX;
+
+/** Figma `74:729` — top inset before logo/actions band (`80 − 49`). */
+export const HEADER_MOBILE_NAV_TOP_INSET_PX =
+  HEADER_MOBILE_NAV_ROW_HEIGHT_PX - HEADER_MOBILE_NAV_BAND_HEIGHT_PX;
+
+/** Bottom edge of the fixed mobile header in viewport coordinates. */
+export const HEADER_MOBILE_VISIBLE_BOTTOM_PX =
+  HEADER_MOBILE_NAV_ROW_HEIGHT_PX + HEADER_HOME_OVERLAY_TOP_PX + HEADER_HOME_OFFSET_Y_PX;
+
+/** @deprecated Use `HEADER_MOBILE_VISIBLE_BOTTOM_PX`. */
+export const HEADER_MOBILE_NAV_HEIGHT_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;
 
 /** Vertical padding on desktop nav row (smaller = navbar sits higher). */
 export const HEADER_DESKTOP_ROW_PADDING_Y_PX = 0;
 
 /** Pill fade-in duration (ms). */
 export const HEADER_PILL_APPEAR_DURATION_MS = 500;
+
+/** On scroll, logo and action icons nudge inward toward pill center. */
+export const HEADER_MOBILE_PILL_CONTENT_INSET_PX = 8;
+/** Extra right nudge for the logo on scroll (added to `HEADER_MOBILE_PILL_CONTENT_INSET_PX`). */
+export const HEADER_MOBILE_PILL_LOGO_EXTRA_INSET_PX = 4;
+export const HEADER_MOBILE_PILL_LOGO_INSET_PX =
+  HEADER_MOBILE_PILL_CONTENT_INSET_PX + HEADER_MOBILE_PILL_LOGO_EXTRA_INSET_PX;
 
 /** Fixed pill height — narrower than full nav row, vertically centered on scroll. */
 export const HEADER_PILL_SHELL_HEIGHT_PX = 70;
@@ -27,8 +68,7 @@ export const HEADER_LOGIN_PILL_HEIGHT_PX = 41;
 export const HEADER_LOGIN_ICON_SIZE_PX = 25;
 
 /** Main content top inset — keeps pages below the fixed navbar (not used on `/`). */
-export const HEADER_CONTENT_CLEARANCE_MOBILE_PX =
-  HEADER_MOBILE_NAV_HEIGHT_PX + HEADER_HOME_OVERLAY_TOP_PX + HEADER_HOME_OFFSET_Y_PX;
+export const HEADER_CONTENT_CLEARANCE_MOBILE_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;
 
 export const HEADER_CONTENT_CLEARANCE_DESKTOP_PX =
   LOGO_HEADER_HEIGHT_PX +

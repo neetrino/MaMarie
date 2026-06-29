@@ -17,6 +17,11 @@ export const BRAND_ASSETS = {
   iconChevron: '/assets/brand/icon-chevron.svg',
   /** Figma `51:335` — heroicons outline login. */
   iconLogin: '/assets/brand/icon-login.svg',
+  /** Figma `74:731` — mobile navbar clay mark. */
+  logoNavbarMobile: '/assets/brand/mobile/logo-navbar.png',
+  /** Figma `74:729` — mobile navbar action icons. */
+  iconLanguageMobile: '/assets/brand/mobile/icon-language.svg',
+  iconMenuMobile: '/assets/brand/mobile/icon-menu.svg',
 } as const;
 
 /** Source art for navbar logo (`logo-inline.png`, Figma `1:162`). */
