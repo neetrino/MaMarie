@@ -7,6 +7,7 @@ import { ConditionalHeader } from '../components/ConditionalHeader';
 import { ConditionalFooter } from '../components/ConditionalFooter';
 import { MainContent } from '../components/MainContent';
 import { MobileBottomNav } from '../components/MobileBottomNav';
+import { NAV_LINKS } from '../constants/nav-links';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -30,7 +31,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ClientProviders>
             <div className="flex min-h-screen flex-col pb-16 lg:pb-0">
-              <ConditionalHeader />
+              <ConditionalHeader navLinks={NAV_LINKS} />
               <MainContent>{children}</MainContent>
               <ConditionalFooter />
               <MobileBottomNav />

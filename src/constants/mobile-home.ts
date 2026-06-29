@@ -10,6 +10,12 @@ export const MOBILE_HOME_HORIZONTAL_PADDING_PX = 20;
 
 export const MOBILE_HOME_SEARCH_HEIGHT_PX = 48;
 export const MOBILE_HOME_SEARCH_RADIUS_PX = 70;
+/** Figma `74:750` — magnifier icon inside the search field. */
+export const MOBILE_HOME_SEARCH_ICON_SIZE_PX = 35;
+export const MOBILE_HOME_SEARCH_ICON_LEFT_PX = 19;
+export const MOBILE_HOME_SEARCH_ICON_COLOR = '#c3c9d0';
+export const MOBILE_HOME_SEARCH_INPUT_PADDING_LEFT_PX =
+  MOBILE_HOME_SEARCH_ICON_LEFT_PX + MOBILE_HOME_SEARCH_ICON_SIZE_PX + 8;
 
 export const MOBILE_HOME_HERO_TOP_PADDING_PX = 16;
 export const MOBILE_HOME_HERO_SEARCH_TO_SALE_GAP_PX = 29;
@@ -75,7 +81,8 @@ export const MOBILE_HOME_TESTIMONIAL_YELLOW_BG = BRAND_COLORS.yellow;
 export const MOBILE_HOME_TESTIMONIAL_PROMO_BG = BRAND_COLORS.pink;
 
 export const MOBILE_HOME_ASSETS = {
-  search: '/assets/brand/icon-search.svg',
+  /** Figma `74:750` — material-symbols:search-rounded. */
+  search: '/assets/home/mobile/icon-search-rounded.svg',
   chevronCta: '/assets/home/icon-chevron-right.svg',
   chevronSection: '/assets/home/icon-chevron-right-pink.svg',
   saleBannerGirl: '/assets/home/mobile/sale-banner-girl.png',

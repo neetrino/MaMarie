@@ -3,14 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  HEADER_NAV_ITEMS,
   HEADER_NAV_FONT_SIZE_PX,
   HEADER_NAV_LETTER_SPACING_PX,
   HEADER_NAV_LINE_HEIGHT_PX,
   HEADER_NAV_LINK_GAP_PX,
-  type HeaderNavKey,
-  getHeaderNavTranslationKey,
 } from '../../constants/brand';
+import {
+  getNavLinkTranslationKey,
+  isNavLinkActive,
+  type NavLinkItem,
+} from '../../constants/nav-links';
 import { useTranslation } from '../../lib/i18n-client';
 
 const navLinkTypographyStyle = {
@@ -19,16 +21,11 @@ const navLinkTypographyStyle = {
   letterSpacing: `${HEADER_NAV_LETTER_SPACING_PX}px`,
 } as const;
 
-function resolveNavActive(labelKey: HeaderNavKey, pathname: string): boolean {
-  if (labelKey === 'home') return pathname === '/';
-  if (labelKey === 'catalog') return pathname.startsWith('/products');
-  if (labelKey === 'about') return pathname.startsWith('/about');
-  if (labelKey === 'partners') return pathname.startsWith('/about');
-  if (labelKey === 'contact') return pathname.startsWith('/contact');
-  return false;
+interface HeaderNavLinksProps {
+  navLinks: readonly NavLinkItem[];
 }
 
-export function HeaderNavLinks() {
+export function HeaderNavLinks({ navLinks }: HeaderNavLinksProps) {
   const pathname = usePathname() ?? '';
   const { t } = useTranslation();
 
@@ -38,13 +35,14 @@ export function HeaderNavLinks() {
       className="flex items-center"
       style={{ gap: HEADER_NAV_LINK_GAP_PX }}
     >
-      {HEADER_NAV_ITEMS.map(({ href, labelKey }) => {
-        const active = resolveNavActive(labelKey, pathname);
+      {navLinks.map(({ href, labelKey }) => {
+        const active = isNavLinkActive(labelKey, pathname);
 
         return (
           <Link
             key={labelKey}
             href={href}
+            aria-current={active ? 'page' : undefined}
             className={`relative inline-block whitespace-nowrap text-left transition-colors ${
               active
                 ? 'font-bold text-brand-pink'
@@ -52,7 +50,7 @@ export function HeaderNavLinks() {
             }`}
             style={navLinkTypographyStyle}
           >
-            {t(getHeaderNavTranslationKey(labelKey))}
+            {t(getNavLinkTranslationKey(labelKey))}
           </Link>
         );
       })}

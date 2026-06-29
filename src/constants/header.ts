@@ -69,6 +69,15 @@ export const HEADER_LOGIN_PILL_WIDTH_PX = 46;
 export const HEADER_LOGIN_PILL_HEIGHT_PX = 41;
 export const HEADER_LOGIN_ICON_SIZE_PX = 25;
 
+/** Mobile nav menu modal — panel below fixed header. */
+export const MOBILE_NAV_DROPDOWN_TOP_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;
+export const MOBILE_NAV_DROPDOWN_INSET_PX = 12;
+export const MOBILE_NAV_DROPDOWN_GAP_PX = 8;
+export const MOBILE_NAV_DROPDOWN_RADIUS_PX = 24;
+export const MOBILE_NAV_DROPDOWN_PADDING_X_PX = HEADER_MOBILE_PADDING_X_PX;
+export const MOBILE_NAV_DROPDOWN_LINK_PADDING_Y_PX = 14;
+export const MOBILE_NAV_MENU_EXIT_ANIMATION_MS = 260;
+
 /** Main content top inset — keeps pages below the fixed navbar (not used on `/`). */
 export const HEADER_CONTENT_CLEARANCE_MOBILE_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;
 

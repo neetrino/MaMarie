@@ -54,24 +54,10 @@ export const HEADER_NAV_LINK_GAP_PX = 24;
 /** Gap between right-side navbar pills (search / language / currency). */
 export const HEADER_ACTIONS_GAP_PX = 10;
 
-/** i18n keys under `common.navigation.*` */
-export type HeaderNavKey = 'home' | 'catalog' | 'about' | 'partners' | 'contact';
-
-export interface HeaderNavItem {
-  href: string;
-  labelKey: HeaderNavKey;
-}
-
-/** Primary desktop navbar links — labels come from locale files. */
-export const HEADER_NAV_ITEMS: HeaderNavItem[] = [
-  { href: '/', labelKey: 'home' },
-  { href: '/products', labelKey: 'catalog' },
-  { href: '/about', labelKey: 'about' },
-  { href: '/about', labelKey: 'partners' },
-  { href: '/contact', labelKey: 'contact' },
-];
-
-/** Maps nav item to translation path in common.json */
-export function getHeaderNavTranslationKey(labelKey: HeaderNavKey): string {
-  return `common.navigation.${labelKey}`;
-}
+export {
+  getNavLinkTranslationKey as getHeaderNavTranslationKey,
+  isNavLinkActive,
+  NAV_LINKS as HEADER_NAV_ITEMS,
+  type NavLinkItem as HeaderNavItem,
+  type NavLinkKey as HeaderNavKey,
+} from './nav-links';

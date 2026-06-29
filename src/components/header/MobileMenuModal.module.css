@@ -1,0 +1,131 @@
+/**
+ * Mobile menu modal — values align with `src/constants/header.ts` mobile menu tokens.
+ */
+.modalRoot {
+  --mobile-menu-animation-ms: 260ms;
+  --mobile-menu-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --mobile-menu-top: 64px;
+  --mobile-menu-gap: 8px;
+  --mobile-menu-inset: 12px;
+  --mobile-menu-radius: 24px;
+  --mobile-menu-padding-x: 20px;
+  --mobile-menu-link-padding-y: 14px;
+}
+
+.mobileOnly {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .mobileOnly {
+    display: none;
+  }
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  /* Below fixed header (z-50) so hero/content behind the navbar blurs; panel stays at z-70. */
+  z-index: 40;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  background-color: rgb(0 0 0 / 25%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  touch-action: none;
+  opacity: 0;
+  transition: opacity var(--mobile-menu-animation-ms) var(--mobile-menu-ease);
+}
+
+.modalRootLocked {
+  overscroll-behavior: none;
+}
+
+.scrimExpanded {
+  opacity: 1;
+}
+
+.panel {
+  position: fixed;
+  z-index: 70;
+  top: calc(var(--mobile-menu-top) + var(--mobile-menu-gap));
+  inset-inline: var(--mobile-menu-inset);
+  max-height: calc(100dvh - var(--mobile-menu-top) - var(--mobile-menu-gap) - var(--mobile-menu-inset));
+  overflow: hidden;
+  border-radius: var(--mobile-menu-radius);
+  background-color: #fff;
+  padding-inline: var(--mobile-menu-padding-x);
+  box-shadow: 0 12px 40px rgb(87 66 59 / 16%);
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+  transition:
+    opacity var(--mobile-menu-animation-ms) var(--mobile-menu-ease),
+    transform var(--mobile-menu-animation-ms) var(--mobile-menu-ease);
+}
+
+.panelExpanded {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.panelBody {
+  display: flex;
+  max-height: inherit;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  padding-block: 12px;
+}
+
+.navLink {
+  border-radius: 12px;
+  padding-block: var(--mobile-menu-link-padding-y);
+  padding-inline: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-brand-brown, #57423b);
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.navLink:hover {
+  background-color: rgb(249 250 251);
+  color: var(--color-brand-pink, #ef95aa);
+}
+
+.navLinkActive {
+  color: var(--color-brand-pink, #ef95aa);
+}
+
+.ctaSection {
+  margin-top: 4px;
+  border-top: 1px solid rgb(243 244 246);
+  padding-block: 16px;
+}
+
+.ctaButton {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--color-brand-yellow, #f9e490);
+  padding-block: 14px;
+  padding-inline: 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-brand-brown, #57423b);
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.ctaButton:hover {
+  opacity: 0.9;
+}
