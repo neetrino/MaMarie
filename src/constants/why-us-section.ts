@@ -33,6 +33,10 @@ export const WHY_US_LINK_LINE_HEIGHT_PX = HOME_SECTION_LINK_LINE_HEIGHT_PX;
 export const WHY_US_LINK_GAP_PX = HOME_SECTION_LINK_GAP_PX;
 export const WHY_US_CHEVRON_SIZE_PX = HOME_SECTION_CHEVRON_SIZE_PX;
 
+export const WHY_US_ASSETS = {
+  chevronRight: '/assets/home/icon-chevron-right.svg',
+} as const;
+
 /** Figma `Info Cards` — gap below heading. */
 export const WHY_US_GRID_OFFSET_TOP_PX = 24;
 export const WHY_US_GRID_MAX_WIDTH_PX = HOME_SECTION_CONTENT_MAX_WIDTH_PX;

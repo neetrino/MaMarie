@@ -1,11 +1,11 @@
 'use client';
 
-import { BEST_PRODUCTS_ASSETS } from '../../constants/home-sections';
 import {
   WHY_US_CARD_COUNT,
   WHY_US_CARD_GAP_PX,
   WHY_US_CARD_LAYOUTS,
   WHY_US_GRID_OFFSET_TOP_PX,
+  WHY_US_ASSETS,
   WHY_US_HEADING_COLOR,
 } from '../../constants/why-us-section';
 import { useTranslation } from '../../lib/i18n-client';
@@ -52,7 +52,7 @@ export function WhyUsSectionBlock() {
         seeAllHref="/products"
         seeAllLabel={t('common.search.seeAll')}
         color={WHY_US_HEADING_COLOR}
-        chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
+        chevronSrc={WHY_US_ASSETS.chevronRight}
       />
 
       <div

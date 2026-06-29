@@ -5,6 +5,9 @@ import {
   BEST_PRODUCTS_CARD_GAP_PX,
   BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
   BEST_PRODUCTS_HEADING_COLOR,
+  BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX,
+  BEST_PRODUCTS_HEADING_PADDING_Y_PX,
+  BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/home-sections';
 import { useTranslation } from '../../lib/i18n-client';
 import type { HomeProductCardData } from './HomeProductCard';
@@ -27,6 +30,9 @@ export function BestProductsBlock({ products }: BestProductsBlockProps) {
         seeAllLabel={t('common.search.seeAll')}
         color={BEST_PRODUCTS_HEADING_COLOR}
         chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
+        titleLineHeightPx={BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX}
+        minHeightPx={BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX}
+        headingPaddingYPx={BEST_PRODUCTS_HEADING_PADDING_Y_PX}
       />
 
       <div

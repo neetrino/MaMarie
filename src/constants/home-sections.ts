@@ -1,4 +1,4 @@
-/** Figma MAMARIE-DEV node `1:65` — «Best products» section heading. */
+/** Figma MAMARIE-DEV node `51:344` — «Best products» section heading. */
 export const HOME_SECTION_MAX_WIDTH_PX = 1440;
 export const BEST_PRODUCTS_SECTION_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
 
@@ -26,8 +26,8 @@ export const HOME_SECTION_HEADING_PADDING_Y_PX = 7;
 export const HOME_SECTION_HEADING_MIN_HEIGHT_PX = 94;
 export const HOME_SECTION_HEADING_TITLE_LINE_HEIGHT_PX = 80;
 
-/** Space below hero before section heading. */
-export const BEST_PRODUCTS_SECTION_OFFSET_TOP_PX = 24;
+/** Space below hero before section heading — Figma `51:343` y=919 vs hero `51:329` bottom 862. */
+export const BEST_PRODUCTS_SECTION_OFFSET_TOP_PX = 120;
 
 /** Product cards row — Figma `Frame 472`. */
 export const BEST_PRODUCTS_GRID_OFFSET_TOP_PX = 75;
@@ -141,10 +141,10 @@ export const BEST_PRODUCTS_PLACEHOLDER_COMPARE_PRICE_AMD = 22000;
 export const BEST_PRODUCTS_SECTION_PADDING_LEFT_PX = HOME_SECTION_PADDING_LEFT_PX;
 export const BEST_PRODUCTS_SECTION_PADDING_RIGHT_PX = HOME_SECTION_PADDING_RIGHT_PX;
 export const BEST_PRODUCTS_HEADING_PADDING_Y_PX = HOME_SECTION_HEADING_PADDING_Y_PX;
-export const BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX = HOME_SECTION_HEADING_MIN_HEIGHT_PX;
+export const BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX = 64;
 
 export const BEST_PRODUCTS_TITLE_FONT_SIZE_PX = HOME_SECTION_TITLE_FONT_SIZE_PX;
-export const BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX = HOME_SECTION_HEADING_TITLE_LINE_HEIGHT_PX;
+export const BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX = 50;
 
 export const BEST_PRODUCTS_LINK_FONT_SIZE_PX = HOME_SECTION_LINK_FONT_SIZE_PX;
 export const BEST_PRODUCTS_LINK_LINE_HEIGHT_PX = HOME_SECTION_LINK_LINE_HEIGHT_PX;
@@ -152,8 +152,8 @@ export const BEST_PRODUCTS_LINK_GAP_PX = HOME_SECTION_LINK_GAP_PX;
 
 export const BEST_PRODUCTS_CHEVRON_SIZE_PX = HOME_SECTION_CHEVRON_SIZE_PX;
 
-export const BEST_PRODUCTS_HEADING_COLOR = '#c2ddf9';
+export const BEST_PRODUCTS_HEADING_COLOR = '#ef95aa';
 
 export const BEST_PRODUCTS_ASSETS = {
-  chevronRight: '/assets/home/icon-chevron-right.svg',
+  chevronRight: '/assets/home/icon-chevron-right-pink.svg',
 } as const;
