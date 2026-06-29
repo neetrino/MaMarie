@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hy" className="h-full overflow-x-clip">
-      <body className={`${montserrat.variable} font-sans bg-gray-50 text-gray-900 antialiased min-h-full`}>
+      <body className={`${montserrat.variable} font-sans bg-white text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>
             <div className="flex min-h-screen flex-col pb-16 lg:pb-0">

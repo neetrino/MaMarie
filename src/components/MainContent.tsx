@@ -23,14 +23,16 @@ const headerClearanceVars = {
 export function MainContent({ children }: MainContentProps) {
   const pathname = usePathname() ?? '';
 
+  const mainBase = 'flex-1 w-full bg-white';
+
   if (pathname === '/' || pathname.startsWith('/supersudo')) {
-    return <main className="flex-1 w-full">{children}</main>;
+    return <main className={mainBase}>{children}</main>;
   }
 
   if (pathname.startsWith('/profile')) {
     return (
       <main
-        className="flex-1 w-full md:pt-[var(--header-clearance-desktop)]"
+        className={`${mainBase} md:pt-[var(--header-clearance-desktop)]`}
         style={{ ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px` }}
       >
         {children}
@@ -39,14 +41,12 @@ export function MainContent({ children }: MainContentProps) {
   }
 
   if (pathname.startsWith('/products')) {
-    return (
-      <main className="flex-1 w-full bg-white">{children}</main>
-    );
+    return <main className={mainBase}>{children}</main>;
   }
 
   return (
     <main
-      className="flex-1 w-full pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+      className={`${mainBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
       style={headerClearanceVars}
     >
       {children}
