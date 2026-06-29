@@ -5,8 +5,10 @@ import {
   WHY_US_CARD_GAP_PX,
   WHY_US_CARD_LAYOUTS,
   WHY_US_GRID_OFFSET_TOP_PX,
-  WHY_US_ASSETS,
   WHY_US_HEADING_COLOR,
+  WHY_US_HEADING_MIN_HEIGHT_PX,
+  WHY_US_HEADING_PADDING_Y_PX,
+  WHY_US_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/why-us-section';
 import { useTranslation } from '../../lib/i18n-client';
 import { HomeSectionHeadingRow } from './HomeSectionHeading';
@@ -20,12 +22,8 @@ function useWhyUsCardContent(cardKey: (typeof WHY_US_CARD_KEYS)[number]): WhyUsC
   const basePath = `home.whyUs.${cardKey}`;
 
   return {
-    titleLines: [t(`${basePath}.titleLine1`), t(`${basePath}.titleLine2`)],
-    descriptionLines: [
-      t(`${basePath}.descLine1`),
-      t(`${basePath}.descLine2`),
-      t(`${basePath}.descLine3`),
-    ],
+    title: t(`${basePath}.title`),
+    description: t(`${basePath}.description`),
   };
 }
 
@@ -52,11 +50,15 @@ export function WhyUsSectionBlock() {
         seeAllHref="/products"
         seeAllLabel={t('common.search.seeAll')}
         color={WHY_US_HEADING_COLOR}
-        chevronSrc={WHY_US_ASSETS.chevronRight}
+        chevronSrc=""
+        showSeeAllLink={false}
+        titleLineHeightPx={WHY_US_TITLE_LINE_HEIGHT_PX}
+        minHeightPx={WHY_US_HEADING_MIN_HEIGHT_PX}
+        headingPaddingYPx={WHY_US_HEADING_PADDING_Y_PX}
       />
 
       <div
-        className="flex w-full overflow-x-auto lg:overflow-visible"
+        className="flex w-full overflow-x-auto pb-4 lg:overflow-visible"
         style={{
           paddingTop: WHY_US_GRID_OFFSET_TOP_PX,
           gap: WHY_US_CARD_GAP_PX,

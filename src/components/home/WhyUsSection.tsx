@@ -3,7 +3,7 @@ import { HomePageSection } from './HomeSectionShell';
 import { WhyUsSectionBlock } from './WhyUsSectionBlock';
 
 /**
- * Why choose us — Figma node `1:112` (heading `1:144`, cards `1:114`).
+ * Why choose us — Figma node `51:371`.
  */
 export function WhyUsSection() {
   return (

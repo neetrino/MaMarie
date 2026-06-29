@@ -1,26 +1,21 @@
 'use client';
 
-import Image from 'next/image';
 import {
-  WHY_US_CARD_CONTENT_GAP_PX,
-  WHY_US_CARD_CONTENT_LEFT_PX,
-  WHY_US_CARD_CONTENT_TOP_PX,
-  WHY_US_CARD_CONTENT_WIDTH_PX,
   WHY_US_CARD_DESCRIPTION_COLOR,
   WHY_US_CARD_DESCRIPTION_LINE_HEIGHT_PX,
   WHY_US_CARD_DESCRIPTION_SIZE_PX,
-  WHY_US_CARD_HEIGHT_PX,
-  WHY_US_CARD_LAYOUT_SCALE,
-  WHY_US_CARD_RADIUS_PX,
+  WHY_US_CARD_TEXT_MAX_WIDTH_PX,
   WHY_US_CARD_TITLE_LINE_HEIGHT_PX,
   WHY_US_CARD_TITLE_SIZE_PX,
   WHY_US_CARD_WIDTH_PX,
+  WHY_US_LAYOUT_SCALE,
   type WhyUsCardLayout,
 } from '../../constants/why-us-section';
+import { WhyUsCardImage } from './WhyUsCardImage';
 
 export interface WhyUsCardContent {
-  titleLines: string[];
-  descriptionLines: string[];
+  title: string;
+  description: string;
 }
 
 interface WhyUsCardProps {
@@ -31,35 +26,30 @@ interface WhyUsCardProps {
 export function WhyUsCard({ layout, content }: WhyUsCardProps) {
   return (
     <article
-      className="relative shrink-0 overflow-hidden"
+      className="flex shrink-0 flex-col items-center"
       style={{
         width: WHY_US_CARD_WIDTH_PX,
-        height: WHY_US_CARD_HEIGHT_PX,
-        borderRadius: WHY_US_CARD_RADIUS_PX,
-        backgroundColor: layout.backgroundColor,
+        gap: layout.sectionGapPx * WHY_US_LAYOUT_SCALE,
       }}
     >
+      <WhyUsCardImage src={layout.imageSrc} layout={layout.imageLayout} />
+
       <div
-        className="absolute flex flex-col"
+        className="flex w-full flex-col items-center text-center"
         style={{
-          left: WHY_US_CARD_CONTENT_LEFT_PX,
-          top: WHY_US_CARD_CONTENT_TOP_PX,
-          width: WHY_US_CARD_CONTENT_WIDTH_PX,
-          gap: WHY_US_CARD_CONTENT_GAP_PX,
+          gap: layout.textGapPx * WHY_US_LAYOUT_SCALE,
+          maxWidth: WHY_US_CARD_TEXT_MAX_WIDTH_PX,
         }}
       >
         <h3
-          className="font-bold text-white"
+          className="font-bold text-black"
           style={{
+            maxWidth: layout.titleMaxWidthPx * WHY_US_LAYOUT_SCALE,
             fontSize: WHY_US_CARD_TITLE_SIZE_PX,
             lineHeight: `${WHY_US_CARD_TITLE_LINE_HEIGHT_PX}px`,
           }}
         >
-          {content.titleLines.map((line, lineIndex) => (
-            <span key={`title-${lineIndex}`} className="block">
-              {line}
-            </span>
-          ))}
+          {content.title}
         </h3>
 
         <p
@@ -70,31 +60,8 @@ export function WhyUsCard({ layout, content }: WhyUsCardProps) {
             lineHeight: `${WHY_US_CARD_DESCRIPTION_LINE_HEIGHT_PX}px`,
           }}
         >
-          {content.descriptionLines.map((line, lineIndex) => (
-            <span key={`desc-${lineIndex}`} className="block">
-              {line}
-            </span>
-          ))}
+          {content.description}
         </p>
-      </div>
-
-      <div
-        aria-hidden
-        className="pointer-events-none absolute relative"
-        style={{
-          left: layout.imageLeftPx * WHY_US_CARD_LAYOUT_SCALE,
-          top: layout.imageTopPx * WHY_US_CARD_LAYOUT_SCALE,
-          width: layout.imageSizePx * WHY_US_CARD_LAYOUT_SCALE,
-          height: layout.imageSizePx * WHY_US_CARD_LAYOUT_SCALE,
-        }}
-      >
-        <Image
-          src={layout.imageSrc}
-          alt=""
-          fill
-          sizes={`${layout.imageSizePx}px`}
-          className="object-cover"
-        />
       </div>
     </article>
   );

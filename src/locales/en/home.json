@@ -20,34 +20,22 @@
     }
   },
   "whyUs": {
-    "title": "WHY US",
+    "title": "Why Us",
     "card1": {
-      "titleLine1": "Soft",
-      "titleLine2": "and safe",
-      "descLine1": "Free express delivery",
-      "descLine2": "on all orders over $150",
-      "descLine3": "for your little ones."
+      "title": "Born from a mother's love",
+      "description": "MaMarie was born from the love story of a mother and her little Mari. Every collection carries that warmth and care."
     },
     "card2": {
-      "titleLine1": "Soft",
-      "titleLine2": "and safe",
-      "descLine1": "Free express delivery",
-      "descLine2": "on all orders over $150",
-      "descLine3": "for your little ones."
+      "title": "For a colorful childhood",
+      "description": "We believe childhood should be bright, joyful, and full of beautiful memories. Our colors and designs are created to build exactly that world."
     },
     "card3": {
-      "titleLine1": "Soft",
-      "titleLine2": "and safe",
-      "descLine1": "Free express delivery",
-      "descLine2": "on all orders over $150",
-      "descLine3": "for your little ones."
+      "title": "Comfort without limits",
+      "description": "Children should move freely, play, dream, and discover the world. That is why our clothes are made first and foremost for their comfort."
     },
     "card4": {
-      "titleLine1": "Soft",
-      "titleLine2": "and safe",
-      "descLine1": "Free express delivery",
-      "descLine2": "on all orders over $150",
-      "descLine3": "for your little ones."
+      "title": "Confidence",
+      "description": "When a child grows up in love, care, and a beautiful environment, they walk more confidently toward their future. We believe every little one deserves that kind of childhood."
     }
   },
   "aboutUs": {
