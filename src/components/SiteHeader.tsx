@@ -100,7 +100,7 @@ function MobileHeaderBar({
   return (
     <>
       <div
-        className="pointer-events-auto grid w-full lg:hidden"
+        className="pointer-events-none grid w-full lg:hidden"
         style={{
           height: HEADER_MOBILE_NAV_ROW_HEIGHT_PX,
           paddingLeft: HEADER_MOBILE_PADDING_X_PX,
@@ -109,7 +109,7 @@ function MobileHeaderBar({
       >
         <div
           aria-hidden
-          className="col-start-1 row-start-1 flex flex-col justify-end self-stretch"
+          className="pointer-events-none col-start-1 row-start-1 flex flex-col justify-end self-stretch"
         >
           <div
             className={headerPillClassName}
@@ -122,7 +122,7 @@ function MobileHeaderBar({
         </div>
 
         <div
-          className={`relative z-10 col-start-1 row-start-1 flex flex-col self-stretch transition-[padding] ease-out ${
+          className={`pointer-events-auto relative z-20 col-start-1 row-start-1 flex flex-col self-stretch transition-[padding] ease-out ${
             showPill ? 'justify-end' : ''
           }`}
           style={{
@@ -192,7 +192,7 @@ function DesktopHeaderBar({
       </div>
 
       <div
-        className="relative z-10 flex w-full items-center"
+        className="pointer-events-auto relative z-10 flex w-full items-center"
         style={{
           ...headerInsetStyle,
           paddingTop: HEADER_DESKTOP_ROW_PADDING_Y_PX,
@@ -233,7 +233,7 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
   return (
     <header
       data-site-header
-      className="pointer-events-none fixed left-0 right-0 top-0 z-[80] w-full bg-transparent lg:z-50"
+      className="fixed left-0 right-0 top-0 z-[80] w-full bg-transparent lg:z-50"
       style={{
         paddingTop: HEADER_HOME_OVERLAY_TOP_PX,
         transform: `translateY(${HEADER_HOME_OFFSET_Y_PX}px)`,

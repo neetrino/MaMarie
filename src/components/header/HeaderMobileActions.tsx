@@ -161,7 +161,7 @@ export function HeaderMobileActions({
           width={HEADER_MOBILE_MENU_ICON_SIZE_PX}
           height={HEADER_MOBILE_MENU_ICON_SIZE_PX}
           aria-hidden
-          className="absolute transition-[opacity,transform] ease-out"
+          className="pointer-events-none absolute transition-[opacity,transform] ease-out"
           style={{
             opacity: menuOpen ? 0 : 1,
             transform: menuOpen ? 'rotate(-90deg) scale(0.82)' : 'rotate(0deg) scale(1)',
@@ -169,7 +169,7 @@ export function HeaderMobileActions({
           }}
         />
         <X
-          className="absolute text-brand-brown transition-[opacity,transform] ease-out"
+          className="pointer-events-none absolute text-brand-brown transition-[opacity,transform] ease-out"
           aria-hidden
           style={{
             width: HEADER_MOBILE_MENU_ICON_SIZE_PX,

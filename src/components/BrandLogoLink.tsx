@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { ComponentProps, CSSProperties, MouseEvent } from 'react';
 import {
   BRAND_ASSETS,
@@ -48,6 +48,15 @@ const mobileLogoCropStyle: CSSProperties = {
   left: 0,
 };
 
+function isHomePath(pathname: string): boolean {
+  return pathname === '/' || pathname === '';
+}
+
+/** Smooth scroll to page top — works on mobile Safari and desktop. */
+function scrollPageToTop(): void {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+}
+
 export function BrandLogoLink({
   className = '',
   size = 'default',
@@ -56,16 +65,23 @@ export function BrandLogoLink({
   ...rest
 }: BrandLogoLinkProps) {
   const pathname = usePathname() ?? '';
+  const router = useRouter();
   const { widthPx, heightPx } = LOGO_FOOTPRINT[size];
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
-    if (event.defaultPrevented || pathname !== '/') {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if (isHomePath(pathname)) {
+      event.preventDefault();
+      scrollPageToTop();
       return;
     }
 
     event.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    router.push('/', { scroll: true });
   };
 
   return (
