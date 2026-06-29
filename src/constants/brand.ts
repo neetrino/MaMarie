@@ -50,7 +50,7 @@ export const HEADER_NAV_LINK_GAP_PX = 24;
 export const HEADER_ACTIONS_GAP_PX = 10;
 
 /** i18n keys under `common.navigation.*` */
-export type HeaderNavKey = 'home' | 'shop' | 'categories' | 'about' | 'partners' | 'contact';
+export type HeaderNavKey = 'home' | 'catalog' | 'about' | 'partners' | 'contact';
 
 export interface HeaderNavItem {
   href: string;
@@ -60,8 +60,7 @@ export interface HeaderNavItem {
 /** Primary desktop navbar links — labels come from locale files. */
 export const HEADER_NAV_ITEMS: HeaderNavItem[] = [
   { href: '/', labelKey: 'home' },
-  { href: '/products', labelKey: 'shop' },
-  { href: '/products', labelKey: 'categories' },
+  { href: '/products', labelKey: 'catalog' },
   { href: '/about', labelKey: 'about' },
   { href: '/about', labelKey: 'partners' },
   { href: '/contact', labelKey: 'contact' },

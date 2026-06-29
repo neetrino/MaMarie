@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   HEADER_NAV_ITEMS,
   HEADER_NAV_FONT_SIZE_PX,
@@ -19,18 +19,9 @@ const navLinkTypographyStyle = {
   letterSpacing: `${HEADER_NAV_LETTER_SPACING_PX}px`,
 } as const;
 
-function resolveNavActive(
-  labelKey: HeaderNavKey,
-  pathname: string,
-  hasCategoryFilter: boolean,
-): boolean {
+function resolveNavActive(labelKey: HeaderNavKey, pathname: string): boolean {
   if (labelKey === 'home') return pathname === '/';
-  if (labelKey === 'shop') {
-    return pathname.startsWith('/products') && !hasCategoryFilter;
-  }
-  if (labelKey === 'categories') {
-    return pathname.startsWith('/products') && hasCategoryFilter;
-  }
+  if (labelKey === 'catalog') return pathname.startsWith('/products');
   if (labelKey === 'about') return pathname.startsWith('/about');
   if (labelKey === 'partners') return pathname.startsWith('/about');
   if (labelKey === 'contact') return pathname.startsWith('/contact');
@@ -39,9 +30,7 @@ function resolveNavActive(
 
 export function HeaderNavLinks() {
   const pathname = usePathname() ?? '';
-  const searchParams = useSearchParams();
   const { t } = useTranslation();
-  const hasCategoryFilter = Boolean(searchParams?.get('category'));
 
   return (
     <nav
@@ -50,7 +39,7 @@ export function HeaderNavLinks() {
       style={{ gap: HEADER_NAV_LINK_GAP_PX }}
     >
       {HEADER_NAV_ITEMS.map(({ href, labelKey }) => {
-        const active = resolveNavActive(labelKey, pathname, hasCategoryFilter);
+        const active = resolveNavActive(labelKey, pathname);
 
         return (
           <Link
