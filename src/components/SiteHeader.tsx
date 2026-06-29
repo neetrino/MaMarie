@@ -100,7 +100,7 @@ function MobileHeaderBar({
   return (
     <>
       <div
-        className="grid w-full lg:hidden"
+        className="pointer-events-auto grid w-full lg:hidden"
         style={{
           height: HEADER_MOBILE_NAV_ROW_HEIGHT_PX,
           paddingLeft: HEADER_MOBILE_PADDING_X_PX,
@@ -232,14 +232,15 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
 
   return (
     <header
-      className="fixed left-0 right-0 top-0 z-50 w-full bg-transparent"
+      data-site-header
+      className="pointer-events-none fixed left-0 right-0 top-0 z-[80] w-full bg-transparent lg:z-50"
       style={{
         paddingTop: HEADER_HOME_OVERLAY_TOP_PX,
         transform: `translateY(${HEADER_HOME_OFFSET_Y_PX}px)`,
       }}
     >
       <MobileHeaderBar
-        showPill={isScrolled}
+        showPill={showPill}
         navLinks={navLinks}
         menuOpen={menuOpen}
         menuId={menuId}

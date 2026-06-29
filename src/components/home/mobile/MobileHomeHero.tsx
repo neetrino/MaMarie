@@ -51,7 +51,7 @@ export function MobileHomeHero() {
 
   return (
     <section
-      className="relative w-full"
+      className="relative w-full max-w-full overflow-x-hidden"
       aria-label={t('home.hero.genderButtons.label')}
       style={{
         paddingTop: HEADER_CONTENT_CLEARANCE_MOBILE_PX + MOBILE_HOME_HERO_TOP_PADDING_PX,

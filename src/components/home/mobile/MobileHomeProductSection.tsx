@@ -35,7 +35,7 @@ export function MobileHomeProductSection({
 
   return (
     <section
-      className="relative w-full"
+      className="relative w-full max-w-full overflow-x-hidden"
       aria-labelledby="mobile-for-you-heading"
       style={{ paddingLeft: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2, paddingRight: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2 }}
     >

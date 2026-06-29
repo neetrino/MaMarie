@@ -23,7 +23,7 @@ const headerClearanceVars = {
 export function MainContent({ children }: MainContentProps) {
   const pathname = usePathname() ?? '';
 
-  const mainBase = 'flex-1 w-full bg-white';
+  const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
 
   if (pathname === '/' || pathname.startsWith('/supersudo')) {
     return <main className={mainBase}>{children}</main>;

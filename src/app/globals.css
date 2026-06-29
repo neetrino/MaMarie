@@ -15,6 +15,18 @@
     @apply bg-white text-gray-900;
   }
 
+  @media (max-width: 1023px) {
+    html {
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+    }
+
+    body {
+      overflow-x: hidden;
+      overscroll-behavior-x: none;
+    }
+  }
+
   button {
     @apply rounded-xl;
   }

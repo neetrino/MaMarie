@@ -4,12 +4,14 @@
 .modalRoot {
   --mobile-menu-animation-ms: 260ms;
   --mobile-menu-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --mobile-menu-top: 64px;
+  --mobile-menu-top: 80px;
   --mobile-menu-gap: 8px;
   --mobile-menu-inset: 12px;
   --mobile-menu-radius: 24px;
   --mobile-menu-padding-x: 20px;
   --mobile-menu-link-padding-y: 14px;
+  --mobile-menu-scrim-z: 60;
+  --mobile-menu-panel-z: 75;
 }
 
 .mobileOnly {
@@ -25,8 +27,8 @@
 .scrim {
   position: fixed;
   inset: 0;
-  /* Below fixed header (z-50) so hero/content behind the navbar blurs; panel stays at z-70. */
-  z-index: 40;
+  /* Below fixed header so hero/content behind the navbar blurs; panel stays below header too. */
+  z-index: var(--mobile-menu-scrim-z);
   border: none;
   border-radius: 0;
   margin: 0;
@@ -36,6 +38,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   touch-action: none;
+  pointer-events: none;
   opacity: 0;
   transition: opacity var(--mobile-menu-animation-ms) var(--mobile-menu-ease);
 }
@@ -46,11 +49,12 @@
 
 .scrimExpanded {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .panel {
   position: fixed;
-  z-index: 70;
+  z-index: var(--mobile-menu-panel-z);
   top: calc(var(--mobile-menu-top) + var(--mobile-menu-gap));
   inset-inline: var(--mobile-menu-inset);
   max-height: calc(100dvh - var(--mobile-menu-top) - var(--mobile-menu-gap) - var(--mobile-menu-inset));

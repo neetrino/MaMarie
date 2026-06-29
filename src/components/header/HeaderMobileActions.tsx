@@ -42,7 +42,7 @@ function MobileIconButton({
       onClick={onClick}
       aria-label={label}
       aria-expanded={false}
-      className={`flex shrink-0 items-center justify-center rounded-full transition-[opacity,background-color] hover:opacity-80 ${
+      className={`flex shrink-0 items-center justify-center rounded-full transition-[opacity,background-color] hover:opacity-80 touch-manipulation ${
         showPill ? 'bg-transparent' : 'bg-white'
       }`}
       style={{
@@ -147,7 +147,7 @@ export function HeaderMobileActions({
         }
         aria-expanded={menuOpen}
         aria-controls={menuId}
-        className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[opacity,background-color] hover:opacity-80 ${
+        className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[opacity,background-color] hover:opacity-80 touch-manipulation ${
           showPill ? 'bg-transparent' : 'bg-white'
         }`}
         style={{

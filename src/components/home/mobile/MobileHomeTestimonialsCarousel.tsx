@@ -112,7 +112,7 @@ export function MobileHomeTestimonialsCarousel() {
 
   return (
     <section
-      className="w-full"
+      className="w-full max-w-full overflow-x-hidden"
       aria-label={t('home.whyUs.title')}
       style={{ paddingLeft: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2, paddingRight: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2 }}
     >

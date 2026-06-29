@@ -10,6 +10,9 @@ export const HEADER_HOME_OVERLAY_TOP_PX = 0;
 /** Nudge homepage navbar up (negative px = higher on screen). */
 export const HEADER_HOME_OFFSET_Y_PX = -16;
 
+/** Mobile uses the same Figma offset; z-index/stacking keeps it visible on real devices. */
+export const HEADER_HOME_OFFSET_Y_MOBILE_PX = HEADER_HOME_OFFSET_Y_PX;
+
 /** Figma `74:729` — mobile top navbar layout. */
 /** Matches mobile hero horizontal inset (`MOBILE_HOME_HORIZONTAL_PADDING_PX`). */
 export const HEADER_MOBILE_PADDING_X_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
@@ -43,7 +46,14 @@ export const HEADER_MOBILE_NAV_TOP_INSET_PX =
 
 /** Bottom edge of the fixed mobile header in viewport coordinates. */
 export const HEADER_MOBILE_VISIBLE_BOTTOM_PX =
-  HEADER_MOBILE_NAV_ROW_HEIGHT_PX + HEADER_HOME_OVERLAY_TOP_PX + HEADER_HOME_OFFSET_Y_PX;
+  HEADER_MOBILE_NAV_ROW_HEIGHT_PX +
+  HEADER_HOME_OVERLAY_TOP_PX +
+  HEADER_HOME_OFFSET_Y_MOBILE_PX;
+
+/** Fixed stacking — header stays above menu scrim/panel and bottom-nav overlays on real devices. */
+export const HEADER_MOBILE_Z_INDEX = 80;
+export const MOBILE_NAV_MENU_SCRIM_Z_INDEX = 60;
+export const MOBILE_NAV_MENU_PANEL_Z_INDEX = 75;
 
 /** @deprecated Use `HEADER_MOBILE_VISIBLE_BOTTOM_PX`. */
 export const HEADER_MOBILE_NAV_HEIGHT_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;

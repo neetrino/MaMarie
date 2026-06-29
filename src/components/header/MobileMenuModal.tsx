@@ -10,7 +10,13 @@ import {
   MOBILE_MENU_CTA,
   type NavLinkItem,
 } from '../../constants/nav-links';
-import { MOBILE_NAV_MENU_EXIT_ANIMATION_MS } from '../../constants/header';
+import {
+  MOBILE_NAV_DROPDOWN_GAP_PX,
+  MOBILE_NAV_DROPDOWN_TOP_PX,
+  MOBILE_NAV_MENU_EXIT_ANIMATION_MS,
+  MOBILE_NAV_MENU_PANEL_Z_INDEX,
+  MOBILE_NAV_MENU_SCRIM_Z_INDEX,
+} from '../../constants/header';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
 import { useTranslation } from '../../lib/i18n-client';
 import styles from './MobileMenuModal.module.css';
@@ -88,10 +94,21 @@ export function MobileMenuModal({ isOpen, onClose, navLinks, menuId }: MobileMen
     lockBodyScroll();
 
     const handleTouchMove = (event: TouchEvent) => {
-      const panel = panelRef.current;
-      if (panel && event.target instanceof Node && panel.contains(event.target)) {
+      const target = event.target;
+      if (!(target instanceof Node)) {
         return;
       }
+
+      const panel = panelRef.current;
+      if (panel?.contains(target)) {
+        return;
+      }
+
+      const siteHeader = document.querySelector('[data-site-header]');
+      if (siteHeader?.contains(target)) {
+        return;
+      }
+
       event.preventDefault();
     };
 
@@ -122,6 +139,12 @@ export function MobileMenuModal({ isOpen, onClose, navLinks, menuId }: MobileMen
         styles.modalRoot,
         isExpanded && styles.modalRootLocked,
       )}
+      style={{
+        ['--mobile-menu-top' as string]: `${MOBILE_NAV_DROPDOWN_TOP_PX}px`,
+        ['--mobile-menu-gap' as string]: `${MOBILE_NAV_DROPDOWN_GAP_PX}px`,
+        ['--mobile-menu-scrim-z' as string]: String(MOBILE_NAV_MENU_SCRIM_Z_INDEX),
+        ['--mobile-menu-panel-z' as string]: String(MOBILE_NAV_MENU_PANEL_Z_INDEX),
+      }}
     >
       <button
         type="button"

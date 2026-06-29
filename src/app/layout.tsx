@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { ClientProviders } from '../components/ClientProviders';
@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   description: 'MAMARIE — handmade clay art & gifts',
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -30,7 +36,7 @@ export default function RootLayout({
       <body className={`${montserrat.variable} font-sans bg-white text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>
-            <div className="flex min-h-screen flex-col pb-16 lg:pb-0">
+            <div className="flex min-h-screen flex-col pb-16 max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pb-0">
               <ConditionalHeader navLinks={NAV_LINKS} />
               <MainContent>{children}</MainContent>
               <ConditionalFooter />
