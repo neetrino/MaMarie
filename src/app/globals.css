@@ -58,6 +58,92 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .home-product-card {
+    --home-product-card-duration: 300ms;
+    --home-product-card-easing: cubic-bezier(0, 0, 0.58, 1);
+    --home-product-card-image-left: var(--home-product-card-image-left-default);
+    --home-product-card-image-top: var(--home-product-card-image-top-default);
+    --home-product-card-image-width: var(--home-product-card-image-width-default);
+    --home-product-card-image-height: var(--home-product-card-image-height-default);
+    --home-product-card-bg: var(--home-product-card-bg-default);
+    --home-product-card-actions-gap: var(--home-product-card-actions-gap-default);
+    --home-product-card-cart-size: var(--home-product-card-cart-size-default);
+    --home-product-card-cart-icon-size: var(--home-product-card-cart-icon-size-default);
+    --home-product-card-cart-icon-left: var(--home-product-card-cart-icon-left-default);
+    --home-product-card-cart-icon-top: var(--home-product-card-cart-icon-top-default);
+    --home-product-card-lift: 0px;
+  }
+
+  .home-product-card:hover,
+  .home-product-card:focus-within {
+    z-index: 10;
+    --home-product-card-image-left: var(--home-product-card-image-left-hover);
+    --home-product-card-image-top: var(--home-product-card-image-top-hover);
+    --home-product-card-image-width: var(--home-product-card-image-width-hover);
+    --home-product-card-image-height: var(--home-product-card-image-height-hover);
+    --home-product-card-bg: var(--home-product-card-bg-hover);
+    --home-product-card-actions-gap: var(--home-product-card-actions-gap-hover);
+    --home-product-card-cart-size: var(--home-product-card-cart-size-hover);
+    --home-product-card-cart-icon-size: var(--home-product-card-cart-icon-size-hover);
+    --home-product-card-cart-icon-left: var(--home-product-card-cart-icon-left-hover);
+    --home-product-card-cart-icon-top: var(--home-product-card-cart-icon-top-hover);
+    --home-product-card-lift: var(--home-product-card-lift-hover);
+  }
+
+  .home-product-card:hover .home-product-card-sizes,
+  .home-product-card:focus-within .home-product-card-sizes {
+    opacity: 1;
+  }
+
+  .home-product-card-surface {
+    background-color: var(--home-product-card-bg);
+    transform: translateY(var(--home-product-card-lift));
+    transition:
+      transform var(--home-product-card-duration) var(--home-product-card-easing),
+      background-color var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-image-wrap {
+    left: var(--home-product-card-image-left);
+    top: var(--home-product-card-image-top);
+    width: var(--home-product-card-image-width);
+    height: var(--home-product-card-image-height);
+    transition:
+      left var(--home-product-card-duration) var(--home-product-card-easing),
+      top var(--home-product-card-duration) var(--home-product-card-easing),
+      width var(--home-product-card-duration) var(--home-product-card-easing),
+      height var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-actions {
+    gap: var(--home-product-card-actions-gap);
+    transition: gap var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-cart {
+    width: var(--home-product-card-cart-size);
+    height: var(--home-product-card-cart-size);
+    transition:
+      width var(--home-product-card-duration) var(--home-product-card-easing),
+      height var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-cart-icon {
+    left: var(--home-product-card-cart-icon-left);
+    top: var(--home-product-card-cart-icon-top);
+    width: var(--home-product-card-cart-icon-size);
+    height: var(--home-product-card-cart-icon-size);
+    transition:
+      left var(--home-product-card-duration) var(--home-product-card-easing),
+      top var(--home-product-card-duration) var(--home-product-card-easing),
+      width var(--home-product-card-duration) var(--home-product-card-easing),
+      height var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+
+  .home-product-card-sizes {
+    transition: opacity var(--home-product-card-duration) var(--home-product-card-easing);
+  }
 }
 
 /* Policy pages typography & spacing */

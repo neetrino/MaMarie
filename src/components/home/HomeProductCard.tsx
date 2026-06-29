@@ -3,13 +3,21 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 import { useState } from 'react';
 import {
+  HOME_PRODUCT_CARD_ACTIONS_GAP_PX,
+  HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX,
   HOME_PRODUCT_CARD_ASSETS,
   HOME_PRODUCT_CARD_BG,
   HOME_PRODUCT_CARD_CART_BG,
+  HOME_PRODUCT_CARD_CART_ICON_HOVER_LEFT_PX,
+  HOME_PRODUCT_CARD_CART_ICON_HOVER_TOP_PX,
+  HOME_PRODUCT_CARD_CART_ICON_LEFT_PX,
+  HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX,
   HOME_PRODUCT_CARD_CART_ICON_SIZE_PX,
+  HOME_PRODUCT_CARD_CART_ICON_TOP_PX,
+  HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX,
   HOME_PRODUCT_CARD_CART_SIZE_PX,
   HOME_PRODUCT_CARD_COMPARE_COLOR,
   HOME_PRODUCT_CARD_COMPARE_SIZE_PX,
@@ -17,11 +25,18 @@ import {
   HOME_PRODUCT_CARD_HEART_RIGHT_PX,
   HOME_PRODUCT_CARD_HEART_SIZE_PX,
   HOME_PRODUCT_CARD_HEART_TOP_PX,
+  HOME_PRODUCT_CARD_HOVER_BG,
   HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX,
+  HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX,
+  HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX,
+  HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX,
+  HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX,
   HOME_PRODUCT_CARD_IMAGE_LEFT_PX,
   HOME_PRODUCT_CARD_IMAGE_TOP_PX,
   HOME_PRODUCT_CARD_IMAGE_WIDTH_PX,
+  HOME_PRODUCT_CARD_LIFT_PX,
   HOME_PRODUCT_CARD_PANEL_HEIGHT_PX,
+  HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX,
   HOME_PRODUCT_CARD_PANEL_RADIUS_PX,
   HOME_PRODUCT_CARD_PANEL_TOP_PX,
   HOME_PRODUCT_CARD_PANEL_WIDTH_PX,
@@ -30,6 +45,8 @@ import {
   HOME_PRODUCT_CARD_RADIUS_PX,
   HOME_PRODUCT_CARD_RATING_COLOR,
   HOME_PRODUCT_CARD_RATING_SIZE_PX,
+  HOME_PRODUCT_CARD_SIZES_LEFT_PX,
+  HOME_PRODUCT_CARD_SIZES_TOP_PX,
   HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX,
   HOME_PRODUCT_CARD_TEXT_DARK,
   HOME_PRODUCT_CARD_TEXT_MUTED,
@@ -41,6 +58,8 @@ import { useCurrency } from '../hooks/useCurrency';
 import { useWishlist } from '../hooks/useWishlist';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { formatPrice } from '../../lib/currency';
+import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
+import { HomeProductCardSizeBadges } from './HomeProductCardSizeBadges';
 
 export interface HomeProductCardData {
   id: string;
@@ -67,6 +86,32 @@ function resolveComparePrice(product: HomeProductCardData): number | null {
     }
   }
   return null;
+}
+
+function buildCardCssVars(): CSSProperties {
+  return {
+    '--home-product-card-image-left-default': `${HOME_PRODUCT_CARD_IMAGE_LEFT_PX}px`,
+    '--home-product-card-image-top-default': `${HOME_PRODUCT_CARD_IMAGE_TOP_PX}px`,
+    '--home-product-card-image-width-default': `${HOME_PRODUCT_CARD_IMAGE_WIDTH_PX}px`,
+    '--home-product-card-image-height-default': `${HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX}px`,
+    '--home-product-card-image-left-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX}px`,
+    '--home-product-card-image-top-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX}px`,
+    '--home-product-card-image-width-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX}px`,
+    '--home-product-card-image-height-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX}px`,
+    '--home-product-card-bg-default': HOME_PRODUCT_CARD_BG,
+    '--home-product-card-bg-hover': HOME_PRODUCT_CARD_HOVER_BG,
+    '--home-product-card-actions-gap-default': `${HOME_PRODUCT_CARD_ACTIONS_GAP_PX}px`,
+    '--home-product-card-actions-gap-hover': `${HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX}px`,
+    '--home-product-card-cart-size-default': `${HOME_PRODUCT_CARD_CART_SIZE_PX}px`,
+    '--home-product-card-cart-size-hover': `${HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX}px`,
+    '--home-product-card-cart-icon-size-default': `${HOME_PRODUCT_CARD_CART_ICON_SIZE_PX}px`,
+    '--home-product-card-cart-icon-size-hover': `${HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}px`,
+    '--home-product-card-cart-icon-left-default': `${HOME_PRODUCT_CARD_CART_ICON_LEFT_PX}px`,
+    '--home-product-card-cart-icon-top-default': `${HOME_PRODUCT_CARD_CART_ICON_TOP_PX}px`,
+    '--home-product-card-cart-icon-left-hover': `${HOME_PRODUCT_CARD_CART_ICON_HOVER_LEFT_PX}px`,
+    '--home-product-card-cart-icon-top-hover': `${HOME_PRODUCT_CARD_CART_ICON_HOVER_TOP_PX}px`,
+    '--home-product-card-lift-hover': `${-HOME_PRODUCT_CARD_LIFT_PX}px`,
+  } as CSSProperties;
 }
 
 export function HomeProductCard({ product }: HomeProductCardProps) {
@@ -114,22 +159,16 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
 
   return (
     <article
-      className="relative shrink-0"
-      style={{ width: HOME_PRODUCT_CARD_WIDTH_PX, height: HOME_PRODUCT_CARD_HEIGHT_PX }}
+      className="home-product-card relative shrink-0"
+      style={{ width: HOME_PRODUCT_CARD_WIDTH_PX, height: HOME_PRODUCT_CARD_HEIGHT_PX, ...buildCardCssVars() }}
     >
       <div
-        className="relative h-full w-full overflow-visible"
-        style={{ borderRadius: HOME_PRODUCT_CARD_RADIUS_PX, backgroundColor: HOME_PRODUCT_CARD_BG }}
+        className="home-product-card-surface relative h-full w-full overflow-visible"
+        style={{ borderRadius: HOME_PRODUCT_CARD_RADIUS_PX }}
       >
         <Link
           href={isPlaceholder ? '/products' : `/products/${product.slug}`}
-          className="absolute overflow-hidden"
-          style={{
-            left: HOME_PRODUCT_CARD_IMAGE_LEFT_PX,
-            top: HOME_PRODUCT_CARD_IMAGE_TOP_PX,
-            width: HOME_PRODUCT_CARD_IMAGE_WIDTH_PX,
-            height: HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX,
-          }}
+          className="home-product-card-image-wrap absolute overflow-hidden"
         >
           <div
             className="pointer-events-none absolute relative max-w-none"
@@ -150,6 +189,13 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
             />
           </div>
         </Link>
+
+        <div
+          className="pointer-events-none absolute"
+          style={{ left: HOME_PRODUCT_CARD_SIZES_LEFT_PX, top: HOME_PRODUCT_CARD_SIZES_TOP_PX }}
+        >
+          <HomeProductCardSizeBadges />
+        </div>
 
         <button
           type="button"
@@ -186,8 +232,11 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
             paddingRight: 20,
           }}
         >
-          <div className="flex min-w-0 flex-col" style={{ gap: 16, width: 100 }}>
-            <div className="flex flex-col">
+          <div
+            className="flex min-w-0 flex-col"
+            style={{ gap: 7, width: HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX }}
+          >
+            <div className="flex w-full flex-col" style={{ gap: 3 }}>
               <Link
                 href={isPlaceholder ? '/products' : `/products/${product.slug}`}
                 className="truncate font-bold"
@@ -209,6 +258,7 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
               >
                 {subtitle}
               </p>
+              <HomeProductCardColorSwatches />
             </div>
 
             <div className="flex items-start whitespace-nowrap" style={{ gap: 16, lineHeight: '24px' }}>
@@ -232,7 +282,7 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
             </div>
           </div>
 
-          <div className="flex flex-col items-end justify-center" style={{ gap: 21, width: 100 }}>
+          <div className="home-product-card-actions flex flex-col items-end justify-center" style={{ width: 100 }}>
             <div className="relative" style={{ width: 71, height: 20 }}>
               <Image
                 src={HOME_PRODUCT_CARD_ASSETS.star}
@@ -261,20 +311,15 @@ export function HomeProductCard({ product }: HomeProductCardProps) {
               onClick={handleAddToCart}
               disabled={isPlaceholder || !product.inStock || isAddingToCart}
               aria-label="Add to cart"
-              className="relative shrink-0 rounded-full transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{
-                width: HOME_PRODUCT_CARD_CART_SIZE_PX,
-                height: HOME_PRODUCT_CARD_CART_SIZE_PX,
-                backgroundColor: HOME_PRODUCT_CARD_CART_BG,
-              }}
+              className="home-product-card-cart relative shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ backgroundColor: HOME_PRODUCT_CARD_CART_BG }}
             >
               <Image
                 src={HOME_PRODUCT_CARD_ASSETS.cart}
                 alt=""
-                width={HOME_PRODUCT_CARD_CART_ICON_SIZE_PX}
-                height={HOME_PRODUCT_CARD_CART_ICON_SIZE_PX}
-                className="absolute"
-                style={{ left: 11, top: 12 }}
+                width={HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}
+                height={HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}
+                className="home-product-card-cart-icon absolute"
               />
             </button>
           </div>
