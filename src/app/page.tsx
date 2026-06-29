@@ -8,10 +8,12 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <HeroSection />
-      <BestProductsSection />
-      <SaleSection />
-      <WhyUsSection />
-      <AboutUsSection />
+      <div className="relative z-0">
+        <BestProductsSection />
+        <SaleSection />
+        <WhyUsSection />
+        <AboutUsSection />
+      </div>
     </div>
   );
 }

@@ -18,7 +18,7 @@ download() {
 }
 
 download "hero-pink-arch.png" "4225c7a49399c60f19ad26b95535a4e01bee7aee"
-download "hero-main-composite.png" "37593d1cb53981dcdb45427f167b3faa5c6ad062"
+download "hero-main-composite.png" "c5a1c24e799590c21c73a176ee5420a9b7c4336d"
 download "hero-left-wing.png" "6a7dab3ac5305995c3111bda81c0ed2f6ff4197e"
 download "decoration-strawberry.png" "87142ae76696ba0208734972db39a7f19077e422"
 download "decoration-carrot.png" "9fb5cb9413d6bebbf44621805e17720fcb087df9"

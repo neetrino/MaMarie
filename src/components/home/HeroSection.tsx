@@ -22,11 +22,11 @@ export function HeroSection() {
   return (
     <HomePageSection
       offsetTopPx={HERO_SECTION_OFFSET_Y_PX}
-      className="relative isolate w-full overflow-hidden bg-white"
+      className="relative isolate w-full overflow-visible bg-white"
       style={{ zIndex: HERO_SECTION_Z_INDEX }}
     >
       <div
-        className="relative isolate w-full overflow-hidden [container-type:size]"
+        className="relative isolate w-full overflow-visible [container-type:size]"
         style={{
           aspectRatio: `${HERO_DESIGN_WIDTH_PX} / ${HERO_DESIGN_HEIGHT_PX}`,
           maxWidth: HERO_CONTENT_MAX_WIDTH_PX,

@@ -12,16 +12,20 @@ export const HERO_CANVAS_MAX_HEIGHT_PX = Math.round(
 );
 export const HERO_CANVAS_MIN_HEIGHT_PX = Math.round(520 * (HERO_CANVAS_MAX_WIDTH_PX / HERO_DESIGN_WIDTH_PX));
 
-/** Nudge entire hero section down (below fixed header). */
-export const HERO_SECTION_OFFSET_Y_PX = 32;
+/** Nudge entire hero section down — 0 lets art extend under transparent navbar. */
+export const HERO_SECTION_OFFSET_Y_PX = 0;
 
 export const HERO_CONTENT_MAX_WIDTH_PX = HERO_CANVAS_MAX_WIDTH_PX;
 export const HERO_CONTENT_MAX_HEIGHT_PX = HERO_CANVAS_MAX_HEIGHT_PX;
 export const HERO_CONTENT_MIN_HEIGHT_PX = HERO_CANVAS_MIN_HEIGHT_PX;
 
+/** Below fixed header (`z-50`), above homepage sections. */
+export const HERO_SECTION_Z_INDEX = 20;
+
 export const HERO_ASSETS = {
-  /** Figma `51:332` — girl + pink «SHAPE YOUR» arch. */
+  /** Figma `51:332` — pink «SHAPE YOUR» arch (top inscription). */
   pinkArch: '/assets/hero/hero-pink-arch.png',
+  /** Figma `51:333` — girl, ottomans, pink arch (893×538 frame). */
   mainComposite: '/assets/hero/hero-main-composite.png',
   leftWing: '/assets/hero/hero-left-wing.png',
   decorationBunny: '/assets/hero/decoration-camera-mid.png',
@@ -90,7 +94,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     zIndex: 2,
   },
   {
-    /** Figma `51:332` — pink «SHAPE YOUR» arch behind composite. */
+    /** Figma `51:332` — top pink «SHAPE YOUR» arch. */
     kind: 'rotated',
     assetKey: 'pinkArch',
     leftPx: 455,
@@ -104,7 +108,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     priority: true,
   },
   {
-    /** Figma `51:333` — girl + ottomans (893×538). */
+    /** Figma `51:333` — girl + ottomans + pink arch (893×538). */
     kind: 'flat',
     assetKey: 'mainComposite',
     leftPx: 282,
@@ -155,8 +159,6 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
   },
 ];
 
-/** Hero section sits below fixed header (z-50) and must not paint over page content. */
-export const HERO_SECTION_Z_INDEX = 0;
 export const HERO_CTA_Z_INDEX = 8;
 
 /** Gender CTA buttons — Figma nodes `51:338`–`51:342`. */
