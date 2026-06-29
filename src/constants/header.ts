@@ -77,6 +77,8 @@ export const MOBILE_NAV_DROPDOWN_RADIUS_PX = 24;
 export const MOBILE_NAV_DROPDOWN_PADDING_X_PX = HEADER_MOBILE_PADDING_X_PX;
 export const MOBILE_NAV_DROPDOWN_LINK_PADDING_Y_PX = 14;
 export const MOBILE_NAV_MENU_EXIT_ANIMATION_MS = 260;
+/** Burger ↔ close icon crossfade on the mobile menu button. */
+export const MOBILE_NAV_MENU_BUTTON_ANIMATION_MS = 280;
 
 /** Main content top inset — keeps pages below the fixed navbar (not used on `/`). */
 export const HEADER_CONTENT_CLEARANCE_MOBILE_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;

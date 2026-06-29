@@ -11,6 +11,7 @@ import {
   HEADER_MOBILE_MENU_ICON_SIZE_PX,
   HEADER_MOBILE_PILL_CONTENT_INSET_PX,
   HEADER_PILL_APPEAR_DURATION_MS,
+  MOBILE_NAV_MENU_BUTTON_ANIMATION_MS,
 } from '../../constants/header';
 import {
   setStoredLanguage,
@@ -53,6 +54,10 @@ function MobileIconButton({
     </button>
   );
 }
+
+const menuButtonIconTransitionStyle = {
+  transitionDuration: `${MOBILE_NAV_MENU_BUTTON_ANIMATION_MS}ms`,
+} as const;
 
 interface HeaderMobileActionsProps {
   showPill?: boolean;
@@ -142,7 +147,7 @@ export function HeaderMobileActions({
         }
         aria-expanded={menuOpen}
         aria-controls={menuId}
-        className={`flex shrink-0 items-center justify-center rounded-full transition-[opacity,background-color] hover:opacity-80 ${
+        className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[opacity,background-color] hover:opacity-80 ${
           showPill ? 'bg-transparent' : 'bg-white'
         }`}
         style={{
@@ -150,20 +155,30 @@ export function HeaderMobileActions({
           height: HEADER_MOBILE_ACTION_BUTTON_SIZE_PX,
         }}
       >
-        {menuOpen ? (
-          <X
-            className="h-[22px] w-[22px] text-brand-brown"
-            aria-hidden
-          />
-        ) : (
-          <Image
-            src={BRAND_ASSETS.iconMenuMobile}
-            alt=""
-            width={HEADER_MOBILE_MENU_ICON_SIZE_PX}
-            height={HEADER_MOBILE_MENU_ICON_SIZE_PX}
-            aria-hidden
-          />
-        )}
+        <Image
+          src={BRAND_ASSETS.iconMenuMobile}
+          alt=""
+          width={HEADER_MOBILE_MENU_ICON_SIZE_PX}
+          height={HEADER_MOBILE_MENU_ICON_SIZE_PX}
+          aria-hidden
+          className="absolute transition-[opacity,transform] ease-out"
+          style={{
+            opacity: menuOpen ? 0 : 1,
+            transform: menuOpen ? 'rotate(-90deg) scale(0.82)' : 'rotate(0deg) scale(1)',
+            ...menuButtonIconTransitionStyle,
+          }}
+        />
+        <X
+          className="absolute text-brand-brown transition-[opacity,transform] ease-out"
+          aria-hidden
+          style={{
+            width: HEADER_MOBILE_MENU_ICON_SIZE_PX,
+            height: HEADER_MOBILE_MENU_ICON_SIZE_PX,
+            opacity: menuOpen ? 1 : 0,
+            transform: menuOpen ? 'rotate(0deg) scale(1)' : 'rotate(90deg) scale(0.82)',
+            ...menuButtonIconTransitionStyle,
+          }}
+        />
       </button>
     </div>
   );
