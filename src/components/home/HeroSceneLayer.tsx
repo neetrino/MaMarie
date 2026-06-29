@@ -54,17 +54,30 @@ function HeroFlatLayer({ layer }: { layer: HeroFlatPlacement }) {
   );
 }
 
+function rotatedImageClassName(layer: HeroRotatedPlacement): string {
+  if (layer.objectFit === 'contain') {
+    if (layer.objectPosition === 'bottom') {
+      return 'object-contain object-bottom';
+    }
+
+    if (layer.objectPosition === 'center') {
+      return 'object-contain object-center';
+    }
+
+    return 'object-contain object-center';
+  }
+
+  return layer.objectPosition === 'bottom' ? 'object-bottom object-cover' : 'object-cover';
+}
+
 function HeroRotatedLayer({ layer }: { layer: HeroRotatedPlacement }) {
   const innerTransform = [layer.flipY ? 'scaleY(-1)' : '', `rotate(${layer.rotateDeg}deg)`]
     .filter(Boolean)
     .join(' ');
 
-  const objectPositionClass =
-    layer.objectPosition === 'bottom' ? 'object-bottom object-cover' : 'object-cover';
-
   return (
     <div
-      className="pointer-events-none absolute flex items-center justify-center"
+      className="pointer-events-none absolute flex items-center justify-center overflow-visible"
       style={{
         left: heroPctX(layer.leftPx),
         top: heroPctY(layer.topPx),
@@ -74,7 +87,7 @@ function HeroRotatedLayer({ layer }: { layer: HeroRotatedPlacement }) {
       }}
     >
       <div
-        className="relative flex-none"
+        className="relative flex-none overflow-visible"
         style={{
           transform: innerTransform,
           width: innerSizePercent(layer.containerWidthPx, layer.imageWidthPx),
@@ -87,7 +100,7 @@ function HeroRotatedLayer({ layer }: { layer: HeroRotatedPlacement }) {
           fill
           priority={layer.priority}
           sizes={`${layer.imageWidthPx}px`}
-          className={objectPositionClass}
+          className={`max-w-none ${rotatedImageClassName(layer)}`}
         />
       </div>
     </div>

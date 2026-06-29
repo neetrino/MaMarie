@@ -15,6 +15,9 @@ export const HERO_CANVAS_MIN_HEIGHT_PX = Math.round(520 * (HERO_CANVAS_MAX_WIDTH
 /** Nudge entire hero section down — 0 lets art extend under transparent navbar. */
 export const HERO_SECTION_OFFSET_Y_PX = 0;
 
+/** Shift all hero scene layers + CTAs down within the canvas. */
+export const HERO_SCENE_OFFSET_Y_PX = 28;
+
 export const HERO_CONTENT_MAX_WIDTH_PX = HERO_CANVAS_MAX_WIDTH_PX;
 export const HERO_CONTENT_MAX_HEIGHT_PX = HERO_CANVAS_MAX_HEIGHT_PX;
 export const HERO_CONTENT_MIN_HEIGHT_PX = HERO_CANVAS_MIN_HEIGHT_PX;
@@ -60,11 +63,24 @@ export interface HeroRotatedPlacement {
   rotateDeg: number;
   flipY?: boolean;
   zIndex: number;
-  objectPosition?: 'bottom' | 'cover';
+  objectPosition?: 'bottom' | 'cover' | 'center';
+  /** Default `cover` — use `contain` for layers that must not crop (e.g. blue arch). */
+  objectFit?: 'contain' | 'cover';
   priority?: boolean;
 }
 
 export type HeroSceneLayer = HeroFlatPlacement | HeroRotatedPlacement;
+
+/** Blue bottom arch — above all hero art, below CTA buttons. */
+export const HERO_LEFT_WING_Z_INDEX = 9;
+
+export const HERO_CTA_Z_INDEX = 10;
+
+/** Space below canvas so blue arch is not clipped by the next section. */
+export const HERO_SCENE_OVERFLOW_BOTTOM_PX = 115;
+
+/** Space above canvas for pink arch (Figma `51:332` sits at top: -27). */
+export const HERO_SCENE_OVERFLOW_TOP_PX = 72;
 
 /** Hero scene layers — paint order back → front (Figma frame `51:329`). */
 export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
@@ -105,6 +121,8 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     imageHeightPx: 750.114,
     rotateDeg: -15.57,
     zIndex: 3,
+    objectFit: 'contain',
+    objectPosition: 'bottom',
     priority: true,
   },
   {
@@ -134,19 +152,6 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
   },
   {
     kind: 'rotated',
-    assetKey: 'leftWing',
-    leftPx: -26.26,
-    topPx: 114.99,
-    containerWidthPx: 839.692,
-    containerHeightPx: 850.998,
-    imageWidthPx: 604.736,
-    imageHeightPx: 634.95,
-    rotateDeg: -29.66,
-    zIndex: 6,
-    objectPosition: 'bottom',
-  },
-  {
-    kind: 'rotated',
     assetKey: 'decorationCarrot',
     leftPx: 1038,
     topPx: 565,
@@ -155,11 +160,24 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     imageWidthPx: 137.966,
     imageHeightPx: 137.966,
     rotateDeg: 71.1,
-    zIndex: 7,
+    zIndex: 6,
+  },
+  {
+    /** Figma `51:336` — blue «YOUR CHILDHOOD» arch; topmost scene layer. */
+    kind: 'rotated',
+    assetKey: 'leftWing',
+    leftPx: -26.26,
+    topPx: 114.99,
+    containerWidthPx: 839.692,
+    containerHeightPx: 850.998,
+    imageWidthPx: 604.736,
+    imageHeightPx: 634.95,
+    rotateDeg: -29.66,
+    zIndex: HERO_LEFT_WING_Z_INDEX,
+    objectPosition: 'bottom',
+    objectFit: 'contain',
   },
 ];
-
-export const HERO_CTA_Z_INDEX = 8;
 
 /** Gender CTA buttons — Figma nodes `51:338`–`51:342`. */
 export const HERO_GENDER_BUTTONS_TOP_PX = 763;
@@ -188,4 +206,14 @@ export function heroPctW(px: number): string {
 
 export function heroPctH(px: number): string {
   return `${(px / HERO_DESIGN_HEIGHT_PX) * 100}%`;
+}
+
+/** Width-relative overflow padding — `%` is vs container width (scales with canvas). */
+export function heroOverflowPaddingX(designOverflowPx: number): string {
+  return `${(designOverflowPx / HERO_DESIGN_WIDTH_PX) * 100}%`;
+}
+
+/** @deprecated Use `heroOverflowPaddingX`. */
+export function heroOverflowPaddingBottom(designOverflowPx: number): string {
+  return heroOverflowPaddingX(designOverflowPx);
 }
