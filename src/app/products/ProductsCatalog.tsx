@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { unstable_cache } from 'next/cache';
 import { getStoredLanguage } from '../../lib/language';
 import { t } from '../../lib/i18n';
+import { ClothingTypeFilter } from '../../components/ClothingTypeFilter';
 import { PriceFilter } from '../../components/PriceFilter';
 import { ColorFilter } from '../../components/ColorFilter';
 import { SizeFilter } from '../../components/SizeFilter';
@@ -10,6 +11,7 @@ import { ProductsHeader } from '../../components/ProductsHeader';
 import { ProductsGrid } from '../../components/ProductsGrid';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
 import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
+import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
 import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
@@ -19,6 +21,7 @@ import {
   PRODUCTS_CATALOG_MAX_WIDTH_PX,
   PRODUCTS_CATALOG_PADDING_LEFT_PX,
   PRODUCTS_CATALOG_PADDING_RIGHT_PX,
+  PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
 } from '../../constants/products-catalog';
 
 interface Product {
@@ -68,7 +71,8 @@ const getProductsCached = unstable_cache(
     maxPrice?: number,
     colors?: string,
     sizes?: string,
-    brand?: string
+    brand?: string,
+    clothingTypes?: string
   ): Promise<ProductsResponse> =>
     productsService.findAll({
       page,
@@ -81,6 +85,7 @@ const getProductsCached = unstable_cache(
       colors,
       sizes,
       brand,
+      clothingTypes,
     }) as Promise<ProductsResponse>,
   ['products-catalog-db-v1'],
   { revalidate: PRODUCTS_LIST_REVALIDATE_SECONDS }
@@ -103,6 +108,7 @@ async function getProducts(
   colors?: string,
   sizes?: string,
   brand?: string,
+  clothingTypes?: string,
   limit: number = 12
 ): Promise<ProductsResponse> {
   try {
@@ -117,7 +123,8 @@ async function getProducts(
       parseOptionalPrice(maxPrice),
       colors?.trim() || undefined,
       sizes?.trim() || undefined,
-      brand?.trim() || undefined
+      brand?.trim() || undefined,
+      clothingTypes?.trim() || undefined
     );
     if (!Array.isArray(response.data)) {
       return {
@@ -160,6 +167,7 @@ export async function ProductsCatalog({
     typeof params.colors === 'string' ? params.colors : undefined,
     typeof params.sizes === 'string' ? params.sizes : undefined,
     typeof params.brand === 'string' ? params.brand : undefined,
+    typeof params.clothingTypes === 'string' ? params.clothingTypes : undefined,
     perPage
   );
 
@@ -180,9 +188,13 @@ export async function ProductsCatalog({
   const colors = typeof params.colors === 'string' ? params.colors : undefined;
   const sizes = typeof params.sizes === 'string' ? params.sizes : undefined;
   const brands = typeof params.brand === 'string' ? params.brand : undefined;
+  const clothingTypes = typeof params.clothingTypes === 'string' ? params.clothingTypes : undefined;
   const selectedColors = colors ? colors.split(',').map((c: string) => c.trim().toLowerCase()) : [];
   const selectedSizes = sizes ? sizes.split(',').map((s: string) => s.trim()) : [];
   const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
+  const selectedClothingTypes = clothingTypes
+    ? clothingTypes.split(',').map((value: string) => value.trim())
+    : [];
 
   const buildPaginationUrl = (num: number) => {
     const q = new URLSearchParams();
@@ -208,7 +220,20 @@ export async function ProductsCatalog({
         paddingRight: PRODUCTS_CATALOG_PADDING_RIGHT_PX,
       }}
     >
-      <ProductsHeader />
+      <div className="hidden lg:flex" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+        <div
+          className="shrink-0"
+          style={{ width: PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX }}
+          aria-hidden
+        />
+        <div className="min-w-0 flex-1 pt-2">
+          <ProductsHeader />
+        </div>
+      </div>
+
+      <div className="lg:hidden pt-2">
+        <ProductsHeader />
+      </div>
 
       <ProductsFiltersProvider
         category={typeof params.category === 'string' ? params.category : undefined}
@@ -224,9 +249,15 @@ export async function ProductsCatalog({
             maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
             selectedColors={selectedColors}
             selectedSizes={selectedSizes}
+            selectedClothingTypes={selectedClothingTypes}
           />
 
-          <div className="min-w-0 flex-1 py-2">
+          <div className="min-w-0 flex-1">
+            <div className="pb-4 pt-2 lg:pt-0">
+              <ProductsBreadcrumb />
+            </div>
+
+            <div className="py-2">
             {normalizedProducts.length > 0 ? (
               <ProductsGrid
                 products={normalizedProducts}
@@ -238,6 +269,7 @@ export async function ProductsCatalog({
                 <p className="text-lg text-[#757571]">{t(language, 'common.messages.noProductsFound')}</p>
               </div>
             )}
+            </div>
           </div>
         </div>
 
@@ -263,6 +295,10 @@ export async function ProductsCatalog({
                 minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
                 maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
                 selectedSizes={selectedSizes}
+              />
+              <ClothingTypeFilter
+                selectedClothingTypes={selectedClothingTypes}
+                variant="catalog"
               />
               <BrandFilter
                 category={typeof params.category === 'string' ? params.category : undefined}

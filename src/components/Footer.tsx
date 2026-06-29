@@ -10,9 +10,10 @@ import {
   FOOTER_PADDING_BOTTOM_PX,
   FOOTER_PADDING_TOP_PX,
   FOOTER_PADDING_X_PX,
+  FOOTER_STRAWBERRY_Z_INDEX,
   FOOTER_YELLOW_TOP_PX,
 } from '../constants/footer';
-import { FooterBunnyDecoration } from './footer/FooterDecorations';
+import { FooterBunnyDecoration, FooterStrawberryDecoration } from './footer/FooterDecorations';
 import { FooterSiteContent } from './footer/FooterSiteContent';
 
 /**
@@ -77,6 +78,13 @@ export function Footer() {
         <div className="mx-auto w-full" style={{ maxWidth: FOOTER_CONTENT_MAX_WIDTH_PX }}>
           <FooterSiteContent />
         </div>
+      </div>
+
+      <div
+        className="pointer-events-none absolute inset-0 overflow-visible"
+        style={{ zIndex: FOOTER_STRAWBERRY_Z_INDEX }}
+      >
+        <FooterStrawberryDecoration />
       </div>
     </footer>
   );

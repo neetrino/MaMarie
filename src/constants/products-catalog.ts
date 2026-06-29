@@ -41,6 +41,8 @@ export const PRODUCTS_CATALOG_FILTER_SECTION_SHADOW = '0px 1px 4px rgba(0, 0, 0,
 export const PRODUCTS_CATALOG_FILTER_TITLE_LETTER_SPACING_PX = 1.4;
 export const PRODUCTS_CATALOG_FILTER_TITLE_SIZE_PX = 11;
 export const PRODUCTS_CATALOG_FILTER_ACCENT = '#5281e1';
+export const PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX = 16;
+export const PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX = 4;
 export const PRODUCTS_CATALOG_BREADCRUMB_MUTED = 'rgba(29, 28, 22, 0.36)';
 export const PRODUCTS_CATALOG_TEXT_DARK = '#1d1c16';
 
@@ -55,4 +57,5 @@ export const PRODUCTS_CATALOG_CTA_BG = BRAND_COLORS.pink;
 export const PRODUCTS_CATALOG_CTA_INSET_SHADOW =
   'inset 0px -4px 8px rgba(0, 0, 0, 0.27), inset 0px 4px 4px rgba(255, 255, 255, 0.4), inset 0px 20px 40px -10px rgba(164, 60, 18, 0.2)';
 
-export const PRODUCTS_CATALOG_FILTER_CHEVRON_SRC = '/assets/brand/icon-chevron.svg';
+export const PRODUCTS_CATALOG_FILTER_CHEVRON_SRC = '/assets/products/filter-chevron.svg';
+export const PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX = 14;

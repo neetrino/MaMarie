@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { CategoryFilter } from '../CategoryFilter';
+import { ClothingTypeFilter } from '../ClothingTypeFilter';
 import { ColorFilter } from '../ColorFilter';
 import { PriceFilter } from '../PriceFilter';
 import { SizeFilter } from '../SizeFilter';
@@ -23,6 +24,7 @@ interface ProductsFilterSidebarProps {
   maxPrice?: string;
   selectedColors: string[];
   selectedSizes: string[];
+  selectedClothingTypes: string[];
 }
 
 function ProductsFilterSidebarContent({
@@ -32,6 +34,7 @@ function ProductsFilterSidebarContent({
   maxPrice,
   selectedColors,
   selectedSizes,
+  selectedClothingTypes,
 }: ProductsFilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,7 +42,7 @@ function ProductsFilterSidebarContent({
 
   const handleClearFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
-    const filterKeys = ['search', 'category', 'minPrice', 'maxPrice', 'colors', 'sizes', 'brand'];
+    const filterKeys = ['search', 'category', 'minPrice', 'maxPrice', 'colors', 'sizes', 'brand', 'clothingTypes'];
     filterKeys.forEach((key) => params.delete(key));
     params.delete('page');
     const queryString = params.toString();
@@ -64,6 +67,13 @@ function ProductsFilterSidebarContent({
               minPrice={minPrice}
               maxPrice={maxPrice}
               selectedSizes={selectedSizes}
+              variant="catalog"
+            />
+          </ProductsFilterSection>
+
+          <ProductsFilterSection title={t('products.catalog.filters.clothingType')}>
+            <ClothingTypeFilter
+              selectedClothingTypes={selectedClothingTypes}
               variant="catalog"
             />
           </ProductsFilterSection>
@@ -121,6 +131,7 @@ export function ProductsFilterSidebar(props: ProductsFilterSidebarProps) {
           <div className="flex flex-col gap-5">
             <div className="h-28 rounded-2xl bg-neutral-200" />
             <div className="h-36 rounded-2xl bg-neutral-200" />
+            <div className="h-72 rounded-2xl bg-neutral-200" />
             <div className="h-32 rounded-2xl bg-neutral-200" />
           </div>
         </aside>

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState, type ReactNode } from 'react';
 import {
+  PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX,
   PRODUCTS_CATALOG_FILTER_CHEVRON_SRC,
   PRODUCTS_CATALOG_FILTER_SECTION_BG,
   PRODUCTS_CATALOG_FILTER_SECTION_RADIUS_PX,
@@ -54,10 +55,10 @@ export function ProductsFilterSection({
         <Image
           src={PRODUCTS_CATALOG_FILTER_CHEVRON_SRC}
           alt=""
-          width={14}
-          height={14}
+          width={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
+          height={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
           aria-hidden
-          className={`shrink-0 transition-transform ${isOpen ? '' : '-rotate-90'}`}
+          className={`shrink-0 transition-transform duration-200 ease-in-out ${isOpen ? 'rotate-180' : 'rotate-0'}`}
         />
       </button>
 

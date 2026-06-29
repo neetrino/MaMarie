@@ -17,10 +17,8 @@ import {
   ABOUT_US_SHELL_PADDING_LEFT_PX,
   ABOUT_US_SHELL_PADDING_RIGHT_PX,
   ABOUT_US_CARD_DECORATION_OVERFLOW_TOP_PX,
-  ABOUT_US_STRAWBERRY_DECORATION_Z_INDEX,
 } from '../../constants/about-us-section';
 import { HOME_SECTION_MAX_WIDTH_PX } from '../../constants/home-sections';
-import { FooterStrawberryDecoration } from '../footer/FooterDecorations';
 import { AboutUsSectionBlock } from './AboutUsSectionBlock';
 
 /** Figma node `51:409` — rotated mother & child photo on white section (`51:408`). */
@@ -93,13 +91,6 @@ export function AboutUsSection() {
             <AboutUsSectionBlock />
           </div>
         </div>
-      </div>
-
-      <div
-        className="pointer-events-none absolute bottom-0 left-0 right-0 overflow-visible"
-        style={{ zIndex: ABOUT_US_STRAWBERRY_DECORATION_Z_INDEX }}
-      >
-        <FooterStrawberryDecoration />
       </div>
     </section>
   );

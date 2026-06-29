@@ -23,6 +23,8 @@ export const FOOTER_YELLOW_TOP_PX = FOOTER_TOP_GAP_PX;
 export const FOOTER_BG_COLOR = BRAND_COLORS.yellow;
 export const FOOTER_DECORATION_Z_INDEX = 0;
 export const FOOTER_CONTENT_Z_INDEX = 10;
+/** Strawberry (`51:429`) — above footer content, may overlap section above. */
+export const FOOTER_STRAWBERRY_Z_INDEX = 20;
 
 /** Gap from payment badges bottom to copyright (Figma y=360 → y=442). */
 export const FOOTER_CONTENT_GAP_PX = 82;

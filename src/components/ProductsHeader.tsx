@@ -11,8 +11,6 @@ import {
 } from '../constants/products-catalog';
 import { MOBILE_FILTERS_EVENT } from '../lib/events';
 import { useTranslation } from '../lib/i18n-client';
-import { ProductsBreadcrumb } from './products/ProductsBreadcrumb';
-
 type ViewMode = 'list' | 'grid-2' | 'grid-3';
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
@@ -121,19 +119,16 @@ function ProductsHeaderContent() {
   const currentSortLabel = t('products.catalog.sortBy');
 
   return (
-    <div className="flex flex-col gap-4 pb-6 pt-2 sm:flex-row sm:items-center sm:justify-between">
-      <ProductsBreadcrumb />
-
-      <div className="flex items-center justify-end gap-3">
-        <button
+    <div className="flex items-center justify-end gap-3 pb-6 pt-2 lg:pb-0">
+      <button
           type="button"
           onClick={() => window.dispatchEvent(new Event(MOBILE_FILTERS_EVENT))}
           className="inline-flex items-center gap-2 rounded-full border border-[#e8e8e8] bg-white px-4 py-2 text-sm font-medium text-[#57423b] lg:hidden"
         >
           {t('products.header.filters')}
-        </button>
+      </button>
 
-        <div
+      <div
           className="hidden items-center gap-7 px-6 lg:flex"
           style={{
             height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
@@ -200,7 +195,6 @@ function ProductsHeaderContent() {
             </div>
           ) : null}
         </div>
-      </div>
     </div>
   );
 }

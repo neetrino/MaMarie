@@ -12,8 +12,6 @@ export const ABOUT_US_SECTION_BG = '#ffffff';
 export const ABOUT_US_SECTION_Z_INDEX = 25;
 /** Large bow (`51:422`) — foreground over cards and footer edge. */
 export const ABOUT_US_FOREGROUND_DECORATION_Z_INDEX = 30;
-/** Footer strawberry (`51:429`) — above footer yellow, below bow. */
-export const ABOUT_US_STRAWBERRY_DECORATION_Z_INDEX = 22;
 /** White space after «Ինչու Մենք» — extra room above About Us content; photo may extend into it. */
 export const ABOUT_US_AFTER_WHY_US_GAP_PX = 160;
 export const ABOUT_US_SECTION_OFFSET_TOP_PX = ABOUT_US_AFTER_WHY_US_GAP_PX;
