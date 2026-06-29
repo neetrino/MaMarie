@@ -109,10 +109,10 @@ export const FOOTER_PAYMENT_BADGES: FooterPaymentBadge[] = [
     alt: 'Visa',
     logoSrc: '/assets/footer/payments/visa.png',
     widthPx: 73,
-    logoLeftPx: 13,
-    logoTopPx: 4,
-    logoWidthPx: 48,
-    logoHeightPx: 22,
+    logoLeftPx: 5,
+    logoTopPx: 1,
+    logoWidthPx: 64,
+    logoHeightPx: 28,
   },
 ];
 
