@@ -22,9 +22,11 @@ export const ABOUT_US_SECTION_PADDING_TOP_PX = 84;
 /** Extends white section bg into the footer gap so clay can overlap without clipping. */
 export const ABOUT_US_SECTION_PADDING_BOTTOM_PX = 223 + FOOTER_TOP_GAP_PX;
 /** Cards + decoration icons — shifted up without moving the section photo. */
-export const ABOUT_US_CONTENT_SHIFT_UP_PX = 50;
+export const ABOUT_US_CONTENT_SHIFT_UP_PX = 90;
 /** Side-card clay (`decoBunny` top −63) — extra room above card row without shifting Figma card positions. */
-export const ABOUT_US_CARD_DECORATION_OVERFLOW_TOP_PX = 63;
+export const ABOUT_US_CARD_DECORATION_OVERFLOW_TOP_PX = 123;
+/** Yellow card carrot (`51:427`) — lifted under `closingText`. */
+export const ABOUT_US_YELLOW_CARD_CARROT_TOP_PX = 149;
 
 export const ABOUT_US_CONTENT_OFFSET_LEFT_PX =
   463 - HOME_SECTION_PADDING_LEFT_PX;
@@ -90,25 +92,40 @@ export const ABOUT_US_ASSETS = {
   decoBow: '/assets/home/about-us/deco-bow.png',
 } as const;
 
+const ABOUT_US_SIDE_CARD_BUNNY_DECORATION: AboutUsDecorationLayout & {
+  imageSrc: string;
+} = {
+  leftPx: 104,
+  topPx: -63,
+  wrapperSizePx: 122.073,
+  imageSizePx: 104.088,
+  rotateDeg: -168.97,
+  flipX: true,
+  flipY: true,
+  imageSrc: ABOUT_US_ASSETS.decoBunny,
+};
+
+const ABOUT_US_SIDE_CARD_CARROT_DECORATION: AboutUsDecorationLayout & {
+  imageSrc: string;
+} = {
+  leftPx: 16,
+  topPx: 164,
+  wrapperSizePx: 88,
+  imageSizePx: 88,
+  imageSrc: ABOUT_US_ASSETS.decoShoes,
+};
+
 export const ABOUT_US_SIDE_CARD_DECORATIONS: Array<
   AboutUsDecorationLayout & { imageSrc: string }
+> = [ABOUT_US_SIDE_CARD_BUNNY_DECORATION, ABOUT_US_SIDE_CARD_CARROT_DECORATION];
+
+export const ABOUT_US_YELLOW_CARD_DECORATIONS: Array<
+  AboutUsDecorationLayout & { imageSrc: string }
 > = [
+  ABOUT_US_SIDE_CARD_BUNNY_DECORATION,
   {
-    leftPx: 104,
-    topPx: -63,
-    wrapperSizePx: 122.073,
-    imageSizePx: 104.088,
-    rotateDeg: -168.97,
-    flipX: true,
-    flipY: true,
-    imageSrc: ABOUT_US_ASSETS.decoBunny,
-  },
-  {
-    leftPx: 16,
-    topPx: 164,
-    wrapperSizePx: 88,
-    imageSizePx: 88,
-    imageSrc: ABOUT_US_ASSETS.decoShoes,
+    ...ABOUT_US_SIDE_CARD_CARROT_DECORATION,
+    topPx: ABOUT_US_YELLOW_CARD_CARROT_TOP_PX,
   },
 ];
 

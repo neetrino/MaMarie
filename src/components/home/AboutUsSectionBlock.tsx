@@ -26,6 +26,7 @@ import {
   ABOUT_US_RIGHT_COLUMN_HEIGHT_PX,
   ABOUT_US_RIGHT_COLUMN_WIDTH_PX,
   ABOUT_US_SIDE_CARD_DECORATIONS,
+  ABOUT_US_YELLOW_CARD_DECORATIONS,
   ABOUT_US_STORY_CARD_BG,
   ABOUT_US_STORY_CARD_HEIGHT_PX,
   ABOUT_US_STORY_CARD_PADDING_X_PX,
@@ -115,10 +116,12 @@ function AboutUsSideCard({
   text,
   backgroundColor,
   widthPx,
+  decorations,
 }: {
   text: string;
   backgroundColor: string;
   widthPx: number;
+  decorations: Array<AboutUsDecorationLayout & { imageSrc: string }>;
 }) {
   return (
     <article
@@ -146,7 +149,7 @@ function AboutUsSideCard({
         {text}
       </p>
 
-      {ABOUT_US_SIDE_CARD_DECORATIONS.map((deco) => (
+      {decorations.map((deco) => (
         <AboutUsDecoration key={deco.imageSrc} layout={deco} imageSrc={deco.imageSrc} />
       ))}
     </article>
@@ -243,6 +246,7 @@ export function AboutUsSectionBlock() {
           text={t('home.aboutUs.introText')}
           backgroundColor={ABOUT_US_CARD_WHITE_BG}
           widthPx={ABOUT_US_CARD_LEFT_WIDTH_PX}
+          decorations={ABOUT_US_SIDE_CARD_DECORATIONS}
         />
         <AboutUsStoryColumn
           storyLead={t('home.aboutUs.storyLead')}
@@ -261,6 +265,7 @@ export function AboutUsSectionBlock() {
           text={t('home.aboutUs.closingText')}
           backgroundColor={ABOUT_US_CARD_YELLOW_BG}
           widthPx={ABOUT_US_CARD_YELLOW_WIDTH_PX}
+          decorations={ABOUT_US_YELLOW_CARD_DECORATIONS}
         />
       </div>
     </div>
