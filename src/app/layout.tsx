@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="hy" className="h-full">
+    <html lang="hy" className="h-full overflow-x-clip">
       <body className={`${montserrat.variable} font-sans bg-gray-50 text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>
