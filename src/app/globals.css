@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: Mirage;
+    src: url('/assets/fonts/Mirage-Expanded.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
   body {
     @apply bg-white text-gray-900;
   }
@@ -57,6 +65,25 @@
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .mobile-home-sale-label {
+    width: 239px;
+    height: 45px;
+    font-family: Mirage;
+    font-size: 73px;
+    line-height: 45px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
+  }
+
+  .mobile-home-sale-discount {
+    font-family: Mirage;
+    font-size: 75px;
+    line-height: 45px;
+    transform: translateY(-50%);
   }
 
   .home-product-card {
