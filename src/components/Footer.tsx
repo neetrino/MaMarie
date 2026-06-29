@@ -12,6 +12,7 @@ import {
   FOOTER_PADDING_X_PX,
   FOOTER_STRAWBERRY_Z_INDEX,
   FOOTER_YELLOW_TOP_PX,
+  FOOTER_Z_INDEX,
 } from '../constants/footer';
 import { FooterBunnyDecoration, FooterStrawberryDecoration } from './footer/FooterDecorations';
 import { FooterSiteContent } from './footer/FooterSiteContent';
@@ -25,8 +26,9 @@ export function Footer() {
 
   return (
     <footer
-      className="relative z-20 w-full overflow-visible"
+      className="relative w-full overflow-visible"
       style={{
+        zIndex: FOOTER_Z_INDEX,
         paddingTop: contentPaddingTopPx,
         paddingBottom: FOOTER_PADDING_BOTTOM_PX,
         backgroundColor: 'transparent',

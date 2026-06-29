@@ -21,6 +21,8 @@ export const FOOTER_GAP_BG_COLOR = '#ffffff';
 /** Yellow layer inset from footer top — gap strip stays white. */
 export const FOOTER_YELLOW_TOP_PX = FOOTER_TOP_GAP_PX;
 export const FOOTER_BG_COLOR = BRAND_COLORS.yellow;
+/** Above homepage sections wrapper (`z-21`) and About Us (`z-25`) so strawberry stays visible. */
+export const FOOTER_Z_INDEX = 26;
 export const FOOTER_DECORATION_Z_INDEX = 0;
 export const FOOTER_CONTENT_Z_INDEX = 10;
 /** Strawberry (`51:429`) — above footer content, may overlap section above. */

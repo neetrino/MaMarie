@@ -8,7 +8,7 @@ import {
 
 /** Figma node `51:408` — About us section. */
 export const ABOUT_US_SECTION_BG = '#ffffff';
-/** Above footer (`z-20`) so large decorations can overlap the gap. */
+/** Below footer (`z-26`); foreground decorations still stack above cards within the section. */
 export const ABOUT_US_SECTION_Z_INDEX = 25;
 /** Large bow (`51:422`) — foreground over cards and footer edge. */
 export const ABOUT_US_FOREGROUND_DECORATION_Z_INDEX = 30;
