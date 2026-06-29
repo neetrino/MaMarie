@@ -23,7 +23,7 @@ function SaleBannerChildPhoto() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute hidden overflow-hidden md:block"
+      className="pointer-events-none absolute overflow-hidden"
       style={{
         left: saleBannerPct(SALE_BANNER_CHILD_LEFT_PX, SALE_BANNER_MAX_WIDTH_PX),
         top: saleBannerPct(SALE_BANNER_CHILD_TOP_PX, SALE_BANNER_HEIGHT_PX),

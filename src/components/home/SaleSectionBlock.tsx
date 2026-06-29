@@ -4,12 +4,9 @@ import Link from 'next/link';
 import {
   SALE_BANNER_BG,
   SALE_BANNER_CONTENT_LEFT_PX,
-  SALE_BANNER_CONTENT_TOP_PX,
   SALE_BANNER_CONTENT_WIDTH_PX,
   SALE_BANNER_CTA_HEIGHT_PX,
   SALE_BANNER_CTA_INSET_SHADOW,
-  SALE_BANNER_CTA_OFFSET_TOP_PX,
-  SALE_BANNER_CTA_OFFSET_TOP_HY_PX,
   SALE_BANNER_CTA_TEXT_COLOR,
   SALE_BANNER_CTA_TEXT_LINE_HEIGHT_PX,
   SALE_BANNER_CTA_TEXT_SIZE_PX,
@@ -21,14 +18,14 @@ import {
   SALE_BANNER_SUBTITLE_LINE_HEIGHT_PX,
   SALE_BANNER_SUBTITLE_LINE_HEIGHT_HY_PX,
   SALE_BANNER_SUBTITLE_MAX_WIDTH_PX,
-  SALE_BANNER_SUBTITLE_OFFSET_TOP_PX,
-  SALE_BANNER_SUBTITLE_OFFSET_TOP_HY_PX,
   SALE_BANNER_SUBTITLE_SIZE_PX,
   SALE_BANNER_SUBTITLE_SIZE_HY_PX,
+  SALE_BANNER_SUBTITLE_GAP_PX,
   SALE_BANNER_TITLE_LINE_HEIGHT_PX,
   SALE_BANNER_TITLE_LINE_HEIGHT_HY_PX,
   SALE_BANNER_TITLE_SIZE_PX,
   SALE_BANNER_TITLE_SIZE_HY_PX,
+  SALE_BANNER_TITLE_SUBTITLE_GAP_PX,
   SALE_HEADING_COLOR,
   SALE_HEADING_MIN_HEIGHT_PX,
   SALE_HEADING_PADDING_Y_PX,
@@ -56,12 +53,6 @@ export function SaleSectionBlock() {
   const titleLineHeightPx = isArmenian
     ? SALE_BANNER_TITLE_LINE_HEIGHT_HY_PX
     : SALE_BANNER_TITLE_LINE_HEIGHT_PX;
-  const subtitleOffsetTopPx = isArmenian
-    ? SALE_BANNER_SUBTITLE_OFFSET_TOP_HY_PX
-    : SALE_BANNER_SUBTITLE_OFFSET_TOP_PX;
-  const ctaOffsetTopPx = isArmenian
-    ? SALE_BANNER_CTA_OFFSET_TOP_HY_PX
-    : SALE_BANNER_CTA_OFFSET_TOP_PX;
 
   return (
     <>
@@ -82,7 +73,7 @@ export function SaleSectionBlock() {
         className="relative w-full overflow-hidden"
         style={{
           marginTop: SALE_BANNER_OFFSET_TOP_PX,
-          minHeight: SALE_BANNER_HEIGHT_PX,
+          height: SALE_BANNER_HEIGHT_PX,
           borderRadius: SALE_BANNER_RADIUS_PX,
           backgroundColor: SALE_BANNER_BG,
         }}
@@ -90,12 +81,11 @@ export function SaleSectionBlock() {
         <SaleBannerVisuals />
 
         <div
-          className="absolute z-10 max-w-full"
+          className="absolute inset-y-0 z-10 flex max-w-full flex-col justify-center"
           style={{
             left: `clamp(24px, ${saleBannerPct(SALE_BANNER_CONTENT_LEFT_PX, SALE_BANNER_MAX_WIDTH_PX)}, ${SALE_BANNER_CONTENT_LEFT_PX}px)`,
-            top: `clamp(32px, ${saleBannerPct(SALE_BANNER_CONTENT_TOP_PX, SALE_BANNER_HEIGHT_PX)}, ${SALE_BANNER_CONTENT_TOP_PX}px)`,
             width: `min(${SALE_BANNER_CONTENT_WIDTH_PX}px, calc(100% - 48px))`,
-            minHeight: ctaOffsetTopPx + SALE_BANNER_CTA_HEIGHT_PX,
+            gap: SALE_BANNER_SUBTITLE_GAP_PX,
           }}
         >
           <h3
@@ -111,13 +101,12 @@ export function SaleSectionBlock() {
           </h3>
 
           <p
-            className="absolute whitespace-pre-line font-normal text-white"
+            className="whitespace-pre-line font-normal text-white"
             style={{
-              left: 0,
-              top: subtitleOffsetTopPx,
               maxWidth: SALE_BANNER_SUBTITLE_MAX_WIDTH_PX,
               fontSize: subtitleFontSizePx,
               lineHeight: `${subtitleLineHeightPx}px`,
+              marginTop: SALE_BANNER_TITLE_SUBTITLE_GAP_PX - SALE_BANNER_SUBTITLE_GAP_PX,
             }}
           >
             {t('home.sale.banner.subtitle')}
@@ -125,10 +114,8 @@ export function SaleSectionBlock() {
 
           <Link
             href="/products"
-            className="absolute inline-flex items-center justify-center rounded-full bg-white font-bold transition-opacity hover:opacity-90"
+            className="inline-flex w-fit items-center justify-center rounded-full bg-white font-bold transition-opacity hover:opacity-90"
             style={{
-              left: 0,
-              top: ctaOffsetTopPx,
               width: SALE_BANNER_CTA_WIDTH_PX,
               maxWidth: '100%',
               height: SALE_BANNER_CTA_HEIGHT_PX,
