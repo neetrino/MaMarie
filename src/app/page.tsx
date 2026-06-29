@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <HeroSection />
-      <div className="relative z-0">
+      <div className="relative isolate z-[21]">
         <BestProductsSection />
         <SaleSection />
         <WhyUsSection />

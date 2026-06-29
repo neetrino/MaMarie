@@ -14,17 +14,15 @@ export const FOOTER_COPYRIGHT_OFFSET_X_PX = FOOTER_COPYRIGHT_INSET_X_PX - FOOTER
 export const FOOTER_PADDING_TOP_PX = 102;
 export const FOOTER_PADDING_BOTTOM_PX = 45;
 export const FOOTER_BORDER_RADIUS_TOP_PX = 30;
-/** Pull footer up so transparent top reveals section bg in rounded corner wedges. */
-export const FOOTER_TOP_OVERLAP_PX = FOOTER_BORDER_RADIUS_TOP_PX;
-/** Extra yellow visible above the rounded body (overlap alone hid the top edge). */
-export const FOOTER_TOP_VISIBLE_EXTRA_PX = 20;
-/** Yellow layer inset from footer top — only corner wedges stay transparent. */
-export const FOOTER_YELLOW_TOP_PX = FOOTER_TOP_OVERLAP_PX - FOOTER_TOP_VISIBLE_EXTRA_PX;
+/** White space above yellow footer body — visible gap from section above. */
+export const FOOTER_TOP_GAP_PX = 10;
+/** Gap strip + footer wrapper background. */
+export const FOOTER_GAP_BG_COLOR = '#ffffff';
+/** Yellow layer inset from footer top — gap strip stays white. */
+export const FOOTER_YELLOW_TOP_PX = FOOTER_TOP_GAP_PX;
 export const FOOTER_BG_COLOR = BRAND_COLORS.yellow;
 export const FOOTER_DECORATION_Z_INDEX = 0;
 export const FOOTER_CONTENT_Z_INDEX = 10;
-/** Strawberry clay — above footer content, may extend past top edge (Figma `1:225`). */
-export const FOOTER_STRAWBERRY_Z_INDEX = 20;
 
 /** Gap from payment badges bottom to copyright (Figma y=360 → y=442). */
 export const FOOTER_CONTENT_GAP_PX = 82;

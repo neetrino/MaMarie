@@ -88,6 +88,7 @@ function AboutUsDecoration({
         top: layout.topPx,
         width: layout.wrapperSizePx,
         height: layout.wrapperSizePx,
+        zIndex: layout.zIndex,
       }}
     >
       <div

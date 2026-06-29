@@ -1,3 +1,4 @@
+import { FOOTER_TOP_GAP_PX } from './footer';
 import {
   HOME_SECTION_CONTENT_MAX_WIDTH_PX,
   HOME_SECTION_PADDING_LEFT_PX,
@@ -7,14 +8,23 @@ import {
 
 /** Figma node `51:408` — About us section. */
 export const ABOUT_US_SECTION_BG = '#ffffff';
+/** Above footer (`z-20`) so large decorations can overlap the gap. */
+export const ABOUT_US_SECTION_Z_INDEX = 25;
+/** Large bow (`51:422`) — foreground over cards and footer edge. */
+export const ABOUT_US_FOREGROUND_DECORATION_Z_INDEX = 30;
+/** Footer strawberry (`51:429`) — above footer yellow, below bow. */
+export const ABOUT_US_STRAWBERRY_DECORATION_Z_INDEX = 22;
 /** White space after «Ինչու Մենք» — extra room above About Us content; photo may extend into it. */
 export const ABOUT_US_AFTER_WHY_US_GAP_PX = 160;
 export const ABOUT_US_SECTION_OFFSET_TOP_PX = ABOUT_US_AFTER_WHY_US_GAP_PX;
 export const ABOUT_US_SECTION_MIN_HEIGHT_PX = 939 + (ABOUT_US_AFTER_WHY_US_GAP_PX - HOME_SECTION_STACK_GAP_PX);
 export const ABOUT_US_SECTION_PADDING_TOP_PX = 84;
-export const ABOUT_US_SECTION_PADDING_BOTTOM_PX = 223;
+/** Extends white section bg into the footer gap so clay can overlap without clipping. */
+export const ABOUT_US_SECTION_PADDING_BOTTOM_PX = 223 + FOOTER_TOP_GAP_PX;
 /** Cards + decoration icons — shifted up without moving the section photo. */
 export const ABOUT_US_CONTENT_SHIFT_UP_PX = 50;
+/** Side-card clay (`decoBunny` top −63) — extra room above card row without shifting Figma card positions. */
+export const ABOUT_US_CARD_DECORATION_OVERFLOW_TOP_PX = 63;
 
 export const ABOUT_US_CONTENT_OFFSET_LEFT_PX =
   463 - HOME_SECTION_PADDING_LEFT_PX;
@@ -67,6 +77,7 @@ export interface AboutUsDecorationLayout {
   rotateDeg?: number;
   flipX?: boolean;
   flipY?: boolean;
+  zIndex?: number;
 }
 
 export const ABOUT_US_ASSETS = {
@@ -119,6 +130,7 @@ export const ABOUT_US_STORY_DECORATIONS: Array<
     imageSizePx: 161.045,
     rotateDeg: 110.52,
     flipY: true,
+    zIndex: ABOUT_US_FOREGROUND_DECORATION_Z_INDEX,
     imageSrc: ABOUT_US_ASSETS.decoBow,
   },
   {
