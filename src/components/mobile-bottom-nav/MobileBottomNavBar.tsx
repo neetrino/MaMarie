@@ -70,6 +70,7 @@ function NavSlotIcon({
   width,
   height,
   fullSlot,
+  flyTarget,
 }: {
   isActive: boolean;
   inactiveSrc: string;
@@ -77,12 +78,13 @@ function NavSlotIcon({
   width: number;
   height: number;
   fullSlot?: boolean;
+  flyTarget?: boolean;
 }) {
   const iconClass = fullSlot ? styles.slotIcon : undefined;
   const imageClass = fullSlot ? styles.slotIconImage : undefined;
 
   return (
-    <span className={styles.iconStack} aria-hidden>
+    <span className={styles.iconStack} aria-hidden data-cart-fly-target={flyTarget ? true : undefined}>
       <Image
         src={inactiveSrc}
         alt=""
@@ -154,6 +156,7 @@ export function MobileBottomNavBar() {
           activeSrc={MOBILE_BOTTOM_NAV_ASSETS.cartActive}
           width={MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX}
           height={MOBILE_BOTTOM_NAV_CART_ICON_SIZE_PX}
+          flyTarget
         />
       ),
     },
@@ -216,6 +219,7 @@ export function MobileBottomNavBar() {
     <nav
       className={joinClasses(styles.root, styles.shell)}
       aria-label={t('common.navigation.mainNavigation')}
+      data-mobile-bottom-nav
       style={{ zIndex: MOBILE_BOTTOM_NAV_Z_INDEX }}
     >
       <div className={styles.frame} style={frameStyle}>

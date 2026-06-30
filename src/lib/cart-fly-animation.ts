@@ -52,11 +52,18 @@ function findVisibleCartTargetRectWithin(root: ParentNode): DOMRect | null {
 }
 
 function getVisibleCartTargetRect(): DOMRect | null {
-  const mainNav = document.querySelector('header.fixed');
-  if (mainNav) {
-    const inMainNav = findVisibleCartTargetRectWithin(mainNav);
-    if (inMainNav) return inMainNav;
+  const header = document.querySelector('[data-site-header]');
+  if (header) {
+    const inHeader = findVisibleCartTargetRectWithin(header);
+    if (inHeader) return inHeader;
   }
+
+  const bottomNav = document.querySelector('[data-mobile-bottom-nav]');
+  if (bottomNav) {
+    const inBottomNav = findVisibleCartTargetRectWithin(bottomNav);
+    if (inBottomNav) return inBottomNav;
+  }
+
   return findVisibleCartTargetRectWithin(document);
 }
 
@@ -187,6 +194,11 @@ export function playCartFlyAnimation(options: CartFlyAnimationOptions): void {
     const toCx = targetRect.left + targetRect.width / 2;
     const toCy = targetRect.top + targetRect.height / 2;
 
+    const endSizePx = Math.max(
+      12,
+      Math.min(targetRect.width, targetRect.height, FLY_END_SIZE_PX * 1.5)
+    );
+
     const startLeft = fromCx - FLY_START_SIZE_PX / 2;
     const startTop = fromCy - FLY_START_SIZE_PX / 2;
     const deltaX = toCx - fromCx;
@@ -200,7 +212,7 @@ export function playCartFlyAnimation(options: CartFlyAnimationOptions): void {
     shell.style.width = `${FLY_START_SIZE_PX}px`;
     shell.style.height = `${FLY_START_SIZE_PX}px`;
 
-    const scaleEnd = FLY_END_SIZE_PX / FLY_START_SIZE_PX;
+    const scaleEnd = endSizePx / FLY_START_SIZE_PX;
     const midDx = deltaX * 0.52;
     const midDy = deltaY * 0.48 - FLY_ARC_BOOST_PX;
 

@@ -72,7 +72,13 @@ export function HeaderActionIcons() {
         className="relative flex h-[30px] w-[33px] items-center justify-center transition-opacity hover:opacity-80"
         aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : 'Cart'}
       >
-        <Image src={BRAND_ASSETS.iconCart} alt="" width={ICON_SIZE_PX} height={29} />
+        <Image
+          src={BRAND_ASSETS.iconCart}
+          alt=""
+          width={ICON_SIZE_PX}
+          height={29}
+          data-cart-fly-target
+        />
         {cartCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-yellow px-1 text-[8.5px] leading-[15px] text-brand-brown">
             {cartCount > 99 ? '99+' : cartCount}

@@ -34,15 +34,12 @@ export function useProductActions({
       if (isInWishlist) {
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist.filter(id => id !== productId)));
         setIsInWishlist(false);
-        setShowMessage(t(language, 'product.removedFromWishlist'));
       } else {
         wishlist.push(productId);
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
         setIsInWishlist(true);
-        setShowMessage(t(language, 'product.addedToWishlist'));
       }
-      
-      setTimeout(() => setShowMessage(null), 2000);
+
       window.dispatchEvent(new Event('wishlist-updated'));
     } catch {
       // Silently fail

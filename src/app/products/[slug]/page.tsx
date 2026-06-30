@@ -109,13 +109,12 @@ export default function ProductPage({ params }: ProductPageProps) {
       } else {
         await apiClient.post('/api/v1/cart/items', { productId: product.id, variantId: currentVariant.id, quantity });
       }
-      setShowMessage(`${t(language, 'product.addedToCart')} ${quantity} ${t(language, 'product.pcs')}`);
       window.dispatchEvent(new Event('cart-updated'));
     } catch {
       setShowMessage(t(language, 'product.errorAddingToCart'));
+      setTimeout(() => setShowMessage(null), 2000);
     } finally {
       setIsAddingToCart(false);
-      setTimeout(() => setShowMessage(null), 2000);
     }
   };
 

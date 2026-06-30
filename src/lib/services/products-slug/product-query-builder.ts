@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
+import { hydrateVariantImageUrls } from "./variant-image-refs";
 import type { ProductWithFullRelations } from "./types";
 
 /**
@@ -22,7 +23,13 @@ const getBaseInclude = () => ({
     where: {
       published: true,
     },
-    include: {
+    select: {
+      id: true,
+      sku: true,
+      price: true,
+      compareAtPrice: true,
+      stock: true,
+      published: true,
       options: {
         include: {
           attributeValue: {
@@ -47,8 +54,14 @@ const getBaseIncludeWithoutAttributeValue = () => ({
     where: {
       published: true,
     },
-    include: {
-      options: true, // Include options without attributeValue relation
+    select: {
+      id: true,
+      sku: true,
+      price: true,
+      compareAtPrice: true,
+      stock: true,
+      published: true,
+      options: true,
     },
   },
 });
@@ -63,7 +76,10 @@ const getProductAttributesInclude = () => ({
         include: {
           translations: true,
           values: {
-            include: {
+            select: {
+              id: true,
+              value: true,
+              colors: true,
               translations: true,
             },
           },
@@ -279,8 +295,13 @@ export async function buildProductQuery(
   // If product not found, log diagnostic information
   if (!product) {
     await logProductNotFoundDiagnostics(slug, lang);
+    return null;
   }
-  
+
+  if (Array.isArray(product.variants) && product.variants.length > 0) {
+    await hydrateVariantImageUrls(product.variants);
+  }
+
   return product as unknown as ProductWithFullRelations | null;
 }
 
