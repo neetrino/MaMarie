@@ -28,6 +28,12 @@ export const CART_DRAWER_CLOSE_ICON_STROKE_WIDTH = 3;
 /** Side-tab close icon horizontal nudge (px). */
 export const CART_DRAWER_CLOSE_ICON_OFFSET_X_PX = 2;
 
+/** Close tab hover scale multiplier. */
+export const CART_DRAWER_CLOSE_TAB_HOVER_SCALE = 1.06;
+
+/** Close tab hover transition duration (ms). */
+export const CART_DRAWER_CLOSE_TAB_TRANSITION_MS = 200;
+
 /** Drawer panel stacks above the close tab so the pill tucks under the edge. */
 export const CART_DRAWER_PANEL_Z_INDEX = 2;
 

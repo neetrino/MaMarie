@@ -9,6 +9,8 @@ import {
   CART_DRAWER_CLOSE_ICON_SIZE_PX,
   CART_DRAWER_CLOSE_ICON_STROKE_WIDTH,
   CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
+  CART_DRAWER_CLOSE_TAB_HOVER_SCALE,
+  CART_DRAWER_CLOSE_TAB_TRANSITION_MS,
   CART_DRAWER_CLOSE_TAB_WIDTH_PX,
   CART_DRAWER_CLOSE_TAB_Z_INDEX,
   CART_DRAWER_MAX_WIDTH_PX,
@@ -21,6 +23,7 @@ import { CartDrawerItemRow } from './CartDrawerItemRow';
 import { CartDrawerSummary } from './CartDrawerSummary';
 import { CartEmptyState } from './CartEmptyState';
 import { useCartState } from './useCartState';
+import styles from './CartDrawerCloseTab.module.css';
 
 function formatItemsCount(count: number, t: (key: string) => string): string {
   const label = count === 1 ? t('common.cart.item') : t('common.cart.items');
@@ -50,16 +53,17 @@ function CartDrawerCloseTab({
     <button
       type="button"
       onClick={onClose}
-      className="absolute flex items-center justify-center bg-brand-pink text-white"
+      className={`${styles.closeTab} absolute flex items-center justify-center bg-brand-pink text-white`}
       style={{
         top: CART_DRAWER_CLOSE_BUTTON_TOP_PX,
         left: 0,
         zIndex: CART_DRAWER_CLOSE_TAB_Z_INDEX,
         width: CART_DRAWER_CLOSE_TAB_WIDTH_PX,
         height: CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
-        transform: 'translateX(-50%)',
         borderRadius: tabRadiusPx,
         paddingRight: CART_DRAWER_CLOSE_TAB_WIDTH_PX / 2,
+        ['--cart-drawer-close-tab-hover-scale' as string]: CART_DRAWER_CLOSE_TAB_HOVER_SCALE,
+        ['--cart-drawer-close-tab-transition-ms' as string]: `${CART_DRAWER_CLOSE_TAB_TRANSITION_MS}ms`,
       }}
       aria-label={closeLabel}
     >
@@ -111,48 +115,48 @@ function CartDrawerPanel({
           aria-labelledby="cart-drawer-title"
           onClick={(event) => event.stopPropagation()}
         >
-        <header className="flex items-center border-b border-gray-100 px-6 py-5">
-          <div className="flex min-h-10 flex-col justify-center">
-            <h2 id="cart-drawer-title" className="text-xl font-bold leading-tight text-gray-900">
-              {t('common.cart.title')}
-            </h2>
-            {headerItemsCount > 0 ? (
-              <p className="mt-1 text-sm text-gray-500">
-                {formatItemsCount(headerItemsCount, t)}
-              </p>
-            ) : null}
-          </div>
-        </header>
-
-        <div className="flex min-h-0 flex-1 flex-col">
-          {showLoading ? (
-            <div className="flex-1 px-6 py-8">
-              <div className="animate-pulse space-y-6">
-                <div className="h-20 rounded-xl bg-gray-100" />
-                <div className="h-20 rounded-xl bg-gray-100" />
-              </div>
+          <header className="flex items-center border-b border-gray-100 px-6 py-5">
+            <div className="flex min-h-10 flex-col justify-center">
+              <h2 id="cart-drawer-title" className="text-xl font-bold leading-tight text-gray-900">
+                {t('common.cart.title')}
+              </h2>
+              {headerItemsCount > 0 ? (
+                <p className="mt-1 text-sm text-gray-500">
+                  {formatItemsCount(headerItemsCount, t)}
+                </p>
+              ) : null}
             </div>
-          ) : !hasItems ? (
-            <CartEmptyState t={t} onCtaClick={onClose} />
-          ) : (
-            <>
-              <div className="flex-1 overflow-y-auto px-6 py-4">
-                {cart?.items.map((item) => (
-                  <CartDrawerItemRow
-                    key={item.id}
-                    item={item}
-                    currency={currency}
-                    onRemove={onRemoveItem}
-                    onUpdateQuantity={onUpdateQuantity}
-                    t={t}
-                  />
-                ))}
+          </header>
+
+          <div className="flex min-h-0 flex-1 flex-col">
+            {showLoading ? (
+              <div className="flex-1 px-6 py-8">
+                <div className="animate-pulse space-y-6">
+                  <div className="h-20 rounded-xl bg-gray-100" />
+                  <div className="h-20 rounded-xl bg-gray-100" />
+                </div>
               </div>
-              {cart ? <CartDrawerSummary cart={cart} currency={currency} t={t} /> : null}
-            </>
-          )}
-        </div>
-      </aside>
+            ) : !hasItems ? (
+              <CartEmptyState t={t} onCtaClick={onClose} />
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  {cart?.items.map((item) => (
+                    <CartDrawerItemRow
+                      key={item.id}
+                      item={item}
+                      currency={currency}
+                      onRemove={onRemoveItem}
+                      onUpdateQuantity={onUpdateQuantity}
+                      t={t}
+                    />
+                  ))}
+                </div>
+                {cart ? <CartDrawerSummary cart={cart} currency={currency} t={t} /> : null}
+              </>
+            )}
+          </div>
+        </aside>
       </div>
     </div>
   );
