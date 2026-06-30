@@ -146,7 +146,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   return (
     <ProductPageFrame>
-      <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-12 items-start">
+      <div className="grid grid-cols-1 gap-12 items-start lg:grid-cols-[55%_45%] lg:items-stretch">
         <ProductImageGallery
           images={images}
           product={product}

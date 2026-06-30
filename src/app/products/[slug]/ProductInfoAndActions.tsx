@@ -99,7 +99,7 @@ export function ProductInfoAndActions({
   const regularPriceValue = originalPrice || compareAtPrice || 0;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="flex-1">
         {product.brand && (
           <div className="mb-2 flex items-center gap-2">
@@ -175,8 +175,8 @@ export function ProductInfoAndActions({
         </div>
       </div>
       
-      {/* Action Buttons - Aligned with bottom of image */}
-      <div className="mt-auto pt-6">
+      {/* Action buttons — bottom-aligned with gallery image on desktop */}
+      <div className="mt-auto lg:pt-0 pt-6">
         {/* Show required attributes message if needed */}
         {isVariationRequired && (
           <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
