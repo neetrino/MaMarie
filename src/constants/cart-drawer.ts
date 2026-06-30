@@ -39,3 +39,12 @@ export const CART_DRAWER_PANEL_Z_INDEX = 2;
 
 /** Close tab sits beneath the drawer panel. */
 export const CART_DRAWER_CLOSE_TAB_Z_INDEX = 1;
+
+/** Panel slide animation duration (ms) — sync with `duration-300`. */
+export const CART_DRAWER_PANEL_TRANSITION_MS = 300;
+
+/** Backdrop fade duration (ms) — sync with `duration-200`. */
+export const CART_DRAWER_BACKDROP_TRANSITION_MS = 200;
+
+/** Checkout CTA pill height (px). */
+export const CART_DRAWER_CHECKOUT_BUTTON_HEIGHT_PX = 50;

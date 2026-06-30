@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import {
   CART_DRAWER_CLOSE_BUTTON_TOP_PX,
@@ -15,10 +15,11 @@ import {
   CART_DRAWER_CLOSE_TAB_Z_INDEX,
   CART_DRAWER_MAX_WIDTH_PX,
   CART_DRAWER_OPEN_EVENT,
+  CART_DRAWER_PANEL_TRANSITION_MS,
   CART_DRAWER_PANEL_Z_INDEX,
-  CART_DRAWER_Z_INDEX,
 } from '../../constants/cart-drawer';
 import type { Cart } from '../../app/cart/types';
+import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
 import { CartDrawerItemRow } from './CartDrawerItemRow';
 import { CartDrawerSummary } from './CartDrawerSummary';
 import { CartEmptyState } from './CartEmptyState';
@@ -31,7 +32,9 @@ function formatItemsCount(count: number, t: (key: string) => string): string {
 }
 
 interface CartDrawerPanelProps {
+  visible: boolean;
   onClose: () => void;
+  panelRef: RefObject<HTMLDivElement | null>;
   cart: Cart | null;
   loading: boolean;
   currency: string;
@@ -84,7 +87,9 @@ function CartDrawerCloseTab({
 }
 
 function CartDrawerPanel({
+  visible,
   onClose,
+  panelRef,
   cart,
   loading,
   currency,
@@ -97,13 +102,22 @@ function CartDrawerPanel({
   const headerItemsCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
   return (
-    <div
-      className="fixed inset-0 flex justify-end bg-black/40 backdrop-blur-sm"
-      style={{ zIndex: CART_DRAWER_Z_INDEX }}
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[90] flex justify-end overscroll-none">
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ease-in-out motion-reduce:transition-none ${
+          visible ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      />
+
       <div
-        className="relative h-dvh max-h-dvh w-full"
+        ref={panelRef}
+        className={`relative h-dvh max-h-dvh w-full transition-transform duration-300 ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+          visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
+        }`}
         style={{ maxWidth: CART_DRAWER_MAX_WIDTH_PX }}
       >
         <CartDrawerCloseTab onClose={onClose} closeLabel={t('common.buttons.close')} />
@@ -162,10 +176,54 @@ function CartDrawerPanel({
   );
 }
 
+/** Keeps drawer mounted through exit; double rAF ensures enter transition paints off-screen first. */
+function useCartDrawerTransition(open: boolean): { rendered: boolean; visible: boolean } {
+  const [rendered, setRendered] = useState(open);
+  const [visible, setVisible] = useState(false);
+
+  useLayoutEffect(() => {
+    if (open) {
+      setRendered(true);
+      setVisible(false);
+      return;
+    }
+
+    setVisible(false);
+  }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      let innerFrameId = 0;
+      const outerFrameId = requestAnimationFrame(() => {
+        innerFrameId = requestAnimationFrame(() => {
+          setVisible(true);
+        });
+      });
+
+      return () => {
+        cancelAnimationFrame(outerFrameId);
+        cancelAnimationFrame(innerFrameId);
+      };
+    }
+
+    const timer = window.setTimeout(() => {
+      setRendered(false);
+    }, CART_DRAWER_PANEL_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [open]);
+
+  return { rendered, visible };
+}
+
 /** Global cart drawer — slides in from the right when `openCartDrawer()` is called. */
 export function CartDrawer() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { rendered, visible } = useCartDrawerTransition(open);
   const cartState = useCartState({ enabled: true });
   const { refreshCart, ...cartPanelProps } = cartState;
 
@@ -199,11 +257,37 @@ export function CartDrawer() {
   }, [open, refreshCart]);
 
   useEffect(() => {
-    if (!open) {
+    if (!rendered) {
       return;
     }
 
-    document.body.style.overflow = 'hidden';
+    lockBodyScroll();
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (panelRef.current?.contains(target)) {
+        return;
+      }
+
+      event.preventDefault();
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      unlockBodyScroll();
+    };
+  }, [rendered]);
+
+  useEffect(() => {
+    if (!rendered) {
+      return;
+    }
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -214,17 +298,21 @@ export function CartDrawer() {
     window.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleEscape);
     };
-  }, [open, handleClose]);
+  }, [rendered, handleClose]);
 
-  if (!mounted || !open) {
+  if (!mounted || !rendered) {
     return null;
   }
 
   return createPortal(
-    <CartDrawerPanel onClose={handleClose} {...cartPanelProps} />,
+    <CartDrawerPanel
+      visible={visible}
+      onClose={handleClose}
+      panelRef={panelRef}
+      {...cartPanelProps}
+    />,
     document.body,
   );
 }
