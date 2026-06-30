@@ -138,7 +138,7 @@
   }
 
   .home-product-card:hover,
-  .home-product-card:focus-within {
+  .home-product-card:has(a:focus-visible) {
     z-index: 10;
     --home-product-card-image-left: var(--home-product-card-image-left-hover);
     --home-product-card-image-top: var(--home-product-card-image-top-hover);
@@ -154,7 +154,7 @@
   }
 
   .home-product-card:hover .home-product-card-sizes,
-  .home-product-card:focus-within .home-product-card-sizes {
+  .home-product-card:has(a:focus-visible) .home-product-card-sizes {
     opacity: 1;
   }
 

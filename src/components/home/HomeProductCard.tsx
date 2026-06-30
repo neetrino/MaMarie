@@ -187,6 +187,7 @@ function HomeProductCardComponent({
     event.preventDefault();
     event.stopPropagation();
     toggleWishlist();
+    event.currentTarget.blur();
   };
 
   const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
@@ -194,6 +195,7 @@ function HomeProductCardComponent({
     event.stopPropagation();
     const origin = event.currentTarget;
     addToCart({ origin, imageUrl: product.image });
+    event.currentTarget.blur();
   };
 
   const cardWidth = layoutWidthPx ?? HOME_PRODUCT_CARD_WIDTH_PX;
