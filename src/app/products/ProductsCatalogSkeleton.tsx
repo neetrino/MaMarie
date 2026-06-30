@@ -3,6 +3,7 @@ import {
   HomeSectionContent,
 } from '../../components/home/HomeSectionShell';
 import {
+  PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
   PRODUCTS_CATALOG_MAIN_GAP_PX,
   PRODUCTS_CATALOG_PILL_HEIGHT_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
@@ -58,7 +59,7 @@ export function ProductsCatalogSkeleton() {
             </div>
           </div>
 
-          <div className="py-2">
+          <div style={{ paddingTop: PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX }}>
             <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div

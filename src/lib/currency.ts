@@ -155,6 +155,22 @@ export function convertPrice(price: number, fromCurrency: CurrencyCode, toCurren
 }
 
 /**
+ * Formats a storefront price stored in AMD (shop base currency).
+ * Use for product cards, cart lines, and totals — not {@link formatPrice}.
+ */
+export function formatStorefrontPrice(
+  amountAmd: number,
+  currency: CurrencyCode = DEFAULT_CURRENCY,
+): string {
+  if (currency === 'AMD') {
+    return formatPriceInCurrency(amountAmd, 'AMD');
+  }
+
+  const converted = convertPrice(amountAmd, 'AMD', currency);
+  return formatPriceInCurrency(converted, currency);
+}
+
+/**
  * Format price that is already in the target currency (no conversion)
  * Use this for prices that are already in AMD (like shipping costs)
  */

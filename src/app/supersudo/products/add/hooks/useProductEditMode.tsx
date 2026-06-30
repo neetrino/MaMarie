@@ -180,6 +180,8 @@ export function useProductEditMode({
             mergedVariant
           );
 
+          (window as { __productMainImage?: string }).__productMainImage = mainProductImage;
+
           setFormData((prev: any) => ({
             ...prev,
             ...formData,

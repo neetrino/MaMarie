@@ -1,8 +1,15 @@
 import { apiClient } from '../../lib/api-client';
+import {
+  buildCartFromGuestStorage,
+  mergeNormalizedGuestItems,
+  readGuestCartItems,
+  syncGuestCartDisplayFromApiCart,
+  writeGuestCartItems,
+} from '../../lib/guest-cart-storage';
+import { extractMediaUrl } from '../../lib/utils/extractMediaUrl';
 import { logger } from '../../lib/utils/logger';
 import { getStoredLanguage } from '../../lib/language';
-import type { Cart, CartItem } from './types';
-import { CART_KEY } from './constants';
+import type { Cart, CartItem, GuestCartItem } from './types';
 
 /**
  * Product data from API
@@ -23,20 +30,15 @@ interface ProductData {
 }
 
 /**
- * Guest cart item
+ * Guest cart item from batch API
  */
-interface GuestCartItem {
-  productId: string;
-  productSlug?: string;
-  variantId: string;
-  quantity: number;
-  price?: number;
-}
-
 interface GuestCartBatchResponse {
   cart: Cart | null;
   normalizedItems: GuestCartItem[];
 }
+
+/** Re-export for instant cart drawer reads. */
+export { getGuestCartFromStorage } from '../../lib/guest-cart-storage';
 
 /**
  * Fetch guest cart items with product details
@@ -67,11 +69,7 @@ async function fetchGuestCartItems(
         }
 
         const translation = productData.translations?.[0];
-        const imageUrl = productData.media?.[0] 
-          ? (typeof productData.media[0] === 'string' 
-              ? productData.media[0] 
-              : productData.media[0].url || productData.media[0].src)
-          : null;
+        const imageUrl = extractMediaUrl(productData.media);
 
         return {
           item: {
@@ -140,13 +138,16 @@ export async function fetchGuestCart(
     return null;
   }
 
+  const productLabel = t('common.messages.product');
+
   try {
-    const stored = localStorage.getItem(CART_KEY);
-    const guestCart: GuestCartItem[] = stored ? JSON.parse(stored) : [];
-    
+    const guestCart = readGuestCartItems();
+
     if (guestCart.length === 0) {
       return null;
     }
+
+    const localCart = buildCartFromGuestStorage(guestCart, productLabel);
 
     try {
       const batch = await apiClient.post<GuestCartBatchResponse>('/api/v1/cart/guest', {
@@ -154,18 +155,19 @@ export async function fetchGuestCart(
         lang: getStoredLanguage(),
       });
 
-      const normalized = Array.isArray(batch.normalizedItems) ? batch.normalizedItems : [];
-      const needsSync =
-        normalized.length !== guestCart.length ||
-        JSON.stringify(normalized) !== JSON.stringify(guestCart);
-
-      if (needsSync) {
-        localStorage.setItem(CART_KEY, JSON.stringify(normalized));
+      if (batch.cart) {
+        const synced = syncGuestCartDisplayFromApiCart(batch.cart, guestCart);
+        const normalized = Array.isArray(batch.normalizedItems) ? batch.normalizedItems : [];
+        const merged = mergeNormalizedGuestItems(normalized, synced);
+        writeGuestCartItems(merged);
+        return batch.cart;
       }
-
-      return batch.cart;
     } catch (batchError: unknown) {
-      logger.warn('[CART] Guest batch fetch failed, using fallback', { error: batchError });
+      logger.warn('[CART] Guest batch fetch failed, using localStorage snapshot', { error: batchError });
+    }
+
+    if (localCart) {
+      return localCart;
     }
 
     // Get product details from API
@@ -175,16 +177,16 @@ export async function fetchGuestCart(
     const itemsToRemove = itemsWithDetails
       .map((result, index) => result.shouldRemove ? index : -1)
       .filter(index => index !== -1);
-    
+
     if (itemsToRemove.length > 0) {
       const updatedCart = guestCart.filter((_, index) => !itemsToRemove.includes(index));
-      localStorage.setItem(CART_KEY, JSON.stringify(updatedCart));
+      writeGuestCartItems(updatedCart);
     }
 
     const validItems = itemsWithDetails
       .map(result => result.item)
       .filter((item): item is CartItem => item !== null);
-    
+
     if (validItems.length === 0) {
       return null;
     }
@@ -192,7 +194,7 @@ export async function fetchGuestCart(
     return buildCartFromItems(validItems);
   } catch (error: unknown) {
     logger.error('Error loading guest cart', { error });
-    return null;
+    return buildCartFromGuestStorage(readGuestCartItems(), productLabel);
   }
 }
 

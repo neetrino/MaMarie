@@ -1,6 +1,27 @@
-import { convertPrice, formatPrice, formatPriceInCurrency } from '../../lib/currency';
+import {
+  convertPrice,
+  formatPrice,
+  formatPriceInCurrency,
+  formatStorefrontPrice,
+} from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
 import type { Cart } from './types';
+
+/** Formats a cart line/subtotal amount stored in USD into the storefront currency. */
+export function formatCartLineAmountInCurrency(
+  amountUsd: number,
+  currencyCode: CurrencyCode,
+): string {
+  return formatPrice(amountUsd, currencyCode);
+}
+
+/** Formats a cart amount stored in AMD into the storefront currency. */
+export function formatCartAmountInCurrency(
+  amountAmd: number,
+  currencyCode: CurrencyCode,
+): string {
+  return formatStorefrontPrice(amountAmd, currencyCode);
+}
 
 interface CartSummaryLabelsInput {
   cart: Cart;
@@ -19,26 +40,15 @@ export function buildCartShippingAndTotalLabels({
   deliveryPriceAMD,
   loadingDelivery,
 }: CartSummaryLabelsInput): { shippingLabel: string; totalLabel: string } {
-  const amountsInAmd = cart.totals.currency === 'AMD';
   const shippingAmdResolved = !loadingDelivery && deliveryPriceAMD !== null;
   const shippingAmd = shippingAmdResolved ? deliveryPriceAMD : 0;
+  const shippingLabel = formatCartAmountInCurrency(shippingAmd, currencyCode);
 
-  if (amountsInAmd) {
-    const shippingLabel = formatPriceInCurrency(
-      convertPrice(shippingAmd, 'AMD', currencyCode),
-      currencyCode,
-    );
-    const totalAmd = cart.totals.subtotal - cart.totals.discount + shippingAmd;
-    const totalLabel = formatPriceInCurrency(
-      convertPrice(totalAmd, 'AMD', currencyCode),
-      currencyCode,
-    );
-    return { shippingLabel, totalLabel };
-  }
+  const subtotalUsd = cart.totals.subtotal - cart.totals.discount;
+  const subtotalInDisplay = convertPrice(subtotalUsd, 'USD', currencyCode);
+  const shippingInDisplay =
+    currencyCode === 'AMD' ? shippingAmd : convertPrice(shippingAmd, 'AMD', currencyCode);
+  const totalLabel = formatPriceInCurrency(subtotalInDisplay + shippingInDisplay, currencyCode);
 
-  const shippingUsd = convertPrice(shippingAmd, 'AMD', 'USD');
-  const shippingLabel = formatPrice(shippingUsd, currencyCode);
-  const displayTotalUsd = cart.totals.subtotal - cart.totals.discount + shippingUsd;
-  const totalLabel = formatPrice(displayTotalUsd, currencyCode);
   return { shippingLabel, totalLabel };
 }

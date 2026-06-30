@@ -7,6 +7,9 @@ import { updateOrCreateVariant } from "./variant-updater";
 import { updateAttributeValueImageUrls } from "./attribute-value-updater";
 import { ensureUniqueProductSlug } from "../product-slug-utils";
 
+const PRODUCT_UPDATE_TX_TIMEOUT_MS = 15000;
+const PRODUCT_UPDATE_TX_MAX_WAIT_MS = 5000;
+
 /**
  * Update product
  */
@@ -98,6 +101,13 @@ export async function updateProduct(
         // Delete variants that are no longer in the list
         const variantsToDelete = Array.from(existingVariantIds).filter(id => !incomingVariantIds.has(id));
         if (variantsToDelete.length > 0) {
+          await tx.cartItem.deleteMany({
+            where: { variantId: { in: variantsToDelete } },
+          });
+          await tx.orderItem.updateMany({
+            where: { variantId: { in: variantsToDelete } },
+            data: { variantId: null },
+          });
           await tx.productVariant.deleteMany({
             where: {
               id: { in: variantsToDelete },
@@ -125,6 +135,9 @@ export async function updateProduct(
           labels: true,
         },
       });
+    }, {
+      timeout: PRODUCT_UPDATE_TX_TIMEOUT_MS,
+      maxWait: PRODUCT_UPDATE_TX_MAX_WAIT_MS,
     });
 
     return result;

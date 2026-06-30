@@ -1,8 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { WISHLIST_KEY } from '../../lib/storageCounts';
+import { logger } from '../../lib/utils/logger';
 
-const WISHLIST_KEY = 'shop_wishlist';
+export interface WishlistUpdatedDetail {
+  ids: string[];
+  count: number;
+}
+
+function readWishlistIds(): string[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = window.localStorage.getItem(WISHLIST_KEY);
+    const parsed: unknown = stored ? JSON.parse(stored) : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return Array.from(
+      new Set(parsed.filter((id): id is string => typeof id === 'string' && id.trim().length > 0)),
+    );
+  } catch {
+    return [];
+  }
+}
 
 /**
  * Hook for managing wishlist state for a product
@@ -14,14 +37,7 @@ export function useWishlist(productId: string) {
 
   useEffect(() => {
     const checkWishlist = () => {
-      if (typeof window === 'undefined') return;
-      try {
-        const stored = localStorage.getItem(WISHLIST_KEY);
-        const wishlist = stored ? JSON.parse(stored) : [];
-        setIsInWishlist(wishlist.includes(productId));
-      } catch {
-        setIsInWishlist(false);
-      }
+      setIsInWishlist(readWishlistIds().includes(productId));
     };
 
     checkWishlist();
@@ -38,22 +54,25 @@ export function useWishlist(productId: string) {
     if (typeof window === 'undefined') return;
     
     try {
-      const stored = localStorage.getItem(WISHLIST_KEY);
-      const wishlist: string[] = stored ? JSON.parse(stored) : [];
+      const wishlist = readWishlistIds();
+      const nextIsInWishlist = !wishlist.includes(productId);
+      const updated = nextIsInWishlist
+        ? [...wishlist, productId]
+        : wishlist.filter((id) => id !== productId);
+
+      window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
+      setIsInWishlist(nextIsInWishlist);
       
-      if (isInWishlist) {
-        const updated = wishlist.filter((id) => id !== productId);
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
-        setIsInWishlist(false);
-      } else {
-        wishlist.push(productId);
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
-        setIsInWishlist(true);
-      }
-      
-      window.dispatchEvent(new Event('wishlist-updated'));
+      window.dispatchEvent(
+        new CustomEvent<WishlistUpdatedDetail>('wishlist-updated', {
+          detail: {
+            ids: updated,
+            count: updated.length,
+          },
+        }),
+      );
     } catch (error) {
-      console.error('Error updating wishlist:', error);
+      logger.error('Error updating wishlist', { error, productId });
     }
   };
 

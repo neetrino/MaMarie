@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { convertPrice, type CurrencyCode } from '@/lib/currency';
 import type { GeneratedVariant } from '../types';
+import { ensureOneMainVariant } from '../utils/variantMainHelpers';
 import { logger } from "@/lib/utils/logger";
 
 interface UseProductVariantConversionProps {
@@ -232,16 +233,9 @@ export function useProductVariantConversion({
         variantGroups.get(groupKey)!.push(variantData);
       });
       
-      const convertedVariants: Array<{
-        id: string;
-        selectedValueIds: string[];
-        price: string;
-        compareAtPrice: string;
-        stock: string;
-        sku: string;
-        image: string | null;
-      }> = [];
-      
+      const builtVariants: GeneratedVariant[] = [];
+      const productMainImage = (window as { __productMainImage?: string }).__productMainImage ?? '';
+
       variantGroups.forEach((group, groupKey) => {
         const allValueIds = new Set<string>();
         group.forEach(variantData => {
@@ -259,8 +253,8 @@ export function useProductVariantConversion({
           : group.map(v => v.sku).filter(Boolean).join(', ');
         
         const combinedImage = firstVariant.image;
-        
-        convertedVariants.push({
+
+        builtVariants.push({
           id: `variant-group-${Date.now()}-${Math.random()}`,
           selectedValueIds: Array.from(allValueIds).sort(),
           price: firstVariant.price.toString(),
@@ -278,14 +272,29 @@ export function useProductVariantConversion({
           originalVariantIds: group.flatMap(v => v.originalVariantIds),
         });
       });
-      
+
+      const imagesMatch = (a: string, b: string): boolean =>
+        a === b || a.includes(b) || b.includes(a);
+
+      const mainIndex = productMainImage
+        ? builtVariants.findIndex(
+            (v) => v.image && imagesMatch(v.image, productMainImage)
+          )
+        : -1;
+      const resolvedMainIndex = mainIndex >= 0 ? mainIndex : 0;
+      const convertedVariants = builtVariants.map((variant, index) => ({
+        ...variant,
+        isMain: index === resolvedMainIndex,
+      }));
+
       if (convertedVariants.length > 0) {
-        setGeneratedVariants(convertedVariants);
+        const variantsWithMain = ensureOneMainVariant(convertedVariants);
+        setGeneratedVariants(variantsWithMain);
         logger.debug('✅ [ADMIN] Converted product variants to generatedVariants:', {
-          totalVariants: convertedVariants.length,
+          totalVariants: variantsWithMain.length,
           totalOriginalVariants: productVariants.length,
           attributeValueIdsMap,
-          convertedVariants: convertedVariants.map(v => ({
+          convertedVariants: variantsWithMain.map(v => ({
             id: v.id,
             valueIdsCount: v.selectedValueIds.length,
             price: v.price,
@@ -293,7 +302,8 @@ export function useProductVariantConversion({
             sku: v.sku,
           })),
         });
-        delete (window as any).__productVariantsToConvert;
+        delete (window as { __productVariantsToConvert?: unknown }).__productVariantsToConvert;
+        delete (window as { __productMainImage?: string }).__productMainImage;
         setHasVariantsToLoad(false);
       } else {
         console.warn('⚠️ [ADMIN] No variants converted. Check variant options structure:', {

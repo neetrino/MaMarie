@@ -91,7 +91,6 @@ export const MOBILE_HOME_ASSETS = {
   genderChevronBoys: '/assets/home/mobile/gender-chevron-boys.svg',
   promoImage: '/assets/home/sale-banner-child.png',
   star: HOME_PRODUCT_CARD_ASSETS.star,
-  heart: HOME_PRODUCT_CARD_ASSETS.heart,
   placeholderImage: HOME_PRODUCT_CARD_ASSETS.placeholderImage,
 } as const;
 

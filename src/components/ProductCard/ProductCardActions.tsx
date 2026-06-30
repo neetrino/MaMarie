@@ -3,25 +3,8 @@
 import type { MouseEvent } from 'react';
 import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
+import { WishlistIcon } from '../icons/WishlistIcon';
 import { useTranslation } from '../../lib/i18n-client';
-
-interface WishlistIconProps {
-  filled?: boolean;
-  size?: number;
-}
-
-const WishlistIcon = ({ filled = false, size = 24 }: WishlistIconProps) => (
-  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path 
-      d="M10 17L8.55 15.7C4.4 12.2 2 10.1 2 7.5C2 5.4 3.4 4 5.5 4C6.8 4 8.1 4.6 9 5.5C9.9 4.6 11.2 4 12.5 4C14.6 4 16 5.4 16 7.5C16 10.1 13.6 12.2 9.45 15.7L10 17Z" 
-      stroke="currentColor" 
-      strokeWidth="1.8" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      fill={filled ? "currentColor" : "none"} 
-    />
-  </svg>
-);
 
 interface ProductCardActionsProps {
   isInWishlist: boolean;
@@ -80,18 +63,14 @@ export function ProductCardActions({
         title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}
         aria-label={isInWishlist ? t('common.ariaLabels.removeFromWishlist') : t('common.ariaLabels.addToWishlist')}
       >
-        {isCompact ? (
-          <WishlistIcon filled={isInWishlist} size={18} />
-        ) : (
-          <WishlistIcon filled={isInWishlist} />
-        )}
+        <WishlistIcon isActive={isInWishlist} size={isCompact ? 18 : 24} />
       </button>
     </>
   );
 
   if (showOnHover) {
     return (
-      <div className={`absolute ${isCompact ? 'top-1.5 right-1.5' : 'top-3 right-3'} flex flex-col ${isCompact ? 'gap-1.5' : 'gap-2'} opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10`}>
+      <div className={`absolute ${isCompact ? 'top-1.5 right-1.5' : 'top-3 right-3'} flex flex-col ${isCompact ? 'gap-1.5' : 'gap-2'} ${isInWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200 z-10`}>
         {actions}
       </div>
     );

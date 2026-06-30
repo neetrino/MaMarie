@@ -1,5 +1,7 @@
 'use client';
 
+import { readCartSnapshot, readGuestCartItems } from './guest-cart-storage';
+
 /**
  * Shared storage keys used to keep wishlist, compare and cart data in localStorage.
  */
@@ -12,6 +14,9 @@ export const STORAGE_KEYS = {
 export const WISHLIST_KEY = STORAGE_KEYS.wishlist;
 export const COMPARE_KEY = STORAGE_KEYS.compare;
 export const CART_KEY = STORAGE_KEYS.cart;
+
+const AUTH_TOKEN_KEY = 'auth_token';
+const AUTH_USER_KEY = 'auth_user';
 
 /**
  * Returns the stored length for an array kept under the provided key.
@@ -62,35 +67,36 @@ interface GuestCartLine {
   quantity?: number;
 }
 
-interface GuestCartPayload {
-  items?: GuestCartLine[];
-  itemsCount?: number;
+function isClientLoggedIn(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return Boolean(
+    window.localStorage.getItem(AUTH_TOKEN_KEY) && window.localStorage.getItem(AUTH_USER_KEY),
+  );
 }
 
 /**
- * Retrieves cart item quantity total from localStorage (guest cart).
+ * Retrieves cart item quantity total — snapshot for logged-in users, guest cart otherwise.
  */
 export function getCartCount(): number {
-  if (typeof window === 'undefined') return 0;
-  try {
-    const stored = window.localStorage.getItem(CART_KEY);
-    if (!stored) return 0;
-
-    const parsed: GuestCartLine[] | GuestCartPayload = JSON.parse(stored);
-
-    if (Array.isArray(parsed)) {
-      return parsed.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
-    }
-
-    if (typeof parsed.itemsCount === 'number') {
-      return parsed.itemsCount;
-    }
-
-    if (Array.isArray(parsed.items)) {
-      return parsed.items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
-    }
-
+  if (typeof window === 'undefined') {
     return 0;
+  }
+
+  try {
+    const guestItems = readGuestCartItems();
+    const guestCount = guestItems.reduce(
+      (sum: number, item: GuestCartLine) => sum + (item.quantity ?? 1),
+      0,
+    );
+
+    if (isClientLoggedIn()) {
+      return readCartSnapshot()?.itemsCount ?? guestCount;
+    }
+
+    return guestCount;
   } catch {
     return 0;
   }

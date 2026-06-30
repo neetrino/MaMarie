@@ -23,6 +23,8 @@ export const PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX = 281;
 export const PRODUCTS_CATALOG_MAIN_GAP_PX = 52;
 /** Breadcrumb row → product grid (desktop). */
 export const PRODUCTS_CATALOG_TOP_ROW_PB_PX = 16;
+/** Product grid top inset below breadcrumb / sort row. */
+export const PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX = 104;
 
 export const PRODUCTS_CATALOG_CARD_GAP_PX = 12;
 export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;

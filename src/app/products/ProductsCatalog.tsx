@@ -21,9 +21,15 @@ import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
 import {
+  PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
   PRODUCTS_CATALOG_MAIN_GAP_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
+
+import type {
+  ProductColorOption,
+  ProductSizeOption,
+} from '../../lib/services/product-variant-attributes';
 
 interface Product {
   id: string;
@@ -38,7 +44,10 @@ interface Product {
     name: string;
   } | null;
   defaultVariantId?: string | null;
-  colors?: unknown[];
+  colors?: ProductColorOption[];
+  sizes?: ProductSizeOption[];
+  averageRating?: number;
+  reviewsCount?: number;
   labels?: Array<{
     id: string;
     type: 'text' | 'percentage';
@@ -178,11 +187,15 @@ export async function ProductsCatalog({
     title: p.title,
     price: p.price,
     compareAtPrice: p.compareAtPrice ?? p.originalPrice ?? null,
+    originalPrice: p.originalPrice ?? p.compareAtPrice ?? null,
     image: p.image ?? null,
     inStock: p.inStock ?? true,
     brand: p.brand ?? null,
     defaultVariantId: p.defaultVariantId ?? null,
     colors: Array.isArray(p.colors) ? p.colors : [],
+    sizes: Array.isArray(p.sizes) ? p.sizes : [],
+    averageRating: typeof p.averageRating === 'number' ? p.averageRating : 0,
+    reviewsCount: typeof p.reviewsCount === 'number' ? p.reviewsCount : 0,
     labels: p.labels ?? [],
   }));
 
@@ -246,7 +259,7 @@ export async function ProductsCatalog({
               <ProductsHeader />
             </div>
 
-            <div className="py-2">
+            <div style={{ paddingTop: PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX }}>
             {normalizedProducts.length > 0 ? (
               <ProductsGrid
                 products={normalizedProducts}

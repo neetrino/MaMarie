@@ -8,6 +8,11 @@ import { isQuietCartStockValidationError } from '../../lib/api-client/error-hand
 import { logger } from '../../lib/utils/logger';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
+import type { CartItem, GuestCartItem } from '../../app/cart/types';
+import { dispatchCartUpdated } from '../../lib/cart-events';
+import { openCartDrawer } from '../../lib/cart-drawer';
+import { getCartCount } from '../../lib/storageCounts';
+import { readGuestCartItems, writeGuestCartItems } from '../../lib/guest-cart-storage';
 import { playCartFlyAnimation } from '../../lib/cart-fly-animation';
 
 interface ProductDetails {
@@ -35,6 +40,81 @@ interface UseAddToCartProps {
   defaultVariantId?: string | null;
   /** Unit price (AMD) — stored in guest cart so Header doesn't need extra API calls. */
   price?: number;
+  /** Cached for instant cart drawer display. */
+  title?: string;
+  image?: string | null;
+  originalPrice?: number | null;
+  stock?: number;
+}
+
+interface OptimisticCartItemInput {
+  item: { id: string; quantity: number; price: number };
+  productId: string;
+  productSlug: string;
+  variantId: string;
+  title: string;
+  image?: string | null;
+  stock?: number;
+  originalPrice?: number | null;
+}
+
+interface EagerCartUpdateInput extends Omit<OptimisticCartItemInput, 'item' | 'variantId'> {
+  price?: number;
+}
+
+function buildOptimisticCartItem({
+  item,
+  productId,
+  productSlug,
+  variantId,
+  title,
+  image,
+  stock,
+  originalPrice,
+}: OptimisticCartItemInput): CartItem {
+  return {
+    id: item.id,
+    variant: {
+      id: variantId,
+      sku: '',
+      stock,
+      product: {
+        id: productId,
+        title,
+        slug: productSlug,
+        image: image ?? null,
+      },
+    },
+    quantity: item.quantity,
+    price: item.price,
+    originalPrice: originalPrice ?? null,
+    total: item.price * item.quantity,
+  };
+}
+
+function dispatchEagerCartUpdate(
+  variantId: string | null | undefined,
+  product: EagerCartUpdateInput,
+): void {
+  if (!variantId || product.price === undefined) {
+    return;
+  }
+
+  dispatchCartUpdated({
+    cartSummary: {
+      itemsCount: getCartCount() + 1,
+      total: product.price,
+    },
+    optimisticItem: buildOptimisticCartItem({
+      item: {
+        id: `optimistic-${product.productId}-${variantId}`,
+        quantity: 1,
+        price: product.price,
+      },
+      variantId,
+      ...product,
+    }),
+  });
 }
 
 /**
@@ -42,7 +122,17 @@ interface UseAddToCartProps {
  * @param props - Product information
  * @returns Object with loading state and addToCart function
  */
-export function useAddToCart({ productId, productSlug, inStock, defaultVariantId, price: propPrice }: UseAddToCartProps) {
+export function useAddToCart({
+  productId,
+  productSlug,
+  inStock,
+  defaultVariantId,
+  price: propPrice,
+  title: propTitle,
+  image: propImage,
+  originalPrice: propOriginalPrice,
+  stock: propStock,
+}: UseAddToCartProps) {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { t } = useTranslation();
@@ -64,17 +154,16 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
       fromElement: fly?.origin ?? null,
       imageUrl: fly?.imageUrl ?? null,
     });
+    openCartDrawer();
 
     // If user is not logged in, use localStorage for cart
     if (!isLoggedIn) {
       setIsAddingToCart(true);
       try {
-        const CART_KEY = 'shop_cart_guest';
-        const stored = localStorage.getItem(CART_KEY);
-        const cart: Array<{ productId: string; productSlug: string; variantId?: string; quantity: number; price?: number }> = stored ? JSON.parse(stored) : [];
+        const cart = readGuestCartItems();
 
         let variantId: string;
-        let variantStock: number | undefined;
+        let variantStock: number | undefined = propStock;
         let variantPrice: number | undefined = propPrice || undefined;
         if (defaultVariantId) {
           variantId = defaultVariantId;
@@ -91,7 +180,9 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           if (!variantPrice) variantPrice = productDetails.variants[0].price;
         }
 
-        const existingItem = cart.find(item => item.productId === productId && item.variantId === variantId);
+        const existingItem = cart.find(
+          (item) => item.productId === productId && item.variantId === variantId,
+        );
         const currentQuantityInCart = existingItem?.quantity || 0;
         const totalQuantity = currentQuantityInCart + 1;
 
@@ -105,18 +196,27 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           existingItem.quantity = totalQuantity;
           if (!existingItem.productSlug) existingItem.productSlug = productSlug;
           if (variantPrice) existingItem.price = variantPrice;
+          if (propTitle) existingItem.title = propTitle;
+          if (propImage != null) existingItem.image = propImage;
+          if (propOriginalPrice != null) existingItem.originalPrice = propOriginalPrice;
+          if (variantStock !== undefined) existingItem.stock = variantStock;
         } else {
-          cart.push({
+          const newItem: GuestCartItem = {
             productId,
             productSlug,
             variantId,
             quantity: 1,
             price: variantPrice || 0,
-          });
+            title: propTitle,
+            image: propImage ?? null,
+            originalPrice: propOriginalPrice ?? null,
+            stock: variantStock,
+          };
+          cart.push(newItem);
         }
 
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
-        window.dispatchEvent(new Event('cart-updated'));
+        writeGuestCartItems(cart);
+        dispatchCartUpdated();
       } catch (error: unknown) {
         logger.error('[PRODUCT CARD] Error adding to guest cart', { error });
         const err = error as { message?: string; status?: number };
@@ -133,13 +233,10 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
 
     setIsAddingToCart(true);
 
-    const unitPrice = propPrice ?? 0;
-    window.dispatchEvent(new CustomEvent('cart-updated', {
-      detail: { optimisticAdd: { quantity: 1, price: unitPrice } },
-    }));
-
     try {
       let variantId: string;
+      let variantPrice = propPrice;
+      let variantStock = propStock;
       if (defaultVariantId) {
         variantId = defaultVariantId;
       } else {
@@ -150,7 +247,19 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
           return;
         }
         variantId = productDetails.variants[0].id;
+        variantPrice = productDetails.variants[0].price;
+        variantStock = productDetails.variants[0].stock;
       }
+
+      dispatchEagerCartUpdate(variantId, {
+        productId,
+        productSlug,
+        title: propTitle ?? t('common.messages.product'),
+        image: propImage,
+        price: variantPrice,
+        stock: variantStock,
+        originalPrice: propOriginalPrice,
+      });
 
       const response = await apiClient.post<{
         item: { id: string; quantity: number; price: number };
@@ -164,9 +273,19 @@ export function useAddToCart({ productId, productSlug, inStock, defaultVariantId
         }
       );
 
-      window.dispatchEvent(new CustomEvent('cart-updated', {
-        detail: response.cartSummary || null,
-      }));
+      dispatchCartUpdated({
+        cartSummary: response.cartSummary,
+        optimisticItem: buildOptimisticCartItem({
+          item: response.item,
+          productId,
+          productSlug,
+          variantId,
+          title: propTitle ?? t('common.messages.product'),
+          image: propImage,
+          stock: propStock,
+          originalPrice: propOriginalPrice,
+        }),
+      });
     } catch (error: unknown) {
       const err = error as {
         message?: string;

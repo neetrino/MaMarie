@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../lib/auth/AuthContext';
 import { useWishlist } from './hooks/useWishlist';
 import { useCompare } from './hooks/useCompare';
 import { useAddToCart } from './hooks/useAddToCart';
@@ -45,8 +43,6 @@ interface ProductCardProps {
  */
 export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) {
   const isCompact = viewMode === 'grid-3';
-  const router = useRouter();
-  const { isLoggedIn } = useAuth();
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
   const { isInCompare, toggleCompare } = useCompare(product.id);
@@ -56,19 +52,16 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
     inStock: product.inStock,
     defaultVariantId: product.defaultVariantId ?? undefined,
     price: product.price,
+    title: product.title,
+    image: product.image,
+    originalPrice: product.originalPrice ?? product.compareAtPrice,
   });
   const [imageError, setImageError] = useState(false);
 
-  // Handle wishlist toggle with auth check
+  // Wishlist mirrors cart behavior: guests can save products locally.
   const handleWishlistToggle = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!isLoggedIn) {
-      router.push(`/login?redirect=/products`);
-      return;
-    }
-    
     toggleWishlist();
   };
 

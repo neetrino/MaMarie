@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { CSSProperties, MouseEvent } from 'react';
 import { useState } from 'react';
 import {
@@ -45,8 +44,6 @@ import {
   HOME_PRODUCT_CARD_RADIUS_PX,
   HOME_PRODUCT_CARD_RATING_COLOR,
   HOME_PRODUCT_CARD_RATING_SIZE_PX,
-  HOME_PRODUCT_CARD_SIZES_LEFT_PX,
-  HOME_PRODUCT_CARD_SIZES_TOP_PX,
   HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX,
   HOME_PRODUCT_CARD_TEXT_DARK,
   HOME_PRODUCT_CARD_TEXT_MUTED,
@@ -56,10 +53,15 @@ import {
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCurrency } from '../hooks/useCurrency';
 import { useWishlist } from '../hooks/useWishlist';
-import { useAuth } from '../../lib/auth/AuthContext';
 import { formatPrice } from '../../lib/currency';
+import { formatProductRatingLabel } from '../../lib/product-rating';
+import { WishlistIcon } from '../icons/WishlistIcon';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
 import { HomeProductCardSizeBadges } from './HomeProductCardSizeBadges';
+import type {
+  ProductColorOption,
+  ProductSizeOption,
+} from '../../lib/services/product-variant-attributes';
 
 export interface HomeProductCardData {
   id: string;
@@ -72,6 +74,10 @@ export interface HomeProductCardData {
   image: string | null;
   inStock: boolean;
   defaultVariantId?: string | null;
+  colors?: ProductColorOption[];
+  sizes?: ProductSizeOption[];
+  averageRating?: number;
+  reviewsCount?: number;
 }
 
 interface HomeProductCardProps {
@@ -117,8 +123,6 @@ function buildCardCssVars(): CSSProperties {
 }
 
 export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: HomeProductCardProps) {
-  const router = useRouter();
-  const { isLoggedIn } = useAuth();
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
   const { isAddingToCart, addToCart } = useAddToCart({
@@ -127,6 +131,9 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
     inStock: product.inStock,
     defaultVariantId: product.defaultVariantId ?? undefined,
     price: product.price,
+    title: product.title,
+    image: product.image,
+    originalPrice: product.originalPrice ?? product.compareAtPrice,
   });
   const [imageError, setImageError] = useState(false);
 
@@ -134,27 +141,20 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
     product.image && !imageError ? product.image : HOME_PRODUCT_CARD_ASSETS.placeholderImage;
   const comparePrice = resolveComparePrice(product);
   const subtitle = product.subtitle?.trim() || product.title;
-  const isPlaceholder = product.id.startsWith('best-products-placeholder');
+  const ratingLabel = formatProductRatingLabel(
+    product.averageRating ?? 0,
+    product.reviewsCount ?? 0
+  );
 
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    if (isPlaceholder) {
-      return;
-    }
-    if (!isLoggedIn) {
-      router.push('/login?redirect=/');
-      return;
-    }
     toggleWishlist();
   };
 
   const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    if (isPlaceholder) {
-      return;
-    }
     const origin = event.currentTarget;
     addToCart({ origin, imageUrl: product.image });
   };
@@ -172,7 +172,7 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
         style={{ borderRadius: HOME_PRODUCT_CARD_RADIUS_PX }}
       >
         <Link
-          href={isPlaceholder ? '/products' : `/products/${product.slug}`}
+          href={`/products/${product.slug}`}
           className="home-product-card-image-wrap absolute overflow-hidden"
         >
           <div
@@ -190,25 +190,22 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
               fill
               loading="lazy"
               sizes={`${HOME_PRODUCT_CARD_IMAGE_WIDTH_PX}px`}
-              className="object-cover"
+              className="object-contain"
               onError={() => setImageError(true)}
             />
           </div>
         </Link>
 
-        <div
-          className="pointer-events-none absolute"
-          style={{ left: HOME_PRODUCT_CARD_SIZES_LEFT_PX, top: HOME_PRODUCT_CARD_SIZES_TOP_PX }}
-        >
-          <HomeProductCardSizeBadges />
-        </div>
+        <HomeProductCardSizeBadges sizes={product.sizes} />
 
         <button
           type="button"
           onClick={handleWishlist}
           aria-pressed={isInWishlist}
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-          className="absolute z-20 transition-opacity hover:opacity-80"
+          className={`absolute z-20 flex items-center justify-center transition-colors hover:opacity-80 ${
+            isInWishlist ? 'text-red-600' : 'text-white'
+          }`}
           style={{
             top: HOME_PRODUCT_CARD_HEART_TOP_PX,
             right: HOME_PRODUCT_CARD_HEART_RIGHT_PX,
@@ -216,13 +213,7 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
             height: HOME_PRODUCT_CARD_HEART_SIZE_PX,
           }}
         >
-          <Image
-            src={HOME_PRODUCT_CARD_ASSETS.heart}
-            alt=""
-            width={HOME_PRODUCT_CARD_HEART_SIZE_PX}
-            height={HOME_PRODUCT_CARD_HEART_SIZE_PX}
-            className={isInWishlist ? 'opacity-100' : 'opacity-90'}
-          />
+          <WishlistIcon isActive={isInWishlist} size={HOME_PRODUCT_CARD_HEART_SIZE_PX} />
         </button>
 
         <div
@@ -244,7 +235,7 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
           >
             <div className="flex w-full flex-col" style={{ gap: 3 }}>
               <Link
-                href={isPlaceholder ? '/products' : `/products/${product.slug}`}
+                href={`/products/${product.slug}`}
                 className="truncate font-bold"
                 style={{
                   color: HOME_PRODUCT_CARD_TEXT_DARK,
@@ -264,7 +255,7 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
               >
                 {subtitle}
               </p>
-              <HomeProductCardColorSwatches />
+              <HomeProductCardColorSwatches colors={product.colors} />
             </div>
 
             <div className="flex items-start whitespace-nowrap" style={{ gap: 16, lineHeight: '24px' }}>
@@ -308,14 +299,14 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
                   lineHeight: '20px',
                 }}
               >
-                4.7 (210)
+                {ratingLabel}
               </p>
             </div>
 
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={isPlaceholder || !product.inStock || isAddingToCart}
+              disabled={!product.inStock || isAddingToCart}
               aria-label="Add to cart"
               className="home-product-card-cart relative shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
               style={{ backgroundColor: HOME_PRODUCT_CARD_CART_BG }}

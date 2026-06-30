@@ -6,6 +6,7 @@ import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
 import { CURRENCIES, type CurrencyCode } from '../../../../../lib/currency';
 import type { Attribute, GeneratedVariant } from '../types';
+import { setMainVariant } from '../utils/variantMainHelpers';
 import { logger } from "@/lib/utils/logger";
 
 interface VariantBuilderProps {
@@ -66,19 +67,26 @@ export function VariantBuilder({
     return [];
   };
 
-  const attributesToShow = generatedVariants.length > 0 ? getAttributesToShow(generatedVariants[0]) : [];
+  const attributesToShow =
+    selectedAttributesForVariants.size > 0
+      ? Array.from(selectedAttributesForVariants)
+      : generatedVariants.length > 0
+        ? getAttributesToShow(generatedVariants[0])
+        : [];
+
+  const hasVariantsTable = attributesToShow.length > 0 || generatedVariants.length > 0;
 
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.products.add.variantBuilder')}</h2>
       <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
-        {/* Generated Variants Table */}
-        {generatedVariants.length > 0 && (
+        {hasVariantsTable ? (
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
                 {t('admin.products.add.generatedVariants')} ({generatedVariants.length.toString()})
               </h3>
+              {generatedVariants.length > 0 && (
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -147,9 +155,10 @@ export function VariantBuilder({
                   {t('admin.products.add.applySkuToAll')}
                 </Button>
               </div>
+              )}
             </div>
 
-            <div className="border border-gray-300 rounded-lg" style={{ overflowX: 'hidden', overflowY: 'hidden' }}>
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
               <table className="w-full divide-y divide-gray-200 bg-white">
                 <thead className="bg-gray-50">
                   <tr>
@@ -179,12 +188,25 @@ export function VariantBuilder({
                     <th className="px-2 py-2 text-left align-middle text-xs font-medium uppercase tracking-wider text-gray-500">
                       {t('admin.products.add.image')}
                     </th>
-                    <th className="w-20 px-2 py-2 text-left align-middle text-xs font-medium uppercase tracking-wider text-gray-500">
-                      {t('admin.products.add.actions') || 'Actions'}
+                    <th className="px-2 py-2 text-center align-middle text-xs font-medium uppercase tracking-wider text-gray-500">
+                      {t('admin.products.add.main')}
+                    </th>
+                    <th className="w-12 px-2 py-2 text-center align-middle text-xs font-medium uppercase tracking-wider text-gray-500">
+                      {t('admin.products.add.actions')}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
+                  {generatedVariants.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={attributesToShow.length + 7}
+                        className="px-4 py-8 text-center text-sm text-gray-500"
+                      >
+                        {t('admin.products.add.noVariantsYet')}
+                      </td>
+                    </tr>
+                  )}
                   {generatedVariants.map((variant) => {
                     const variantAttributesToShow = getAttributesToShow(variant);
 
@@ -381,14 +403,28 @@ export function VariantBuilder({
                             />
                           </div>
                         </td>
-                        <td className="px-2 py-2 align-middle whitespace-nowrap text-left">
+                        <td className="px-2 py-2 align-middle whitespace-nowrap text-center">
+                          <label className="inline-flex items-center justify-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!variant.isMain}
+                              onChange={() => {
+                                onVariantUpdate((prev) => setMainVariant(prev, variant.id));
+                              }}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              title={t('admin.products.add.setAsMain')}
+                            />
+                          </label>
+                        </td>
+                        <td className="px-2 py-2 align-middle whitespace-nowrap text-center">
                           <button
                             type="button"
                             onClick={() => onVariantDelete(variant.id)}
-                            className="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors flex items-center gap-1"
-                            title={t('admin.products.add.deleteVariant') || 'Delete variant'}
+                            className="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-50 p-1.5 text-red-700 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            title={t('admin.products.add.deleteVariant')}
+                            aria-label={t('admin.products.add.deleteVariant')}
                           >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -396,7 +432,6 @@ export function VariantBuilder({
                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                               />
                             </svg>
-                            {t('admin.products.add.delete') || 'Delete'}
                           </button>
                         </td>
                       </tr>
@@ -408,17 +443,26 @@ export function VariantBuilder({
 
             <div className="mt-4 flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={onVariantAdd}>
-                {t('admin.products.add.addVariant') || 'Add'}
+                {t('admin.products.add.addVariant')}
               </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  logger.debug('✅ [VARIANT BUILDER] Variants ready for submission:', generatedVariants);
-                }}
-              >
-                {t('admin.products.add.variantsReady') || 'Variants Ready'}
-              </Button>
+              {generatedVariants.length > 0 && (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    logger.debug('✅ [VARIANT BUILDER] Variants ready for submission:', generatedVariants);
+                  }}
+                >
+                  {t('admin.products.add.variantsReady')}
+                </Button>
+              )}
             </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <p className="text-sm text-gray-500">{t('admin.products.add.selectAttributesForVariants')}</p>
+            <Button type="button" variant="outline" onClick={onVariantAdd} disabled>
+              {t('admin.products.add.addVariant')}
+            </Button>
           </div>
         )}
       </div>

@@ -41,7 +41,11 @@ export function AttributesSelection({
             onClick={onAttributesDropdownToggle}
             className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
           >
-            <span className="text-gray-700">
+            <span
+              className={
+                selectedAttributesForVariants.size === 0 ? 'text-gray-500' : 'text-gray-700'
+              }
+            >
               {selectedAttributesForVariants.size === 0
                 ? t('admin.products.add.selectAttributes')
                 : selectedAttributesForVariants.size === 1

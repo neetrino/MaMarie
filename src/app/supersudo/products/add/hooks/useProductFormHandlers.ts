@@ -376,10 +376,19 @@ export function useProductFormHandlers({
       const attributeIds = Array.from(attributeIdsSet);
 
       // Process images
+      const mainVariant =
+        productType === 'variable'
+          ? generatedVariants.find((v) => v.isMain) ?? generatedVariants[0]
+          : undefined;
+      const mainVariantImage = mainVariant?.image ?? null;
+
       const { finalMedia, mainImage, processedVariants } = processImagesForSubmit({
-        imageUrls: currentFormData.imageUrls,
-        featuredImageIndex: currentFormData.featuredImageIndex,
-        mainProductImage: currentFormData.mainProductImage,
+        imageUrls: productType === 'variable' ? [] : currentFormData.imageUrls,
+        featuredImageIndex: productType === 'variable' ? 0 : currentFormData.featuredImageIndex,
+        mainProductImage:
+          productType === 'variable'
+            ? mainVariantImage || ''
+            : currentFormData.mainProductImage,
         variants: variants,
       });
       const finalVariants = processedVariants.length > 0 ? processedVariants : variants;

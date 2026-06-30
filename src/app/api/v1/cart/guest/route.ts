@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@white-shop/db";
+import { extractMediaUrl } from "@/lib/utils/extractMediaUrl";
 import { logger } from "@/lib/utils/logger";
 
 interface GuestCartItemInput {
@@ -59,23 +60,7 @@ interface GuestCartResponse {
 }
 
 function pickFirstImage(media: unknown): string | null {
-  if (!Array.isArray(media) || media.length === 0) {
-    return null;
-  }
-
-  const first = media[0];
-  if (typeof first === "string") {
-    return first.trim() || null;
-  }
-
-  if (typeof first === "object" && first !== null) {
-    const maybeUrl = "url" in first ? first.url : undefined;
-    const maybeSrc = "src" in first ? first.src : undefined;
-    const raw = typeof maybeUrl === "string" ? maybeUrl : typeof maybeSrc === "string" ? maybeSrc : "";
-    return raw.trim() || null;
-  }
-
-  return null;
+  return extractMediaUrl(media);
 }
 
 function sanitizeItems(items: GuestCartItemInput[] | undefined): GuestCartItemInput[] {

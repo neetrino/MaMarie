@@ -1,30 +1,85 @@
+import type { Dispatch, SetStateAction } from 'react';
 import { apiClient } from '../../lib/api-client';
+import { dispatchCartUpdated } from '../../lib/cart-events';
 import { logger } from '../../lib/utils/logger';
-import type { Cart, CartItem } from './types';
-import { CART_KEY } from './constants';
+import {
+  buildCartFromGuestStorage,
+  readGuestCartItems,
+  writeCartSnapshot,
+  writeGuestCartItems,
+} from '../../lib/guest-cart-storage';
+import type { Cart, CartItem, GuestCartItem } from './types';
+
+type SetCartState = Dispatch<SetStateAction<Cart | null>>;
 
 /**
- * Guest cart item
+ * Parse guest cart line id (`${productId}-${variantId}-${index}`).
+ * Uses the last segment as index and splits product/variant on the previous dash.
  */
-interface GuestCartItem {
-  productId: string;
-  productSlug?: string;
-  variantId: string;
-  quantity: number;
+function parseGuestCartLineId(itemId: string): { productId: string; variantId: string } | null {
+  const lastDash = itemId.lastIndexOf('-');
+  if (lastDash <= 0) {
+    return null;
+  }
+
+  const indexPart = itemId.slice(lastDash + 1);
+  if (!/^\d+$/.test(indexPart)) {
+    return null;
+  }
+
+  const withoutIndex = itemId.slice(0, lastDash);
+  const variantDash = withoutIndex.lastIndexOf('-');
+  if (variantDash <= 0) {
+    return null;
+  }
+
+  return {
+    productId: withoutIndex.slice(0, variantDash),
+    variantId: withoutIndex.slice(variantDash + 1),
+  };
 }
 
-/**
- * Parse item ID to extract productId and variantId
- */
-function parseItemId(itemId: string): { productId: string; variantId: string } | null {
-  // itemId format: `${productId}-${variantId}-${index}`
-  const parts = itemId.split('-');
-  if (parts.length >= 2) {
-    const productId = parts[0];
-    const variantId = parts.slice(1, -1).join('-'); // variantId-ն կարող է պարունակել '-'
-    return { productId, variantId };
+function resolveGuestLineIndex(guestCart: GuestCartItem[], itemId: string): number {
+  const parsed = parseGuestCartLineId(itemId);
+  if (parsed) {
+    const matchedIndex = guestCart.findIndex(
+      (item) => item.productId === parsed.productId && item.variantId === parsed.variantId,
+    );
+    if (matchedIndex >= 0) {
+      return matchedIndex;
+    }
   }
-  return null;
+
+  return guestCart.findIndex(
+    (item, index) => `${item.productId}-${item.variantId}-${index}` === itemId,
+  );
+}
+
+function syncGuestCartState(
+  setCart: SetCartState,
+  productLabel: string,
+): Cart | null {
+  const cart = buildCartFromGuestStorage(readGuestCartItems(), productLabel);
+  setCart(cart);
+  return cart;
+}
+
+function isQuantityAboveStock(stock: number | undefined, quantity: number): boolean {
+  return stock !== undefined && stock > 0 && quantity > stock;
+}
+
+function isAtMaxStock(stock: number | undefined, quantity: number): boolean {
+  return stock !== undefined && stock > 0 && quantity >= stock;
+}
+
+/** Whether the increase button should be disabled for a cart line. */
+export function isCartItemAtMaxStock(stock: number | undefined, quantity: number): boolean {
+  return isAtMaxStock(stock, quantity);
+}
+
+/** Whether the requested quantity exceeds available stock. */
+export function isCartItemQuantityAboveStock(stock: number | undefined, quantity: number): boolean {
+  return isQuantityAboveStock(stock, quantity);
 }
 
 /**
@@ -42,43 +97,61 @@ function calculateCartTotals(items: CartItem[], existingTotals: Cart['totals']):
 /**
  * Remove item from guest cart in localStorage
  */
-function removeFromGuestCart(itemId: string): void {
-  if (typeof window === 'undefined') return;
+function removeFromGuestCart(itemId: string): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
 
-  const parsed = parseItemId(itemId);
-  if (!parsed) return;
+  const guestCart = readGuestCartItems();
+  const lineIndex = resolveGuestLineIndex(guestCart, itemId);
+  if (lineIndex < 0) {
+    return false;
+  }
 
-  const stored = localStorage.getItem(CART_KEY);
-  const guestCart: GuestCartItem[] = stored ? JSON.parse(stored) : [];
-  
-  const updatedCart = guestCart.filter(
-    item => !(item.productId === parsed.productId && item.variantId === parsed.variantId)
-  );
-  
-  localStorage.setItem(CART_KEY, JSON.stringify(updatedCart));
-  window.dispatchEvent(new Event('cart-updated'));
+  guestCart.splice(lineIndex, 1);
+  writeGuestCartItems(guestCart);
+  return true;
 }
 
 /**
  * Update item quantity in guest cart in localStorage
  */
-function updateGuestCartQuantity(itemId: string, quantity: number): void {
-  if (typeof window === 'undefined') return;
+function updateGuestCartQuantity(itemId: string, quantity: number): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
 
-  const parsed = parseItemId(itemId);
-  if (!parsed) return;
+  const guestCart = readGuestCartItems();
+  const lineIndex = resolveGuestLineIndex(guestCart, itemId);
+  if (lineIndex < 0) {
+    return false;
+  }
 
-  const stored = localStorage.getItem(CART_KEY);
-  const guestCart: GuestCartItem[] = stored ? JSON.parse(stored) : [];
-  
-  const item = guestCart.find(
-    item => item.productId === parsed.productId && item.variantId === parsed.variantId
-  );
-  
-  if (item) {
-    item.quantity = quantity;
-    localStorage.setItem(CART_KEY, JSON.stringify(guestCart));
-    window.dispatchEvent(new Event('cart-updated'));
+  guestCart[lineIndex].quantity = quantity;
+  writeGuestCartItems(guestCart);
+  return true;
+}
+
+async function syncLoggedInQuantity(
+  itemId: string,
+  quantity: number,
+  fetchCart: (silent?: boolean) => Promise<void>,
+  t: (key: string) => string,
+): Promise<void> {
+  try {
+    await apiClient.patch(`/api/v1/cart/items/${itemId}`, { quantity });
+    dispatchCartUpdated({ localOnly: true });
+  } catch (error: unknown) {
+    const errorObj = error as { detail?: string; message?: string };
+    logger.error('Error updating quantity', { error, itemId });
+    await fetchCart(true);
+
+    const errorMessage = errorObj?.detail || errorObj?.message || t('common.messages.failedToUpdateQuantity');
+    if (errorMessage.includes('stock') || errorMessage.includes('exceeds')) {
+      alert(t('common.alerts.stockInsufficient').replace('{message}', errorMessage));
+    } else {
+      alert(errorMessage);
+    }
   }
 }
 
@@ -87,147 +160,164 @@ function updateGuestCartQuantity(itemId: string, quantity: number): void {
  */
 export async function handleRemoveItem(
   itemId: string,
-  cart: Cart,
   isLoggedIn: boolean,
-  setCart: (cart: Cart | null) => void,
-  fetchCart: () => Promise<void>
+  setCart: SetCartState,
+  fetchCart: () => Promise<void>,
+  productLabel: string,
 ): Promise<void> {
-  const itemToRemove = cart.items.find(item => item.id === itemId);
-  if (!itemToRemove) return;
-
-  // Calculate new totals
-  const updatedItems = cart.items.filter(item => item.id !== itemId);
-  const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-
-  // Update UI immediately (optimistic update)
-  setCart({
-    ...cart,
-    items: updatedItems,
-    totals: calculateCartTotals(updatedItems, cart.totals),
-    itemsCount: newItemsCount,
-  });
-
-  try {
-    if (!isLoggedIn) {
-      removeFromGuestCart(itemId);
+  if (!isLoggedIn) {
+    if (!removeFromGuestCart(itemId)) {
       return;
     }
 
-    // For logged-in users, delete from API
+    syncGuestCartState(setCart, productLabel);
+    dispatchCartUpdated({ localOnly: true });
+    return;
+  }
+
+  let itemFound = false;
+  let nextCart: Cart | null = null;
+
+  setCart((prevCart) => {
+    if (!prevCart) {
+      return prevCart;
+    }
+
+    const itemToRemove = prevCart.items.find((item) => item.id === itemId);
+    if (!itemToRemove) {
+      return prevCart;
+    }
+
+    itemFound = true;
+    const updatedItems = prevCart.items.filter((item) => item.id !== itemId);
+    const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
+
+    nextCart = {
+      ...prevCart,
+      items: updatedItems,
+      totals: calculateCartTotals(updatedItems, prevCart.totals),
+      itemsCount: newItemsCount,
+    };
+
+    return nextCart;
+  });
+
+  if (!itemFound) {
+    return;
+  }
+
+  writeCartSnapshot(nextCart);
+
+  try {
     await apiClient.delete(`/api/v1/cart/items/${itemId}`);
-    window.dispatchEvent(new Event('cart-updated'));
+    dispatchCartUpdated({ localOnly: true });
   } catch (error: unknown) {
     logger.error('Error removing item', { error, itemId });
-    // Revert optimistic update on error
     await fetchCart();
   }
 }
 
 /**
- * Handle update item quantity in cart
+ * Handle update item quantity in cart (optimistic UI, API sync in background).
  */
-export async function handleUpdateQuantity(
+export function handleUpdateQuantity(
   itemId: string,
   quantity: number,
-  cart: Cart | null,
   isLoggedIn: boolean,
-  setCart: (cart: Cart | null) => void,
-  setUpdatingItems: (fn: (prev: Set<string>) => Set<string>) => void,
-  fetchCart: () => Promise<void>,
-  t: (key: string) => string
-): Promise<void> {
+  setCart: SetCartState,
+  fetchCart: (silent?: boolean) => Promise<void>,
+  t: (key: string) => string,
+  productLabel: string,
+): void {
   if (quantity < 1) {
-    if (cart) {
-      await handleRemoveItem(itemId, cart, isLoggedIn, setCart, fetchCart);
-    }
+    void handleRemoveItem(itemId, isLoggedIn, setCart, () => fetchCart(true), productLabel);
     return;
   }
 
-  // Find the cart item to check stock
-  const cartItem = cart?.items.find(item => item.id === itemId);
-  if (!cartItem) return;
-
-  if (cartItem.variant.stock !== undefined) {
-    if (quantity > cartItem.variant.stock) {
-      alert(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`);
-      return;
-    }
+  const cartItem = readCartItemForUpdate(itemId, isLoggedIn, setCart, productLabel);
+  if (!cartItem) {
+    return;
   }
 
-  // Optimistic update: update UI immediately
-  if (cart) {
-    const updatedItems = cart.items.map(item => 
-      item.id === itemId 
-        ? { ...item, quantity, total: item.price * quantity }
-        : item
+  if (isQuantityAboveStock(cartItem.variant.stock, quantity)) {
+    alert(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`);
+    return;
+  }
+
+  if (!isLoggedIn) {
+    if (!updateGuestCartQuantity(itemId, quantity)) {
+      return;
+    }
+
+    syncGuestCartState(setCart, productLabel);
+    dispatchCartUpdated({ localOnly: true });
+    return;
+  }
+
+  setCart((prevCart) => {
+    if (!prevCart) {
+      return prevCart;
+    }
+
+    const updatedItems = prevCart.items.map((item) =>
+      item.id === itemId ? { ...item, quantity, total: item.price * quantity } : item,
     );
     const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    setCart({
-      ...cart,
+    const updatedCart = {
+      ...prevCart,
       items: updatedItems,
-      totals: calculateCartTotals(updatedItems, cart.totals),
+      totals: calculateCartTotals(updatedItems, prevCart.totals),
       itemsCount: newItemsCount,
-    });
-  }
+    };
 
-  setUpdatingItems(prev => new Set(prev).add(itemId));
+    writeCartSnapshot(updatedCart);
+    return updatedCart;
+  });
 
-  try {
-    if (!isLoggedIn) {
-      if (typeof window === 'undefined') return;
-
-      // Check stock for guest cart
-      if (cartItem.variant.stock !== undefined && quantity > cartItem.variant.stock) {
-        alert(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`);
-        // Revert optimistic update
-        await fetchCart();
-        setUpdatingItems(prev => {
-          const next = new Set(prev);
-          next.delete(itemId);
-          return next;
-        });
-        return;
-      }
-      
-      updateGuestCartQuantity(itemId, quantity);
-      setUpdatingItems(prev => {
-        const next = new Set(prev);
-        next.delete(itemId);
-        return next;
-      });
-      return;
-    }
-
-    // For logged-in users, update via API
-    await apiClient.patch(
-      `/api/v1/cart/items/${itemId}`,
-      { quantity }
-    );
-
-    window.dispatchEvent(new Event('cart-updated'));
-  } catch (error: unknown) {
-    const errorObj = error as { detail?: string; message?: string };
-    logger.error('Error updating quantity', { error, itemId });
-    // Revert optimistic update on error
-    await fetchCart();
-    
-    // Show user-friendly error message
-    const errorMessage = errorObj?.detail || errorObj?.message || t('common.messages.failedToUpdateQuantity');
-    if (errorMessage.includes('stock') || errorMessage.includes('exceeds')) {
-      alert(t('common.alerts.stockInsufficient').replace('{message}', errorMessage));
-    } else {
-      alert(errorMessage);
-    }
-  } finally {
-    setUpdatingItems(prev => {
-      const next = new Set(prev);
-      next.delete(itemId);
-      return next;
-    });
-  }
+  dispatchCartUpdated({ localOnly: true });
+  void syncLoggedInQuantity(itemId, quantity, fetchCart, t);
 }
 
+function readCartItemForUpdate(
+  itemId: string,
+  isLoggedIn: boolean,
+  setCart: SetCartState,
+  productLabel: string,
+): CartItem | undefined {
+  if (!isLoggedIn) {
+    const guestCart = readGuestCartItems();
+    const lineIndex = resolveGuestLineIndex(guestCart, itemId);
+    if (lineIndex < 0) {
+      return undefined;
+    }
 
+    const line = guestCart[lineIndex];
+    const price = line.price ?? 0;
+    return {
+      id: `${line.productId}-${line.variantId}-${lineIndex}`,
+      variant: {
+        id: line.variantId,
+        sku: line.sku ?? '',
+        stock: line.stock,
+        product: {
+          id: line.productId,
+          title: line.title ?? productLabel,
+          slug: line.productSlug ?? '',
+          image: line.image ?? null,
+        },
+      },
+      quantity: line.quantity,
+      price,
+      originalPrice: line.originalPrice ?? null,
+      total: price * line.quantity,
+    };
+  }
 
-
+  let cartItem: CartItem | undefined;
+  setCart((prevCart) => {
+    cartItem = prevCart?.items.find((item) => item.id === itemId);
+    return prevCart ?? null;
+  });
+  return cartItem;
+}

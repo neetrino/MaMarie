@@ -443,12 +443,15 @@
       "noAttributesAvailable": "Ատրիբուտներ չկան",
       "attributeSelected": "{count} ատրիբուտ ընտրված",
       "attributesSelected": "{count} ատրիբուտ ընտրված",
+      "valuesPlaceholder": "Ընտրել արժեքներ",
+      "selectValues": "Ընտրել",
       "generatedVariants": "Գեներացված տարբերակներ",
       "applyPriceToAll": "Կիրառել գինը բոլորին",
       "applyStockToAll": "Կիրառել պաշարը բոլորին",
       "applySkuToAll": "Կիրառել SKU նմուշը բոլորին",
       "variantsReady": "Տարբերակները պատրաստ են",
       "addVariant": "Ավելացնել",
+      "noVariantsYet": "Դեռ տարբերակներ չկան։ Սեղմեք «Ավելացնել»՝ աղյուսակում նոր տող ավելացնելու համար։",
       "image": "Պատկեր",
       "compareAtPrice": "Զեղչված գինը",
       "pricePlaceholder": "0.00",
@@ -476,7 +479,10 @@
       "failedToProcessImage": "Չհաջողվեց մշակել ընտրված պատկերը",
       "enterDefaultPrice": "Մուտքագրել լռելյայն գին բոլոր տարբերակների համար:",
       "enterDefaultStock": "Մուտքագրել լռելյայն պաշար բոլոր տարբերակների համար:",
-      "enterSkuPrefix": "Մուտքագրել SKU նախածանց (կավտոմատ կավելացվի -color-size, եթե կիրառելի է):"
+      "enterSkuPrefix": "Մուտքագրել SKU նախածանց (կավտոմատ կավելացվի -color-size, եթե կիրառելի է):",
+      "actions": "Գործողություններ",
+      "delete": "Ջնջել",
+      "deleteVariant": "Ջնջել տարբերակը"
     }
   },
   "settings": {

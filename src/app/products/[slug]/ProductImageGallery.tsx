@@ -76,7 +76,7 @@ export function ProductImageGallery({
                 <button 
                   key={actualIndex}
                   onClick={() => onImageIndexChange(actualIndex)}
-                  className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border bg-white transition-all duration-300 flex-shrink-0 ${
+                  className={`relative w-full aspect-[3/4] rounded-lg overflow-hidden border transition-all duration-300 flex-shrink-0 ${
                     isActive 
                       ? "border-gray-400 shadow-[0_2px_8px_rgba(0,0,0,0.12)] ring-2 ring-gray-300" 
                       : "border-gray-200 hover:border-gray-300 hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]"
@@ -88,7 +88,7 @@ export function ProductImageGallery({
                     <img
                       src={image}
                       alt=""
-                      className="w-full h-full object-cover transition-transform duration-300"
+                      className="w-full h-full object-contain transition-transform duration-300"
                       loading="lazy"
                       decoding="async"
                       onError={() => markFailed(actualIndex)}
@@ -176,14 +176,14 @@ export function ProductImageGallery({
         <div className="flex-1">
           <div
             data-product-fly-origin
-            className="relative aspect-square bg-white rounded-lg overflow-hidden group shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+            className="relative aspect-square rounded-lg overflow-hidden group shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
           >
           {images.length > 0 && !mainImageFailed ? (
             <Image
               src={currentSrc}
               alt={product.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-contain transition-transform duration-500 group-hover:scale-105"
               sizes={PDP_MAIN_IMAGE_SIZES}
               priority={mainImagePriority}
               unoptimized

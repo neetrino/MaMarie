@@ -3,7 +3,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -23,8 +23,11 @@ import {
   getMobileBottomNavActiveLayout,
   resolveMobileBottomNavActiveItem,
 } from '../../constants/mobile-bottom-nav';
+import type { CartUpdatedDetail } from '../../lib/cart-events';
 import { getCartCount, getWishlistCount } from '../../lib/storageCounts';
+import { openCartDrawer } from '../../lib/cart-drawer';
 import { useTranslation } from '../../lib/i18n-client';
+import type { WishlistUpdatedDetail } from '../hooks/useWishlist';
 import styles from './MobileBottomNavBar.module.css';
 
 function joinClasses(...classes: ReadonlyArray<string | false | undefined>): string {
@@ -110,6 +113,7 @@ function NavSlotIcon({
 /** Figma bottom navigation — home `74:875`, cart `109:579`, wishlist `109:600`, profile `109:621`. */
 export function MobileBottomNavBar() {
   const pathname = usePathname() ?? '';
+  const router = useRouter();
   const { t } = useTranslation();
   const [wishlistCount, setWishlistCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
@@ -186,11 +190,15 @@ export function MobileBottomNavBar() {
   }, []);
 
   useEffect(() => {
-    const updateCounts = () => {
-      setWishlistCount(getWishlistCount());
-      setCartCount(getCartCount());
+    const updateCounts = (event?: Event) => {
+      const wishlistDetail = (event as CustomEvent<WishlistUpdatedDetail | null> | undefined)?.detail;
+      setWishlistCount(wishlistDetail?.count ?? getWishlistCount());
+
+      const cartDetail = (event as CustomEvent<CartUpdatedDetail | null> | undefined)?.detail;
+      setCartCount(cartDetail?.cartSummary?.itemsCount ?? getCartCount());
     };
 
+    router.prefetch('/wishlist');
     updateCounts();
     window.addEventListener('wishlist-updated', updateCounts);
     window.addEventListener('cart-updated', updateCounts);
@@ -233,6 +241,37 @@ export function MobileBottomNavBar() {
                 topPx: inactiveLayout.slotTopPx,
               };
 
+          const slotStyle = {
+            ...slotLeftStyle(slotLayout.leftPx),
+            top: `${slotLayout.topPx}px`,
+          };
+
+          const slotContent = (
+            <>
+              {item.renderIcon(isActive)}
+              {item.badgeCount && item.badgeCount > 0 ? (
+                <span className={joinClasses(styles.badge, item.id === 'wishlist' && styles.wishlistBadge)}>
+                  {formatBadgeCount(item.badgeCount)}
+                </span>
+              ) : null}
+            </>
+          );
+
+          if (item.id === 'cart') {
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={openCartDrawer}
+                aria-label={t(item.labelKey)}
+                className={styles.slot}
+                style={slotStyle}
+              >
+                {slotContent}
+              </button>
+            );
+          }
+
           return (
             <Link
               key={item.id}
@@ -240,15 +279,9 @@ export function MobileBottomNavBar() {
               aria-label={t(item.labelKey)}
               aria-current={isActive ? 'page' : undefined}
               className={styles.slot}
-              style={{
-                ...slotLeftStyle(slotLayout.leftPx),
-                top: `${slotLayout.topPx}px`,
-              }}
+              style={slotStyle}
             >
-              {item.renderIcon(isActive)}
-              {item.badgeCount && item.badgeCount > 0 ? (
-                <span className={styles.badge}>{formatBadgeCount(item.badgeCount)}</span>
-              ) : null}
+              {slotContent}
             </Link>
           );
         })}

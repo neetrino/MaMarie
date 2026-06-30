@@ -17,12 +17,18 @@ import { HomeProductCard, type HomeProductCardData } from './home/HomeProductCar
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
+import type {
+  ProductColorOption,
+  ProductSizeOption,
+} from '../lib/services/product-variant-attributes';
+
 interface Product {
   id: string;
   slug: string;
   title: string;
   price: number;
   compareAtPrice: number | null;
+  originalPrice?: number | null;
   image: string | null;
   inStock: boolean;
   brand: {
@@ -30,6 +36,10 @@ interface Product {
     name: string;
   } | null;
   defaultVariantId?: string | null;
+  colors?: ProductColorOption[];
+  sizes?: ProductSizeOption[];
+  averageRating?: number;
+  reviewsCount?: number;
 }
 
 interface ProductsGridProps {
