@@ -1,10 +1,9 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { CategoryFilter } from '../CategoryFilter';
-import { ClothingTypeFilter } from '../ClothingTypeFilter';
+import { BrandFilter } from '../BrandFilter';
 import { ColorFilter } from '../ColorFilter';
 import { PriceFilter } from '../PriceFilter';
 import { SizeFilter } from '../SizeFilter';
@@ -16,39 +15,14 @@ import {
   PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
 } from '../../constants/products-catalog';
+import { useProductsCatalog } from './ProductsCatalogProvider';
+import { useProductsCatalogFilterNavigation } from './useProductsCatalogFilterNavigation';
 import { ProductsFilterSection } from './ProductsFilterSection';
 
-interface ProductsFilterSidebarProps {
-  category?: string;
-  search?: string;
-  minPrice?: string;
-  maxPrice?: string;
-  selectedColors: string[];
-  selectedSizes: string[];
-  selectedClothingTypes: string[];
-}
-
-function ProductsFilterSidebarContent({
-  category,
-  search,
-  minPrice,
-  maxPrice,
-  selectedColors,
-  selectedSizes,
-  selectedClothingTypes,
-}: ProductsFilterSidebarProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+function ProductsFilterSidebarContent() {
+  const { params } = useProductsCatalog();
+  const { clearFilters } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
-
-  const handleClearFilters = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    const filterKeys = ['search', 'category', 'minPrice', 'maxPrice', 'colors', 'sizes', 'brand', 'clothingTypes'];
-    filterKeys.forEach((key) => params.delete(key));
-    params.delete('page');
-    const queryString = params.toString();
-    router.push(queryString ? `/products?${queryString}` : '/products');
-  };
 
   return (
     <aside
@@ -58,44 +32,45 @@ function ProductsFilterSidebarContent({
       <div className="flex flex-col items-center gap-[18px]">
         <div className="flex w-full flex-col gap-5">
           <ProductsFilterSection title={t('products.catalog.filters.category')}>
-            <CategoryFilter currentCategory={category} variant="catalog" />
+            <CategoryFilter currentCategory={params.category} variant="catalog" />
           </ProductsFilterSection>
 
           <ProductsFilterSection title={t('products.catalog.filters.size')}>
             <SizeFilter
-              category={category}
-              search={search}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-              selectedSizes={selectedSizes}
+              category={params.category}
+              search={params.search}
+              minPrice={params.minPrice}
+              maxPrice={params.maxPrice}
               variant="catalog"
             />
           </ProductsFilterSection>
 
-          <ProductsFilterSection title={t('products.catalog.filters.clothingType')}>
-            <ClothingTypeFilter
-              selectedClothingTypes={selectedClothingTypes}
+          <ProductsFilterSection title={t('products.catalog.filters.brand')}>
+            <BrandFilter
+              category={params.category}
+              search={params.search}
+              minPrice={params.minPrice}
+              maxPrice={params.maxPrice}
               variant="catalog"
             />
           </ProductsFilterSection>
 
           <ProductsFilterSection title={t('products.catalog.filters.price')}>
             <PriceFilter
-              currentMinPrice={minPrice}
-              currentMaxPrice={maxPrice}
-              category={category}
-              search={search}
+              currentMinPrice={params.minPrice}
+              currentMaxPrice={params.maxPrice}
+              category={params.category}
+              search={params.search}
               variant="catalog"
             />
           </ProductsFilterSection>
 
           <ProductsFilterSection title={t('products.catalog.filters.color')}>
             <ColorFilter
-              category={category}
-              search={search}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-              selectedColors={selectedColors}
+              category={params.category}
+              search={params.search}
+              minPrice={params.minPrice}
+              maxPrice={params.maxPrice}
               variant="catalog"
             />
           </ProductsFilterSection>
@@ -103,7 +78,7 @@ function ProductsFilterSidebarContent({
 
         <button
           type="button"
-          onClick={handleClearFilters}
+          onClick={clearFilters}
           className="flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
           style={{
             width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
@@ -121,7 +96,7 @@ function ProductsFilterSidebarContent({
   );
 }
 
-export function ProductsFilterSidebar(props: ProductsFilterSidebarProps) {
+export function ProductsFilterSidebar() {
   return (
     <Suspense
       fallback={
@@ -139,7 +114,7 @@ export function ProductsFilterSidebar(props: ProductsFilterSidebarProps) {
         </aside>
       }
     >
-      <ProductsFilterSidebarContent {...props} />
+      <ProductsFilterSidebarContent />
     </Suspense>
   );
 }

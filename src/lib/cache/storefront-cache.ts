@@ -9,8 +9,10 @@ export const STOREFRONT_CACHE_TTL = {
   categoryBySlug: 300,
   navigationPreviews: 180,
   currencyRates: 180,
-  productsFilters: 120,
-  productsPriceRange: 120,
+  productsFilters: 300,
+  productsPriceRange: 300,
+  /** Catalog product list (`/api/v1/products`). */
+  productsList: 300,
   /** PDP first paint (images + identifiers). */
   productVisual: 300,
   /** PDP full product JSON for info column. */
@@ -26,6 +28,7 @@ export const STOREFRONT_CACHE_KEYS = {
   currencyRates: () => "settings:currency-rates",
   productsFilters: (stableQuery: string) => `products:filters:${stableQuery}`,
   productsPriceRange: (stableQuery: string) => `products:price-range:${stableQuery}`,
+  productsList: (stableQuery: string) => `products:list:${stableQuery}`,
   productVisual: (lang: string, slug: string) => `product:visual:${lang}:${slug}`,
   productDetails: (lang: string, slug: string) => `product:details:${lang}:${slug}`,
   productRelated: (lang: string, slug: string) => `product:related:${lang}:${slug}`,

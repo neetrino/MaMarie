@@ -29,7 +29,19 @@ class ProductsFindFilterService {
   filterProducts(
     products: ProductWithRelations[],
     filters: ProductFilters,
-    bestsellerProductIds: string[]
+    bestsellerProductIds: string[],
+    options?: { skipAttributeFilters?: boolean }
+  ): ProductWithRelations[] {
+    if (!options?.skipAttributeFilters) {
+      products = this.applyAttributeFilters(products, filters);
+    }
+
+    return this.sortProducts(products, filters, bestsellerProductIds);
+  }
+
+  private applyAttributeFilters(
+    products: ProductWithRelations[],
+    filters: ProductFilters
   ): ProductWithRelations[] {
     const { minPrice, maxPrice, colors, sizes, brand, clothingTypes } = filters;
 
@@ -154,6 +166,14 @@ class ProductsFindFilterService {
       });
     }
 
+    return products;
+  }
+
+  private sortProducts(
+    products: ProductWithRelations[],
+    filters: ProductFilters,
+    bestsellerProductIds: string[]
+  ): ProductWithRelations[] {
     // Sort
     const { filter, sort = "createdAt" } = filters;
     if (filter === "bestseller" && bestsellerProductIds.length > 0) {

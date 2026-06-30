@@ -117,9 +117,10 @@ export function AttributesSelection({
                   .map(id => attribute.values.find(v => v.id === id))
                   .filter((v): v is NonNullable<typeof v> => v !== null);
                 
-                // Get first selected value's image if available
-                const previewImage = selectedValues.find(v => v.imageUrl)?.imageUrl;
                 const isColor = attribute.key === 'color';
+                const previewImage = isColor
+                  ? selectedValues.find(v => v.imageUrl)?.imageUrl
+                  : null;
                 const previewColor = isColor && selectedValues.length > 0 
                   ? (selectedValues[0].colors?.[0] || getColorHex(selectedValues[0].label))
                   : null;

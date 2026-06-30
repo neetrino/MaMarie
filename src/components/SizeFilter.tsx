@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
-import { useProductsFilters } from './ProductsFiltersProvider';
+import { useProductsFilters, readCachedProductsFilters, writeCachedProductsFilters } from './ProductsFiltersProvider';
+import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
 import {
   PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
   PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
@@ -40,13 +41,14 @@ export function SizeFilter({
   selectedSizes = [],
   variant = 'default',
 }: SizeFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
+  const catalog = useOptionalProductsCatalog();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
   const [sizes, setSizes] = useState<SizeOption[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<string[]>(selectedSizes);
+  const activeSelected = catalog?.selectedSizes ?? selectedSizes;
+  const [selected, setSelected] = useState<string[]>(activeSelected);
 
   useEffect(() => {
     if (filtersContext?.data?.sizes) {
@@ -62,10 +64,17 @@ export function SizeFilter({
   }, [category, search, minPrice, maxPrice, filtersContext?.data?.sizes, filtersContext?.loading, filtersContext === null]);
 
   useEffect(() => {
-    setSelected(selectedSizes);
-  }, [selectedSizes]);
+    setSelected(activeSelected);
+  }, [activeSelected]);
 
   const fetchSizes = async () => {
+    const cached = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+    if (cached) {
+      setSizes(cached.sizes);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const language = getStoredLanguage();
@@ -78,9 +87,23 @@ export function SizeFilter({
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
 
-      // Fetch filters from API
       const response = await apiClient.get<{ colors: any[]; sizes: SizeOption[] }>('/api/v1/products/filters', { params });
-      
+      const existing = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+      writeCachedProductsFilters(
+        { category, search, minPrice, maxPrice },
+        {
+          colors: existing?.colors || response.colors || [],
+          sizes: response.sizes || [],
+          brands: existing?.brands || [],
+          priceRange: existing?.priceRange || {
+            min: 0,
+            max: 100000,
+            stepSize: null,
+            stepSizePerCurrency: null,
+          },
+        }
+      );
+
       setSizes(response.sizes || []);
     } catch (error) {
       setSizes([]);
@@ -99,20 +122,9 @@ export function SizeFilter({
   };
 
   const applyFilters = (sizesToApply: string[]) => {
-    // Ստեղծում ենք նոր URLSearchParams URL-ի հիման վրա, որպեսզի պահպանենք բոլոր params-ները
-    const params = new URLSearchParams(searchParams.toString());
-    
-    // Թարմացնում ենք sizes պարամետրը
-    if (sizesToApply.length > 0) {
-      params.set('sizes', sizesToApply.join(','));
-    } else {
-      params.delete('sizes');
-    }
-    
-    // Reset page to 1 when filters change
-    params.delete('page');
-
-    router.push(`/products?${params.toString()}`);
+    applyPatch({
+      sizes: sizesToApply.length > 0 ? sizesToApply.join(',') : undefined,
+    });
   };
 
   if (loading) {

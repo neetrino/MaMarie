@@ -185,6 +185,7 @@
     "categoryTitlePlaceholder": "Մուտքագրել կատեգորիայի անվանում",
     "parentCategory": "Ենթակատեգորիա",
     "rootCategory": "Ոչինչ (Արմատային կատեգորիա)",
+    "selectedParentsCount": "Ընտրված ծնողներ՝ {count}",
     "status": "Կարգավիճակ",
     "published": "Հրապարակված",
     "draft": "Սևագիր",

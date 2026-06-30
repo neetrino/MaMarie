@@ -4,6 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { HEADER_CONTENT_CLEARANCE_MOBILE_PX } from '../../../constants/header';
 import {
+  HOME_GENDER_CATEGORY_SLUG,
+  homeGenderCategoryProductsHref,
+} from '../../../constants/home-gender-categories';
+import {
   MOBILE_HOME_ASSETS,
   MOBILE_HOME_GENDER_BOYS_BG,
   MOBILE_HOME_GENDER_BUTTON_GAP_PX,
@@ -88,13 +92,13 @@ export function MobileHomeHero() {
         aria-label={t('home.hero.genderButtons.label')}
       >
         <GenderCta
-          href="/products"
+          href={homeGenderCategoryProductsHref(HOME_GENDER_CATEGORY_SLUG.girls)}
           label={t('home.hero.genderButtons.girls')}
           backgroundColor={MOBILE_HOME_GENDER_GIRLS_BG}
           chevronSrc={MOBILE_HOME_ASSETS.genderChevronGirls}
         />
         <GenderCta
-          href="/products"
+          href={homeGenderCategoryProductsHref(HOME_GENDER_CATEGORY_SLUG.boys)}
           label={t('home.hero.genderButtons.boys')}
           backgroundColor={MOBILE_HOME_GENDER_BOYS_BG}
           chevronSrc={MOBILE_HOME_ASSETS.genderChevronBoys}

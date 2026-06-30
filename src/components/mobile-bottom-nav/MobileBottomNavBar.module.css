@@ -153,6 +153,11 @@
   max-width: 100%;
 }
 
+.slotIconImage {
+  width: auto;
+  height: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shell {
     --bottom-nav-transition-ms: 0ms;

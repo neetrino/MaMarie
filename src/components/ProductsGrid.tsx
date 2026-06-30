@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { memo, useMemo } from 'react';
 import {
   PRODUCTS_CATALOG_CARD_GAP_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
@@ -13,7 +13,7 @@ import {
   PRODUCTS_CATALOG_CTA_WIDTH_PX,
 } from '../constants/products-catalog';
 import { mapToHomeProductCard } from './home/best-products-data';
-import { HomeProductCard, type HomeProductCardData } from './home/HomeProductCard';
+import { HomeProductCard } from './home/HomeProductCard';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
@@ -46,14 +46,23 @@ interface ProductsGridProps {
   products: Product[];
   sortBy?: string;
   loadMoreHref?: string | null;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
 }
 
-export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null }: ProductsGridProps) {
+export const ProductsGrid = memo(function ProductsGrid({
+  products,
+  sortBy = 'default',
+  loadMoreHref = null,
+  hasMore = false,
+  onLoadMore,
+  isLoadingMore = false,
+}: ProductsGridProps) {
   const { t } = useTranslation();
   const { viewMode } = useProductsCatalogViewMode();
-  const [sortedProducts, setSortedProducts] = useState<HomeProductCardData[]>([]);
 
-  useEffect(() => {
+  const sortedProducts = useMemo(() => {
     const sorted = [...products];
 
     switch (sortBy) {
@@ -73,7 +82,7 @@ export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null
         break;
     }
 
-    setSortedProducts(sorted.map(mapToHomeProductCard));
+    return sorted.map(mapToHomeProductCard);
   }, [products, sortBy]);
 
   const cardWidthPx =
@@ -96,17 +105,34 @@ export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null
         className="flex w-full flex-wrap justify-center lg:justify-start"
         style={{ gap: PRODUCTS_CATALOG_CARD_GAP_PX }}
       >
-        {sortedProducts.map((product) => (
+        {sortedProducts.map((product, index) => (
           <HomeProductCard
             key={product.id}
             product={product}
             layoutWidthPx={cardWidthPx}
             layoutHeightPx={cardHeightPx}
+            imagePriority={index < 6}
           />
         ))}
       </div>
 
-      {loadMoreHref ? (
+      {onLoadMore && hasMore ? (
+        <button
+          type="button"
+          onClick={onLoadMore}
+          disabled={isLoadingMore}
+          className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
+          style={{
+            width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
+            height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
+            borderRadius: 9999,
+            backgroundColor: PRODUCTS_CATALOG_CTA_BG,
+            boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
+          }}
+        >
+          {t('products.catalog.seeAll')}
+        </button>
+      ) : loadMoreHref ? (
         <Link
           href={loadMoreHref}
           className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
@@ -123,4 +149,4 @@ export function ProductsGrid({ products, sortBy = 'default', loadMoreHref = null
       ) : null}
     </div>
   );
-}
+});

@@ -79,6 +79,7 @@ function NavSlotIcon({
   fullSlot?: boolean;
 }) {
   const iconClass = fullSlot ? styles.slotIcon : undefined;
+  const imageClass = fullSlot ? styles.slotIconImage : undefined;
 
   return (
     <span className={styles.iconStack} aria-hidden>
@@ -91,6 +92,7 @@ function NavSlotIcon({
         className={joinClasses(
           styles.iconLayer,
           iconClass,
+          imageClass,
           !isActive && styles.iconLayerVisible
         )}
       />
@@ -103,6 +105,7 @@ function NavSlotIcon({
         className={joinClasses(
           styles.iconLayer,
           iconClass,
+          imageClass,
           isActive && styles.iconLayerVisible
         )}
       />

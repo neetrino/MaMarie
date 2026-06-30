@@ -98,3 +98,9 @@ export const PRODUCTS_CATALOG_CTA_INSET_SHADOW =
 
 export const PRODUCTS_CATALOG_FILTER_CHEVRON_SRC = '/assets/products/filter-chevron.svg';
 export const PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX = 14;
+
+/** Max products prefetched client-side for instant first filter preview. */
+export const PRODUCTS_CATALOG_CLIENT_POOL_LIMIT = 200;
+
+/** Debounce delay before server fetch when catalog search query changes. */
+export const PRODUCTS_CATALOG_SEARCH_DEBOUNCE_MS = 300;

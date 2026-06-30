@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CSSProperties, MouseEvent } from 'react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import {
   HOME_PRODUCT_CARD_ACTIONS_GAP_PX,
   HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX,
@@ -84,6 +84,8 @@ interface HomeProductCardProps {
   product: HomeProductCardData;
   layoutWidthPx?: number;
   layoutHeightPx?: number;
+  /** Preload image for above-the-fold catalog cards. */
+  imagePriority?: boolean;
 }
 
 function resolveComparePrice(product: HomeProductCardData): number | null {
@@ -122,7 +124,42 @@ function buildCardCssVars(): CSSProperties {
   } as CSSProperties;
 }
 
-export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: HomeProductCardProps) {
+function areHomeProductCardPropsEqual(
+  prev: HomeProductCardProps,
+  next: HomeProductCardProps
+): boolean {
+  if (
+    prev.layoutWidthPx !== next.layoutWidthPx ||
+    prev.layoutHeightPx !== next.layoutHeightPx ||
+    prev.imagePriority !== next.imagePriority
+  ) {
+    return false;
+  }
+
+  const prevProduct = prev.product;
+  const nextProduct = next.product;
+  return (
+    prevProduct.id === nextProduct.id &&
+    prevProduct.slug === nextProduct.slug &&
+    prevProduct.title === nextProduct.title &&
+    prevProduct.subtitle === nextProduct.subtitle &&
+    prevProduct.price === nextProduct.price &&
+    prevProduct.compareAtPrice === nextProduct.compareAtPrice &&
+    prevProduct.originalPrice === nextProduct.originalPrice &&
+    prevProduct.image === nextProduct.image &&
+    prevProduct.inStock === nextProduct.inStock &&
+    prevProduct.defaultVariantId === nextProduct.defaultVariantId &&
+    prevProduct.averageRating === nextProduct.averageRating &&
+    prevProduct.reviewsCount === nextProduct.reviewsCount
+  );
+}
+
+function HomeProductCardComponent({
+  product,
+  layoutWidthPx,
+  layoutHeightPx,
+  imagePriority = false,
+}: HomeProductCardProps) {
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
   const { isAddingToCart, addToCart } = useAddToCart({
@@ -188,7 +225,8 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
               src={imageSrc}
               alt={product.title}
               fill
-              loading="lazy"
+              priority={imagePriority}
+              loading={imagePriority ? 'eager' : 'lazy'}
               sizes={`${HOME_PRODUCT_CARD_IMAGE_WIDTH_PX}px`}
               className="object-contain"
               onError={() => setImageError(true)}
@@ -325,3 +363,6 @@ export function HomeProductCard({ product, layoutWidthPx, layoutHeightPx }: Home
     </article>
   );
 }
+
+/** Memoized catalog card — skips re-render when product display fields are unchanged. */
+export const HomeProductCard = memo(HomeProductCardComponent, areHomeProductCardPropsEqual);

@@ -81,11 +81,12 @@ export type MobileBottomNavItemId = 'home' | 'cart' | 'wishlist' | 'profile';
 export const MOBILE_BOTTOM_NAV_FLUSH_BAR_TOP_PX =
   MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX - MOBILE_BOTTOM_NAV_BAR_HEIGHT_PX;
 
-const MOBILE_BOTTOM_NAV_FLUSH_TOP_OFFSET_PX =
-  MOBILE_BOTTOM_NAV_FLUSH_BAR_TOP_PX - MOBILE_BOTTOM_NAV_BAR_TOP_PX;
-
 function toFlushTopPx(figmaTopPx: number): number {
-  return figmaTopPx + MOBILE_BOTTOM_NAV_FLUSH_TOP_OFFSET_PX;
+  return (
+    figmaTopPx +
+    MOBILE_BOTTOM_NAV_FLUSH_BAR_TOP_PX -
+    MOBILE_BOTTOM_NAV_BAR_TOP_PX
+  );
 }
 
 export interface MobileBottomNavActiveLayout {

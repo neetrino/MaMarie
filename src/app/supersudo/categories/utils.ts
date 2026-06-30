@@ -1,3 +1,4 @@
+import { getEffectiveParentIds } from '../../../lib/categories/category-parent-ids';
 import type { Category, CategoryWithLevel } from './types';
 
 /**
@@ -18,27 +19,41 @@ export function buildCategoryTree(categories: Category[]): CategoryWithLevel[] {
   // Second pass: build tree
   categories.forEach(cat => {
     const categoryNode = categoryMap.get(cat.id)!;
-    if (cat.parentId && categoryMap.has(cat.parentId)) {
-      const parent = categoryMap.get(cat.parentId)!;
+    const parentIds = getEffectiveParentIds(cat);
+
+    if (parentIds.length === 0) {
+      rootCategories.push(categoryNode);
+      return;
+    }
+
+    parentIds.forEach((parentId) => {
+      if (!categoryMap.has(parentId)) {
+        return;
+      }
+
+      const parent = categoryMap.get(parentId)!;
       if (!parent.children) {
         parent.children = [];
       }
-      categoryNode.level = (parent.level || 0) + 1;
-      parent.children.push(categoryNode);
-    } else {
-      rootCategories.push(categoryNode);
-    }
+
+      parent.children.push({
+        ...categoryNode,
+        level: (parent.level || 0) + 1,
+      });
+    });
   });
 
-  // Flatten tree for display
+  // Flatten tree for display; treeKey is unique even when a category has multiple parents
   const flattenTree = (
-    nodes: CategoryWithLevelInternal[], 
-    result: CategoryWithLevel[] = []
+    nodes: CategoryWithLevelInternal[],
+    result: CategoryWithLevel[] = [],
+    parentPath = '',
   ): CategoryWithLevel[] => {
-    nodes.forEach(node => {
-      result.push({ ...node, level: node.level });
+    nodes.forEach((node) => {
+      const treeKey = parentPath ? `${parentPath}/${node.id}` : node.id;
+      result.push({ ...node, level: node.level, treeKey });
       if (node.children) {
-        flattenTree(node.children, result);
+        flattenTree(node.children, result, treeKey);
       }
     });
     return result;

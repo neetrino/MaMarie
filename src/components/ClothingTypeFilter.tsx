@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { PRODUCTS_CATALOG_CLOTHING_TYPE_OPTIONS } from '../constants/products-catalog-clothing-types';
 import {
   PRODUCTS_CATALOG_FILTER_ACCENT,
@@ -12,6 +11,8 @@ import {
   PRODUCTS_CATALOG_TEXT_DARK,
 } from '../constants/products-catalog';
 import { useTranslation } from '../lib/i18n-client';
+import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
 
 type ClothingTypeFilterVariant = 'default' | 'catalog';
 
@@ -64,30 +65,24 @@ export function ClothingTypeFilter({
   selectedClothingTypes = [],
   variant = 'default',
 }: ClothingTypeFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const catalog = useOptionalProductsCatalog();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
-  const [selected, setSelected] = useState<string[]>(selectedClothingTypes);
+  const activeSelected = catalog?.selectedClothingTypes ?? selectedClothingTypes;
+  const [selected, setSelected] = useState<string[]>(activeSelected);
 
   useEffect(() => {
-    setSelected(selectedClothingTypes);
-  }, [selectedClothingTypes]);
+    setSelected(activeSelected);
+  }, [activeSelected]);
 
   if (variant !== 'catalog') {
     return null;
   }
 
   const applyFilters = (typesToApply: string[]) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (typesToApply.length > 0) {
-      params.set('clothingTypes', typesToApply.join(','));
-    } else {
-      params.delete('clothingTypes');
-    }
-
-    params.delete('page');
-    router.push(`/products?${params.toString()}`);
+    applyPatch({
+      clothingTypes: typesToApply.length > 0 ? typesToApply.join(',') : undefined,
+    });
   };
 
   const handleToggle = (slug: string) => {

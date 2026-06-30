@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
 import { useTranslation } from '../lib/i18n-client';
-import { useProductsFilters } from './ProductsFiltersProvider';
+import { useProductsFilters, readCachedProductsFilters, writeCachedProductsFilters } from './ProductsFiltersProvider';
+import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
 import {
   PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
   PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
@@ -40,13 +41,14 @@ export function ColorFilter({
   selectedColors = [],
   variant = 'default',
 }: ColorFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
+  const catalog = useOptionalProductsCatalog();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<string[]>(selectedColors);
+  const activeSelected = catalog?.selectedColors ?? selectedColors;
+  const [selected, setSelected] = useState<string[]>(activeSelected);
 
   useEffect(() => {
     if (filtersContext?.data?.colors) {
@@ -62,10 +64,17 @@ export function ColorFilter({
   }, [category, search, minPrice, maxPrice, filtersContext?.data?.colors, filtersContext?.loading, filtersContext === null]);
 
   useEffect(() => {
-    setSelected(selectedColors);
-  }, [selectedColors]);
+    setSelected(activeSelected);
+  }, [activeSelected]);
 
   const fetchColors = async () => {
+    const cached = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+    if (cached) {
+      setColors(cached.colors);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const language = getStoredLanguage();
@@ -78,9 +87,23 @@ export function ColorFilter({
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
 
-      // Fetch filters from API
       const response = await apiClient.get<{ colors: ColorOption[]; sizes: any[] }>('/api/v1/products/filters', { params });
-      
+      const existing = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+      writeCachedProductsFilters(
+        { category, search, minPrice, maxPrice },
+        {
+          colors: response.colors || [],
+          sizes: response.sizes || existing?.sizes || [],
+          brands: existing?.brands || [],
+          priceRange: existing?.priceRange || {
+            min: 0,
+            max: 100000,
+            stepSize: null,
+            stepSizePerCurrency: null,
+          },
+        }
+      );
+
       setColors(response.colors || []);
     } catch (error) {
       setColors([]);
@@ -99,20 +122,9 @@ export function ColorFilter({
   };
 
   const applyFilters = (colorsToApply: string[]) => {
-    // Ստեղծում ենք նոր URLSearchParams URL-ի հիման վրա, որպեսզի պահպանենք բոլոր params-ները
-    const params = new URLSearchParams(searchParams.toString());
-    
-    // Թարմացնում ենք colors պարամետրը
-    if (colorsToApply.length > 0) {
-      params.set('colors', colorsToApply.join(','));
-    } else {
-      params.delete('colors');
-    }
-    
-    // Reset page to 1 when filters change
-    params.delete('page');
-
-    router.push(`/products?${params.toString()}`);
+    applyPatch({
+      colors: colorsToApply.length > 0 ? colorsToApply.join(',') : undefined,
+    });
   };
 
   if (loading) {

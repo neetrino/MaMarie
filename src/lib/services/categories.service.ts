@@ -1,4 +1,8 @@
 import { db } from "@white-shop/db";
+import {
+  getEffectiveParentIds,
+  isRootCategory,
+} from "@/lib/categories/category-parent-ids";
 
 class CategoriesService {
   /**
@@ -30,6 +34,7 @@ class CategoriesService {
     categories.forEach((category: {
       id: string;
       parentId: string | null;
+      parentIds: string[];
       translations: Array<{ locale: string; slug: string; title: string; fullPath: string }>;
     }) => {
       const translation =
@@ -42,12 +47,18 @@ class CategoriesService {
         slug: translation.slug,
         title: translation.title,
         fullPath: translation.fullPath,
-        children: [] as any[],
+        children: [] as Array<{
+          id: string;
+          slug: string;
+          title: string;
+          fullPath: string;
+          children: unknown[];
+        }>,
       };
 
       categoryMap.set(category.id, categoryData);
 
-      if (!category.parentId) {
+      if (isRootCategory(category)) {
         rootCategories.push(categoryData);
       }
     });
@@ -56,14 +67,20 @@ class CategoriesService {
     categories.forEach((category: {
       id: string;
       parentId: string | null;
+      parentIds: string[];
     }) => {
-      if (category.parentId) {
-        const parent = categoryMap.get(category.parentId);
-        const child = categoryMap.get(category.id);
-        if (parent && child) {
+      const parentIds = getEffectiveParentIds(category);
+      const child = categoryMap.get(category.id);
+      if (!child || parentIds.length === 0) {
+        return;
+      }
+
+      parentIds.forEach((parentId) => {
+        const parent = categoryMap.get(parentId);
+        if (parent) {
           parent.children.push(child);
         }
-      }
+      });
     });
 
     return {

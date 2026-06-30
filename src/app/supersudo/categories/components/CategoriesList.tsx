@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { getEffectiveParentIds } from '../../../../lib/categories/category-parent-ids';
 import { buildCategoryTree } from '../utils';
 import { CategoriesPagination } from './CategoriesPagination';
 import {
@@ -75,12 +76,12 @@ export function CategoriesList({ categories, searchQuery, onEdit, onDelete }: Ca
           </thead>
           <tbody className={ADMIN_TABLE_TBODY}>
             {paginatedCategories.map((category: CategoryWithLevel) => {
-              const parentCategory = category.parentId
-                ? categories.find((cat) => cat.id === category.parentId)
-                : null;
+              const parentTitles = getEffectiveParentIds(category)
+                .map((parentId) => categories.find((cat) => cat.id === parentId)?.title)
+                .filter(Boolean);
 
               return (
-                <tr key={category.id} className={ADMIN_TABLE_ROW}>
+                <tr key={category.treeKey} className={ADMIN_TABLE_ROW}>
                   <td className={`${ADMIN_TABLE_TD} whitespace-nowrap`}>
                     {category.imageUrl ? (
                       <img
@@ -104,7 +105,9 @@ export function CategoriesList({ categories, searchQuery, onEdit, onDelete }: Ca
                     <div className="text-xs text-gray-500">{category.slug}</div>
                   </td>
                   <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-left text-gray-700`}>
-                    {parentCategory ? parentCategory.title : t('admin.categories.rootCategory')}
+                    {parentTitles.length > 0
+                      ? parentTitles.join(', ')
+                      : t('admin.categories.rootCategory')}
                   </td>
                   <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center`}>
                     <div className="flex items-center justify-center gap-1">

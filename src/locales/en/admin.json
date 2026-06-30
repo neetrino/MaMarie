@@ -185,6 +185,7 @@
     "categoryTitlePlaceholder": "Enter category title",
     "parentCategory": "Parent Category",
     "rootCategory": "None (Root Category)",
+    "selectedParentsCount": "Selected parents: {count}",
     "status": "Status",
     "published": "Published",
     "draft": "Draft",

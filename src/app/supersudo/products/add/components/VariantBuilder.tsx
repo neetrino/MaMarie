@@ -217,6 +217,7 @@ export function VariantBuilder({
                           if (!attribute) return null;
 
                           const isColor = attribute.key === 'color';
+                          const showValueImage = isColor;
                           const selectedValueIds = variant.selectedValueIds.filter((id) => {
                             return attribute.values.some((v) => v.id === id);
                           });
@@ -252,7 +253,7 @@ export function VariantBuilder({
                                           key={val.id}
                                           className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-xs"
                                         >
-                                          {val.imageUrl ? (
+                                          {showValueImage && val.imageUrl ? (
                                             <img
                                               src={val.imageUrl}
                                               alt={val.label}

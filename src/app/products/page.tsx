@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, type CSSProperties } from 'react';
 import {
   PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX,
   PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX,
@@ -9,7 +9,7 @@ import { ProductsCatalogSkeleton } from './ProductsCatalogSkeleton';
 const catalogOffsetStyle = {
   ['--products-catalog-offset-mobile']: `${PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX}px`,
   ['--products-catalog-offset-desktop']: `${PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX}px`,
-} as const;
+} as CSSProperties;
 
 /**
  * Shop catalog page — white canvas under transparent navbar, same pattern as home.

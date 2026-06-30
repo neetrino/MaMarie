@@ -2,16 +2,16 @@ import { Suspense } from 'react';
 import { unstable_cache } from 'next/cache';
 import { getStoredLanguage } from '../../lib/language';
 import { t } from '../../lib/i18n';
-import { ClothingTypeFilter } from '../../components/ClothingTypeFilter';
-import { PriceFilter } from '../../components/PriceFilter';
-import { ColorFilter } from '../../components/ColorFilter';
-import { SizeFilter } from '../../components/SizeFilter';
 import { BrandFilter } from '../../components/BrandFilter';
-import { ProductsHeader } from '../../components/ProductsHeader';
-import { ProductsGrid } from '../../components/ProductsGrid';
+import { ColorFilter } from '../../components/ColorFilter';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
-import { ProductsFiltersProvider } from '../../components/ProductsFiltersProvider';
+import { PriceFilter } from '../../components/PriceFilter';
+import { ProductsFiltersProviderBridge } from '../../components/products/ProductsFiltersProviderBridge';
+import { ProductsHeader } from '../../components/ProductsHeader';
+import { SizeFilter } from '../../components/SizeFilter';
 import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
+import { ProductsCatalogGridSection } from '../../components/products/ProductsCatalogGridSection';
+import { ProductsCatalogProvider } from '../../components/products/ProductsCatalogProvider';
 import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
 import {
   HomeContentHorizontalFrame,
@@ -21,52 +21,16 @@ import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
 import {
-  PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
   PRODUCTS_CATALOG_MAIN_GAP_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
-
+import {
+  parseProductsCatalogParams,
+} from '../../lib/products-catalog-params';
 import type {
-  ProductColorOption,
-  ProductSizeOption,
-} from '../../lib/services/product-variant-attributes';
-
-interface Product {
-  id: string;
-  slug: string;
-  title: string;
-  price: number;
-  compareAtPrice: number | null;
-  image: string | null;
-  inStock: boolean;
-  brand: {
-    id: string;
-    name: string;
-  } | null;
-  defaultVariantId?: string | null;
-  colors?: ProductColorOption[];
-  sizes?: ProductSizeOption[];
-  averageRating?: number;
-  reviewsCount?: number;
-  labels?: Array<{
-    id: string;
-    type: 'text' | 'percentage';
-    value: string;
-    position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-    color: string | null;
-  }>;
-  originalPrice?: number | null;
-}
-
-interface ProductsResponse {
-  data: Product[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+  ProductsCatalogProduct,
+  ProductsCatalogResponse,
+} from './products-catalog-types';
 
 const PRODUCTS_LIST_REVALIDATE_SECONDS = 60;
 
@@ -83,7 +47,7 @@ const getProductsCached = unstable_cache(
     sizes?: string,
     brand?: string,
     clothingTypes?: string
-  ): Promise<ProductsResponse> =>
+  ): Promise<ProductsCatalogResponse> =>
     productsService.findAll({
       page,
       limit,
@@ -96,12 +60,12 @@ const getProductsCached = unstable_cache(
       sizes,
       brand,
       clothingTypes,
-    }) as Promise<ProductsResponse>,
+    }) as Promise<ProductsCatalogResponse>,
   ['products-catalog-db-v1'],
   { revalidate: PRODUCTS_LIST_REVALIDATE_SECONDS }
 );
 
-function parseOptionalPrice(value?: string): number | undefined {
+function parseOptionalPriceFromString(value?: string): number | undefined {
   if (!value?.trim()) {
     return undefined;
   }
@@ -109,37 +73,26 @@ function parseOptionalPrice(value?: string): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-async function getProducts(
-  page: number = 1,
-  search?: string,
-  category?: string,
-  minPrice?: string,
-  maxPrice?: string,
-  colors?: string,
-  sizes?: string,
-  brand?: string,
-  clothingTypes?: string,
-  limit: number = 12
-): Promise<ProductsResponse> {
+async function getProducts(params: ReturnType<typeof parseProductsCatalogParams>): Promise<ProductsCatalogResponse> {
   try {
     const language = getStoredLanguage();
     const response = await getProductsCached(
-      page,
-      limit,
+      params.page,
+      params.limit,
       language,
-      search?.trim() || undefined,
-      category?.trim() || undefined,
-      parseOptionalPrice(minPrice),
-      parseOptionalPrice(maxPrice),
-      colors?.trim() || undefined,
-      sizes?.trim() || undefined,
-      brand?.trim() || undefined,
-      clothingTypes?.trim() || undefined
+      params.search,
+      params.category,
+      parseOptionalPriceFromString(params.minPrice),
+      parseOptionalPriceFromString(params.maxPrice),
+      params.colors,
+      params.sizes,
+      params.brand,
+      params.clothingTypes
     );
     if (!Array.isArray(response.data)) {
       return {
         data: [],
-        meta: { total: 0, page: 1, limit: 12, totalPages: 0 },
+        meta: { total: 0, page: 1, limit: params.limit, totalPages: 0 },
       };
     }
 
@@ -148,9 +101,29 @@ async function getProducts(
     logger.error('Product catalog fetch failed', e);
     return {
       data: [],
-      meta: { total: 0, page: 1, limit: 12, totalPages: 0 },
+      meta: { total: 0, page: 1, limit: params.limit, totalPages: 0 },
     };
   }
+}
+
+function normalizeProduct(product: ProductsCatalogProduct): ProductsCatalogProduct {
+  return {
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    compareAtPrice: product.compareAtPrice ?? product.originalPrice ?? null,
+    originalPrice: product.originalPrice ?? product.compareAtPrice ?? null,
+    image: product.image ?? null,
+    inStock: product.inStock ?? true,
+    brand: product.brand ?? null,
+    defaultVariantId: product.defaultVariantId ?? null,
+    colors: Array.isArray(product.colors) ? product.colors : [],
+    sizes: Array.isArray(product.sizes) ? product.sizes : [],
+    averageRating: typeof product.averageRating === 'number' ? product.averageRating : 0,
+    reviewsCount: typeof product.reviewsCount === 'number' ? product.reviewsCount : 0,
+    labels: product.labels ?? [],
+  };
 }
 
 type SearchParamsInput = Record<string, string | string[] | undefined>;
@@ -160,159 +133,54 @@ export async function ProductsCatalog({
 }: {
   searchParams: Promise<SearchParamsInput> | SearchParamsInput;
 }) {
-  const params = searchParams instanceof Promise ? await searchParams : searchParams;
-  const page = parseInt((params.page as string) || '1', 10);
-  const limitParam = typeof params.limit === 'string' ? params.limit.trim() : '';
-  const parsedLimit = limitParam && !Number.isNaN(parseInt(limitParam, 10))
-    ? parseInt(limitParam, 10)
-    : null;
-  const perPage = parsedLimit ? Math.min(parsedLimit, 200) : 12;
-
-  const productsData = await getProducts(
-    page,
-    typeof params.search === 'string' ? params.search : undefined,
-    typeof params.category === 'string' ? params.category : undefined,
-    typeof params.minPrice === 'string' ? params.minPrice : undefined,
-    typeof params.maxPrice === 'string' ? params.maxPrice : undefined,
-    typeof params.colors === 'string' ? params.colors : undefined,
-    typeof params.sizes === 'string' ? params.sizes : undefined,
-    typeof params.brand === 'string' ? params.brand : undefined,
-    typeof params.clothingTypes === 'string' ? params.clothingTypes : undefined,
-    perPage
-  );
-
-  const normalizedProducts = productsData.data.map((p: Product) => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    price: p.price,
-    compareAtPrice: p.compareAtPrice ?? p.originalPrice ?? null,
-    originalPrice: p.originalPrice ?? p.compareAtPrice ?? null,
-    image: p.image ?? null,
-    inStock: p.inStock ?? true,
-    brand: p.brand ?? null,
-    defaultVariantId: p.defaultVariantId ?? null,
-    colors: Array.isArray(p.colors) ? p.colors : [],
-    sizes: Array.isArray(p.sizes) ? p.sizes : [],
-    averageRating: typeof p.averageRating === 'number' ? p.averageRating : 0,
-    reviewsCount: typeof p.reviewsCount === 'number' ? p.reviewsCount : 0,
-    labels: p.labels ?? [],
-  }));
-
-  const colors = typeof params.colors === 'string' ? params.colors : undefined;
-  const sizes = typeof params.sizes === 'string' ? params.sizes : undefined;
-  const brands = typeof params.brand === 'string' ? params.brand : undefined;
-  const clothingTypes = typeof params.clothingTypes === 'string' ? params.clothingTypes : undefined;
-  const selectedColors = colors ? colors.split(',').map((c: string) => c.trim().toLowerCase()) : [];
-  const selectedSizes = sizes ? sizes.split(',').map((s: string) => s.trim()) : [];
-  const selectedBrands = brands ? brands.split(',').map((b: string) => b.trim()) : [];
-  const selectedClothingTypes = clothingTypes
-    ? clothingTypes.split(',').map((value: string) => value.trim())
-    : [];
-
-  const buildPaginationUrl = (num: number) => {
-    const q = new URLSearchParams();
-    q.set('page', num.toString());
-    const currentLimit = params.limit ? String(params.limit) : '12';
-    q.set('limit', currentLimit);
-    Object.entries(params).forEach(([k, v]) => {
-      if (k !== 'page' && k !== 'limit' && v && typeof v === 'string') q.set(k, v);
-    });
-    return `/products?${q.toString()}`;
-  };
-
+  const rawParams = searchParams instanceof Promise ? await searchParams : searchParams;
+  const catalogParams = parseProductsCatalogParams(rawParams);
+  const productsData = await getProducts(catalogParams);
+  const normalizedProducts = productsData.data.map(normalizeProduct);
   const language = getStoredLanguage();
-  const sortParam = typeof params.sort === 'string' ? params.sort : 'default';
-  const loadMoreHref = page < productsData.meta.totalPages ? buildPaginationUrl(page + 1) : null;
 
   return (
     <HomeContentHorizontalFrame>
       <HomeSectionContent>
-      <div className="space-y-3 pt-2 pb-4 lg:hidden">
-        <ProductsBreadcrumb />
-        <ProductsHeader />
-      </div>
-
-      <ProductsFiltersProvider
-        category={typeof params.category === 'string' ? params.category : undefined}
-        search={typeof params.search === 'string' ? params.search : undefined}
-        minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-        maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-      >
-        <div className="flex flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
-          <ProductsFilterSidebar
-            category={typeof params.category === 'string' ? params.category : undefined}
-            search={typeof params.search === 'string' ? params.search : undefined}
-            minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-            maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-            selectedColors={selectedColors}
-            selectedSizes={selectedSizes}
-            selectedClothingTypes={selectedClothingTypes}
-          />
-
-          <div className="min-w-0 flex-1">
-            <div
-              className="hidden items-center justify-between gap-4 lg:flex"
-              style={{ paddingBottom: PRODUCTS_CATALOG_TOP_ROW_PB_PX }}
-            >
-              <ProductsBreadcrumb />
-              <ProductsHeader />
-            </div>
-
-            <div style={{ paddingTop: PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX }}>
-            {normalizedProducts.length > 0 ? (
-              <ProductsGrid
-                products={normalizedProducts}
-                sortBy={sortParam}
-                loadMoreHref={loadMoreHref}
-              />
-            ) : (
-              <div className="py-12 text-center">
-                <p className="text-lg text-[#757571]">{t(language, 'common.messages.noProductsFound')}</p>
-              </div>
-            )}
-            </div>
-          </div>
+        <div className="space-y-3 pt-2 pb-4 lg:hidden">
+          <ProductsBreadcrumb />
+          <ProductsHeader />
         </div>
 
-        <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
-          <div className="space-y-6 p-4">
-            <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
-              <PriceFilter
-                currentMinPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                currentMaxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                category={typeof params.category === 'string' ? params.category : undefined}
-                search={typeof params.search === 'string' ? params.search : undefined}
-              />
-              <ColorFilter
-                category={typeof params.category === 'string' ? params.category : undefined}
-                search={typeof params.search === 'string' ? params.search : undefined}
-                minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                selectedColors={selectedColors}
-              />
-              <SizeFilter
-                category={typeof params.category === 'string' ? params.category : undefined}
-                search={typeof params.search === 'string' ? params.search : undefined}
-                minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                selectedSizes={selectedSizes}
-              />
-              <ClothingTypeFilter
-                selectedClothingTypes={selectedClothingTypes}
-                variant="catalog"
-              />
-              <BrandFilter
-                category={typeof params.category === 'string' ? params.category : undefined}
-                search={typeof params.search === 'string' ? params.search : undefined}
-                minPrice={typeof params.minPrice === 'string' ? params.minPrice : undefined}
-                maxPrice={typeof params.maxPrice === 'string' ? params.maxPrice : undefined}
-                selectedBrands={selectedBrands}
-              />
-            </Suspense>
-          </div>
-        </MobileFiltersDrawer>
-      </ProductsFiltersProvider>
+        <ProductsCatalogProvider
+          initialParams={catalogParams}
+          initialProducts={normalizedProducts}
+          initialMeta={productsData.meta}
+        >
+          <ProductsFiltersProviderBridge>
+            <div className="flex flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+              <ProductsFilterSidebar />
+
+              <div className="min-w-0 flex-1">
+                <div
+                  className="hidden items-center justify-between gap-4 lg:flex"
+                  style={{ paddingBottom: PRODUCTS_CATALOG_TOP_ROW_PB_PX }}
+                >
+                  <ProductsBreadcrumb />
+                  <ProductsHeader />
+                </div>
+
+                <ProductsCatalogGridSection />
+              </div>
+            </div>
+
+            <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
+              <div className="space-y-6 p-4">
+                <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
+                  <PriceFilter variant="catalog" />
+                  <ColorFilter variant="catalog" />
+                  <SizeFilter variant="catalog" />
+                  <BrandFilter variant="catalog" />
+                </Suspense>
+              </div>
+            </MobileFiltersDrawer>
+          </ProductsFiltersProviderBridge>
+        </ProductsCatalogProvider>
       </HomeSectionContent>
     </HomeContentHorizontalFrame>
   );

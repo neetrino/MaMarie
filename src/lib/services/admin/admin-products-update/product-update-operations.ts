@@ -5,9 +5,10 @@ import type { UpdateProductData } from "./types";
 import { collectVariantImages, buildProductUpdateData, updateProductTranslation, updateProductLabels, updateProductAttributes } from "./product-updater";
 import { updateOrCreateVariant } from "./variant-updater";
 import { updateAttributeValueImageUrls } from "./attribute-value-updater";
+import { buildAttributeValueLookupCache } from "./variant-processor";
 import { ensureUniqueProductSlug } from "../product-slug-utils";
 
-const PRODUCT_UPDATE_TX_TIMEOUT_MS = 15000;
+const PRODUCT_UPDATE_TX_TIMEOUT_MS = 60000;
 const PRODUCT_UPDATE_TX_MAX_WAIT_MS = 5000;
 
 /**
@@ -82,8 +83,18 @@ export async function updateProduct(
         const incomingVariantIds = new Set<string>();
         
         const locale = dataToPersist.locale || "en";
-        
-        // Process each variant: update if exists, create if new
+        const attributeValueCache = await buildAttributeValueLookupCache(
+          dataToPersist.variants,
+          tx,
+        );
+        const attributeKeyValueCache = new Map<string, string>();
+        const usedSkuSet = new Set(
+          existingVariants
+            .map((v) => v.sku?.trim().toLowerCase())
+            .filter((sku): sku is string => Boolean(sku)),
+        );
+        const verifiedExternalSkus = new Set<string>();
+
         if (dataToPersist.variants.length > 0) {
           for (const variant of dataToPersist.variants) {
             const variantId = await updateOrCreateVariant(
@@ -92,7 +103,11 @@ export async function updateProduct(
               locale,
               existingVariantIds,
               existingSkuMap,
-              tx
+              tx,
+              attributeValueCache,
+              attributeKeyValueCache,
+              usedSkuSet,
+              verifiedExternalSkus,
             );
             incomingVariantIds.add(variantId);
           }
@@ -118,9 +133,6 @@ export async function updateProduct(
         }
       }
 
-      // Update attribute value imageUrls from variant images
-      await updateAttributeValueImageUrls(productId, tx);
-
       // 5. Finally update the product record itself
       return await tx.product.update({
         where: { id: productId },
@@ -139,6 +151,8 @@ export async function updateProduct(
       timeout: PRODUCT_UPDATE_TX_TIMEOUT_MS,
       maxWait: PRODUCT_UPDATE_TX_MAX_WAIT_MS,
     });
+
+    await updateAttributeValueImageUrls(productId);
 
     return result;
   } catch (error: unknown) {

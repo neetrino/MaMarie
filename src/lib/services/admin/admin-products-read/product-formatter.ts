@@ -1,3 +1,5 @@
+import { processImageUrl, smartSplitUrls } from "../../../utils/image-utils";
+
 function categoryTitleFromTranslations(
   translations: Array<{ title: string }> | undefined
 ): string {
@@ -54,6 +56,7 @@ export function formatProductForList(product: {
     price: number;
     stock: number;
     compareAtPrice: number | null;
+    imageUrl?: string | null;
   }>;
   media?: unknown[];
   categories?: Array<{
@@ -66,12 +69,16 @@ export function formatProductForList(product: {
     ? product.translations[0]
     : null;
   
-  // Безопасное получение variant с проверкой на существование массива
-  const variant = Array.isArray(product.variants) && product.variants.length > 0
-    ? product.variants[0]
-    : null;
-  
-  const image = extractImageFromMedia(product.media);
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const variant =
+    variants.length > 0
+      ? variants.reduce((cheapest, current) =>
+          current.price < cheapest.price ? current : cheapest
+        )
+      : null;
+
+  const image =
+    extractImageFromMedia(product.media) ?? extractImageFromVariants(variants);
 
   return {
     id: product.id,
@@ -112,6 +119,24 @@ function extractImageFromMedia(media: unknown[] | undefined): string | null {
   return null;
 }
 
-
-
+/**
+ * Fallback: variable products often store images only on variants.
+ */
+function extractImageFromVariants(
+  variants: Array<{ imageUrl?: string | null }>
+): string | null {
+  for (const variant of variants) {
+    if (!variant.imageUrl?.trim()) {
+      continue;
+    }
+    const urls = smartSplitUrls(variant.imageUrl);
+    for (const url of urls) {
+      const processed = processImageUrl(url);
+      if (processed) {
+        return processed;
+      }
+    }
+  }
+  return null;
+}
 

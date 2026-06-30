@@ -1,12 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, Input } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
-import { useProductsFilters } from './ProductsFiltersProvider';
+import {
+  PRODUCTS_CATALOG_FILTER_ACCENT,
+  PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX,
+  PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+  PRODUCTS_CATALOG_TEXT_DARK,
+} from '../constants/products-catalog';
+import { useProductsFilters, readCachedProductsFilters, writeCachedProductsFilters } from './ProductsFiltersProvider';
+import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
+
+type BrandFilterVariant = 'default' | 'catalog';
 
 interface BrandFilterProps {
   category?: string;
@@ -14,6 +25,7 @@ interface BrandFilterProps {
   minPrice?: string;
   maxPrice?: string;
   selectedBrands?: string[];
+  variant?: BrandFilterVariant;
 }
 
 interface BrandOption {
@@ -22,15 +34,68 @@ interface BrandOption {
   count: number;
 }
 
-export function BrandFilter({ category, search, minPrice, maxPrice, selectedBrands = [] }: BrandFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+function CheckboxIndicator({ selected }: { selected: boolean }) {
+  if (selected) {
+    return (
+      <span
+        className="flex shrink-0 items-center justify-center border-2"
+        style={{
+          width: PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
+          height: PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
+          borderRadius: PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX,
+          borderColor: PRODUCTS_CATALOG_FILTER_ACCENT,
+          backgroundColor: PRODUCTS_CATALOG_FILTER_ACCENT,
+        }}
+        aria-hidden
+      >
+        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+          <path
+            d="M1 4L3.5 6.5L9 1"
+            stroke="white"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="shrink-0 border-2 border-[#d0d0d0]"
+      style={{
+        width: PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
+        height: PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
+        borderRadius: PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX,
+      }}
+      aria-hidden
+    />
+  );
+}
+
+export function BrandFilter({
+  category,
+  search,
+  minPrice,
+  maxPrice,
+  selectedBrands = [],
+  variant = 'default',
+}: BrandFilterProps) {
   const filtersContext = useProductsFilters();
+  const catalog = useOptionalProductsCatalog();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
+  const activeSelected = catalog?.selectedBrands ?? selectedBrands;
   const { t } = useTranslation();
   const [brands, setBrands] = useState<BrandOption[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<BrandOption[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<string[]>(activeSelected);
+
+  useEffect(() => {
+    setSelected(activeSelected);
+  }, [activeSelected]);
 
   useEffect(() => {
     if (filtersContext?.data?.brands) {
@@ -58,6 +123,14 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
   }, [searchQuery, brands]);
 
   const fetchBrands = async () => {
+    const cached = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+    if (cached) {
+      setBrands(cached.brands);
+      setFilteredBrands(cached.brands);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const language = getStoredLanguage();
@@ -68,6 +141,21 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
       if (maxPrice) params.maxPrice = maxPrice;
       const response = await apiClient.get<{ brands: BrandOption[] }>('/api/v1/products/filters', { params });
       const list = response.brands ?? [];
+      const existing = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+      writeCachedProductsFilters(
+        { category, search, minPrice, maxPrice },
+        {
+          colors: existing?.colors || [],
+          sizes: existing?.sizes || [],
+          brands: list,
+          priceRange: existing?.priceRange || {
+            min: 0,
+            max: 100000,
+            stepSize: null,
+            stepSizePerCurrency: null,
+          },
+        }
+      );
       setBrands(list);
       setFilteredBrands(list);
     } catch (err) {
@@ -79,26 +167,81 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
   };
 
   const handleBrandSelect = (brandId: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const currentBrands = selectedBrands || [];
-    const newBrands = currentBrands.includes(brandId)
-      ? currentBrands.filter((id) => id !== brandId)
-      : [...currentBrands, brandId];
-    if (newBrands.length > 0) {
-      params.set('brand', newBrands.join(','));
-    } else {
-      params.delete('brand');
-    }
-    params.delete('page');
-    router.push(`/products?${params.toString()}`);
+    const newBrands = selected.includes(brandId)
+      ? selected.filter((id) => id !== brandId)
+      : [...selected, brandId];
+
+    setSelected(newBrands);
+    applyPatch({
+      brand: newBrands.length > 0 ? newBrands.join(',') : undefined,
+    });
   };
 
   if (loading) {
+    if (variant === 'catalog') {
+      return (
+        <div
+          className="text-[#555]"
+          style={{
+            fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+            lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+          }}
+        >
+          {t('products.filters.brand.loading')}
+        </div>
+      );
+    }
     return (
       <Card className="p-4 mb-6">
         <h3 className="text-base font-bold text-gray-800 mb-4 uppercase tracking-wide">{t('products.filters.brand.title')}</h3>
         <div className="text-sm text-gray-500">{t('products.filters.brand.loading')}</div>
       </Card>
+    );
+  }
+
+  if (variant === 'catalog') {
+    if (brands.length === 0) {
+      return (
+        <div
+          className="py-2 text-[#555]"
+          style={{
+            fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+            lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+          }}
+        >
+          {t('products.filters.brand.noBrands')}
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-2.5">
+        {brands.map((brand) => {
+          const isSelected = selected.includes(brand.id);
+
+          return (
+            <button
+              key={brand.id}
+              type="button"
+              onClick={() => handleBrandSelect(brand.id)}
+              className="flex w-full items-center gap-3 text-left"
+              aria-pressed={isSelected}
+            >
+              <CheckboxIndicator selected={isSelected} />
+              <span
+                className={isSelected ? 'font-semibold' : 'font-medium text-[#555]'}
+                style={{
+                  fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+                  lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+                  color: isSelected ? PRODUCTS_CATALOG_TEXT_DARK : undefined,
+                }}
+              >
+                {brand.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     );
   }
 
@@ -138,7 +281,7 @@ export function BrandFilter({ category, search, minPrice, maxPrice, selectedBran
       {filteredBrands.length > 0 ? (
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {filteredBrands.map((brand) => {
-            const isSelected = selectedBrands.includes(brand.id);
+            const isSelected = activeSelected.includes(brand.id);
 
             return (
               <button

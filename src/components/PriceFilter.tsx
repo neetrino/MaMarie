@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { getStoredCurrency, formatPrice as formatCurrencyPrice, type CurrencyCode } from '../lib/currency';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters } from './ProductsFiltersProvider';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
 import { PRODUCTS_CATALOG_FILTER_PRICE_FONT_SIZE_PX } from '../constants/products-catalog';
 
 type PriceFilterVariant = 'default' | 'catalog';
@@ -33,9 +33,8 @@ export function PriceFilter({
   category,
   variant = 'default',
 }: PriceFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const filtersContext = useProductsFilters();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
   const [priceRange, setPriceRange] = useState<PriceRange>({
     min: 0,
@@ -195,33 +194,17 @@ export function PriceFilter({
       const shouldApplyMax = maxPrice !== priceRange.max;
       
       if (shouldApplyMin || shouldApplyMax) {
-        // Ստեղծում ենք նոր URLSearchParams URL-ի հիման վրա, որպեսզի պահպանենք բոլոր params-ները
-        const params = new URLSearchParams(searchParams.toString());
-        
-        if (shouldApplyMin) {
-          params.set('minPrice', minPrice.toString());
-        } else {
-          params.delete('minPrice');
-        }
-        
-        if (shouldApplyMax) {
-          params.set('maxPrice', maxPrice.toString());
-        } else {
-          params.delete('maxPrice');
-        }
-        
-        // Reset page to 1 when filters change
-        params.delete('page');
-        
-        // Use a small delay to debounce rapid changes
         const timeoutId = setTimeout(() => {
-          router.push(`/products?${params.toString()}`);
+          applyPatch({
+            minPrice: shouldApplyMin ? String(minPrice) : undefined,
+            maxPrice: shouldApplyMax ? String(maxPrice) : undefined,
+          });
         }, 300);
-        
+
         return () => clearTimeout(timeoutId);
       }
     }
-  }, [isDragging, minPrice, maxPrice, priceRange, searchParams, router]);
+  }, [isDragging, minPrice, maxPrice, priceRange, applyPatch]);
 
   // Используем функцию форматирования из currency.ts для консистентности
   const formatPrice = (price: number) => {

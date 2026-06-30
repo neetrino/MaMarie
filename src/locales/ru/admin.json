@@ -185,6 +185,7 @@
     "categoryTitlePlaceholder": "Введите название категории",
     "parentCategory": "категория",
     "rootCategory": "Нет (Корневая категория)",
+    "selectedParentsCount": "Выбрано родительских категорий: {count}",
     "status": "Статус",
     "published": "Опубликовано",
     "draft": "Черновик",
