@@ -1,17 +1,25 @@
 'use client';
 
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
+  CART_DRAWER_CLOSE_BUTTON_TOP_PX,
   CART_DRAWER_CLOSE_EVENT,
+  CART_DRAWER_CLOSE_ICON_OFFSET_X_PX,
+  CART_DRAWER_CLOSE_ICON_SIZE_PX,
+  CART_DRAWER_CLOSE_ICON_STROKE_WIDTH,
+  CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
+  CART_DRAWER_CLOSE_TAB_WIDTH_PX,
+  CART_DRAWER_CLOSE_TAB_Z_INDEX,
   CART_DRAWER_MAX_WIDTH_PX,
   CART_DRAWER_OPEN_EVENT,
+  CART_DRAWER_PANEL_Z_INDEX,
   CART_DRAWER_Z_INDEX,
 } from '../../constants/cart-drawer';
 import type { Cart } from '../../app/cart/types';
 import { CartDrawerItemRow } from './CartDrawerItemRow';
 import { CartDrawerSummary } from './CartDrawerSummary';
+import { CartEmptyState } from './CartEmptyState';
 import { useCartState } from './useCartState';
 
 function formatItemsCount(count: number, t: (key: string) => string): string {
@@ -27,6 +35,48 @@ interface CartDrawerPanelProps {
   onRemoveItem: (itemId: string) => Promise<void>;
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   t: (key: string) => string;
+}
+
+function CartDrawerCloseTab({
+  onClose,
+  closeLabel,
+}: {
+  onClose: () => void;
+  closeLabel: string;
+}) {
+  const tabRadiusPx = CART_DRAWER_CLOSE_TAB_HEIGHT_PX / 2;
+
+  return (
+    <button
+      type="button"
+      onClick={onClose}
+      className="absolute flex items-center justify-center bg-brand-pink text-white"
+      style={{
+        top: CART_DRAWER_CLOSE_BUTTON_TOP_PX,
+        left: 0,
+        zIndex: CART_DRAWER_CLOSE_TAB_Z_INDEX,
+        width: CART_DRAWER_CLOSE_TAB_WIDTH_PX,
+        height: CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
+        transform: 'translateX(-50%)',
+        borderRadius: tabRadiusPx,
+        paddingRight: CART_DRAWER_CLOSE_TAB_WIDTH_PX / 2,
+      }}
+      aria-label={closeLabel}
+    >
+      <svg
+        width={CART_DRAWER_CLOSE_ICON_SIZE_PX}
+        height={CART_DRAWER_CLOSE_ICON_SIZE_PX}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={CART_DRAWER_CLOSE_ICON_STROKE_WIDTH}
+        aria-hidden
+        style={{ transform: `translateX(${CART_DRAWER_CLOSE_ICON_OFFSET_X_PX}px)` }}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  );
 }
 
 function CartDrawerPanel({
@@ -48,17 +98,22 @@ function CartDrawerPanel({
       style={{ zIndex: CART_DRAWER_Z_INDEX }}
       onClick={onClose}
     >
-      <aside
-        className="flex h-dvh max-h-dvh w-full max-w-full flex-col overflow-hidden bg-white shadow-2xl max-sm:rounded-none sm:rounded-l-3xl"
+      <div
+        className="relative h-dvh max-h-dvh w-full"
         style={{ maxWidth: CART_DRAWER_MAX_WIDTH_PX }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cart-drawer-title"
-        onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-start justify-between border-b border-gray-100 px-6 py-5">
-          <div>
-            <h2 id="cart-drawer-title" className="text-xl font-bold text-gray-900">
+        <CartDrawerCloseTab onClose={onClose} closeLabel={t('common.buttons.close')} />
+        <aside
+          className="relative flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl max-sm:rounded-none sm:rounded-l-3xl"
+          style={{ zIndex: CART_DRAWER_PANEL_Z_INDEX }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cart-drawer-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+        <header className="flex items-center border-b border-gray-100 px-6 py-5">
+          <div className="flex min-h-10 flex-col justify-center">
+            <h2 id="cart-drawer-title" className="text-xl font-bold leading-tight text-gray-900">
               {t('common.cart.title')}
             </h2>
             {headerItemsCount > 0 ? (
@@ -67,16 +122,6 @@ function CartDrawerPanel({
               </p>
             ) : null}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
-            aria-label={t('common.buttons.close')}
-          >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </header>
 
         <div className="flex min-h-0 flex-1 flex-col">
@@ -88,16 +133,7 @@ function CartDrawerPanel({
               </div>
             </div>
           ) : !hasItems ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-              <p className="text-lg font-semibold text-gray-900">{t('common.cart.empty')}</p>
-              <Link
-                href="/products"
-                onClick={onClose}
-                className="mt-6 rounded-2xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
-              >
-                {t('common.buttons.browseProducts')}
-              </Link>
-            </div>
+            <CartEmptyState t={t} onCtaClick={onClose} />
           ) : (
             <>
               <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -117,6 +153,7 @@ function CartDrawerPanel({
           )}
         </div>
       </aside>
+      </div>
     </div>
   );
 }
