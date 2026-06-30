@@ -12,6 +12,8 @@ import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { WISHLIST_KEY } from '../../lib/storageCounts';
 import type { WishlistUpdatedDetail } from '../../components/hooks/useWishlist';
+import { WishlistEmptyState } from '../../components/wishlist/WishlistEmptyState';
+import { WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX } from '../../constants/wishlist-empty-state';
 
 interface Product {
   id: string;
@@ -246,7 +248,16 @@ export default function WishlistPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('common.wishlist.title')}</h1>
+      <h1
+        className={`text-3xl font-bold text-gray-900 ${products.length > 0 ? 'mb-8' : ''}`}
+        style={
+          products.length === 0
+            ? { marginBottom: WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX }
+            : undefined
+        }
+      >
+        {t('common.wishlist.title')}
+      </h1>
 
       {products.length > 0 ? (
         <>
@@ -360,34 +371,7 @@ export default function WishlistPage() {
           </div>
         </>
       ) : (
-        <div className="text-center py-16">
-          <div className="max-w-md mx-auto">
-            <svg
-              className="mx-auto h-24 w-24 text-gray-400 mb-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {t('common.wishlist.empty')}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {t('common.wishlist.emptyDescription')}
-            </p>
-            <Link href="/products">
-              <Button variant="primary" size="lg">
-                {t('common.buttons.browseProducts')}
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <WishlistEmptyState t={t} />
       )}
     </div>
   );
