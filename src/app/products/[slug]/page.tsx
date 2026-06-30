@@ -9,6 +9,7 @@ import { RelatedProducts } from '../../../components/RelatedProducts';
 import { ProductReviews } from '../../../components/ProductReviews';
 import { ProductImageGallery } from './ProductImageGallery';
 import { ProductInfoAndActions } from './ProductInfoAndActions';
+import { ProductPageFrame } from './ProductPageFrame';
 import { ProductPageShell } from './ProductPageShell';
 import { useProductPage } from './useProductPage';
 import { readGuestCartItems, writeGuestCartItems } from '../../../lib/guest-cart-storage';
@@ -124,28 +125,28 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   if (notFound && !product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
+      <ProductPageFrame className="text-center space-y-4">
         <p className="text-lg text-neutral-600">{t(language, 'common.messages.noProductsFound')}</p>
         <Link href="/products" className="inline-block text-blue-600 font-medium hover:underline">
           {t(language, 'common.navigation.products')}
         </Link>
-      </div>
+      </ProductPageFrame>
     );
   }
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
+      <ProductPageFrame className="text-center space-y-4">
         <p className="text-lg text-neutral-600">{t(language, 'common.messages.invalidProduct')}</p>
         <Link href="/products" className="inline-block text-blue-600 font-medium hover:underline">
           {t(language, 'common.navigation.products')}
         </Link>
-      </div>
+      </ProductPageFrame>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <ProductPageFrame>
       <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-12 items-start">
         <ProductImageGallery
           images={images}
@@ -211,6 +212,6 @@ export default function ProductPage({ params }: ProductPageProps) {
       <div id="product-reviews" className="mt-16 scroll-mt-24">
         <ProductReviews productSlug={slug} productId={product.id} />
       </div>
-    </div>
+    </ProductPageFrame>
   );
 }
