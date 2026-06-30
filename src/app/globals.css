@@ -34,6 +34,14 @@
   input, textarea {
     caret-color: currentColor;
   }
+
+  /* Desktop — scale 1440px Figma layout to viewport (navbar + homepage stay aligned). */
+  @media (min-width: 1024px) {
+    :root {
+      --desktop-layout-design-width: 1440px;
+      --desktop-layout-scale: calc(100vw / var(--desktop-layout-design-width));
+    }
+  }
 }
 
 @layer utilities {

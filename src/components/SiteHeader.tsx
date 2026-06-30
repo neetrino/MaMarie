@@ -22,6 +22,7 @@ import {
 } from '../constants/header';
 import type { NavLinkItem } from '../constants/nav-links';
 import { BrandLogoLink } from './BrandLogoLink';
+import { DesktopFluidFrame } from './DesktopFluidFrame';
 import {
   HomeContentHorizontalFrame,
   HomeSectionContent,
@@ -172,7 +173,7 @@ function DesktopHeaderBar({
   navLinks: readonly NavLinkItem[];
 }) {
   return (
-    <div className="relative hidden w-full lg:block">
+    <div className="relative w-full">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-0 flex items-center"
@@ -247,7 +248,9 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
         onMenuToggle={handleMenuToggle}
         onMenuClose={handleMenuClose}
       />
-      <DesktopHeaderBar showPill={isScrolled} navLinks={navLinks} />
+      <DesktopFluidFrame className="hidden lg:flex">
+        <DesktopHeaderBar showPill={isScrolled} navLinks={navLinks} />
+      </DesktopFluidFrame>
     </header>
   );
 }

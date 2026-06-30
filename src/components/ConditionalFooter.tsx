@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX } from '../constants/lazy-loading';
+import { DesktopFluidFrame } from './DesktopFluidFrame';
 import { Footer } from './Footer';
 import { LazyWhenVisible } from './LazyWhenVisible';
 
@@ -11,10 +12,10 @@ export function ConditionalFooter() {
     return null;
   }
   return (
-    <div className="hidden lg:block">
+    <DesktopFluidFrame className="hidden lg:flex">
       <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
         <Footer />
       </LazyWhenVisible>
-    </div>
+    </DesktopFluidFrame>
   );
 }

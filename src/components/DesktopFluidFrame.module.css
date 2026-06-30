@@ -1,0 +1,21 @@
+.frame {
+  width: 100%;
+}
+
+.stage {
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    display: flex;
+    justify-content: center;
+    overflow-x: clip;
+  }
+
+  .stage {
+    width: var(--desktop-layout-design-width);
+    flex-shrink: 0;
+    zoom: var(--desktop-layout-scale);
+  }
+}

@@ -13,7 +13,7 @@ interface MainContentProps {
 
 const headerClearanceVars = {
   ['--header-clearance-mobile']: `${HEADER_CONTENT_CLEARANCE_MOBILE_PX}px`,
-  ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px`,
+  ['--header-clearance-desktop']: `calc(${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,
 } as CSSProperties;
 
 /**
@@ -35,7 +35,7 @@ export function MainContent({ children }: MainContentProps) {
         className={`${mainBase} md:pt-[var(--header-clearance-desktop)]`}
         style={
           {
-            ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px`,
+            ['--header-clearance-desktop']: `calc(${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,
           } as CSSProperties
         }
       >
