@@ -6,8 +6,7 @@ import {
 import {
   HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX,
   HOME_PRODUCT_CARD_DESIGN_WIDTH_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX,
-  HOME_PRODUCT_CARD_LIFT_PX,
+  BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
 } from './home-sections';
 
 /** Figma shop page — catalog layout tokens. Horizontal insets use `HomeContentHorizontalFrame` (same as navbar pill). */
@@ -28,12 +27,8 @@ export const PRODUCTS_CATALOG_TOP_ROW_PB_PX = 16;
 /** Product grid top inset below breadcrumb / sort row. */
 export const PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX = 104;
 
-/** PDP related products — gap below section title (px). */
-export const RELATED_PRODUCTS_TITLE_TO_CARDS_GAP_PX = 56;
-
-/** PDP related products — top scroll inset so full card art + hover lift stay visible (px). */
-export const RELATED_PRODUCTS_SCROLL_PADDING_TOP_PX =
-  Math.abs(HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX) + HOME_PRODUCT_CARD_LIFT_PX;
+/** PDP related products — title → card row (same as home best-products; image sits in this inset). */
+export const RELATED_PRODUCTS_GRID_OFFSET_TOP_PX = BEST_PRODUCTS_GRID_OFFSET_TOP_PX;
 
 export const PRODUCTS_CATALOG_CARD_GAP_PX = 12;
 

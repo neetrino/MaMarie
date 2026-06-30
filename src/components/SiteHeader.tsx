@@ -3,8 +3,6 @@
 import { Suspense, useId, useState } from 'react';
 import {
   HEADER_ACTIONS_GAP_PX,
-  HEADER_PADDING_LEFT_PX,
-  HEADER_PADDING_RIGHT_PX,
 } from '../constants/brand';
 import {
   HEADER_DESKTOP_ROW_PADDING_Y_PX,
@@ -28,6 +26,7 @@ import {
   HomeSectionContent,
 } from './home/HomeSectionShell';
 import { HeaderActionIcons } from './header/HeaderActionIcons';
+import { HeaderContentFrame } from './header/HeaderContentFrame';
 import { HeaderCurrencyPill } from './header/HeaderCurrencyPill';
 import { HeaderLanguagePill } from './header/HeaderLanguagePill';
 import { HeaderLoginPill } from './header/HeaderLoginPill';
@@ -39,11 +38,6 @@ import { useHeaderScrolled } from './header/useHomeHeaderScrolled';
 export interface SiteHeaderProps {
   navLinks: readonly NavLinkItem[];
 }
-
-const headerInsetStyle = {
-  paddingLeft: HEADER_PADDING_LEFT_PX,
-  paddingRight: HEADER_PADDING_RIGHT_PX,
-} as const;
 
 const headerPillTransitionStyle = {
   transitionDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
@@ -192,16 +186,15 @@ function DesktopHeaderBar({
         </HomeContentHorizontalFrame>
       </div>
 
-      <div
+      <HeaderContentFrame
         className="pointer-events-auto relative z-10 flex w-full items-center"
         style={{
-          ...headerInsetStyle,
           paddingTop: HEADER_DESKTOP_ROW_PADDING_Y_PX,
           paddingBottom: HEADER_DESKTOP_ROW_PADDING_Y_PX,
         }}
       >
         <HeaderDesktopNav navLinks={navLinks} />
-      </div>
+      </HeaderContentFrame>
     </div>
   );
 }

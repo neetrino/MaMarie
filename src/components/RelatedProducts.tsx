@@ -5,8 +5,7 @@ import {
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   RELATED_PRODUCTS_CARD_GAP_PX,
-  RELATED_PRODUCTS_SCROLL_PADDING_TOP_PX,
-  RELATED_PRODUCTS_TITLE_TO_CARDS_GAP_PX,
+  RELATED_PRODUCTS_GRID_OFFSET_TOP_PX,
 } from '../constants/products-catalog';
 import {
   BEST_PRODUCTS_ASSETS,
@@ -54,10 +53,14 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
     };
   }, []);
 
+  const relatedRowStyle = {
+    gap: RELATED_PRODUCTS_CARD_GAP_PX,
+    paddingTop: RELATED_PRODUCTS_GRID_OFFSET_TOP_PX,
+  } as const;
+
   return (
     <section className="py-12 mt-20 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <HomeSectionHeadingRow
+      <HomeSectionHeadingRow
           id="related-products-heading"
           title={t(language, 'product.related_products_title')}
           seeAllHref="/products"
@@ -71,13 +74,7 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
         />
 
         {loading ? (
-          <div
-            className="scrollbar-hide flex overflow-x-auto pb-6"
-            style={{
-              gap: RELATED_PRODUCTS_CARD_GAP_PX,
-              paddingTop: RELATED_PRODUCTS_TITLE_TO_CARDS_GAP_PX + RELATED_PRODUCTS_SCROLL_PADDING_TOP_PX,
-            }}
-          >
+          <div className="scrollbar-hide flex overflow-x-auto overflow-y-visible pb-6" style={relatedRowStyle}>
             {[1, 2, 3, 4].map((index) => (
               <div
                 key={index}
@@ -95,11 +92,8 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
           </div>
         ) : (
           <div
-            className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto pb-6"
-            style={{
-              gap: RELATED_PRODUCTS_CARD_GAP_PX,
-              paddingTop: RELATED_PRODUCTS_TITLE_TO_CARDS_GAP_PX + RELATED_PRODUCTS_SCROLL_PADDING_TOP_PX,
-            }}
+            className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto overflow-y-visible pb-6"
+            style={relatedRowStyle}
           >
             {products.map((product, index) => (
               <RelatedProductCard
@@ -110,7 +104,6 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
             ))}
           </div>
         )}
-      </div>
     </section>
   );
 }
