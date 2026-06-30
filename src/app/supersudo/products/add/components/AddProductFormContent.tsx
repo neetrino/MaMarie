@@ -167,12 +167,7 @@ export function AddProductFormContent({
   generateSlug,
   handleSubmit,
 }: AddProductFormContentProps) {
-  const shouldShowSimpleFields =
-    productType === 'simple' ||
-    (productType === 'variable' &&
-      selectedAttributesForVariants.size === 0 &&
-      generatedVariants.length === 0 &&
-      !hasVariantsToLoad);
+  const shouldShowSimpleFields = productType === 'simple';
 
   return (
     <Card className="p-6 pb-24 sm:pb-24">
@@ -188,16 +183,18 @@ export function AddProductFormContent({
           onDescriptionChange={onDescriptionChange}
         />
 
-        <ProductImages
-          imageUrls={formData.imageUrls}
-          featuredImageIndex={formData.featuredImageIndex}
-          imageUploadLoading={imageUploadLoading}
-          imageUploadError={imageUploadError}
-          fileInputRef={fileInputRef}
-          onUploadImages={onUploadImages}
-          onRemoveImage={onRemoveImage}
-          onSetFeaturedImage={onSetFeaturedImage}
-        />
+        {productType === 'simple' && (
+          <ProductImages
+            imageUrls={formData.imageUrls}
+            featuredImageIndex={formData.featuredImageIndex}
+            imageUploadLoading={imageUploadLoading}
+            imageUploadError={imageUploadError}
+            fileInputRef={fileInputRef}
+            onUploadImages={onUploadImages}
+            onRemoveImage={onRemoveImage}
+            onSetFeaturedImage={onSetFeaturedImage}
+          />
+        )}
 
         <CategoriesBrands
           categories={categories}

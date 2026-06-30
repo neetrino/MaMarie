@@ -11,7 +11,7 @@ import {
 import { logger } from "@/lib/utils/logger";
 import { ensureUniqueProductSlug } from "./product-slug-utils";
 
-const PRODUCT_CREATE_TX_TIMEOUT_MS = 15000;
+const PRODUCT_CREATE_TX_TIMEOUT_MS = 30000;
 const PRODUCT_CREATE_TX_MAX_WAIT_MS = 5000;
 
 class AdminProductsCreateService {
@@ -159,21 +159,29 @@ class AdminProductsCreateService {
                 let value: string | null = null;
 
                 if (opt.valueId) {
-                  // New format: use valueId
                   valueId = opt.valueId;
-                  // Fetch AttributeValue to get value and attributeKey
-                  const attrValue = await tx.attributeValue.findUnique({
-                    where: { id: opt.valueId },
-                    include: { attribute: true },
-                  });
-                  if (attrValue) {
-                    attributeKey = attrValue.attribute.key;
-                    value = attrValue.value;
+                  if (opt.attributeKey && opt.value) {
+                    attributeKey = opt.attributeKey;
+                    value = opt.value;
+                  } else {
+                    const attrValue = await tx.attributeValue.findUnique({
+                      where: { id: opt.valueId },
+                      include: { attribute: true },
+                    });
+                    if (attrValue) {
+                      attributeKey = attrValue.attribute.key;
+                      value = attrValue.value;
+                    }
                   }
                   options.push({ valueId: opt.valueId });
                 } else if (opt.attributeKey && opt.value) {
                   // Try to find or create AttributeValue
-                  const foundValueId = await findOrCreateAttributeValue(opt.attributeKey, opt.value, data.locale);
+                  const foundValueId = await findOrCreateAttributeValue(
+                    opt.attributeKey,
+                    opt.value,
+                    data.locale,
+                    tx,
+                  );
                   if (foundValueId) {
                     valueId = foundValueId;
                     attributeKey = opt.attributeKey;
@@ -205,7 +213,7 @@ class AdminProductsCreateService {
             } else {
               // Old format: Try to find or create AttributeValues for color and size
               if (variant.color) {
-                const colorValueId = await findOrCreateAttributeValue("color", variant.color, data.locale);
+                const colorValueId = await findOrCreateAttributeValue("color", variant.color, data.locale, tx);
                 if (colorValueId) {
                   options.push({ valueId: colorValueId });
                   if (!attributesMap["color"]) {
@@ -223,7 +231,7 @@ class AdminProductsCreateService {
               }
               
               if (variant.size) {
-                const sizeValueId = await findOrCreateAttributeValue("size", variant.size, data.locale);
+                const sizeValueId = await findOrCreateAttributeValue("size", variant.size, data.locale, tx);
                 if (sizeValueId) {
                   options.push({ valueId: sizeValueId });
                   if (!attributesMap["size"]) {

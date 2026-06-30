@@ -5,6 +5,7 @@ import { type ChangeEvent } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { ParentCategorySelector } from './ParentCategorySelector';
 
 interface AddCategoryModalProps {
   isOpen: boolean;
@@ -53,25 +54,11 @@ export function AddCategoryModal({
               className="w-full"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('admin.categories.parentCategory')}
-            </label>
-            <select
-              value={formData.parentId}
-              onChange={(e) => onFormDataChange({ ...formData, parentId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">{t('admin.categories.rootCategory')}</option>
-              {categories
-                .filter((cat) => !cat.parentId)
-                .map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.title}
-                  </option>
-                ))}
-            </select>
-          </div>
+          <ParentCategorySelector
+            categories={categories}
+            selectedParentIds={formData.parentIds}
+            onChange={(parentIds) => onFormDataChange({ ...formData, parentIds })}
+          />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('admin.categories.status')}
@@ -175,7 +162,3 @@ export function AddCategoryModal({
     </div>
   );
 }
-
-
-
-

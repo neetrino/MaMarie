@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { useTranslation } from '../../lib/i18n-client';
 import {
+  HOME_GENDER_CATEGORY_SLUG,
+  homeGenderCategoryProductsHref,
+} from '../../constants/home-gender-categories';
+import {
   HERO_GENDER_BUTTON_BOYS_BG_COLOR,
   HERO_GENDER_BUTTON_FONT_SIZE_PX,
   HERO_GENDER_BUTTON_GIRLS_BG_COLOR,
@@ -61,13 +65,13 @@ export function HeroGenderButtons() {
       aria-label={t('home.hero.genderButtons.label')}
     >
       <GenderButton
-        href="/products"
+        href={homeGenderCategoryProductsHref(HOME_GENDER_CATEGORY_SLUG.girls)}
         label={t('home.hero.genderButtons.girls')}
         backgroundColor={HERO_GENDER_BUTTON_GIRLS_BG_COLOR}
         widthPx={HERO_GENDER_BUTTON_GIRLS_WIDTH_PX}
       />
       <GenderButton
-        href="/products"
+        href={homeGenderCategoryProductsHref(HOME_GENDER_CATEGORY_SLUG.boys)}
         label={t('home.hero.genderButtons.boys')}
         backgroundColor={HERO_GENDER_BUTTON_BOYS_BG_COLOR}
       />

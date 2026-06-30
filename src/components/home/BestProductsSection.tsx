@@ -4,11 +4,7 @@ import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
 import { BEST_PRODUCTS_CARD_COUNT, BEST_PRODUCTS_SECTION_OFFSET_TOP_PX } from '../../constants/home-sections';
 import { BestProductsBlock } from './BestProductsBlock';
-import {
-  fillBestProductsRow,
-  getBestProductsFallbackList,
-  mapToHomeProductCard,
-} from './best-products-data';
+import { mapToHomeProductCard } from './best-products-data';
 import { HomePageSection } from './HomeSectionShell';
 
 const BEST_PRODUCTS_REVALIDATE_SECONDS = 600;
@@ -17,7 +13,7 @@ const getBestProductsCached = unstable_cache(
   async (lang: string) => {
     try {
       const result = await productsService.findAll({
-        filter: 'bestseller',
+        filter: 'featured',
         limit: BEST_PRODUCTS_CARD_COUNT,
         page: 1,
         lang,
@@ -26,15 +22,15 @@ const getBestProductsCached = unstable_cache(
       return result.data.map(mapToHomeProductCard);
     } catch (error) {
       logger.error('Failed to load home best products', { error, lang });
-      return getBestProductsFallbackList();
+      return [];
     }
   },
-  ['home-best-products-v1'],
+  ['home-featured-products-v3'],
   { revalidate: BEST_PRODUCTS_REVALIDATE_SECONDS }
 );
 
 export async function BestProductsSection() {
-  const products = fillBestProductsRow(await getBestProductsCached(DEFAULT_LANGUAGE));
+  const products = await getBestProductsCached(DEFAULT_LANGUAGE);
 
   return (
     <HomePageSection offsetTopPx={BEST_PRODUCTS_SECTION_OFFSET_TOP_PX}>

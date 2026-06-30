@@ -1,4 +1,10 @@
 import { db } from "@white-shop/db";
+import {
+  getEffectiveParentIds,
+  isRootCategory,
+  normalizeParentIds,
+  syncPrimaryParentId,
+} from "@/lib/categories/category-parent-ids";
 import { toSlug } from "@/lib/utils/slug";
 import { logger } from "@/lib/utils/logger";
 
@@ -64,6 +70,56 @@ class AdminCategoriesService {
     });
   }
 
+  private async validateParentIds(parentIds: string[], categoryId?: string): Promise<string[]> {
+    const normalized = normalizeParentIds(parentIds);
+
+    if (normalized.length === 0) {
+      return [];
+    }
+
+    if (categoryId && normalized.includes(categoryId)) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/bad-request",
+        title: "Invalid parent",
+        detail: "Category cannot be its own parent",
+      };
+    }
+
+    const parents = await db.category.findMany({
+      where: {
+        id: { in: normalized },
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        parentId: true,
+        parentIds: true,
+      },
+    });
+
+    if (parents.length !== normalized.length) {
+      throw {
+        status: 404,
+        type: "https://api.shop.am/problems/not-found",
+        title: "Parent category not found",
+        detail: "One or more selected parent categories do not exist",
+      };
+    }
+
+    const invalidParent = parents.find((parent) => !isRootCategory(parent));
+    if (invalidParent) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/bad-request",
+        title: "Invalid parent",
+        detail: "Only root categories can be selected as parents",
+      };
+    }
+
+    return normalized;
+  }
+
   /**
    * Get categories for admin
    */
@@ -84,7 +140,7 @@ class AdminCategoriesService {
     });
 
     return {
-      data: categories.map((category: { id: string; parentId: string | null; requiresSizes: boolean | null; published: boolean | null; media: unknown[]; translations?: Array<{ title: string; slug: string }> }) => {
+      data: categories.map((category: { id: string; parentId: string | null; parentIds: string[]; requiresSizes: boolean | null; published: boolean | null; media: unknown[]; translations?: Array<{ title: string; slug: string }> }) => {
         const translations = Array.isArray(category.translations) ? category.translations : [];
         const translation = translations[0] || null;
         return {
@@ -92,6 +148,7 @@ class AdminCategoriesService {
           title: translation?.title || "",
           slug: translation?.slug || "",
           parentId: category.parentId,
+          parentIds: getEffectiveParentIds(category),
           requiresSizes: category.requiresSizes || false,
           published: Boolean(category.published),
           imageUrl: this.extractImageUrl(category.media),
@@ -107,34 +164,25 @@ class AdminCategoriesService {
     title: string;
     locale?: string;
     parentId?: string;
+    parentIds?: string[];
     requiresSizes?: boolean;
+    subcategoryIds?: string[];
     imageUrl?: string;
     published?: boolean;
   }) {
     const locale = data.locale || "en";
-    
-    // Validate parent category exists if parentId is provided
-    if (data.parentId) {
-      const parentCategory = await db.category.findUnique({
-        where: { id: data.parentId },
-      });
+    const parentIds = await this.validateParentIds(
+      data.parentIds ?? (data.parentId ? [data.parentId] : []),
+    );
+    const primaryParentId = syncPrimaryParentId(parentIds);
 
-      if (!parentCategory) {
-        throw {
-          status: 404,
-          type: "https://api.shop.am/problems/not-found",
-          title: "Parent category not found",
-          detail: `Parent category with id '${data.parentId}' does not exist`,
-        };
-      }
-    }
-    
     // Generate slug from title (ReDoS-safe)
     const slug = toSlug(data.title);
 
     const category = await db.category.create({
       data: {
-        parentId: data.parentId || undefined,
+        parentId: primaryParentId ?? undefined,
+        parentIds,
         requiresSizes: data.requiresSizes || false,
         published: data.published ?? true,
         media: data.imageUrl
@@ -154,7 +202,24 @@ class AdminCategoriesService {
       },
     });
 
-    // Безопасное получение translation с проверкой на существование массива
+    if (parentIds.length === 0 && data.subcategoryIds && data.subcategoryIds.length > 0) {
+      const validSubcategoryIds = Array.from(new Set(data.subcategoryIds)).filter(
+        (id) => id !== category.id
+      );
+
+      if (validSubcategoryIds.length > 0) {
+        await db.category.updateMany({
+          where: {
+            id: { in: validSubcategoryIds },
+          },
+          data: {
+            parentId: category.id,
+            parentIds: [],
+          },
+        });
+      }
+    }
+
     const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
     const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
 
@@ -164,6 +229,7 @@ class AdminCategoriesService {
         title: translation?.title || "",
         slug: translation?.slug || "",
         parentId: category.parentId,
+        parentIds: getEffectiveParentIds(category),
         requiresSizes: category.requiresSizes || false,
         imageUrl: this.extractImageUrl(category.media),
         published: Boolean(category.published),
@@ -205,6 +271,7 @@ class AdminCategoriesService {
       title: translation?.title || "",
       slug: translation?.slug || "",
       parentId: category.parentId,
+      parentIds: getEffectiveParentIds(category),
       requiresSizes: category.requiresSizes || false,
       published: Boolean(category.published),
       imageUrl: this.extractImageUrl(category.media),
@@ -229,6 +296,7 @@ class AdminCategoriesService {
     title?: string;
     locale?: string;
     parentId?: string | null;
+    parentIds?: string[];
     requiresSizes?: boolean;
     subcategoryIds?: string[];
     imageUrl?: string | null;
@@ -252,47 +320,26 @@ class AdminCategoriesService {
       };
     }
 
-    // Prevent circular reference (category cannot be its own parent)
-    if (data.parentId === categoryId) {
-      throw {
-        status: 400,
-        type: "https://api.shop.am/problems/bad-request",
-        title: "Invalid parent",
-        detail: "Category cannot be its own parent",
-      };
+    let resolvedParentIds: string[] | undefined;
+    if (data.parentIds !== undefined) {
+      resolvedParentIds = await this.validateParentIds(data.parentIds, categoryId);
+    } else if (data.parentId !== undefined) {
+      resolvedParentIds = data.parentId
+        ? await this.validateParentIds([data.parentId], categoryId)
+        : [];
     }
 
-    // Prevent setting parent to a child category (would create circular reference)
-    if (data.parentId) {
-      const potentialParent = await db.category.findUnique({
-        where: { id: data.parentId },
-        include: {
-          children: {
-            where: {
-              deletedAt: null,
-            },
-          },
-        },
-      });
-
-      if (!potentialParent) {
-        throw {
-          status: 404,
-          type: "https://api.shop.am/problems/not-found",
-          title: "Parent category not found",
-          detail: `Parent category with id '${data.parentId}' does not exist`,
-        };
-      }
-
-      // Check if the category to update is in the children of the potential parent
-      const isChild = await this.isCategoryDescendant(potentialParent.id, categoryId);
-      if (isChild) {
-        throw {
-          status: 400,
-          type: "https://api.shop.am/problems/bad-request",
-          title: "Circular reference",
-          detail: "Cannot set parent to a category that is a descendant of this category",
-        };
+    if (resolvedParentIds) {
+      for (const parentId of resolvedParentIds) {
+        const isDescendant = await this.isCategoryDescendant(categoryId, parentId);
+        if (isDescendant) {
+          throw {
+            status: 400,
+            type: "https://api.shop.am/problems/bad-request",
+            title: "Circular reference",
+            detail: "Cannot set parent to a category that is a descendant of this category",
+          };
+        }
       }
     }
 
@@ -301,15 +348,13 @@ class AdminCategoriesService {
       // First, remove all existing children relationships
       await db.category.updateMany({
         where: { parentId: categoryId },
-        data: { parentId: null },
+        data: { parentId: null, parentIds: [] },
       });
 
-      // Then, set new children relationships (prevent circular references)
-      if (data.subcategoryIds.length > 0) {
-        // Filter out the category itself and its descendants
+      const effectiveParentIds = resolvedParentIds ?? getEffectiveParentIds(category);
+      if (effectiveParentIds.length === 0 && data.subcategoryIds.length > 0) {
         const validSubcategoryIds = data.subcategoryIds.filter(id => id !== categoryId);
         
-        // Check for circular references
         for (const subId of validSubcategoryIds) {
           const isDescendant = await this.isCategoryDescendant(categoryId, subId);
           if (isDescendant) {
@@ -327,16 +372,26 @@ class AdminCategoriesService {
             where: { 
               id: { in: validSubcategoryIds },
             },
-            data: { parentId: categoryId },
+            data: {
+              parentId: categoryId,
+              parentIds: [],
+            },
           });
         }
       }
     }
 
-    const updateData: any = {};
+    const updateData: {
+      parentId?: string | null;
+      parentIds?: string[];
+      requiresSizes?: boolean;
+      published?: boolean;
+      media?: Array<{ type: string; url: string }>;
+    } = {};
     
-    if (data.parentId !== undefined) {
-      updateData.parentId = data.parentId || null;
+    if (resolvedParentIds !== undefined) {
+      updateData.parentIds = resolvedParentIds;
+      updateData.parentId = syncPrimaryParentId(resolvedParentIds);
     }
     
     if (data.requiresSizes !== undefined) {
@@ -401,6 +456,7 @@ class AdminCategoriesService {
         title: translation?.title || "",
         slug: translation?.slug || "",
         parentId: updatedCategory.parentId,
+        parentIds: getEffectiveParentIds(updatedCategory),
         requiresSizes: updatedCategory.requiresSizes || false,
         published: Boolean(updatedCategory.published),
         imageUrl: this.extractImageUrl(updatedCategory.media),

@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { apiClient } from '../../../../lib/api-client';
+import { getEffectiveParentIds } from '../../../../lib/categories/category-parent-ids';
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
 import { useTranslation } from '../../../../lib/i18n-client';
@@ -30,7 +31,7 @@ interface UseCategoryActionsReturn {
 
 const initialFormData: CategoryFormData = {
   title: '',
-  parentId: '',
+  parentIds: [],
   requiresSizes: false,
   subcategoryIds: [],
   imageUrl: '',
@@ -71,9 +72,11 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
     setSaving(true);
     try {
+      const sanitizedParentIds = Array.from(new Set(formData.parentIds));
+
       await apiClient.post('/api/v1/admin/categories', {
         title: formData.title.trim(),
-        parentId: formData.parentId || undefined,
+        parentIds: sanitizedParentIds,
         requiresSizes: formData.requiresSizes,
         imageUrl: formData.imageUrl.trim() || undefined,
         published: formData.published === 'published',
@@ -105,7 +108,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       
       setFormData({
         title: category.title,
-        parentId: category.parentId || '',
+        parentIds: getEffectiveParentIds(categoryWithChildren),
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: categoryWithChildren.children?.map(child => child.id) || [],
         imageUrl: category.imageUrl || '',
@@ -115,7 +118,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       logger.error('Error fetching category children', { error: err });
       setFormData({
         title: category.title,
-        parentId: category.parentId || '',
+        parentIds: getEffectiveParentIds(category),
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: [],
         imageUrl: category.imageUrl || '',
@@ -134,14 +137,14 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
     setSaving(true);
     try {
-      const normalizedParentId = formData.parentId || null;
-      const sanitizedSubcategoryIds = normalizedParentId
+      const sanitizedParentIds = Array.from(new Set(formData.parentIds));
+      const sanitizedSubcategoryIds = sanitizedParentIds.length
         ? []
         : Array.from(new Set(formData.subcategoryIds)).filter((subcategoryId) => subcategoryId !== editingCategory.id);
 
       await apiClient.put(`/api/v1/admin/categories/${editingCategory.id}`, {
         title: formData.title.trim(),
-        parentId: normalizedParentId,
+        parentIds: sanitizedParentIds,
         requiresSizes: formData.requiresSizes,
         subcategoryIds: sanitizedSubcategoryIds,
         imageUrl: formData.imageUrl.trim() || null,

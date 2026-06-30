@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { buildDirectChildCategoryWhere } from "../../categories/category-parent-ids";
 import { logger } from "../../utils/logger";
 
 /**
@@ -7,7 +8,7 @@ import { logger } from "../../utils/logger";
 export async function getAllChildCategoryIds(parentId: string): Promise<string[]> {
   const children = await db.category.findMany({
     where: {
-      parentId: parentId,
+      ...buildDirectChildCategoryWhere(parentId),
       published: true,
       deletedAt: null,
     },

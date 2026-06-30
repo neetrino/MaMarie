@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import {
   MOBILE_HOME_ASSETS,
   MOBILE_HOME_SEARCH_HEIGHT_PX,
@@ -10,15 +9,15 @@ import {
   MOBILE_HOME_SEARCH_INPUT_PADDING_LEFT_PX,
   MOBILE_HOME_SEARCH_RADIUS_PX,
 } from '../../../constants/mobile-home';
+import { openSearchModal } from '../../../lib/search-modal';
 import { useTranslation } from '../../../lib/i18n-client';
 
 /** Figma `74:748` + `74:750` — mobile home hero search pill. */
 export function MobileHomeSearchField() {
-  const router = useRouter();
   const { t } = useTranslation();
 
-  const handleSearchFocus = () => {
-    router.push('/products');
+  const handleSearchOpen = () => {
+    openSearchModal();
   };
 
   return (
@@ -30,7 +29,8 @@ export function MobileHomeSearchField() {
         id="mobile-home-search"
         type="search"
         readOnly
-        onFocus={handleSearchFocus}
+        onClick={handleSearchOpen}
+        onFocus={handleSearchOpen}
         placeholder={t('home.mobile.searchPlaceholder')}
         className="w-full border-none bg-white text-sm text-[rgba(0,0,0,0.72)] outline-none placeholder:text-[rgba(0,0,0,0.45)]"
         style={{

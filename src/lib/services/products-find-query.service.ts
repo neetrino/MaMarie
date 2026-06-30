@@ -27,30 +27,15 @@ class ProductsFindQueryService {
       };
     }
 
-    const needOverFetch =
-      Boolean(filters.category || filters.search) ||
-      filters.minPrice != null ||
-      filters.maxPrice != null ||
-      Boolean(filters.colors || filters.sizes || filters.brand);
-
-    if (!needOverFetch) {
-      const [total, products] = await Promise.all([
-        db.product.count({ where }),
-        executeProductQuery(where, limit, (page - 1) * limit),
-      ]);
-      return {
-        products,
-        bestsellerProductIds,
-        total,
-      };
-    }
-
-    const fetchLimit = Math.min(limit * 10, 200);
-    const products = await executeProductQuery(where, fetchLimit, 0);
+    const [total, products] = await Promise.all([
+      db.product.count({ where }),
+      executeProductQuery(where, limit, (page - 1) * limit),
+    ]);
 
     return {
       products,
       bestsellerProductIds,
+      total,
     };
   }
 }

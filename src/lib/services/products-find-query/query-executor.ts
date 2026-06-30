@@ -124,6 +124,7 @@ export async function executeProductQuery(
       },
       skip,
       take: limit,
+      orderBy: { createdAt: "desc" },
     });
     logger.debug(`Found ${products.length} products from database (with productAttributes)`);
     return products as unknown as ProductWithRelations[];

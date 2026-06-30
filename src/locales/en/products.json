@@ -56,6 +56,7 @@
       "price": "Price",
       "color": "Color",
       "clothingType": "Clothing type",
+      "brand": "Brand",
       "all": "All",
       "sizeNote": "European size chart",
       "clothingTypes": {

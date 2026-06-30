@@ -41,7 +41,11 @@ export function AttributesSelection({
             onClick={onAttributesDropdownToggle}
             className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
           >
-            <span className="text-gray-700">
+            <span
+              className={
+                selectedAttributesForVariants.size === 0 ? 'text-gray-500' : 'text-gray-700'
+              }
+            >
               {selectedAttributesForVariants.size === 0
                 ? t('admin.products.add.selectAttributes')
                 : selectedAttributesForVariants.size === 1
@@ -113,9 +117,10 @@ export function AttributesSelection({
                   .map(id => attribute.values.find(v => v.id === id))
                   .filter((v): v is NonNullable<typeof v> => v !== null);
                 
-                // Get first selected value's image if available
-                const previewImage = selectedValues.find(v => v.imageUrl)?.imageUrl;
                 const isColor = attribute.key === 'color';
+                const previewImage = isColor
+                  ? selectedValues.find(v => v.imageUrl)?.imageUrl
+                  : null;
                 const previewColor = isColor && selectedValues.length > 0 
                   ? (selectedValues[0].colors?.[0] || getColorHex(selectedValues[0].label))
                   : null;

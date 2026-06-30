@@ -67,6 +67,7 @@ model Address {
 model Category {
   id            String                @id @default(cuid())
   parentId      String?
+  parentIds     String[]              @default([])
   position      Int                   @default(0)
   published     Boolean               @default(false)
   requiresSizes Boolean               @default(false)

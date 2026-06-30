@@ -183,8 +183,8 @@ export function ValueSelectionModal({
                     onChange={(e) => handleValueToggle(value.id, e.target.checked)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
                   />
-                  {/* Display image, color, or nothing */}
-                  {value.imageUrl ? (
+                  {/* Display image (color only), color swatch, or nothing */}
+                  {isColor && value.imageUrl ? (
                     <img
                       src={value.imageUrl}
                       alt={value.label}

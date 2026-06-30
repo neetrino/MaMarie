@@ -33,7 +33,11 @@ export function MainContent({ children }: MainContentProps) {
     return (
       <main
         className={`${mainBase} md:pt-[var(--header-clearance-desktop)]`}
-        style={{ ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px` }}
+        style={
+          {
+            ['--header-clearance-desktop']: `${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px`,
+          } as CSSProperties
+        }
       >
         {children}
       </main>

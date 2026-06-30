@@ -1,26 +1,29 @@
 import { assertPostgresDatabaseUrlConfigured } from "@white-shop/db/env";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  STOREFRONT_CACHE_KEYS,
+  STOREFRONT_CACHE_TTL,
+  readJsonCache,
+  writeJsonCache,
+} from "@/lib/cache/storefront-cache";
 import { apiRouteErrorResponse, buildApiRouteErrorContext } from "@/lib/http/api-route-errors";
+import { buildProductsListCacheKey } from "@/lib/products-list-cache-key";
 import { productsService } from "@/lib/services/products.service";
-import { cacheService } from "@/lib/services/cache.service";
 
-const PRODUCTS_CACHE_TTL = 120; // 2 minutes
-const FEATURED_CACHE_TTL = 600; // 10 minutes for home featured tabs (new/bestseller/featured)
-
-function buildProductsCacheKey(searchParams: URLSearchParams): string {
-  const sortedEntries = Array.from(searchParams.entries()).sort(([keyA], [keyB]) =>
-    keyA.localeCompare(keyB)
-  );
-  const normalizedParams = new URLSearchParams();
-  sortedEntries.forEach(([key, value]) => {
-    normalizedParams.append(key, value);
-  });
-  return `products:${normalizedParams.toString()}`;
-}
+const FEATURED_CACHE_TTL = 600;
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const stableKey = buildProductsListCacheKey(searchParams);
+    const cacheKey = STOREFRONT_CACHE_KEYS.productsList(stableKey);
+    const cached = await readJsonCache<unknown>(cacheKey);
+    if (cached !== null) {
+      return NextResponse.json(cached, {
+        headers: { "X-Cache": "HIT" },
+      });
+    }
+
     const idsParam = searchParams.get("ids");
     const ids = idsParam
       ? idsParam
@@ -55,15 +58,6 @@ export async function GET(req: NextRequest) {
       lang: searchParams.get("lang") || "en",
     };
 
-    const cacheKey = buildProductsCacheKey(searchParams);
-    const cached = await cacheService.get(cacheKey);
-    if (cached !== null && cached !== undefined) {
-      const data = typeof cached === "string" ? JSON.parse(cached) : cached;
-      return NextResponse.json(data, {
-        headers: { "X-Cache": "HIT" },
-      });
-    }
-
     assertPostgresDatabaseUrlConfigured();
     const result = await productsService.findAll(filters);
 
@@ -73,8 +67,8 @@ export async function GET(req: NextRequest) {
       !filters.category &&
       !filters.search &&
       (filters.limit ?? 12) <= 24;
-    const ttl = onlyFeatured ? FEATURED_CACHE_TTL : PRODUCTS_CACHE_TTL;
-    await cacheService.setex(cacheKey, ttl, JSON.stringify(result));
+    const ttl = onlyFeatured ? FEATURED_CACHE_TTL : STOREFRONT_CACHE_TTL.productsList;
+    await writeJsonCache(cacheKey, ttl, result);
 
     return NextResponse.json(result, {
       headers: { "X-Cache": "MISS" },
@@ -83,4 +77,3 @@ export async function GET(req: NextRequest) {
     return apiRouteErrorResponse(req, error, "[PRODUCTS]", buildApiRouteErrorContext(req));
   }
 }
-

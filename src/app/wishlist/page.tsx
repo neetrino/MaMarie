@@ -10,6 +10,8 @@ import { formatPrice, getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { WISHLIST_KEY } from '../../lib/storageCounts';
+import type { WishlistUpdatedDetail } from '../../components/hooks/useWishlist';
 
 interface Product {
   id: string;
@@ -26,8 +28,6 @@ interface Product {
     name: string;
   } | null;
 }
-
-const WISHLIST_KEY = 'shop_wishlist';
 
 function getWishlist(): string[] {
   if (typeof window === 'undefined') return [];
@@ -95,7 +95,14 @@ export default function WishlistPage() {
       if (normalizedIds.length !== idsToLoad.length) {
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(normalizedIds));
         setWishlistIds(normalizedIds);
-        window.dispatchEvent(new Event('wishlist-updated'));
+        window.dispatchEvent(
+          new CustomEvent<WishlistUpdatedDetail>('wishlist-updated', {
+            detail: {
+              ids: normalizedIds,
+              count: normalizedIds.length,
+            },
+          }),
+        );
       }
     } catch (error) {
       console.error('[Wishlist] Error fetching wishlist products:', error);
@@ -112,7 +119,7 @@ export default function WishlistPage() {
 
     // Listen for wishlist updates from other components (header, etc.)
     // But don't re-fetch if we already updated locally
-    const handleWishlistUpdate = () => {
+    const handleWishlistUpdate = (event: Event) => {
       // If we just updated locally, skip re-fetch to avoid page reload
       if (isLocalUpdateRef.current) {
         isLocalUpdateRef.current = false;
@@ -120,7 +127,8 @@ export default function WishlistPage() {
       }
       
       // Only re-fetch if update came from external source (another component)
-      const updatedIds = getWishlist();
+      const wishlistDetail = (event as CustomEvent<WishlistUpdatedDetail | null>).detail;
+      const updatedIds = wishlistDetail?.ids ?? getWishlist();
       setWishlistIds(updatedIds);
       fetchWishlistProducts(updatedIds);
     };
@@ -156,7 +164,14 @@ export default function WishlistPage() {
     
     // Dispatch event for other components (header, etc.) - but our handler won't re-fetch
     // because isLocalUpdateRef.current is true
-    window.dispatchEvent(new Event('wishlist-updated'));
+    window.dispatchEvent(
+      new CustomEvent<WishlistUpdatedDetail>('wishlist-updated', {
+        detail: {
+          ids: updatedIds,
+          count: updatedIds.length,
+        },
+      }),
+    );
   };
 
   const handleAddToCart = async (product: Product) => {

@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
+import { buildDirectChildCategoryWhere } from "../categories/category-parent-ids";
 import { adminService } from "./admin.service";
 import { ProductWithRelations } from "./products-find-query.service";
 
@@ -10,7 +11,7 @@ class ProductsFiltersService {
   private async getAllChildCategoryIds(parentId: string): Promise<string[]> {
     const children = await db.category.findMany({
       where: {
-        parentId: parentId,
+        ...buildDirectChildCategoryWhere(parentId),
         published: true,
         deletedAt: null,
       },

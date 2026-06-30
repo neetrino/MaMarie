@@ -13,8 +13,12 @@ const getProductListInclude = () => ({
   },
   variants: {
     where: { published: true },
-    take: 1,
-    orderBy: { price: "asc" as const },
+    select: {
+      price: true,
+      stock: true,
+      compareAtPrice: true,
+      imageUrl: true,
+    },
   },
   categories: {
     include: {

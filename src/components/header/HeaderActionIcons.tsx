@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BRAND_ASSETS } from '../../constants/brand';
+import { openCartDrawer } from '../../lib/cart-drawer';
+import { openSearchModal } from '../../lib/search-modal';
+import type { CartUpdatedDetail } from '../../lib/cart-events';
 import { getCartCount, getWishlistCount } from '../../lib/storageCounts';
+import type { WishlistUpdatedDetail } from '../hooks/useWishlist';
 
 const ICON_SIZE_PX = 30;
 
@@ -15,11 +19,15 @@ export function HeaderActionIcons() {
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const updateCounts = () => {
-      setWishlistCount(getWishlistCount());
-      setCartCount(getCartCount());
+    const updateCounts = (event?: Event) => {
+      const wishlistDetail = (event as CustomEvent<WishlistUpdatedDetail | null> | undefined)?.detail;
+      setWishlistCount(wishlistDetail?.count ?? getWishlistCount());
+
+      const cartDetail = (event as CustomEvent<CartUpdatedDetail | null> | undefined)?.detail;
+      setCartCount(cartDetail?.cartSummary?.itemsCount ?? getCartCount());
     };
 
+    router.prefetch('/wishlist');
     updateCounts();
     window.addEventListener('wishlist-updated', updateCounts);
     window.addEventListener('cart-updated', updateCounts);
@@ -31,7 +39,7 @@ export function HeaderActionIcons() {
   }, []);
 
   const handleSearch = () => {
-    router.push('/products');
+    openSearchModal();
   };
 
   return (
@@ -51,10 +59,16 @@ export function HeaderActionIcons() {
         aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} items` : 'Wishlist'}
       >
         <Image src={BRAND_ASSETS.iconHeart} alt="" width={ICON_SIZE_PX} height={ICON_SIZE_PX} />
+        {wishlistCount > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[8.5px] leading-[15px] text-white">
+            {wishlistCount > 99 ? '99+' : wishlistCount}
+          </span>
+        )}
       </Link>
 
-      <Link
-        href="/cart"
+      <button
+        type="button"
+        onClick={openCartDrawer}
         className="relative flex h-[30px] w-[33px] items-center justify-center transition-opacity hover:opacity-80"
         aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : 'Cart'}
       >
@@ -64,7 +78,7 @@ export function HeaderActionIcons() {
             {cartCount > 99 ? '99+' : cartCount}
           </span>
         )}
-      </Link>
+      </button>
     </div>
   );
 }

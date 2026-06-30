@@ -169,6 +169,41 @@ class ReviewsService {
   }
 
   /**
+   * Get published review stats for multiple products in one query.
+   */
+  async getProductReviewStatsBatch(
+    productIds: string[]
+  ): Promise<Map<string, { averageRating: number; reviewsCount: number }>> {
+    await ensureProductReviewsTable();
+
+    if (productIds.length === 0) {
+      return new Map();
+    }
+
+    const groups = await db.productReview.groupBy({
+      by: ['productId'],
+      where: {
+        productId: { in: productIds },
+        published: true,
+      },
+      _avg: { rating: true },
+      _count: { _all: true },
+    });
+
+    const stats = new Map<string, { averageRating: number; reviewsCount: number }>();
+
+    groups.forEach((group) => {
+      const average = group._avg.rating ?? 0;
+      stats.set(group.productId, {
+        averageRating: average > 0 ? Number(average.toFixed(1)) : 0,
+        reviewsCount: group._count._all,
+      });
+    });
+
+    return stats;
+  }
+
+  /**
    * Create a new review for a product
    * @param productId - Product ID
    * @param userId - User ID

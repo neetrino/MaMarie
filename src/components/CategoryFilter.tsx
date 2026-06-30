@@ -1,8 +1,8 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '../lib/i18n-client';
 import { useCategories } from './CategoryNavigation/hooks/useCategories';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
 import {
   PRODUCTS_CATALOG_FILTER_ACCENT,
   PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
@@ -44,20 +44,12 @@ function RadioIndicator({ selected }: { selected: boolean }) {
 }
 
 export function CategoryFilter({ currentCategory, variant = 'default' }: CategoryFilterProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
   const { categories, loading } = useCategories();
 
   const handleSelect = (slug: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (slug) {
-      params.set('category', slug);
-    } else {
-      params.delete('category');
-    }
-    params.delete('page');
-    router.push(`/products?${params.toString()}`);
+    applyPatch({ category: slug ?? undefined });
   };
 
   if (variant !== 'catalog') {

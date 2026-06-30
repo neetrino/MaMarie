@@ -108,13 +108,6 @@ export const HOME_PRODUCT_CARD_SIZE_INACTIVE_TEXT = '#555555';
 
 export const HOME_PRODUCT_CARD_SWATCH_SIZE_PX = 24;
 export const HOME_PRODUCT_CARD_SWATCH_GAP_PX = 8;
-export const HOME_PRODUCT_CARD_SWATCH_ACTIVE_BORDER = '#1d1c16';
-export const HOME_PRODUCT_CARD_SWATCHES = [
-  { color: '#d9d9d9', active: false },
-  { color: '#e8c4a0', active: true },
-  { color: '#ef95aa', active: false },
-  { color: '#96d0ff', active: false },
-] as const;
 
 export const HOME_PRODUCT_CARD_ACTIONS_GAP_PX = 66;
 export const HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX = 50;
@@ -133,13 +126,7 @@ export const HOME_PRODUCT_CARD_ASSETS = {
   placeholderImage: '/assets/home/product-card/placeholder-jacket.png',
   star: '/assets/home/product-card/icon-star.svg',
   cart: '/assets/home/product-card/icon-cart.svg',
-  heart: '/assets/home/product-card/icon-heart.svg',
 } as const;
-
-export const BEST_PRODUCTS_PLACEHOLDER_TITLE = 'Բաճկոն';
-export const BEST_PRODUCTS_PLACEHOLDER_SUBTITLE = 'Բաճկոն';
-export const BEST_PRODUCTS_PLACEHOLDER_PRICE_AMD = 14000;
-export const BEST_PRODUCTS_PLACEHOLDER_COMPARE_PRICE_AMD = 22000;
 
 export const BEST_PRODUCTS_SECTION_PADDING_LEFT_PX = HOME_SECTION_PADDING_LEFT_PX;
 export const BEST_PRODUCTS_SECTION_PADDING_RIGHT_PX = HOME_SECTION_PADDING_RIGHT_PX;

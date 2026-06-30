@@ -45,6 +45,13 @@ export interface GuestCartItem {
   productSlug?: string;
   variantId: string;
   quantity: number;
+  price?: number;
+  /** Cached from product card for instant cart drawer display. */
+  title?: string;
+  image?: string | null;
+  stock?: number;
+  originalPrice?: number | null;
+  sku?: string;
 }
 
 

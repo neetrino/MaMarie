@@ -10,11 +10,16 @@ import {
   HOME_PRODUCT_CARD_SIZE_SOLD_OUT_BG,
   HOME_PRODUCT_CARD_SIZE_SOLD_OUT_BORDER,
   HOME_PRODUCT_CARD_SIZE_SOLD_OUT_TEXT,
+  HOME_PRODUCT_CARD_SIZES_LEFT_PX,
+  HOME_PRODUCT_CARD_SIZES_TOP_PX,
 } from '../../constants/home-sections';
-
-const HOME_PRODUCT_CARD_SIZE_LABELS = ['86', '92', '98', '104'] as const;
+import type { ProductSizeOption } from '../../lib/services/product-variant-attributes';
 
 type SizeBadgeVariant = 'active' | 'sold-out' | 'inactive';
+
+interface HomeProductCardSizeBadgesProps {
+  sizes?: ProductSizeOption[];
+}
 
 function getSizeBadgeStyle(variant: SizeBadgeVariant): {
   backgroundColor: string;
@@ -44,21 +49,31 @@ function getSizeBadgeStyle(variant: SizeBadgeVariant): {
   };
 }
 
-const SIZE_BADGE_VARIANTS: SizeBadgeVariant[] = ['active', 'sold-out', 'inactive', 'inactive'];
+function resolveSizeBadgeVariant(size: ProductSizeOption): SizeBadgeVariant {
+  return size.inStock ? 'active' : 'sold-out';
+}
 
-export function HomeProductCardSizeBadges() {
+export function HomeProductCardSizeBadges({ sizes }: HomeProductCardSizeBadgesProps) {
+  if (!sizes || sizes.length === 0) {
+    return null;
+  }
+
   return (
     <div
-      className="home-product-card-sizes pointer-events-none absolute flex items-center opacity-0"
-      style={{ gap: HOME_PRODUCT_CARD_SIZE_BADGE_GAP_PX }}
+      className="home-product-card-sizes pointer-events-none absolute z-20 flex items-center opacity-0"
+      style={{
+        left: HOME_PRODUCT_CARD_SIZES_LEFT_PX,
+        top: HOME_PRODUCT_CARD_SIZES_TOP_PX,
+        gap: HOME_PRODUCT_CARD_SIZE_BADGE_GAP_PX,
+      }}
     >
-      {HOME_PRODUCT_CARD_SIZE_LABELS.map((label, index) => {
-        const variant = SIZE_BADGE_VARIANTS[index] ?? 'inactive';
+      {sizes.map((size) => {
+        const variant = resolveSizeBadgeVariant(size);
         const badgeStyle = getSizeBadgeStyle(variant);
 
         return (
           <span
-            key={label}
+            key={size.value}
             className="flex items-center justify-center border-2 font-semibold"
             style={{
               width: HOME_PRODUCT_CARD_SIZE_BADGE_WIDTH_PX,
@@ -71,7 +86,7 @@ export function HomeProductCardSizeBadges() {
               color: badgeStyle.color,
             }}
           >
-            {label}
+            {size.label}
           </span>
         );
       })}

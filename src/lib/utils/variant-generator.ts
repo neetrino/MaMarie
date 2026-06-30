@@ -1,5 +1,11 @@
 import { db } from "@white-shop/db";
+import type { Prisma } from "@white-shop/db";
 import { logger } from "./logger";
+
+type AttributeValueClient = Pick<
+  Prisma.TransactionClient,
+  "attribute" | "attributeValue"
+>;
 
 /**
  * Generate all possible combinations of AttributeValues
@@ -88,12 +94,12 @@ export async function getProductAttributeValues(
 export async function findOrCreateAttributeValue(
   attributeKey: string,
   valueString: string,
-  locale: string = "en"
+  locale: string = "en",
+  client: AttributeValueClient = db,
 ): Promise<string | null> {
   logger.debug('Finding/Creating AttributeValue', { attributeKey, valueString });
 
-  // Find attribute by key
-  const attribute = await db.attribute.findUnique({
+  const attribute = await client.attribute.findUnique({
     where: { key: attributeKey },
     include: {
       values: {
@@ -109,14 +115,12 @@ export async function findOrCreateAttributeValue(
     return null;
   }
 
-  // If value exists, return its ID
   if (attribute.values.length > 0) {
     logger.debug('Found existing AttributeValue', { attributeValueId: attribute.values[0].id });
     return attribute.values[0].id;
   }
 
-  // Create new AttributeValue
-  const newValue = await db.attributeValue.create({
+  const newValue = await client.attributeValue.create({
     data: {
       attributeId: attribute.id,
       value: valueString,

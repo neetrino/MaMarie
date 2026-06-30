@@ -3,6 +3,7 @@ import { db } from "@white-shop/db";
 import { logger } from "../../utils/logger";
 import type { ProductFilters } from "./types";
 import { getAllChildCategoryIds, findCategoryBySlug } from "./category-utils";
+import { buildCatalogAttributeWhere } from "./attribute-filters";
 
 /**
  * Build search filter for where clause
@@ -208,6 +209,12 @@ export async function buildWhereClause(
     search,
     ids,
     filter,
+    colors,
+    sizes,
+    brand,
+    clothingTypes,
+    minPrice,
+    maxPrice,
     lang = "en",
   } = filters;
 
@@ -248,6 +255,18 @@ export async function buildWhereClause(
   const filterResult = await buildFilterFilter(filter || "", where);
   where = filterResult.where;
   bestsellerProductIds.push(...filterResult.bestsellerProductIds);
+
+  const attributeWhere = buildCatalogAttributeWhere({
+    colors,
+    sizes,
+    brand,
+    clothingTypes,
+    minPrice,
+    maxPrice,
+  });
+  if (Object.keys(attributeWhere).length > 0) {
+    where = { AND: [where, attributeWhere] };
+  }
 
   return {
     where,

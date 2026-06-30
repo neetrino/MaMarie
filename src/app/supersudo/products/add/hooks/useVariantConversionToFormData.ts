@@ -97,11 +97,6 @@ export function useVariantConversionToFormData({
               colorData.sizeStocks[sizeValue.value] = variant.stock || '0';
               if (!colorData.sizePrices) colorData.sizePrices = {};
               colorData.sizePrices[sizeValue.value] = variant.price || '0';
-              
-              if (sizeValue.imageUrl) {
-                colorData.images.push(sizeValue.imageUrl);
-                logger.debug('✅ [ADMIN] Added size attribute value imageUrl:', sizeValue.imageUrl);
-              }
             }
           });
           

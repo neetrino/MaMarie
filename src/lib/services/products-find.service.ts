@@ -22,7 +22,8 @@ class ProductsFindService {
     const filteredProducts = productsFindFilterService.filterProducts(
       products,
       filters,
-      bestsellerProductIds
+      bestsellerProductIds,
+      { skipAttributeFilters: totalFromQuery !== undefined }
     );
 
     // Step 3: Pagination — use server total when provided (no filters), else client slice

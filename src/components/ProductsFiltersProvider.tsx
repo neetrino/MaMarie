@@ -6,11 +6,17 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
+import {
+  buildCatalogClientCacheKey,
+  readCatalogClientCache,
+  writeCatalogClientCache,
+} from '../lib/products-catalog-client-cache';
 
 export interface ColorOption {
   value: string;
@@ -61,12 +67,29 @@ const DEFAULT_FILTERS: ProductsFiltersData = {
   priceRange: { min: 0, max: 100000, stepSize: null, stepSizePerCurrency: null },
 };
 
+const PRODUCTS_FILTERS_CACHE_SCOPE = 'filters';
+
 interface ProductsFiltersProviderProps {
   category?: string;
   search?: string;
   minPrice?: string;
   maxPrice?: string;
   children: ReactNode;
+}
+
+function buildFiltersCacheKey(input: {
+  category?: string;
+  search?: string;
+  minPrice?: string;
+  maxPrice?: string;
+}): string {
+  return buildCatalogClientCacheKey(PRODUCTS_FILTERS_CACHE_SCOPE, {
+    lang: getStoredLanguage(),
+    category: input.category,
+    search: input.search,
+    minPrice: input.minPrice,
+    maxPrice: input.maxPrice,
+  });
 }
 
 export function ProductsFiltersProvider({
@@ -76,13 +99,28 @@ export function ProductsFiltersProvider({
   maxPrice,
   children,
 }: ProductsFiltersProviderProps) {
-  const [data, setData] = useState<ProductsFiltersData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = buildFiltersCacheKey({ category, search, minPrice, maxPrice });
+  const cachedFilters = readCatalogClientCache<ProductsFiltersData>(cacheKey);
+  const [data, setData] = useState<ProductsFiltersData | null>(cachedFilters);
+  const [loading, setLoading] = useState(!cachedFilters);
   const [error, setError] = useState(false);
+  const requestSeqRef = useRef(0);
 
   const fetchFilters = useCallback(async () => {
+    const requestId = ++requestSeqRef.current;
+    const activeCacheKey = buildFiltersCacheKey({ category, search, minPrice, maxPrice });
+    const cached = readCatalogClientCache<ProductsFiltersData>(activeCacheKey);
+
+    if (cached) {
+      setData(cached);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+
     setLoading(true);
     setError(false);
+
     try {
       const lang = getStoredLanguage();
       const params: Record<string, string> = { lang };
@@ -90,23 +128,35 @@ export function ProductsFiltersProvider({
       if (search) params.search = search;
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
+
       const res = await apiClient.get<ProductsFiltersData>('/api/v1/products/filters', { params });
-      setData({
+      if (requestId !== requestSeqRef.current) {
+        return;
+      }
+
+      const nextData: ProductsFiltersData = {
         colors: res.colors ?? [],
         sizes: res.sizes ?? [],
         brands: res.brands ?? [],
         priceRange: res.priceRange ?? DEFAULT_FILTERS.priceRange,
-      });
+      };
+      writeCatalogClientCache(activeCacheKey, nextData);
+      setData(nextData);
     } catch {
+      if (requestId !== requestSeqRef.current) {
+        return;
+      }
       setError(true);
       setData(DEFAULT_FILTERS);
     } finally {
-      setLoading(false);
+      if (requestId === requestSeqRef.current) {
+        setLoading(false);
+      }
     }
   }, [category, search, minPrice, maxPrice]);
 
   useEffect(() => {
-    fetchFilters();
+    void fetchFilters();
   }, [fetchFilters]);
 
   const value = useMemo<ProductsFiltersContextValue>(
@@ -123,4 +173,27 @@ export function ProductsFiltersProvider({
 
 export function useProductsFilters(): ProductsFiltersContextValue | null {
   return useContext(ProductsFiltersContext);
+}
+
+/** Reads cached sidebar filter options (colors/sizes/brands) for standalone filter components. */
+export function readCachedProductsFilters(input: {
+  category?: string;
+  search?: string;
+  minPrice?: string;
+  maxPrice?: string;
+}): ProductsFiltersData | null {
+  return readCatalogClientCache<ProductsFiltersData>(buildFiltersCacheKey(input));
+}
+
+/** Persists sidebar filter options after a successful API fetch. */
+export function writeCachedProductsFilters(
+  input: {
+    category?: string;
+    search?: string;
+    minPrice?: string;
+    maxPrice?: string;
+  },
+  data: ProductsFiltersData
+): void {
+  writeCatalogClientCache(buildFiltersCacheKey(input), data);
 }

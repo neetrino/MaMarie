@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   PRODUCTS_CATALOG_ASSETS,
@@ -21,6 +21,8 @@ import {
 import { MOBILE_FILTERS_EVENT } from '../lib/events';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
+import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
+import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
 
@@ -96,7 +98,8 @@ function ViewModeIcon({ mode, active }: { mode: ProductsCatalogViewMode; active:
 }
 
 function ProductsHeaderContent() {
-  const router = useRouter();
+  const catalog = useOptionalProductsCatalog();
+  const { applyPatch } = useProductsCatalogFilterNavigation();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const { viewMode, setViewMode } = useProductsCatalogViewMode();
@@ -113,11 +116,11 @@ function ProductsHeaderContent() {
   ];
 
   useEffect(() => {
-    const sortParam = searchParams.get('sort') as SortOption;
-    if (sortParam && sortOptions.some((opt) => opt.value === sortParam)) {
+    const sortParam = (catalog?.sortBy ?? searchParams.get('sort') ?? 'default') as SortOption;
+    if (sortOptions.some((opt) => opt.value === sortParam)) {
       setSortBy(sortParam);
     }
-  }, [searchParams]);
+  }, [searchParams, catalog?.sortBy]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -136,14 +139,9 @@ function ProductsHeaderContent() {
   const handleSortChange = (option: SortOption) => {
     setSortBy(option);
     setShowSortDropdown(false);
-    const params = new URLSearchParams(searchParams.toString());
-    if (option === 'default') {
-      params.delete('sort');
-    } else {
-      params.set('sort', option);
-    }
-    params.delete('page');
-    router.push(`/products?${params.toString()}`);
+    applyPatch({
+      sort: option === 'default' ? undefined : option,
+    });
   };
 
   const currentSortLabel = t('products.catalog.sortBy');

@@ -1,4 +1,4 @@
-import { ApiError } from "./types";
+import { ApiError, RequestAbortedError } from "./types";
 import type { RequestOptions } from "./types";
 import { buildUrl } from "./url-builder";
 import { getHeaders } from "./headers";
@@ -16,7 +16,15 @@ import { logger } from "@/lib/utils/logger";
  * Handle network errors
  */
 function handleNetworkError(error: unknown, baseUrl: string, url: string): never {
+  if (error instanceof RequestAbortedError) {
+    throw error;
+  }
+
   const networkError = error as { message?: string; name?: string };
+
+  if (networkError.name === 'AbortError') {
+    throw new RequestAbortedError();
+  }
   
   // Check if it's a timeout error
   if (networkError.message?.includes('timeout') || networkError.message?.includes('Request timeout')) {
@@ -52,6 +60,26 @@ function handleNetworkError(error: unknown, baseUrl: string, url: string): never
   }
   
   throw new Error(`Ցանցային սխալ: Չհաջողվեց միանալ API-ին ${url}. ${networkError.message || 'Խնդրում ենք ստուգել, արդյոք Next.js server-ը գործարկված է:'}`);
+}
+
+function linkAbortSignal(
+  source: AbortSignal | undefined,
+  target: AbortController
+): () => void {
+  if (!source) {
+    return () => {};
+  }
+  if (source.aborted) {
+    target.abort();
+    return () => {};
+  }
+  const onAbort = () => target.abort();
+  source.addEventListener('abort', onAbort);
+  return () => source.removeEventListener('abort', onAbort);
+}
+
+function isRequestAborted(options: RequestOptions | undefined): boolean {
+  return Boolean(options?.signal?.aborted);
 }
 
 /**
@@ -112,24 +140,34 @@ export async function getRequest<T>(
   const timeout = 30000; // 30 seconds timeout
   
   logger.debug('🌐 [API CLIENT] GET request:', { url, endpoint, baseUrl });
+
+  if (isRequestAborted(options)) {
+    throw new RequestAbortedError();
+  }
   
   let response: Response;
   try {
-    // Create timeout controller
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    
+    const timeoutController = new AbortController();
+    const timeoutId = setTimeout(() => timeoutController.abort(), timeout);
+    const unlinkExternal = linkAbortSignal(options?.signal ?? undefined, timeoutController);
+    const { signal: _externalSignal, ...fetchOptions } = options ?? {};
+
     try {
       response = await fetch(url, {
         method: 'GET',
         headers: getHeaders(options),
-        cache: 'no-store', // Disable caching for server components
-        signal: controller.signal,
-        ...options,
+        cache: 'no-store',
+        signal: timeoutController.signal,
+        ...fetchOptions,
       });
       clearTimeout(timeoutId);
+      unlinkExternal();
     } catch (fetchError: unknown) {
       clearTimeout(timeoutId);
+      unlinkExternal();
+      if (isRequestAborted(options)) {
+        throw new RequestAbortedError();
+      }
       const error = fetchError as { name?: string };
       if (error.name === 'AbortError') {
         throw new Error(`Request timeout: API server did not respond within ${timeout / 1000} seconds. URL: ${url}`);

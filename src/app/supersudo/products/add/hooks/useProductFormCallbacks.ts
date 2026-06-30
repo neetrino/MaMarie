@@ -6,6 +6,7 @@ import { logger } from "@/lib/utils/logger";
 import type { ChangeEvent } from 'react';
 import type { Brand, Category, Attribute, GeneratedVariant } from '../types';
 import { generateSlug } from '../utils/productUtils';
+import { ensureOneMainVariant } from '../utils/variantMainHelpers';
 
 interface UseProductFormCallbacksProps {
   formData: {
@@ -72,21 +73,30 @@ export function useProductFormCallbacks({
   };
 
   const handleVariantDelete = (variantId: string) => {
-    setGeneratedVariants((prev) => prev.filter((v) => v.id !== variantId));
+    setGeneratedVariants((prev) => {
+      const filtered = prev.filter((v) => v.id !== variantId);
+      const deletedWasMain = prev.find((v) => v.id === variantId)?.isMain;
+      if (deletedWasMain && filtered.length > 0) {
+        return filtered.map((v, index) => ({ ...v, isMain: index === 0 }));
+      }
+      return ensureOneMainVariant(filtered);
+    });
   };
 
   const handleVariantAdd = () => {
+    const baseSlug = formData.slug || generateSlug(formData.title) || 'PROD';
     const newVariant: GeneratedVariant = {
       id: `variant-${Date.now()}-${Math.random()}`,
       selectedValueIds: [],
       price: '0.00',
       compareAtPrice: '0.00',
       stock: '0',
-      sku: 'PROD',
+      sku: baseSlug.toUpperCase(),
       image: null,
+      isMain: false,
     };
     setGeneratedVariants((prev) => {
-      const updated = [...prev, newVariant];
+      const updated = ensureOneMainVariant([...prev, newVariant]);
       logger.debug('✅ [VARIANT BUILDER] New manual variant added:', {
         newVariantId: newVariant.id,
         totalVariants: updated.length,

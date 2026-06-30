@@ -1,12 +1,4 @@
 /**
- * Request options interface
- */
-export interface RequestOptions extends globalThis.RequestInit {
-  params?: Record<string, string>;
-  skipAuth?: boolean; // Skip automatic token injection
-}
-
-/**
  * Custom API Error class with proper typing
  */
 export class ApiError extends Error {
@@ -26,6 +18,22 @@ export class ApiError extends Error {
       Error.captureStackTrace(this, ApiError);
     }
   }
+}
+
+/** Thrown when a request is intentionally cancelled (e.g. superseded catalog filter fetch). */
+export class RequestAbortedError extends Error {
+  constructor() {
+    super('Request aborted');
+    this.name = 'RequestAbortedError';
+  }
+}
+
+/**
+ * Request options interface
+ */
+export interface RequestOptions extends globalThis.RequestInit {
+  params?: Record<string, string>;
+  skipAuth?: boolean; // Skip automatic token injection
 }
 
 
