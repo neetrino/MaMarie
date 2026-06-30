@@ -13,7 +13,18 @@ import { useAuth } from '../../lib/auth/AuthContext';
 import { WISHLIST_KEY } from '../../lib/storageCounts';
 import type { WishlistUpdatedDetail } from '../../components/hooks/useWishlist';
 import { WishlistEmptyState } from '../../components/wishlist/WishlistEmptyState';
-import { WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX } from '../../constants/wishlist-empty-state';
+import { HomeSectionHeadingRow } from '../../components/home/HomeSectionHeading';
+import {
+  BEST_PRODUCTS_ASSETS,
+  BEST_PRODUCTS_HEADING_COLOR,
+  BEST_PRODUCTS_HEADING_PADDING_Y_PX,
+} from '../../constants/home-sections';
+import {
+  WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX,
+  WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX,
+  WISHLIST_PAGE_TITLE_FONT_SIZE_PX,
+  WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX,
+} from '../../constants/wishlist-empty-state';
 
 interface Product {
   id: string;
@@ -238,9 +249,12 @@ export default function WishlistPage() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+        <div className="animate-pulse" aria-busy="true">
+          <div
+            className="rounded bg-gray-200/80"
+            style={{ minHeight: WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX, maxWidth: '40%' }}
+          />
+          <div className="mt-8 h-64 rounded bg-gray-200" />
         </div>
       </div>
     );
@@ -248,16 +262,28 @@ export default function WishlistPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1
-        className={`text-3xl font-bold text-gray-900 ${products.length > 0 ? 'mb-8' : ''}`}
+      <div
+        className={products.length > 0 ? 'mb-8' : ''}
         style={
           products.length === 0
             ? { marginBottom: WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX }
             : undefined
         }
       >
-        {t('common.wishlist.title')}
-      </h1>
+        <HomeSectionHeadingRow
+          id="wishlist-heading"
+          title={t('common.wishlist.title')}
+          seeAllHref="/products"
+          seeAllLabel=""
+          color={BEST_PRODUCTS_HEADING_COLOR}
+          chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
+          titleFontSizePx={WISHLIST_PAGE_TITLE_FONT_SIZE_PX}
+          titleLineHeightPx={WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX}
+          minHeightPx={WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX}
+          headingPaddingYPx={BEST_PRODUCTS_HEADING_PADDING_Y_PX}
+          showSeeAllLink={false}
+        />
+      </div>
 
       {products.length > 0 ? (
         <>

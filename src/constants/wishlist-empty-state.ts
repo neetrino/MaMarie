@@ -46,6 +46,11 @@ export const WISHLIST_EMPTY_SECTION_PADDING_TOP_PX = 0;
 /** Gap below page title when wishlist is empty (px). */
 export const WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX = 16;
 
+/** Wishlist page title — pink section style, slightly smaller than best products (px). */
+export const WISHLIST_PAGE_TITLE_FONT_SIZE_PX = 40;
+export const WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX = 44;
+export const WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX = 52;
+
 export const WISHLIST_EMPTY_ASSETS = {
   illustration: '/assets/wishlist/empty-heart.png',
   ctaArrow: '/assets/cart/empty-cta-arrow.svg',
