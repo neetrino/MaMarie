@@ -64,7 +64,9 @@ export function MainContent({ children }: MainContentProps) {
   }
 
   if (pathname.startsWith('/products')) {
-    return <main className={mainBase}>{children}</main>;
+    return (
+      <main className={`${mainBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
+    );
   }
 
   return (

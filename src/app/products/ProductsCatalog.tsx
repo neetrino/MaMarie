@@ -12,6 +12,7 @@ import { SizeFilter } from '../../components/SizeFilter';
 import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
 import { ProductsCatalogMobileTitle } from '../../components/products/ProductsCatalogMobileTitle';
 import { ProductsCatalogGridSection } from '../../components/products/ProductsCatalogGridSection';
+import { MobileProductsCatalogTrack } from '../../components/products/MobileProductsCatalogTrack';
 import { ProductsCatalogProvider } from '../../components/products/ProductsCatalogProvider';
 import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
 import {
@@ -23,10 +24,9 @@ import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
 import {
   PRODUCTS_CATALOG_MAIN_GAP_PX,
-  PRODUCTS_CATALOG_MOBILE_HEADER_ALIGN_OFFSET_RIGHT_PX,
-  PRODUCTS_CATALOG_MOBILE_TITLE_ALIGN_OFFSET_X_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
+import { MOBILE_PRODUCTS_CATALOG_TITLE_TO_FILTERS_GAP_PX } from '../../constants/mobile-products-catalog';
 import {
   parseProductsCatalogParams,
 } from '../../lib/products-catalog-params';
@@ -145,16 +145,13 @@ export async function ProductsCatalog({
   return (
     <HomeContentHorizontalFrame>
       <HomeSectionContent>
-        <div
-          className="space-y-3 pt-2 pb-4 lg:hidden"
-          style={{
-            marginLeft: PRODUCTS_CATALOG_MOBILE_TITLE_ALIGN_OFFSET_X_PX,
-            marginRight: PRODUCTS_CATALOG_MOBILE_HEADER_ALIGN_OFFSET_RIGHT_PX,
-          }}
+        <MobileProductsCatalogTrack
+          className="flex flex-col pt-2 pb-4 lg:hidden"
+          style={{ gap: MOBILE_PRODUCTS_CATALOG_TITLE_TO_FILTERS_GAP_PX }}
         >
           <ProductsCatalogMobileTitle />
           <ProductsHeader />
-        </div>
+        </MobileProductsCatalogTrack>
 
         <ProductsCatalogProvider
           initialParams={catalogParams}
@@ -162,10 +159,10 @@ export async function ProductsCatalog({
           initialMeta={productsData.meta}
         >
           <ProductsFiltersProviderBridge>
-            <div className="flex flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
+            <div className="flex w-full flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
               <ProductsFilterSidebar />
 
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 w-full flex-1 max-lg:overflow-visible">
                 <div
                   className="hidden items-center justify-between gap-4 lg:flex"
                   style={{ paddingBottom: PRODUCTS_CATALOG_TOP_ROW_PB_PX }}

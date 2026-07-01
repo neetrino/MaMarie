@@ -16,6 +16,7 @@ import {
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
   getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
+import { MOBILE_PRODUCTS_CATALOG_TITLE_TO_FILTERS_GAP_PX } from '../../constants/mobile-products-catalog';
 
 /**
  * Shell for /products while catalog data streams in (layout-stable, no spinners).
@@ -25,7 +26,10 @@ export function ProductsCatalogSkeleton() {
     <HomeContentHorizontalFrame>
       <HomeSectionContent>
         <div className="animate-pulse" aria-busy="true" aria-label="Loading products">
-      <div className="space-y-3 pt-2 pb-4 lg:hidden">
+      <div
+        className="flex flex-col pt-2 pb-4 lg:hidden"
+        style={{ gap: MOBILE_PRODUCTS_CATALOG_TITLE_TO_FILTERS_GAP_PX }}
+      >
         <div className="h-8 w-48 rounded bg-neutral-200" />
         <div
           className="rounded-[30px] bg-neutral-200"

@@ -3,6 +3,13 @@
 import { ProductsGrid } from '../ProductsGrid';
 import { useTranslation } from '../../lib/i18n-client';
 import {
+  MOBILE_PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+  MOBILE_PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+  MOBILE_PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
+} from '../../constants/mobile-products-catalog';
+import { MobileProductsCatalogTrack } from './MobileProductsCatalogTrack';
+import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
   PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
   PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
@@ -35,35 +42,64 @@ function ProductsCatalogGridLoading() {
       : PRODUCTS_CATALOG_CARD_ROW_GAP_PX;
 
   return (
-    <div
-      className={getProductsCatalogGridClassName(viewMode)}
-      style={
-        isListView
-          ? { gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }
-          : {
-              columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-              rowGap: rowGapPx,
-            }
-      }
-      aria-busy="true"
-      aria-label="Loading filtered products"
-    >
-      {Array.from({ length: PRODUCTS_CATALOG_LOADING_CARD_COUNT }).map((_, index) => (
+    <>
+      <MobileProductsCatalogTrack className="lg:hidden">
         <div
-          key={index}
-          className="animate-pulse bg-[#f9e490]/60"
+          className="grid w-full"
+          style={{
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            columnGap: MOBILE_PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+            rowGap: MOBILE_PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+          }}
+          aria-busy="true"
+          aria-label="Loading filtered products"
+        >
+          {Array.from({ length: PRODUCTS_CATALOG_LOADING_CARD_COUNT }).map((_, index) => (
+            <div
+              key={`mobile-loading-${index}`}
+              className="animate-pulse bg-white"
+              style={{
+                width: '100%',
+                height: MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+                borderRadius: 30,
+              }}
+            />
+          ))}
+        </div>
+      </MobileProductsCatalogTrack>
+
+      <div className="hidden w-full lg:block">
+        <div
+          className={getProductsCatalogGridClassName(viewMode)}
           style={
             isListView
-              ? {
-                  width: '100%',
-                  height: PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
-                  borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
+              ? { gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }
+              : {
+                  columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+                  rowGap: rowGapPx,
                 }
-              : { width: cardWidthPx, height: cardHeightPx, borderRadius: 30 }
           }
-        />
-      ))}
-    </div>
+          aria-busy="true"
+          aria-label="Loading filtered products"
+        >
+          {Array.from({ length: PRODUCTS_CATALOG_LOADING_CARD_COUNT }).map((_, index) => (
+            <div
+              key={index}
+              className="animate-pulse bg-white"
+              style={
+                isListView
+                  ? {
+                      width: '100%',
+                      height: PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
+                      borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
+                    }
+                  : { width: cardWidthPx, height: cardHeightPx, borderRadius: 30 }
+              }
+            />
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -113,8 +149,11 @@ export function ProductsCatalogGridSection() {
 
   return (
     <div
-      className="relative"
-      style={{ paddingTop: PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX }}
+      className="relative pt-[var(--products-catalog-grid-offset-top-mobile)] lg:pt-[var(--products-catalog-grid-offset-top)]"
+      style={{
+        ['--products-catalog-grid-offset-top' as string]: `${PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX}px`,
+        ['--products-catalog-grid-offset-top-mobile' as string]: `${MOBILE_PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX}px`,
+      }}
       aria-busy={isFetching}
     >
       {showInlineUpdating ? <ProductsCatalogInlineUpdating /> : null}
@@ -122,7 +161,7 @@ export function ProductsCatalogGridSection() {
       {showInitialLoading ? (
         <ProductsCatalogGridLoading />
       ) : showStaleGrid ? (
-        <div key={gridRevision} className="animate-catalog-grid-in">
+        <div key={gridRevision} className="w-full">
           <ProductsGrid
             products={products}
             sortBy={sortBy}
@@ -132,7 +171,7 @@ export function ProductsCatalogGridSection() {
           />
         </div>
       ) : (
-        <div key={gridRevision} className="animate-catalog-grid-in py-12 text-center">
+        <div key={gridRevision} className="w-full py-12 text-center">
           <p className="text-lg text-[#757571]">{t('common.messages.noProductsFound')}</p>
         </div>
       )}
