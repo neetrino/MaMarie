@@ -88,6 +88,7 @@ export const MOBILE_WISHLIST_CARD_CTA_CART_ICON_SIZE_PX = 20;
 
 export const MOBILE_WISHLIST_CARD_ASSETS = {
   star: HOME_PRODUCT_CARD_ASSETS.star,
-  cart: HOME_PRODUCT_CARD_ASSETS.cart,
+  /** Grey cart — visible on the white CTA circle (Figma `74:798`). */
+  cart: '/assets/mobile-bottom-nav/icon-cart.svg',
   placeholderImage: HOME_PRODUCT_CARD_ASSETS.placeholderImage,
 } as const;
