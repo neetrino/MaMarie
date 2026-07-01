@@ -18,7 +18,10 @@ export function MobileHomePage({ products }: MobileHomePageProps) {
     <div className="w-full max-w-full overflow-x-hidden lg:hidden" style={{ backgroundColor: MOBILE_HOME_BG }}>
       <MobileHomeHero />
 
-      <div className="flex flex-col pb-8" style={{ gap: MOBILE_HOME_SECTION_GAP_PX }}>
+      <div
+        className="flex flex-col pb-8"
+        style={{ gap: MOBILE_HOME_SECTION_GAP_PX, paddingTop: MOBILE_HOME_SECTION_GAP_PX }}
+      >
         <MobileHomeProductSection products={firstRow} />
         <MobileHomeTestimonialsCarousel />
         <MobileHomeProductSection products={secondRow} />

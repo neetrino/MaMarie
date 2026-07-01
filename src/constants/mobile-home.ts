@@ -5,7 +5,7 @@ import { HOME_PRODUCT_CARD_ASSETS } from './home-sections';
 export const MOBILE_HOME_DESIGN_WIDTH_PX = 375;
 
 export const MOBILE_HOME_BG = '#f1f1f3';
-export const MOBILE_HOME_SECTION_GAP_PX = 32;
+export const MOBILE_HOME_SECTION_GAP_PX = 50;
 export const MOBILE_HOME_HORIZONTAL_PADDING_PX = 20;
 
 export const MOBILE_HOME_SEARCH_HEIGHT_PX = 48;

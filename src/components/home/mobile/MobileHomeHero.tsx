@@ -12,9 +12,7 @@ import {
   MOBILE_HOME_GENDER_BOYS_BG,
   MOBILE_HOME_GENDER_BUTTON_GAP_PX,
   MOBILE_HOME_GENDER_BUTTON_HEIGHT_PX,
-  MOBILE_HOME_GENDER_BUTTON_WIDTH_PX,
   MOBILE_HOME_GENDER_GIRLS_BG,
-  MOBILE_HOME_HERO_GENDER_INSET_LEFT_PX,
   MOBILE_HOME_HERO_SALE_TO_GENDER_GAP_PX,
   MOBILE_HOME_HERO_SEARCH_TO_SALE_GAP_PX,
   MOBILE_HOME_HERO_TOP_PADDING_PX,
@@ -35,15 +33,14 @@ function GenderCta({ href, label, backgroundColor, chevronSrc }: GenderCtaProps)
   return (
     <Link
       href={href}
-      className="flex shrink-0 items-center justify-between rounded-full pl-5 pr-2.5 text-sm font-semibold leading-7 text-white"
+      className="flex min-w-0 flex-1 items-center justify-between rounded-full pl-5 pr-2.5 text-sm font-semibold leading-7 text-white"
       style={{
-        width: MOBILE_HOME_GENDER_BUTTON_WIDTH_PX,
         height: MOBILE_HOME_GENDER_BUTTON_HEIGHT_PX,
         backgroundColor,
       }}
     >
-      <span>{label}</span>
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
+      <span className="truncate">{label}</span>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
         <Image src={chevronSrc} alt="" width={20} height={20} className="rotate-90" />
       </span>
     </Link>
@@ -83,10 +80,11 @@ export function MobileHomeHero() {
       </div>
 
       <div
-        className="scrollbar-hide flex overflow-x-auto pb-1 pr-[22px]"
+        className="flex"
         style={{
           gap: MOBILE_HOME_GENDER_BUTTON_GAP_PX,
-          paddingLeft: MOBILE_HOME_HERO_GENDER_INSET_LEFT_PX,
+          paddingLeft: MOBILE_HOME_HORIZONTAL_PADDING_PX,
+          paddingRight: MOBILE_HOME_HORIZONTAL_PADDING_PX,
         }}
         role="group"
         aria-label={t('home.hero.genderButtons.label')}
