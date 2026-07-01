@@ -1,18 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  CART_DRAWER_CLOSE_BUTTON_TOP_PX,
   CART_DRAWER_CLOSE_EVENT,
-  CART_DRAWER_CLOSE_ICON_OFFSET_X_PX,
-  CART_DRAWER_CLOSE_ICON_SIZE_PX,
-  CART_DRAWER_CLOSE_ICON_STROKE_WIDTH,
-  CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
-  CART_DRAWER_CLOSE_TAB_HOVER_SCALE,
-  CART_DRAWER_CLOSE_TAB_TRANSITION_MS,
-  CART_DRAWER_CLOSE_TAB_WIDTH_PX,
-  CART_DRAWER_CLOSE_TAB_Z_INDEX,
   CART_DRAWER_MAX_WIDTH_PX,
   CART_DRAWER_MOBILE_WIDTH_PERCENT,
   CART_DRAWER_OPEN_EVENT,
@@ -21,11 +12,12 @@ import {
 } from '../../constants/cart-drawer';
 import type { Cart } from '../../app/cart/types';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
+import { useDrawerTransition } from '../../lib/use-drawer-transition';
+import { DrawerCloseTab } from '../drawer/DrawerCloseTab';
 import { CartDrawerItemRow } from './CartDrawerItemRow';
 import { CartDrawerSummary } from './CartDrawerSummary';
 import { CartEmptyState } from './CartEmptyState';
 import { useCartState } from './useCartState';
-import styles from './CartDrawerCloseTab.module.css';
 
 function formatItemsCount(count: number, t: (key: string) => string): string {
   const label = count === 1 ? t('common.cart.item') : t('common.cart.items');
@@ -42,49 +34,6 @@ interface CartDrawerPanelProps {
   onRemoveItem: (itemId: string) => Promise<void>;
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   t: (key: string) => string;
-}
-
-function CartDrawerCloseTab({
-  onClose,
-  closeLabel,
-}: {
-  onClose: () => void;
-  closeLabel: string;
-}) {
-  const tabRadiusPx = CART_DRAWER_CLOSE_TAB_HEIGHT_PX / 2;
-
-  return (
-    <button
-      type="button"
-      onClick={onClose}
-      className={`${styles.closeTab} absolute flex items-center justify-center bg-brand-pink text-white`}
-      style={{
-        top: CART_DRAWER_CLOSE_BUTTON_TOP_PX,
-        left: 0,
-        zIndex: CART_DRAWER_CLOSE_TAB_Z_INDEX,
-        width: CART_DRAWER_CLOSE_TAB_WIDTH_PX,
-        height: CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
-        borderRadius: tabRadiusPx,
-        paddingRight: CART_DRAWER_CLOSE_TAB_WIDTH_PX / 2,
-        ['--cart-drawer-close-tab-hover-scale' as string]: CART_DRAWER_CLOSE_TAB_HOVER_SCALE,
-        ['--cart-drawer-close-tab-transition-ms' as string]: `${CART_DRAWER_CLOSE_TAB_TRANSITION_MS}ms`,
-      }}
-      aria-label={closeLabel}
-    >
-      <svg
-        width={CART_DRAWER_CLOSE_ICON_SIZE_PX}
-        height={CART_DRAWER_CLOSE_ICON_SIZE_PX}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={CART_DRAWER_CLOSE_ICON_STROKE_WIDTH}
-        aria-hidden
-        style={{ transform: `translateX(${CART_DRAWER_CLOSE_ICON_OFFSET_X_PX}px)` }}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  );
 }
 
 function CartDrawerPanel({
@@ -124,7 +73,7 @@ function CartDrawerPanel({
           ['--cart-drawer-mobile-width' as string]: `${CART_DRAWER_MOBILE_WIDTH_PERCENT}%`,
         }}
       >
-        <CartDrawerCloseTab onClose={onClose} closeLabel={t('common.buttons.close')} />
+        <DrawerCloseTab edge="start" onClose={onClose} closeLabel={t('common.buttons.close')} />
         <aside
           className="relative flex h-full w-full flex-col overflow-hidden rounded-l-3xl bg-white shadow-2xl"
           style={{ zIndex: CART_DRAWER_PANEL_Z_INDEX }}
@@ -180,54 +129,12 @@ function CartDrawerPanel({
   );
 }
 
-/** Keeps drawer mounted through exit; double rAF ensures enter transition paints off-screen first. */
-function useCartDrawerTransition(open: boolean): { rendered: boolean; visible: boolean } {
-  const [rendered, setRendered] = useState(open);
-  const [visible, setVisible] = useState(false);
-
-  useLayoutEffect(() => {
-    if (open) {
-      setRendered(true);
-      setVisible(false);
-      return;
-    }
-
-    setVisible(false);
-  }, [open]);
-
-  useEffect(() => {
-    if (open) {
-      let innerFrameId = 0;
-      const outerFrameId = requestAnimationFrame(() => {
-        innerFrameId = requestAnimationFrame(() => {
-          setVisible(true);
-        });
-      });
-
-      return () => {
-        cancelAnimationFrame(outerFrameId);
-        cancelAnimationFrame(innerFrameId);
-      };
-    }
-
-    const timer = window.setTimeout(() => {
-      setRendered(false);
-    }, CART_DRAWER_PANEL_TRANSITION_MS);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [open]);
-
-  return { rendered, visible };
-}
-
 /** Global cart drawer — slides in from the right when `openCartDrawer()` is called. */
 export function CartDrawer() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
-  const { rendered, visible } = useCartDrawerTransition(open);
+  const { rendered, visible } = useDrawerTransition(open, CART_DRAWER_PANEL_TRANSITION_MS);
   const cartState = useCartState({ enabled: true });
   const { refreshCart, ...cartPanelProps } = cartState;
 
