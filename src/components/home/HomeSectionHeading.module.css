@@ -1,0 +1,30 @@
+.headingRow {
+  min-height: var(--heading-min-height);
+  padding-top: var(--heading-padding-y);
+  padding-bottom: var(--heading-padding-y);
+}
+
+.title {
+  font-size: var(--title-font-size);
+  line-height: var(--title-line-height);
+}
+
+@media (max-width: 639px) {
+  .headingRowResponsive {
+    min-height: var(--heading-min-height-mobile, var(--heading-min-height));
+  }
+
+  .titleResponsive {
+    font-size: var(--title-font-size-mobile, var(--title-font-size));
+    line-height: var(--title-line-height-mobile, var(--title-line-height));
+  }
+
+  .titleMultilineMobile {
+    display: -webkit-box;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--title-mobile-max-lines, 2);
+  }
+}

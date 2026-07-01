@@ -74,6 +74,7 @@
     "empty": "You haven't added anything to your list yet",
     "emptyDescription": "Nothing here yet — find and add your favorite products",
     "emptyCta": "More",
+    "addToCart": "Add",
     "totalCount": "Total items in wishlist",
     "tableHeaders": {
       "productName": "Product Name",

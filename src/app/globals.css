@@ -339,8 +339,9 @@
     background-color: #f1f1f3;
   }
 
-  /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home only; default shell stays 114px. */
-  .layout-shell-mobile-bottom-clearance:has(.mobile-home-page) {
+  /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home + wishlist mobile; default shell stays 114px. */
+  .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page) {
     background-color: #f1f1f3;
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
   }

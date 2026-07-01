@@ -59,6 +59,12 @@ export const WISHLIST_PAGE_TITLE_FONT_SIZE_PX = 40;
 export const WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX = 44;
 export const WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX = 52;
 
+/** Wishlist page title on mobile — fits long Armenian headline on narrow screens. */
+export const WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX = 26;
+export const WISHLIST_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX = 32;
+export const WISHLIST_PAGE_MOBILE_TITLE_MAX_LINES = 2;
+export const WISHLIST_PAGE_MOBILE_HEADING_MIN_HEIGHT_PX = 78;
+
 /** Tailwind `max-w-7xl` (1280) minus `lg:px-8` horizontal padding (32×2). */
 export const WISHLIST_PAGE_CONTENT_WIDTH_PX = 1280 - 64;
 
