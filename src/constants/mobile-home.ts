@@ -72,6 +72,8 @@ export const MOBILE_HOME_GENDER_BOYS_BG = '#5281e1';
 export const MOBILE_HOME_SECTION_TITLE_SIZE_PX = 35;
 export const MOBILE_HOME_SECTION_TITLE_LINE_HEIGHT_PX = 45;
 export const MOBILE_HOME_SECTION_TITLE_COLOR = 'rgba(0, 0, 0, 0.72)';
+/** Space between section heading row and product carousel. */
+export const MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX = 1;
 /** Figma `74:789` — white see-all pill next to section title. */
 export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX = 40;
 export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_RADIUS_PX = 20;

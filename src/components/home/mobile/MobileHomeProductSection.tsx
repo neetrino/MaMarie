@@ -15,6 +15,7 @@ import {
   MOBILE_HOME_SECTION_TITLE_COLOR,
   MOBILE_HOME_SECTION_TITLE_LINE_HEIGHT_PX,
   MOBILE_HOME_SECTION_TITLE_SIZE_PX,
+  MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX,
 } from '../../../constants/mobile-home';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { HomeProductCardData } from '../HomeProductCard';
@@ -44,7 +45,10 @@ export function MobileHomeProductSection({
       aria-labelledby="mobile-for-you-heading"
       style={{ paddingLeft: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2, paddingRight: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2 }}
     >
-      <div className="relative mb-6 flex items-start justify-between pr-1">
+      <div
+        className="relative flex items-start justify-between pr-1"
+        style={{ marginBottom: MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX }}
+      >
         <h2
           id="mobile-for-you-heading"
           className="font-black"
