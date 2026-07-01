@@ -13,6 +13,8 @@
 
   body {
     @apply bg-white text-gray-900;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   @media (max-width: 1023px) {
@@ -31,8 +33,48 @@
     @apply rounded-xl;
   }
 
-  input, textarea {
+  input, textarea, select {
     caret-color: currentColor;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  img,
+  video,
+  canvas {
+    -webkit-user-drag: none;
+    user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  p,
+  span,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  a,
+  li,
+  td,
+  th,
+  label,
+  dt,
+  dd,
+  figcaption,
+  option,
+  pre,
+  code,
+  blockquote,
+  em,
+  strong,
+  small,
+  time,
+  address {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   /* Desktop — scale 1440px Figma layout to viewport (navbar + homepage stay aligned). */

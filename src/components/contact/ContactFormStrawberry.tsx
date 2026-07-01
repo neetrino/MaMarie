@@ -24,6 +24,7 @@ export function ContactFormStrawberry() {
         alt=""
         src={CONTACT_FORM_ASSETS.strawberry}
         decoding="async"
+        draggable={false}
         className="max-w-none object-contain"
         style={{
           width: CONTACT_FORM_STRAWBERRY_SIZE_PX,
