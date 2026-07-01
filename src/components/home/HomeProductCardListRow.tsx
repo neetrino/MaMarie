@@ -21,6 +21,10 @@ import {
   PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX,
   PRODUCTS_CATALOG_LIST_PANEL_PADDING_X_PX,
   PRODUCTS_CATALOG_LIST_PANEL_PADDING_Y_PX,
+  PRODUCTS_CATALOG_LIST_PRICE_TO_ACTIONS_GAP_PX,
+  PRODUCTS_CATALOG_LIST_RATING_STAR_TEXT_GAP_PX,
+  PRODUCTS_CATALOG_LIST_RATING_TO_CART_GAP_PX,
+  PRODUCTS_CATALOG_LIST_ROW_BORDER_WIDTH_PX,
   PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
   PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
 } from '../../constants/products-catalog';
@@ -33,7 +37,6 @@ import { useWishlist } from '../hooks/useWishlist';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import type { HomeProductCardData } from './HomeProductCard';
-import { HomeProductCardCartActions } from './HomeProductCardCartActions';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
 
 interface HomeProductCardListRowProps {
@@ -104,6 +107,53 @@ function HomeProductCardListRowComponent({
     </button>
   );
 
+  const ratingRow = (
+    <div
+      className="flex items-center justify-end whitespace-nowrap"
+      style={{
+        height: typography.ratingLineHeightPx,
+        gap: lp(PRODUCTS_CATALOG_LIST_RATING_STAR_TEXT_GAP_PX),
+        color: HOME_PRODUCT_CARD_RATING_COLOR,
+        fontSize: typography.ratingSizePx,
+        lineHeight: `${typography.ratingLineHeightPx}px`,
+      }}
+    >
+      <Image
+        src={HOME_PRODUCT_CARD_ASSETS.star}
+        alt=""
+        width={typography.ratingStarSizePx}
+        height={typography.ratingStarSizePx}
+        className="shrink-0"
+      />
+      <span className="font-normal">{ratingLabel}</span>
+    </div>
+  );
+
+  const priceRow = (
+    <div
+      className="flex items-center whitespace-nowrap"
+      style={{ gap: lp(16), lineHeight: `${typography.priceLineHeightPx}px` }}
+    >
+      <p
+        className="font-bold"
+        style={{ color: HOME_PRODUCT_CARD_PRICE_COLOR, fontSize: typography.priceSizePx }}
+      >
+        {formatPrice(product.price, currency)}
+      </p>
+      {comparePrice != null ? (
+        <p
+          className="font-normal line-through"
+          style={{
+            color: HOME_PRODUCT_CARD_COMPARE_COLOR,
+            fontSize: typography.compareSizePx,
+          }}
+        >
+          {formatPrice(comparePrice, currency)}
+        </p>
+      ) : null}
+    </div>
+  );
+
   return (
     <article
       className="home-product-card w-full shrink-0 overflow-visible"
@@ -113,12 +163,20 @@ function HomeProductCardListRowComponent({
         ...buildHomeProductCardCssVars(layoutWidthPx),
       }}
     >
-      <div className="flex h-full w-full overflow-hidden" style={{ borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX }}>
+      <div
+        className="flex h-full w-full overflow-hidden border-solid"
+        style={{
+          borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
+          borderWidth: PRODUCTS_CATALOG_LIST_ROW_BORDER_WIDTH_PX,
+          borderColor: HOME_PRODUCT_CARD_BG,
+        }}
+      >
         <div
-          className="relative shrink-0"
+          className="relative shrink-0 overflow-hidden"
           style={{
             width: PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX,
             backgroundColor: HOME_PRODUCT_CARD_BG,
+            borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
           }}
         >
           <Link
@@ -167,45 +225,17 @@ function HomeProductCardListRowComponent({
           }}
         >
           <div className="flex min-w-0 flex-1 flex-col" style={{ gap: lp(3) }}>
-            <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
-              <Link
-                href={`/products/${product.slug}`}
-                className="min-w-0 flex-1 truncate font-bold"
-                style={{
-                  color: HOME_PRODUCT_CARD_TEXT_DARK,
-                  fontSize: typography.titleSizePx,
-                  lineHeight: `${typography.titleLineHeightPx}px`,
-                }}
-              >
-                {product.title}
-              </Link>
-
-              <div
-                className="relative shrink-0"
-                style={{ width: lp(71), height: typography.ratingLineHeightPx }}
-              >
-                <Image
-                  src={HOME_PRODUCT_CARD_ASSETS.star}
-                  alt=""
-                  width={typography.ratingStarSizePx}
-                  height={typography.ratingStarSizePx}
-                  className="absolute top-0"
-                  style={{ left: lp(-7) }}
-                />
-                <p
-                  className="absolute whitespace-nowrap font-normal"
-                  style={{
-                    left: lp(11),
-                    top: 0,
-                    color: HOME_PRODUCT_CARD_RATING_COLOR,
-                    fontSize: typography.ratingSizePx,
-                    lineHeight: `${typography.ratingLineHeightPx}px`,
-                  }}
-                >
-                  {ratingLabel}
-                </p>
-              </div>
-            </div>
+            <Link
+              href={`/products/${product.slug}`}
+              className="truncate font-bold"
+              style={{
+                color: HOME_PRODUCT_CARD_TEXT_DARK,
+                fontSize: typography.titleSizePx,
+                lineHeight: `${typography.titleLineHeightPx}px`,
+              }}
+            >
+              {product.title}
+            </Link>
 
             <p
               className="truncate font-normal"
@@ -225,35 +255,18 @@ function HomeProductCardListRowComponent({
             />
           </div>
 
-          <div className="flex shrink-0 flex-col items-end justify-end" style={{ gap: lp(8) }}>
+          <div
+            className="flex h-full shrink-0 items-center"
+            style={{ gap: lp(PRODUCTS_CATALOG_LIST_PRICE_TO_ACTIONS_GAP_PX) }}
+          >
+            {priceRow}
             <div
-              className="flex items-center whitespace-nowrap"
-              style={{ gap: lp(16), lineHeight: `${typography.priceLineHeightPx}px` }}
+              className="flex shrink-0 flex-col items-end"
+              style={{ gap: lp(PRODUCTS_CATALOG_LIST_RATING_TO_CART_GAP_PX) }}
             >
-              <p
-                className="font-bold"
-                style={{ color: HOME_PRODUCT_CARD_PRICE_COLOR, fontSize: typography.priceSizePx }}
-              >
-                {formatPrice(product.price, currency)}
-              </p>
-              {comparePrice != null ? (
-                <p
-                  className="font-normal line-through"
-                  style={{
-                    color: HOME_PRODUCT_CARD_COMPARE_COLOR,
-                    fontSize: typography.compareSizePx,
-                  }}
-                >
-                  {formatPrice(comparePrice, currency)}
-                </p>
-              ) : null}
+              {ratingRow}
+              {cartButton}
             </div>
-
-            <HomeProductCardCartActions
-              cartButton={cartButton}
-              ratingLineHeightPx={typography.ratingLineHeightPx}
-              actionsWidthPx={lp(100)}
-            />
           </div>
         </div>
       </div>
