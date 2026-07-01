@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { memo, useMemo } from 'react';
 import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
   PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
@@ -98,6 +99,10 @@ export const ProductsGrid = memo(function ProductsGrid({
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX : PRODUCTS_CATALOG_CARD_WIDTH_PX;
   const cardHeightPx =
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
+  const rowGapPx =
+    viewMode === 'grid-3'
+      ? PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX
+      : PRODUCTS_CATALOG_CARD_ROW_GAP_PX;
 
   if (sortedProducts.length === 0) {
     return (
@@ -172,7 +177,7 @@ export const ProductsGrid = memo(function ProductsGrid({
         className={getProductsCatalogGridClassName(viewMode)}
         style={{
           columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-          rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+          rowGap: rowGapPx,
         }}
       >
         {sortedProducts.map((product, index) => (

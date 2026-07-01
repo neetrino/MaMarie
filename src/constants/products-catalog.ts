@@ -57,13 +57,29 @@ export const PRODUCTS_CATALOG_CARD_WIDTH_PX = Math.floor(
   ),
 );
 
+/** Minimum clearance below image overhang — grid-4 uses this unchanged. */
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_BUFFER_PX = 8;
+
+/** Extra breathing room between grid-3 rows (shop catalog default view). */
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_BUFFER_PX = 26;
+
+function productsCatalogCardImageOverhangGapPx(cardWidthPx: number): number {
+  return Math.abs(
+    HOME_PRODUCT_CARD_IMAGE_TOP_PX * (cardWidthPx / HOME_PRODUCT_CARD_WIDTH_PX),
+  );
+}
+
 /**
  * Vertical space between rows — product images sit above the card (`HOME_PRODUCT_CARD_IMAGE_TOP_PX`).
  * Row gap must clear that overhang so cards do not overlap.
  */
 export const PRODUCTS_CATALOG_CARD_ROW_GAP_PX =
-  Math.abs(HOME_PRODUCT_CARD_IMAGE_TOP_PX * (PRODUCTS_CATALOG_CARD_WIDTH_PX / HOME_PRODUCT_CARD_WIDTH_PX)) +
-  8;
+  productsCatalogCardImageOverhangGapPx(PRODUCTS_CATALOG_CARD_WIDTH_PX) +
+  PRODUCTS_CATALOG_CARD_ROW_GAP_BUFFER_PX;
+
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX =
+  productsCatalogCardImageOverhangGapPx(PRODUCTS_CATALOG_CARD_WIDTH_PX) +
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_BUFFER_PX;
 
 export const PRODUCTS_CATALOG_CARD_HEIGHT_PX = resolveHomeProductCardHeightPx(
   PRODUCTS_CATALOG_CARD_WIDTH_PX,

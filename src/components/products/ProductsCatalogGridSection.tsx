@@ -4,6 +4,7 @@ import { ProductsGrid } from '../ProductsGrid';
 import { useTranslation } from '../../lib/i18n-client';
 import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
   PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
@@ -28,6 +29,10 @@ function ProductsCatalogGridLoading() {
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX : PRODUCTS_CATALOG_CARD_WIDTH_PX;
   const cardHeightPx =
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
+  const rowGapPx =
+    viewMode === 'grid-3'
+      ? PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX
+      : PRODUCTS_CATALOG_CARD_ROW_GAP_PX;
 
   return (
     <div
@@ -37,7 +42,7 @@ function ProductsCatalogGridLoading() {
           ? { gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }
           : {
               columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-              rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+              rowGap: rowGapPx,
             }
       }
       aria-busy="true"

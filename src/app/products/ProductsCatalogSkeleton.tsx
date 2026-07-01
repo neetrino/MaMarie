@@ -5,7 +5,7 @@ import {
 import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
-  PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
   PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
@@ -70,7 +70,7 @@ export function ProductsCatalogSkeleton() {
               className={getProductsCatalogGridClassName(PRODUCTS_CATALOG_DEFAULT_VIEW_MODE)}
               style={{
                 columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-                rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+                rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
               }}
             >
               {Array.from({ length: 6 }).map((_, index) => (
