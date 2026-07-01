@@ -4,10 +4,14 @@ import {
   HEADER_CONTENT_CLEARANCE_MOBILE_PX,
 } from './header';
 import {
-  HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX,
   HOME_PRODUCT_CARD_DESIGN_WIDTH_PX,
+  HOME_PRODUCT_CARD_IMAGE_TOP_PX,
+  HOME_PRODUCT_CARD_WIDTH_PX,
+  HOME_SECTION_CONTENT_MAX_WIDTH_PX,
   BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
+  homeSectionColumnWidthPx,
 } from './home-sections';
+import { resolveHomeProductCardHeightPx } from '../lib/home-product-card-layout';
 
 /** Figma shop page — catalog layout tokens. Horizontal insets use `HomeContentHorizontalFrame` (same as navbar pill). */
 
@@ -30,16 +34,39 @@ export const PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX = 104;
 /** PDP related products — title → card row (same as home best-products; image sits in this inset). */
 export const RELATED_PRODUCTS_GRID_OFFSET_TOP_PX = BEST_PRODUCTS_GRID_OFFSET_TOP_PX;
 
-export const PRODUCTS_CATALOG_CARD_GAP_PX = 12;
+/** Horizontal space between catalog cards. */
+export const PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX = 24;
 
 /** PDP related row — slightly tighter than shop grid. */
 export const RELATED_PRODUCTS_CARD_GAP_PX = 8;
 export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;
-export const PRODUCTS_CATALOG_CARD_WIDTH_PX = 344;
+export const PRODUCTS_CATALOG_GRID4_COLUMNS = 4;
 
-export const PRODUCTS_CATALOG_CARD_HEIGHT_PX = Math.round(
-  PRODUCTS_CATALOG_CARD_WIDTH_PX *
-    (HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX / HOME_PRODUCT_CARD_DESIGN_WIDTH_PX),
+/** Product grid width beside the filter sidebar (1354 − sidebar − gap). */
+export const PRODUCTS_CATALOG_MAIN_CONTENT_WIDTH_PX =
+  HOME_SECTION_CONTENT_MAX_WIDTH_PX -
+  PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX -
+  PRODUCTS_CATALOG_MAIN_GAP_PX;
+
+/** Fits exactly three cards per row in the catalog main column. */
+export const PRODUCTS_CATALOG_CARD_WIDTH_PX = Math.floor(
+  homeSectionColumnWidthPx(
+    PRODUCTS_CATALOG_CARD_COLUMNS,
+    PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+    PRODUCTS_CATALOG_MAIN_CONTENT_WIDTH_PX,
+  ),
+);
+
+/**
+ * Vertical space between rows — product images sit above the card (`HOME_PRODUCT_CARD_IMAGE_TOP_PX`).
+ * Row gap must clear that overhang so cards do not overlap.
+ */
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_PX =
+  Math.abs(HOME_PRODUCT_CARD_IMAGE_TOP_PX * (PRODUCTS_CATALOG_CARD_WIDTH_PX / HOME_PRODUCT_CARD_WIDTH_PX)) +
+  8;
+
+export const PRODUCTS_CATALOG_CARD_HEIGHT_PX = resolveHomeProductCardHeightPx(
+  PRODUCTS_CATALOG_CARD_WIDTH_PX,
 );
 
 export const PRODUCTS_CATALOG_CARD_LAYOUT_SCALE =
@@ -82,13 +109,32 @@ export type ProductsCatalogViewMode = (typeof PRODUCTS_CATALOG_VIEW_MODES)[numbe
 export const PRODUCTS_CATALOG_DEFAULT_VIEW_MODE: ProductsCatalogViewMode =
   PRODUCTS_CATALOG_VIEW_MODES[1];
 
-/** Four-column card width — fits same row as three 344px cards. */
+/** Fits exactly four cards per row in the catalog main column. */
 export const PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX = Math.floor(
-  (PRODUCTS_CATALOG_CARD_WIDTH_PX * PRODUCTS_CATALOG_CARD_COLUMNS +
-    PRODUCTS_CATALOG_CARD_GAP_PX * (PRODUCTS_CATALOG_CARD_COLUMNS - 1) -
-    PRODUCTS_CATALOG_CARD_GAP_PX * (4 - 1)) /
-    4,
+  homeSectionColumnWidthPx(
+    PRODUCTS_CATALOG_GRID4_COLUMNS,
+    PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+    PRODUCTS_CATALOG_MAIN_CONTENT_WIDTH_PX,
+  ),
 );
+
+export const PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX = resolveHomeProductCardHeightPx(
+  PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX,
+);
+
+const PRODUCTS_CATALOG_GRID_BASE_CLASS =
+  'grid w-full overflow-visible justify-items-center lg:justify-items-start';
+
+/** Responsive catalog grid — 3 or 4 columns on desktop beside the sidebar. */
+export function getProductsCatalogGridClassName(
+  viewMode: ProductsCatalogViewMode,
+): string {
+  if (viewMode === 'grid-4') {
+    return `${PRODUCTS_CATALOG_GRID_BASE_CLASS} grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`;
+  }
+
+  return `${PRODUCTS_CATALOG_GRID_BASE_CLASS} grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`;
+}
 
 export function normalizeProductsCatalogViewMode(value: string | null): ProductsCatalogViewMode {
   if (value === 'list' || value === 'grid-3' || value === 'grid-4') {

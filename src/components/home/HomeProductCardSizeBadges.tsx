@@ -13,12 +13,14 @@ import {
   HOME_PRODUCT_CARD_SIZES_LEFT_PX,
   HOME_PRODUCT_CARD_SIZES_TOP_PX,
 } from '../../constants/home-sections';
+import { homeProductCardLayoutPx } from '../../lib/home-product-card-layout';
 import type { ProductSizeOption } from '../../lib/services/product-variant-attributes';
 
 type SizeBadgeVariant = 'active' | 'sold-out' | 'inactive';
 
 interface HomeProductCardSizeBadgesProps {
   sizes?: ProductSizeOption[];
+  layoutWidthPx?: number;
 }
 
 function getSizeBadgeStyle(variant: SizeBadgeVariant): {
@@ -53,18 +55,23 @@ function resolveSizeBadgeVariant(size: ProductSizeOption): SizeBadgeVariant {
   return size.inStock ? 'active' : 'sold-out';
 }
 
-export function HomeProductCardSizeBadges({ sizes }: HomeProductCardSizeBadgesProps) {
+export function HomeProductCardSizeBadges({
+  sizes,
+  layoutWidthPx,
+}: HomeProductCardSizeBadgesProps) {
   if (!sizes || sizes.length === 0) {
     return null;
   }
+
+  const lp = (value: number) => homeProductCardLayoutPx(value, layoutWidthPx);
 
   return (
     <div
       className="home-product-card-sizes pointer-events-none absolute z-20 flex items-center opacity-0"
       style={{
-        left: HOME_PRODUCT_CARD_SIZES_LEFT_PX,
-        top: HOME_PRODUCT_CARD_SIZES_TOP_PX,
-        gap: HOME_PRODUCT_CARD_SIZE_BADGE_GAP_PX,
+        left: lp(HOME_PRODUCT_CARD_SIZES_LEFT_PX),
+        top: lp(HOME_PRODUCT_CARD_SIZES_TOP_PX),
+        gap: lp(HOME_PRODUCT_CARD_SIZE_BADGE_GAP_PX),
       }}
     >
       {sizes.map((size) => {
@@ -76,9 +83,9 @@ export function HomeProductCardSizeBadges({ sizes }: HomeProductCardSizeBadgesPr
             key={size.value}
             className="flex items-center justify-center border-2 font-semibold"
             style={{
-              width: HOME_PRODUCT_CARD_SIZE_BADGE_WIDTH_PX,
-              height: HOME_PRODUCT_CARD_SIZE_BADGE_HEIGHT_PX,
-              borderRadius: HOME_PRODUCT_CARD_SIZE_BADGE_RADIUS_PX,
+              width: lp(HOME_PRODUCT_CARD_SIZE_BADGE_WIDTH_PX),
+              height: lp(HOME_PRODUCT_CARD_SIZE_BADGE_HEIGHT_PX),
+              borderRadius: lp(HOME_PRODUCT_CARD_SIZE_BADGE_RADIUS_PX),
               fontSize: HOME_PRODUCT_CARD_SIZE_BADGE_FONT_SIZE_PX,
               lineHeight: '18px',
               backgroundColor: badgeStyle.backgroundColor,

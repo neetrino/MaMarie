@@ -3,11 +3,14 @@
 import { ProductsGrid } from '../ProductsGrid';
 import { useTranslation } from '../../lib/i18n-client';
 import {
-  PRODUCTS_CATALOG_CARD_GAP_PX,
+  PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+  PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
+  getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
 import { useProductsCatalogViewMode } from './useProductsCatalogViewMode';
 import { useProductsCatalog } from './ProductsCatalogProvider';
@@ -19,14 +22,15 @@ function ProductsCatalogGridLoading() {
   const cardWidthPx =
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX : PRODUCTS_CATALOG_CARD_WIDTH_PX;
   const cardHeightPx =
-    viewMode === 'grid-4'
-      ? Math.round(cardWidthPx * (PRODUCTS_CATALOG_CARD_HEIGHT_PX / PRODUCTS_CATALOG_CARD_WIDTH_PX))
-      : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
+    viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
 
   return (
     <div
-      className="flex w-full flex-wrap justify-center lg:justify-start"
-      style={{ gap: PRODUCTS_CATALOG_CARD_GAP_PX }}
+      className={getProductsCatalogGridClassName(viewMode)}
+      style={{
+        columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+        rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+      }}
       aria-busy="true"
       aria-label="Loading filtered products"
     >
