@@ -2,37 +2,19 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import type { CSSProperties, MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 import {
-  HOME_PRODUCT_CARD_ACTIONS_GAP_PX,
-  HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX,
   HOME_PRODUCT_CARD_ASSETS,
-  HOME_PRODUCT_CARD_BG,
   HOME_PRODUCT_CARD_CART_BG,
-  HOME_PRODUCT_CARD_CART_ICON_HOVER_LEFT_PX,
-  HOME_PRODUCT_CARD_CART_ICON_HOVER_TOP_PX,
-  HOME_PRODUCT_CARD_CART_ICON_LEFT_PX,
   HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX,
-  HOME_PRODUCT_CARD_CART_ICON_SIZE_PX,
-  HOME_PRODUCT_CARD_CART_ICON_TOP_PX,
-  HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX,
-  HOME_PRODUCT_CARD_CART_SIZE_PX,
   HOME_PRODUCT_CARD_COMPARE_COLOR,
   HOME_PRODUCT_CARD_HEART_RIGHT_PX,
   HOME_PRODUCT_CARD_HEART_SIZE_PX,
   HOME_PRODUCT_CARD_HEART_TOP_PX,
-  HOME_PRODUCT_CARD_HOVER_BG,
-  HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX,
-  HOME_PRODUCT_CARD_IMAGE_LEFT_PX,
-  HOME_PRODUCT_CARD_IMAGE_TOP_PX,
   HOME_PRODUCT_CARD_IMAGE_WIDTH_PX,
-  HOME_PRODUCT_CARD_LIFT_PX,
   HOME_PRODUCT_CARD_PANEL_HEIGHT_PX,
+  HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX,
   HOME_PRODUCT_CARD_PANEL_RADIUS_PX,
   HOME_PRODUCT_CARD_PANEL_TOP_PX,
   HOME_PRODUCT_CARD_PANEL_WIDTH_PX,
@@ -55,6 +37,7 @@ import {
 } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { WishlistIcon } from '../icons/WishlistIcon';
+import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
 import { HomeProductCardSizeBadges } from './HomeProductCardSizeBadges';
 import type {
@@ -87,44 +70,6 @@ interface HomeProductCardProps {
   compactPanel?: boolean;
   /** Preload image for above-the-fold catalog cards. */
   imagePriority?: boolean;
-}
-
-function resolveComparePrice(product: HomeProductCardData): number | null {
-  const candidates = [product.originalPrice, product.compareAtPrice];
-  for (const value of candidates) {
-    if (value != null && value > product.price) {
-      return value;
-    }
-  }
-  return null;
-}
-
-function buildCardCssVars(layoutWidthPx?: number): CSSProperties {
-  const lp = (value: number) => homeProductCardLayoutPx(value, layoutWidthPx);
-
-  return {
-    '--home-product-card-image-left-default': `${lp(HOME_PRODUCT_CARD_IMAGE_LEFT_PX)}px`,
-    '--home-product-card-image-top-default': `${lp(HOME_PRODUCT_CARD_IMAGE_TOP_PX)}px`,
-    '--home-product-card-image-width-default': `${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`,
-    '--home-product-card-image-height-default': `${lp(HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX)}px`,
-    '--home-product-card-image-left-hover': `${lp(HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX)}px`,
-    '--home-product-card-image-top-hover': `${lp(HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX)}px`,
-    '--home-product-card-image-width-hover': `${lp(HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX)}px`,
-    '--home-product-card-image-height-hover': `${lp(HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX)}px`,
-    '--home-product-card-bg-default': HOME_PRODUCT_CARD_BG,
-    '--home-product-card-bg-hover': HOME_PRODUCT_CARD_HOVER_BG,
-    '--home-product-card-actions-gap-default': `${lp(HOME_PRODUCT_CARD_ACTIONS_GAP_PX)}px`,
-    '--home-product-card-actions-gap-hover': `${lp(HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX)}px`,
-    '--home-product-card-cart-size-default': `${lp(HOME_PRODUCT_CARD_CART_SIZE_PX)}px`,
-    '--home-product-card-cart-size-hover': `${lp(HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX)}px`,
-    '--home-product-card-cart-icon-size-default': `${lp(HOME_PRODUCT_CARD_CART_ICON_SIZE_PX)}px`,
-    '--home-product-card-cart-icon-size-hover': `${lp(HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX)}px`,
-    '--home-product-card-cart-icon-left-default': `${lp(HOME_PRODUCT_CARD_CART_ICON_LEFT_PX)}px`,
-    '--home-product-card-cart-icon-top-default': `${lp(HOME_PRODUCT_CARD_CART_ICON_TOP_PX)}px`,
-    '--home-product-card-cart-icon-left-hover': `${lp(HOME_PRODUCT_CARD_CART_ICON_HOVER_LEFT_PX)}px`,
-    '--home-product-card-cart-icon-top-hover': `${lp(HOME_PRODUCT_CARD_CART_ICON_HOVER_TOP_PX)}px`,
-    '--home-product-card-lift-hover': `${-lp(HOME_PRODUCT_CARD_LIFT_PX)}px`,
-  } as CSSProperties;
 }
 
 function areHomeProductCardPropsEqual(
@@ -304,6 +249,14 @@ function HomeProductCardComponent({
     </Link>
   );
 
+  const colorSwatches = (
+    <HomeProductCardColorSwatches
+      colors={product.colors}
+      layoutWidthPx={layoutWidthPx}
+      maxVisible={typography.colorSwatchMaxVisible}
+    />
+  );
+
   const priceFooter = (
     <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
       {priceRow}
@@ -313,25 +266,25 @@ function HomeProductCardComponent({
     </div>
   );
 
-  const colorSwatches = (
-    <HomeProductCardColorSwatches
-      colors={product.colors}
-      layoutWidthPx={layoutWidthPx}
-      maxVisible={typography.colorSwatchMaxVisible}
-    />
-  );
-
   const standardPanelContent = (
-    <div className="flex h-full min-h-0 flex-col justify-between">
-      <div className="flex w-full items-start justify-between" style={{ gap: lp(8) }}>
-        <div className="flex min-w-0 flex-1 flex-col" style={{ gap: lp(3) }}>
-          {titleLine}
-          {subtitleLine}
-          {colorSwatches}
-        </div>
-        {ratingRow}
+    <div className="flex w-full items-start justify-between" style={{ gap: lp(8) }}>
+      <div
+        className="flex min-w-0 flex-col"
+        style={{ gap: lp(7), width: lp(HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX) }}
+      >
+        {titleLine}
+        {subtitleLine}
+        {colorSwatches}
+        {priceRow}
       </div>
-      {priceFooter}
+
+      <div
+        className="home-product-card-actions flex shrink-0 flex-col items-end justify-center"
+        style={{ width: lp(100) }}
+      >
+        {ratingRow}
+        {cartButton}
+      </div>
     </div>
   );
 
@@ -357,7 +310,7 @@ function HomeProductCardComponent({
   return (
     <article
       className="home-product-card relative shrink-0 overflow-visible"
-      style={{ width: cardWidth, height: cardHeight, ...buildCardCssVars(layoutWidthPx) }}
+      style={{ width: cardWidth, height: cardHeight, ...buildHomeProductCardCssVars(layoutWidthPx) }}
     >
       <div
         className="home-product-card-surface relative h-full w-full overflow-visible"

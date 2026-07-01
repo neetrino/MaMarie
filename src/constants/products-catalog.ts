@@ -129,6 +129,10 @@ const PRODUCTS_CATALOG_GRID_BASE_CLASS =
 export function getProductsCatalogGridClassName(
   viewMode: ProductsCatalogViewMode,
 ): string {
+  if (viewMode === 'list') {
+    return 'flex w-full flex-col overflow-visible';
+  }
+
   if (viewMode === 'grid-4') {
     return `${PRODUCTS_CATALOG_GRID_BASE_CLASS} grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`;
   }
@@ -157,3 +161,11 @@ export const PRODUCTS_CATALOG_CLIENT_POOL_LIMIT = 200;
 
 /** Debounce delay before server fetch when catalog search query changes. */
 export const PRODUCTS_CATALOG_SEARCH_DEBOUNCE_MS = 300;
+
+/** List view — full-width horizontal product row. */
+export const PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX = 128;
+export const PRODUCTS_CATALOG_LIST_ROW_GAP_PX = 12;
+export const PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX = 152;
+export const PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX = 30;
+export const PRODUCTS_CATALOG_LIST_PANEL_PADDING_X_PX = 18;
+export const PRODUCTS_CATALOG_LIST_PANEL_PADDING_Y_PX = 14;

@@ -10,6 +10,9 @@ import {
   PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
+  PRODUCTS_CATALOG_LIST_ROW_GAP_PX,
+  PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
+  PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
   getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
 import { useProductsCatalogViewMode } from './useProductsCatalogViewMode';
@@ -19,6 +22,7 @@ const PRODUCTS_CATALOG_LOADING_CARD_COUNT = 6;
 
 function ProductsCatalogGridLoading() {
   const { viewMode } = useProductsCatalogViewMode();
+  const isListView = viewMode === 'list';
   const cardWidthPx =
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX : PRODUCTS_CATALOG_CARD_WIDTH_PX;
   const cardHeightPx =
@@ -27,18 +31,30 @@ function ProductsCatalogGridLoading() {
   return (
     <div
       className={getProductsCatalogGridClassName(viewMode)}
-      style={{
-        columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-        rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
-      }}
+      style={
+        isListView
+          ? { gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }
+          : {
+              columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+              rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+            }
+      }
       aria-busy="true"
       aria-label="Loading filtered products"
     >
       {Array.from({ length: PRODUCTS_CATALOG_LOADING_CARD_COUNT }).map((_, index) => (
         <div
           key={index}
-          className="animate-pulse rounded-[30px] bg-[#f9e490]/60"
-          style={{ width: cardWidthPx, height: cardHeightPx }}
+          className="animate-pulse bg-[#f9e490]/60"
+          style={
+            isListView
+              ? {
+                  width: '100%',
+                  height: PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
+                  borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
+                }
+              : { width: cardWidthPx, height: cardHeightPx, borderRadius: 30 }
+          }
         />
       ))}
     </div>
