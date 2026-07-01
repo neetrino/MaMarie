@@ -10,6 +10,7 @@ import { ProductsFiltersProviderBridge } from '../../components/products/Product
 import { ProductsHeader } from '../../components/ProductsHeader';
 import { SizeFilter } from '../../components/SizeFilter';
 import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
+import { ProductsCatalogMobileTitle } from '../../components/products/ProductsCatalogMobileTitle';
 import { ProductsCatalogGridSection } from '../../components/products/ProductsCatalogGridSection';
 import { ProductsCatalogProvider } from '../../components/products/ProductsCatalogProvider';
 import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
@@ -22,6 +23,8 @@ import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
 import {
   PRODUCTS_CATALOG_MAIN_GAP_PX,
+  PRODUCTS_CATALOG_MOBILE_HEADER_ALIGN_OFFSET_RIGHT_PX,
+  PRODUCTS_CATALOG_MOBILE_TITLE_ALIGN_OFFSET_X_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
 } from '../../constants/products-catalog';
 import {
@@ -142,8 +145,14 @@ export async function ProductsCatalog({
   return (
     <HomeContentHorizontalFrame>
       <HomeSectionContent>
-        <div className="space-y-3 pt-2 pb-4 lg:hidden">
-          <ProductsBreadcrumb />
+        <div
+          className="space-y-3 pt-2 pb-4 lg:hidden"
+          style={{
+            marginLeft: PRODUCTS_CATALOG_MOBILE_TITLE_ALIGN_OFFSET_X_PX,
+            marginRight: PRODUCTS_CATALOG_MOBILE_HEADER_ALIGN_OFFSET_RIGHT_PX,
+          }}
+        >
+          <ProductsCatalogMobileTitle />
           <ProductsHeader />
         </div>
 

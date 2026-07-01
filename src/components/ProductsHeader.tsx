@@ -7,6 +7,13 @@ import {
   PRODUCTS_CATALOG_ASSETS,
   PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX,
   PRODUCTS_CATALOG_FILTER_CHEVRON_SRC,
+  PRODUCTS_CATALOG_MOBILE_ACTION_FONT_SIZE_PX,
+  PRODUCTS_CATALOG_MOBILE_ACTION_LINE_HEIGHT_PX,
+  PRODUCTS_CATALOG_MOBILE_ACTION_PILL_HEIGHT_PX,
+  PRODUCTS_CATALOG_MOBILE_ACTION_PILL_PADDING_X_PX,
+  PRODUCTS_CATALOG_MOBILE_ACTIONS_GAP_PX,
+  PRODUCTS_CATALOG_MOBILE_FILTER_PILL_BORDER_COLOR,
+  PRODUCTS_CATALOG_MOBILE_FILTER_PILL_TEXT_COLOR,
   PRODUCTS_CATALOG_PILL_HEIGHT_PX,
   PRODUCTS_CATALOG_PILL_RADIUS_PX,
   PRODUCTS_CATALOG_SORT_ICON_SIZE_PX,
@@ -146,12 +153,29 @@ function ProductsHeaderContent() {
 
   const currentSortLabel = t('products.catalog.sortBy');
 
+  const mobileActionPillStyle = {
+    minHeight: PRODUCTS_CATALOG_MOBILE_ACTION_PILL_HEIGHT_PX,
+    paddingLeft: PRODUCTS_CATALOG_MOBILE_ACTION_PILL_PADDING_X_PX,
+    paddingRight: PRODUCTS_CATALOG_MOBILE_ACTION_PILL_PADDING_X_PX,
+    fontSize: PRODUCTS_CATALOG_MOBILE_ACTION_FONT_SIZE_PX,
+    lineHeight: `${PRODUCTS_CATALOG_MOBILE_ACTION_LINE_HEIGHT_PX}px`,
+    borderRadius: PRODUCTS_CATALOG_PILL_RADIUS_PX,
+  } as const;
+
   return (
-    <div className="flex items-center justify-end gap-3">
+    <div
+      className="flex w-full items-center justify-between lg:w-auto lg:justify-end"
+      style={{ gap: PRODUCTS_CATALOG_MOBILE_ACTIONS_GAP_PX }}
+    >
       <button
         type="button"
         onClick={() => window.dispatchEvent(new Event(MOBILE_FILTERS_EVENT))}
-        className="inline-flex items-center gap-2 rounded-full border border-[#e8e8e8] bg-white px-4 py-2 text-sm font-medium text-[#57423b] lg:hidden"
+        className="inline-flex shrink-0 items-center justify-center border bg-white font-medium lg:hidden"
+        style={{
+          ...mobileActionPillStyle,
+          borderColor: PRODUCTS_CATALOG_MOBILE_FILTER_PILL_BORDER_COLOR,
+          color: PRODUCTS_CATALOG_MOBILE_FILTER_PILL_TEXT_COLOR,
+        }}
       >
         {t('products.header.filters')}
       </button>
@@ -182,11 +206,32 @@ function ProductsHeaderContent() {
         ))}
       </div>
 
-      <div className="relative" ref={sortDropdownRef}>
+      <div className="relative shrink-0" ref={sortDropdownRef}>
         <button
           type="button"
           onClick={() => setShowSortDropdown((open) => !open)}
-          className="flex items-center gap-3 px-6 font-normal text-white"
+          className="inline-flex shrink-0 items-center gap-2 font-medium text-white lg:hidden"
+          style={{
+            ...mobileActionPillStyle,
+            backgroundColor: PRODUCTS_CATALOG_SORT_PILL_BG,
+          }}
+          aria-expanded={showSortDropdown}
+        >
+          <span className="whitespace-nowrap">{currentSortLabel}</span>
+          <Image
+            src={PRODUCTS_CATALOG_FILTER_CHEVRON_SRC}
+            alt=""
+            width={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
+            height={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
+            aria-hidden
+            className={`shrink-0 brightness-0 invert transition-transform duration-200 ease-in-out ${showSortDropdown ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowSortDropdown((open) => !open)}
+          className="hidden items-center gap-3 px-6 font-normal text-white lg:flex"
           style={{
             height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
             borderRadius: PRODUCTS_CATALOG_PILL_RADIUS_PX,
@@ -243,14 +288,34 @@ export function ProductsHeader() {
   return (
     <Suspense
       fallback={
-        <div className="flex justify-end gap-3 animate-pulse">
+        <div
+          className="flex w-full animate-pulse justify-between lg:w-auto lg:justify-end"
+          style={{ gap: PRODUCTS_CATALOG_MOBILE_ACTIONS_GAP_PX }}
+        >
+          <div
+            className="rounded-[30px] bg-neutral-200 lg:hidden"
+            style={{
+              width: 96,
+              height: PRODUCTS_CATALOG_MOBILE_ACTION_PILL_HEIGHT_PX,
+            }}
+          />
+          <div
+            className="rounded-[30px] bg-neutral-200 lg:hidden"
+            style={{
+              width: 140,
+              height: PRODUCTS_CATALOG_MOBILE_ACTION_PILL_HEIGHT_PX,
+            }}
+          />
           <div
             className="hidden rounded-[30px] bg-neutral-200 lg:block"
             style={{ width: 182, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
           />
           <div
-            className="rounded-[30px] bg-neutral-200"
-            style={{ width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX, height: PRODUCTS_CATALOG_PILL_HEIGHT_PX }}
+            className="hidden rounded-[30px] bg-neutral-200 lg:block"
+            style={{
+              width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
+              height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
+            }}
           />
         </div>
       }
