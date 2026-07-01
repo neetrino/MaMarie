@@ -75,11 +75,14 @@ export const WISHLIST_CARD_WIDTH_PX = Math.floor(
 
 export const WISHLIST_CARD_HEIGHT_PX = resolveHomeProductCardHeightPx(WISHLIST_CARD_WIDTH_PX);
 
+/** Extra breathing room between wishlist card rows beyond image overhang (px). */
+export const WISHLIST_CARD_ROW_GAP_EXTRA_PX = 25;
+
 /** Clears product image overhang between wishlist rows. */
 export const WISHLIST_CARD_ROW_GAP_PX =
   Math.abs(
     HOME_PRODUCT_CARD_IMAGE_TOP_PX * (WISHLIST_CARD_WIDTH_PX / HOME_PRODUCT_CARD_WIDTH_PX),
-  ) + 8;
+  ) + WISHLIST_CARD_ROW_GAP_EXTRA_PX;
 
 export const WISHLIST_EMPTY_ASSETS = {
   illustration: '/assets/wishlist/empty-heart.png',
