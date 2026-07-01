@@ -1,4 +1,6 @@
-export const PRODUCTS_CATALOG_DEFAULT_LIMIT = 12;
+import { PRODUCTS_CATALOG_PAGE_LIMIT_GRID3 } from '../constants/products-catalog';
+
+export const PRODUCTS_CATALOG_DEFAULT_LIMIT = PRODUCTS_CATALOG_PAGE_LIMIT_GRID3;
 
 export const PRODUCTS_CATALOG_FILTER_PARAM_KEYS = [
   'search',

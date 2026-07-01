@@ -16,6 +16,7 @@ import {
   getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
 import { useProductsCatalogViewMode } from './useProductsCatalogViewMode';
+import { useProductsCatalogViewModePageLimit } from './useProductsCatalogViewModePageLimit';
 import { useProductsCatalog } from './ProductsCatalogProvider';
 
 const PRODUCTS_CATALOG_LOADING_CARD_COUNT = 6;
@@ -81,6 +82,7 @@ function ProductsCatalogInlineUpdating() {
 
 export function ProductsCatalogGridSection() {
   const { t } = useTranslation();
+  useProductsCatalogViewModePageLimit();
   const {
     products,
     meta,

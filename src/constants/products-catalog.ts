@@ -147,6 +147,22 @@ export function normalizeProductsCatalogViewMode(value: string | null): Products
   return PRODUCTS_CATALOG_DEFAULT_VIEW_MODE;
 }
 
+/** Page size per catalog view mode. */
+export const PRODUCTS_CATALOG_PAGE_LIMIT_LIST = 10;
+export const PRODUCTS_CATALOG_PAGE_LIMIT_GRID3 = 12;
+export const PRODUCTS_CATALOG_PAGE_LIMIT_GRID4 = 16;
+
+/** Resolves API page size for the active catalog view mode. */
+export function resolveProductsCatalogPageLimit(viewMode: ProductsCatalogViewMode): number {
+  if (viewMode === 'list') {
+    return PRODUCTS_CATALOG_PAGE_LIMIT_LIST;
+  }
+  if (viewMode === 'grid-4') {
+    return PRODUCTS_CATALOG_PAGE_LIMIT_GRID4;
+  }
+  return PRODUCTS_CATALOG_PAGE_LIMIT_GRID3;
+}
+
 export const PRODUCTS_CATALOG_CTA_WIDTH_PX = 200;
 export const PRODUCTS_CATALOG_CTA_HEIGHT_PX = 56;
 export const PRODUCTS_CATALOG_CTA_BG = BRAND_COLORS.pink;
