@@ -57,7 +57,7 @@ export function ProductCardActions({
         onClick={onWishlistToggle}
         className={`${buttonSize} rounded-full flex items-center justify-center transition-all duration-200 ${
           isInWishlist
-            ? 'bg-red-600 text-white shadow-lg'
+            ? 'bg-brand-pink text-white shadow-lg'
             : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
         }`}
         title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}

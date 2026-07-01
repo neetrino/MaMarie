@@ -350,7 +350,7 @@ function HomeProductCardComponent({
           aria-pressed={isInWishlist}
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
           className={`absolute z-20 flex items-center justify-center transition-colors hover:opacity-80 ${
-            isInWishlist ? 'text-red-600' : 'text-white'
+            isInWishlist ? 'text-brand-pink' : ''
           }`}
           style={{
             top: lp(HOME_PRODUCT_CARD_HEART_TOP_PX),

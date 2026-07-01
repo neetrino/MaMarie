@@ -75,6 +75,8 @@ export const HOME_PRODUCT_CARD_PANEL_RADIUS_PX = scaleProductCardPx(25);
 export const HOME_PRODUCT_CARD_HEART_SIZE_PX = scaleProductCardPx(34);
 export const HOME_PRODUCT_CARD_HEART_TOP_PX = scaleProductCardPx(17);
 export const HOME_PRODUCT_CARD_HEART_RIGHT_PX = scaleProductCardPx(15);
+/** Figma `51:643` — mdi:heart-outline inactive fill. */
+export const HOME_PRODUCT_CARD_HEART_INACTIVE_FILL_OPACITY = 0.35;
 
 export const HOME_PRODUCT_CARD_TITLE_SIZE_PX = 18;
 export const HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX = 16;

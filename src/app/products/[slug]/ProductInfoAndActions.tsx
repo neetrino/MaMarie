@@ -234,7 +234,7 @@ export function ProductInfoAndActions({
             onClick={onAddToWishlist} 
             className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
               isInWishlist
-                ? 'border-gray-200 text-red-600'
+                ? 'border-gray-200 text-brand-pink'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
