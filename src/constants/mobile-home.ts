@@ -1,12 +1,23 @@
 import { BRAND_COLORS } from './brand';
 import { HOME_PRODUCT_CARD_ASSETS } from './home-sections';
+import { resolveHomeProductCardHeightPx, homeProductCardLayoutPx } from '../lib/home-product-card-layout';
+import {
+  HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX,
+  HOME_PRODUCT_CARD_IMAGE_TOP_PX,
+} from './home-sections';
+import { MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX } from './mobile-bottom-nav';
 
 /** Figma mobile home artboard — 375×2147 (`MobileApp`). */
 export const MOBILE_HOME_DESIGN_WIDTH_PX = 375;
 
 export const MOBILE_HOME_BG = '#f1f1f3';
-export const MOBILE_HOME_SECTION_GAP_PX = 32;
+export const MOBILE_HOME_SECTION_GAP_PX = 50;
 export const MOBILE_HOME_HORIZONTAL_PADDING_PX = 20;
+/** Slightly tighter than full nav shell — less empty strip above bottom bar. */
+export const MOBILE_HOME_BOTTOM_NAV_CLEARANCE_OFFSET_PX = 10;
+export const MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX =
+  MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX - MOBILE_HOME_BOTTOM_NAV_CLEARANCE_OFFSET_PX;
+export const MOBILE_HOME_BOTTOM_CONTENT_PADDING_PX = 20;
 
 export const MOBILE_HOME_SEARCH_HEIGHT_PX = 48;
 export const MOBILE_HOME_SEARCH_RADIUS_PX = 70;
@@ -61,10 +72,34 @@ export const MOBILE_HOME_GENDER_BOYS_BG = '#5281e1';
 export const MOBILE_HOME_SECTION_TITLE_SIZE_PX = 35;
 export const MOBILE_HOME_SECTION_TITLE_LINE_HEIGHT_PX = 45;
 export const MOBILE_HOME_SECTION_TITLE_COLOR = 'rgba(0, 0, 0, 0.72)';
+/** Space between section heading row and product carousel. */
+export const MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX = 1;
+/** Figma `74:789` — white see-all pill next to section title. */
+export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX = 40;
+export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_RADIUS_PX = 20;
+export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_PADDING_PX = 10;
+export const MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX = 20;
 
-export const MOBILE_HOME_PRODUCT_CARD_WIDTH_PX = 184;
-export const MOBILE_HOME_PRODUCT_CARD_HEIGHT_PX = 330;
-export const MOBILE_HOME_PRODUCT_CARD_RADIUS_PX = 30;
+export const MOBILE_HOME_PRODUCT_CARD_WIDTH_PX = 240;
+
+/** Product photo bleed above card — matches HomeProductCard image frame offsets. */
+const HOME_PRODUCT_CARD_IMAGE_INNER_TOP_BLEED_RATIO = 0.2148;
+
+function mobileHomeProductCardTopBleedPx(widthPx: number): number {
+  const imageWrapTopPx = homeProductCardLayoutPx(HOME_PRODUCT_CARD_IMAGE_TOP_PX, widthPx);
+  const imageWrapHeightPx = homeProductCardLayoutPx(HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX, widthPx);
+
+  return Math.ceil(
+    Math.abs(imageWrapTopPx) + imageWrapHeightPx * HOME_PRODUCT_CARD_IMAGE_INNER_TOP_BLEED_RATIO,
+  );
+}
+
+export const MOBILE_HOME_PRODUCT_CARD_TOP_BLEED_PX = mobileHomeProductCardTopBleedPx(
+  MOBILE_HOME_PRODUCT_CARD_WIDTH_PX,
+);
+export const MOBILE_HOME_PRODUCT_CARD_HEIGHT_PX = resolveHomeProductCardHeightPx(
+  MOBILE_HOME_PRODUCT_CARD_WIDTH_PX,
+);
 export const MOBILE_HOME_PRODUCT_CARD_GAP_PX = 10;
 
 export const MOBILE_HOME_DOT_ACTIVE_WIDTH_PX = 35;
@@ -84,7 +119,8 @@ export const MOBILE_HOME_ASSETS = {
   /** Figma `74:750` — material-symbols:search-rounded. */
   search: '/assets/home/mobile/icon-search-rounded.svg',
   chevronCta: '/assets/home/icon-chevron-right.svg',
-  chevronSection: '/assets/home/icon-chevron-right-pink.svg',
+  /** Figma `74:790` — glyphs:arrow-bold inside `74:789`. */
+  sectionSeeAllArrow: '/assets/home/mobile/section-see-all-arrow.svg',
   saleBannerGirl: '/assets/home/mobile/sale-banner-girl.png',
   saleBannerArrow: '/assets/home/mobile/sale-banner-arrow.svg',
   genderChevronGirls: '/assets/home/mobile/gender-chevron-girls.svg',

@@ -160,7 +160,7 @@ export function ProductCardList({
               onClick={onWishlistToggle}
               className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
                 isInWishlist
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-brand-pink text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
               title={isInWishlist ? t('common.messages.removedFromWishlist') : t('common.messages.addedToWishlist')}

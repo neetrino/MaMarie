@@ -75,6 +75,8 @@ export const HOME_PRODUCT_CARD_PANEL_RADIUS_PX = scaleProductCardPx(25);
 export const HOME_PRODUCT_CARD_HEART_SIZE_PX = scaleProductCardPx(34);
 export const HOME_PRODUCT_CARD_HEART_TOP_PX = scaleProductCardPx(17);
 export const HOME_PRODUCT_CARD_HEART_RIGHT_PX = scaleProductCardPx(15);
+/** Figma `51:643` — mdi:heart-outline inactive fill. */
+export const HOME_PRODUCT_CARD_HEART_INACTIVE_FILL_OPACITY = 0.35;
 
 export const HOME_PRODUCT_CARD_TITLE_SIZE_PX = 18;
 export const HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX = 16;
@@ -86,6 +88,7 @@ export const HOME_PRODUCT_CARD_PRICE_COLOR = '#a43c12';
 export const HOME_PRODUCT_CARD_COMPARE_COLOR = '#9a9a9a';
 export const HOME_PRODUCT_CARD_RATING_COLOR = '#757571';
 export const HOME_PRODUCT_CARD_RATING_SIZE_PX = 13.745;
+export const HOME_PRODUCT_CARD_RATING_STAR_TEXT_GAP_PX = 4;
 
 export const HOME_PRODUCT_CARD_HOVER_DURATION_MS = 300;
 export const HOME_PRODUCT_CARD_HOVER_EASING = 'cubic-bezier(0, 0, 0.58, 1)';

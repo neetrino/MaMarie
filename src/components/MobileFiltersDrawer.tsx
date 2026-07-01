@@ -1,46 +1,121 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  CART_DRAWER_MOBILE_WIDTH_PERCENT,
+  CART_DRAWER_PANEL_TRANSITION_MS,
+  CART_DRAWER_PANEL_Z_INDEX,
+} from '../constants/cart-drawer';
+import { PRODUCTS_CATALOG_MOBILE_FILTERS_Z_INDEX } from '../constants/products-catalog';
+import { lockBodyScroll, unlockBodyScroll } from '../lib/body-scroll-lock';
 import { useTranslation } from '../lib/i18n-client';
+import { useDrawerTransition } from '../lib/use-drawer-transition';
+import { DrawerCloseTab } from './drawer/DrawerCloseTab';
 
 interface MobileFiltersDrawerProps {
   title?: string;
-  triggerLabel?: string;
   children: ReactNode;
   openEventName?: string;
+  zIndex?: number;
+}
+
+interface MobileFiltersDrawerPanelProps {
+  visible: boolean;
+  onClose: () => void;
+  panelRef: RefObject<HTMLDivElement>;
+  title: string;
+  closeLabel: string;
+  zIndex: number;
+  children: ReactNode;
+}
+
+function MobileFiltersDrawerPanel({
+  visible,
+  onClose,
+  panelRef,
+  title,
+  closeLabel,
+  zIndex,
+  children,
+}: MobileFiltersDrawerPanelProps) {
+  return (
+    <div
+      className="fixed inset-0 flex justify-start overscroll-none lg:hidden"
+      style={{ zIndex }}
+    >
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden
+        className={`fixed inset-0 rounded-none bg-black/40 backdrop-blur-sm transition-opacity duration-200 ease-in-out motion-reduce:transition-none ${
+          visible ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      />
+
+      <div
+        ref={panelRef}
+        className={`relative h-dvh max-h-dvh w-[var(--mobile-filters-drawer-width)] transition-transform duration-300 ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+          visible ? 'translate-x-0' : '-translate-x-full motion-reduce:translate-x-0'
+        }`}
+        style={{
+          ['--mobile-filters-drawer-width' as string]: `${CART_DRAWER_MOBILE_WIDTH_PERCENT}%`,
+        }}
+      >
+        <DrawerCloseTab edge="end" onClose={onClose} closeLabel={closeLabel} />
+        <aside
+          className="relative flex h-full w-full flex-col overflow-hidden rounded-r-3xl bg-white shadow-2xl"
+          style={{ zIndex: CART_DRAWER_PANEL_Z_INDEX }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-filters-drawer-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="flex items-center border-b border-gray-100 px-6 py-5">
+            <h2 id="mobile-filters-drawer-title" className="text-xl font-bold leading-tight text-gray-900">
+              {title}
+            </h2>
+          </header>
+
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-6">{children}</div>
+        </aside>
+      </div>
+    </div>
+  );
 }
 
 /**
- * Mobile filters drawer that կարող է բացվել թե՛ կոճակից, թե՛ արտաքին իրադարձությունից։
+ * Mobile filters sidebar — slides in from the left with cart-style close tab and scroll lock.
  */
 export function MobileFiltersDrawer({
   title,
-  triggerLabel,
   children,
   openEventName,
+  zIndex = PRODUCTS_CATALOG_MOBILE_FILTERS_Z_INDEX,
 }: MobileFiltersDrawerProps) {
   const { t } = useTranslation();
   const defaultTitle = title || t('products.mobileFilters.title');
-  const defaultTriggerLabel = triggerLabel || t('products.mobileFilters.title');
+  const closeLabel = t('products.mobileFilters.close');
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { rendered, visible } = useDrawerTransition(open, CART_DRAWER_PANEL_TRANSITION_MS);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!openEventName) {
+      return;
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!openEventName) return;
 
     const handleExternalToggle = () => {
-      console.debug('[MobileFiltersDrawer] external toggle received');
       setOpen((prev) => !prev);
     };
 
@@ -50,38 +125,67 @@ export function MobileFiltersDrawer({
     };
   }, [openEventName]);
 
-  return (
-    <div className="lg:hidden">
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
-            role="dialog"
-            aria-modal="true"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <p className="text-lg font-semibold text-gray-900">{defaultTitle}</p>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
-                aria-label={t('products.mobileFilters.close')}
-              >
-                <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+  useEffect(() => {
+    if (!rendered) {
+      return;
+    }
 
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6">{children}</div>
-          </div>
-        </div>
-      )}
-    </div>
+    lockBodyScroll();
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (panelRef.current?.contains(target)) {
+        return;
+      }
+
+      event.preventDefault();
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      unlockBodyScroll();
+    };
+  }, [rendered]);
+
+  useEffect(() => {
+    if (!rendered) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [rendered, handleClose]);
+
+  if (!mounted || !rendered) {
+    return null;
+  }
+
+  return createPortal(
+    <MobileFiltersDrawerPanel
+      visible={visible}
+      onClose={handleClose}
+      panelRef={panelRef}
+      title={defaultTitle}
+      closeLabel={closeLabel}
+      zIndex={zIndex}
+    >
+      {children}
+    </MobileFiltersDrawerPanel>,
+    document.body,
   );
 }
-

@@ -9,6 +9,7 @@ import { logger } from '../../lib/utils/logger';
 import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../../lib/product-card-lazy';
 import type { WishlistUpdatedDetail } from '../../components/hooks/useWishlist';
 import { WishlistEmptyState } from '../../components/wishlist/WishlistEmptyState';
+import { MobileWishlistProductGrid } from '../../components/wishlist/MobileWishlistProductGrid';
 import { HomeSectionHeadingRow } from '../../components/home/HomeSectionHeading';
 import { mapToHomeProductCard } from '../../components/home/best-products-data';
 import { HomeProductCard } from '../../components/home/HomeProductCard';
@@ -30,9 +31,18 @@ import {
   WISHLIST_CARD_WIDTH_PX,
   WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX,
   WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX,
+  WISHLIST_PAGE_MOBILE_HEADING_MIN_HEIGHT_PX,
+  WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX,
+  WISHLIST_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX,
+  WISHLIST_PAGE_MOBILE_TITLE_MAX_LINES,
   WISHLIST_PAGE_TITLE_FONT_SIZE_PX,
   WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/wishlist-empty-state';
+import {
+  MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
+  MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
+  MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
+} from '../../constants/mobile-wishlist';
 import type {
   ProductColorOption,
   ProductSizeOption,
@@ -167,7 +177,55 @@ export default function WishlistPage() {
   const gridItemCount = loading && cardProducts.length === 0 ? wishlistIds.length : cardProducts.length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <div
+        className="mobile-wishlist-page sm:hidden w-full max-w-full overflow-x-hidden"
+        style={{
+          paddingTop: MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
+          paddingBottom: MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
+          paddingLeft: MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
+          paddingRight: MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
+        }}
+      >
+        <div
+          style={
+            showEmptyState
+              ? { marginBottom: WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX }
+              : undefined
+          }
+        >
+          <HomeSectionHeadingRow
+            id="wishlist-heading-mobile"
+            title={t('common.wishlist.title')}
+            seeAllHref="/products"
+            seeAllLabel=""
+            color={BEST_PRODUCTS_HEADING_COLOR}
+            chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
+            titleFontSizePx={WISHLIST_PAGE_TITLE_FONT_SIZE_PX}
+            titleLineHeightPx={WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX}
+            minHeightPx={WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX}
+            mobileTitleFontSizePx={WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX}
+            mobileTitleLineHeightPx={WISHLIST_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX}
+            mobileMinHeightPx={WISHLIST_PAGE_MOBILE_HEADING_MIN_HEIGHT_PX}
+            mobileTitleMaxLines={WISHLIST_PAGE_MOBILE_TITLE_MAX_LINES}
+            headingPaddingYPx={BEST_PRODUCTS_HEADING_PADDING_Y_PX}
+            showSeeAllLink={false}
+          />
+        </div>
+
+        {showEmptyState ? (
+          <WishlistEmptyState t={t} />
+        ) : gridItemCount > 0 ? (
+          <MobileWishlistProductGrid
+            products={cardProducts}
+            loading={loading}
+            placeholderCount={wishlistIds.length}
+            addToCartLabel={t('common.wishlist.addToCart')}
+          />
+        ) : null}
+      </div>
+
+      <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div
         style={
           showEmptyState
@@ -236,6 +294,7 @@ export default function WishlistPage() {
           </div>
         </div>
       ) : null}
-    </div>
+      </div>
+    </>
   );
 }

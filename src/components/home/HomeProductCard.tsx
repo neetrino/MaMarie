@@ -21,6 +21,7 @@ import {
   HOME_PRODUCT_CARD_PRICE_COLOR,
   HOME_PRODUCT_CARD_RADIUS_PX,
   HOME_PRODUCT_CARD_RATING_COLOR,
+  HOME_PRODUCT_CARD_RATING_STAR_TEXT_GAP_PX,
   HOME_PRODUCT_CARD_TEXT_DARK,
   HOME_PRODUCT_CARD_TEXT_MUTED,
   HOME_PRODUCT_CARD_WIDTH_PX,
@@ -70,6 +71,8 @@ interface HomeProductCardProps {
   compactPanel?: boolean;
   /** Preload image for above-the-fold catalog cards. */
   imagePriority?: boolean;
+  /** Static card — no hover lift, size badges, or cart/image transitions (mobile home). */
+  disableHoverEffects?: boolean;
 }
 
 function areHomeProductCardPropsEqual(
@@ -80,7 +83,8 @@ function areHomeProductCardPropsEqual(
     prev.layoutWidthPx !== next.layoutWidthPx ||
     prev.layoutHeightPx !== next.layoutHeightPx ||
     prev.compactPanel !== next.compactPanel ||
-    prev.imagePriority !== next.imagePriority
+    prev.imagePriority !== next.imagePriority ||
+    prev.disableHoverEffects !== next.disableHoverEffects
   ) {
     return false;
   }
@@ -109,6 +113,7 @@ function HomeProductCardComponent({
   layoutHeightPx,
   compactPanel = false,
   imagePriority = false,
+  disableHoverEffects = false,
 }: HomeProductCardProps) {
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
@@ -178,7 +183,27 @@ function HomeProductCardComponent({
     </div>
   );
 
-  const ratingRow = (
+  const ratingRow = compactPanel ? (
+    <div
+      className="flex items-center justify-end whitespace-nowrap"
+      style={{
+        height: typography.ratingLineHeightPx,
+        gap: lp(HOME_PRODUCT_CARD_RATING_STAR_TEXT_GAP_PX),
+        color: HOME_PRODUCT_CARD_RATING_COLOR,
+        fontSize: typography.ratingSizePx,
+        lineHeight: `${typography.ratingLineHeightPx}px`,
+      }}
+    >
+      <Image
+        src={HOME_PRODUCT_CARD_ASSETS.star}
+        alt=""
+        width={typography.ratingStarSizePx}
+        height={typography.ratingStarSizePx}
+        className="shrink-0"
+      />
+      <span className="font-normal">{ratingLabel}</span>
+    </div>
+  ) : (
     <div className="relative shrink-0" style={{ width: lp(71), height: typography.ratingLineHeightPx }}>
       <Image
         src={HOME_PRODUCT_CARD_ASSETS.star}
@@ -257,15 +282,6 @@ function HomeProductCardComponent({
     />
   );
 
-  const priceFooter = (
-    <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
-      {priceRow}
-      <div className="home-product-card-actions flex shrink-0 flex-col items-end justify-center">
-        {cartButton}
-      </div>
-    </div>
-  );
-
   const standardPanelContent = (
     <div className="flex w-full items-start justify-between" style={{ gap: lp(8) }}>
       <div
@@ -289,27 +305,34 @@ function HomeProductCardComponent({
   );
 
   const compactPanelContent = (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex h-full min-h-0 w-full flex-col">
       <div className="flex w-full items-center justify-between" style={{ gap: lp(8) }}>
         <div className="min-w-0 flex-1">{titleLine}</div>
         {ratingRow}
       </div>
 
       <div
-        className="flex w-full flex-1 flex-col justify-center"
+        className="flex flex-1 flex-col justify-center"
         style={{ gap: HOME_PRODUCT_CARD_COMPACT_DESCRIPTION_TO_SWATCHES_GAP_PX }}
       >
         {subtitleLine}
         {colorSwatches}
       </div>
 
-      {priceFooter}
+      <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
+        {priceRow}
+        <div className="home-product-card-actions flex shrink-0 items-center justify-center">
+          {cartButton}
+        </div>
+      </div>
     </div>
   );
 
   return (
     <article
-      className="home-product-card relative shrink-0 overflow-visible"
+      className={`home-product-card relative shrink-0 overflow-visible${
+        disableHoverEffects ? ' home-product-card--static' : ''
+      }`}
       style={{ width: cardWidth, height: cardHeight, ...buildHomeProductCardCssVars(layoutWidthPx) }}
     >
       <div
@@ -342,7 +365,9 @@ function HomeProductCardComponent({
           </div>
         </Link>
 
-        <HomeProductCardSizeBadges sizes={product.sizes} layoutWidthPx={layoutWidthPx} />
+        {!disableHoverEffects ? (
+          <HomeProductCardSizeBadges sizes={product.sizes} layoutWidthPx={layoutWidthPx} />
+        ) : null}
 
         <button
           type="button"
@@ -350,7 +375,7 @@ function HomeProductCardComponent({
           aria-pressed={isInWishlist}
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
           className={`absolute z-20 flex items-center justify-center transition-colors hover:opacity-80 ${
-            isInWishlist ? 'text-red-600' : 'text-white'
+            isInWishlist ? 'text-brand-pink' : ''
           }`}
           style={{
             top: lp(HOME_PRODUCT_CARD_HEART_TOP_PX),

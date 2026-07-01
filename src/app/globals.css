@@ -115,6 +115,7 @@
 
   .animate-catalog-grid-in {
     animation: catalog-grid-in 0.35s ease-out;
+    animation-fill-mode: forwards;
   }
 
   @keyframes header-pill-in {
@@ -179,8 +180,8 @@
     --home-product-card-lift: 0px;
   }
 
-  .home-product-card:hover,
-  .home-product-card:has(a:focus-visible) {
+  .home-product-card:not(.home-product-card--static):hover,
+  .home-product-card:not(.home-product-card--static):has(a:focus-visible) {
     z-index: 10;
     --home-product-card-image-left: var(--home-product-card-image-left-hover);
     --home-product-card-image-top: var(--home-product-card-image-top-hover);
@@ -195,9 +196,17 @@
     --home-product-card-lift: var(--home-product-card-lift-hover);
   }
 
-  .home-product-card:hover .home-product-card-sizes,
-  .home-product-card:has(a:focus-visible) .home-product-card-sizes {
+  .home-product-card:not(.home-product-card--static):hover .home-product-card-sizes,
+  .home-product-card:not(.home-product-card--static):has(a:focus-visible) .home-product-card-sizes {
     opacity: 1;
+  }
+
+  .home-product-card--static .home-product-card-surface,
+  .home-product-card--static .home-product-card-image-wrap,
+  .home-product-card--static .home-product-card-actions,
+  .home-product-card--static .home-product-card-cart,
+  .home-product-card--static .home-product-card-cart-icon {
+    transition: none;
   }
 
   .home-product-card-surface {
@@ -324,6 +333,19 @@
 @media (max-width: 1023px) {
   .layout-shell-mobile-bottom-clearance {
     padding-bottom: max(114px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* MOBILE_HOME_BG — match shell clearance strip on home mobile. */
+  main.home-main-surface {
+    background-color: #f1f1f3;
+  }
+
+  /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home + wishlist + products mobile; default shell stays 114px. */
+  .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page) {
+    background-color: #f1f1f3;
+    padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
   }
 }
 

@@ -25,7 +25,26 @@ export function MainContent({ children }: MainContentProps) {
 
   const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
 
-  if (pathname === '/' || pathname.startsWith('/supersudo')) {
+  if (pathname === '/') {
+    return (
+      <main className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white">
+        {children}
+      </main>
+    );
+  }
+
+  if (pathname === '/wishlist' || pathname.startsWith('/wishlist/')) {
+    return (
+      <main
+        className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
+  if (pathname.startsWith('/supersudo')) {
     return <main className={mainBase}>{children}</main>;
   }
 
@@ -45,7 +64,9 @@ export function MainContent({ children }: MainContentProps) {
   }
 
   if (pathname.startsWith('/products')) {
-    return <main className={mainBase}>{children}</main>;
+    return (
+      <main className={`${mainBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
+    );
   }
 
   return (

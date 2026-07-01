@@ -2,12 +2,15 @@ import { BRAND_COLORS } from './brand';
 import {
   HEADER_CONTENT_CLEARANCE_DESKTOP_PX,
   HEADER_CONTENT_CLEARANCE_MOBILE_PX,
+  HEADER_MOBILE_PADDING_X_PX,
 } from './header';
 import {
   HOME_PRODUCT_CARD_DESIGN_WIDTH_PX,
   HOME_PRODUCT_CARD_IMAGE_TOP_PX,
   HOME_PRODUCT_CARD_WIDTH_PX,
   HOME_SECTION_CONTENT_MAX_WIDTH_PX,
+  HOME_SECTION_PADDING_LEFT_PX,
+  HOME_SECTION_PADDING_RIGHT_PX,
   BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
   homeSectionColumnWidthPx,
 } from './home-sections';
@@ -106,6 +109,28 @@ export const PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX = 4;
 export const PRODUCTS_CATALOG_BREADCRUMB_MUTED = 'rgba(29, 28, 22, 0.36)';
 export const PRODUCTS_CATALOG_TEXT_DARK = '#1d1c16';
 
+/** Mobile catalog page title — pink section style (matches wishlist mobile). */
+export const PRODUCTS_CATALOG_MOBILE_TITLE_COLOR = BRAND_COLORS.pink;
+export const PRODUCTS_CATALOG_MOBILE_TITLE_SIZE_PX = 26;
+export const PRODUCTS_CATALOG_MOBILE_TITLE_LINE_HEIGHT_PX = 32;
+/** Negates `HomeContentHorizontalFrame` inset so title aligns with mobile navbar track. */
+export const PRODUCTS_CATALOG_MOBILE_TITLE_ALIGN_OFFSET_X_PX =
+  HEADER_MOBILE_PADDING_X_PX - HOME_SECTION_PADDING_LEFT_PX;
+export const PRODUCTS_CATALOG_MOBILE_HEADER_ALIGN_OFFSET_RIGHT_PX =
+  HEADER_MOBILE_PADDING_X_PX - HOME_SECTION_PADDING_RIGHT_PX;
+
+/** Stacked above header (80) and bottom nav (70); same tier as search modal. */
+export const PRODUCTS_CATALOG_MOBILE_FILTERS_Z_INDEX = 85;
+
+/** Mobile catalog toolbar — filter + sort pills share height and typography. */
+export const PRODUCTS_CATALOG_MOBILE_ACTION_PILL_HEIGHT_PX = 40;
+export const PRODUCTS_CATALOG_MOBILE_ACTION_PILL_PADDING_X_PX = 16;
+export const PRODUCTS_CATALOG_MOBILE_ACTION_FONT_SIZE_PX = 14;
+export const PRODUCTS_CATALOG_MOBILE_ACTION_LINE_HEIGHT_PX = 20;
+export const PRODUCTS_CATALOG_MOBILE_ACTIONS_GAP_PX = 12;
+export const PRODUCTS_CATALOG_MOBILE_FILTER_PILL_BORDER_COLOR = '#e8e8e8';
+export const PRODUCTS_CATALOG_MOBILE_FILTER_PILL_TEXT_COLOR = '#57423b';
+
 export const PRODUCTS_CATALOG_SORT_PILL_BG = BRAND_COLORS.pink;
 export const PRODUCTS_CATALOG_VIEW_PILL_BG = '#f3f3f3';
 export const PRODUCTS_CATALOG_PILL_HEIGHT_PX = 48;
@@ -114,6 +139,11 @@ export const PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX = 231;
 export const PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX = 16;
 export const PRODUCTS_CATALOG_SORT_ICON_SIZE_PX = 16;
 export const PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX = 25;
+
+/** Sort dropdown fade/slide — matches header language/currency pills. */
+export const PRODUCTS_CATALOG_SORT_DROPDOWN_ANIMATION_MS = 300;
+export const PRODUCTS_CATALOG_SORT_DROPDOWN_GAP_PX = 8;
+export const PRODUCTS_CATALOG_SORT_DROPDOWN_WIDTH_PX = 224;
 export const PRODUCTS_CATALOG_ASSETS = {
   sortSliders: '/assets/products/icon-sort-sliders.svg',
 } as const;

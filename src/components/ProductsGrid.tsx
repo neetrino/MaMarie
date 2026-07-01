@@ -22,6 +22,8 @@ import { mapToHomeProductCard } from './home/best-products-data';
 import { HomeProductCard } from './home/HomeProductCard';
 import { HomeProductCardListRow } from './home/HomeProductCardListRow';
 import { ProductCardMountPlaceholder } from './home/ProductCardMountPlaceholder';
+import { MobileProductsCatalogProductGrid } from './products/MobileProductsCatalogProductGrid';
+import { MobileProductsCatalogTrack } from './products/MobileProductsCatalogTrack';
 import { LazyWhenVisible } from './LazyWhenVisible';
 import { useTranslation } from '../lib/i18n-client';
 import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../lib/product-card-lazy';
@@ -118,7 +120,7 @@ export const ProductsGrid = memo(function ProductsGrid({
         type="button"
         onClick={onLoadMore}
         disabled={isLoadingMore}
-        className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
+        className="mt-10 flex w-full max-w-[200px] self-center items-center justify-center font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
         style={{
           width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
           height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
@@ -132,7 +134,7 @@ export const ProductsGrid = memo(function ProductsGrid({
     ) : loadMoreHref ? (
       <Link
         href={loadMoreHref}
-        className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
+        className="mt-10 flex w-full max-w-[200px] self-center items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
         style={{
           width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
           height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
@@ -145,11 +147,20 @@ export const ProductsGrid = memo(function ProductsGrid({
       </Link>
     ) : null;
 
+  const mobileGrid = (
+    <MobileProductsCatalogTrack className="block w-full min-w-0 max-lg:overflow-visible lg:hidden">
+      <MobileProductsCatalogProductGrid
+        products={sortedProducts}
+        addToCartLabel={t('common.wishlist.addToCart')}
+      />
+    </MobileProductsCatalogTrack>
+  );
+
   if (viewMode === 'list') {
     return (
-      <div className="flex w-full flex-col items-center">
+      <div className="flex w-full min-w-0 flex-col">
         <div
-          className={getProductsCatalogGridClassName(viewMode)}
+          className="hidden w-full lg:flex lg:flex-col"
           style={{ gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }}
         >
           {sortedProducts.map((product, index) => (
@@ -166,42 +177,49 @@ export const ProductsGrid = memo(function ProductsGrid({
             </LazyWhenVisible>
           ))}
         </div>
+
+        {mobileGrid}
+
         {loadMoreCta}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <div
-        className={getProductsCatalogGridClassName(viewMode)}
-        style={{
-          columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-          rowGap: rowGapPx,
-        }}
-      >
-        {sortedProducts.map((product, index) => (
-          <LazyWhenVisible
-            key={product.id}
-            eager={resolveProductCardEagerMount(index, viewMode)}
-            minHeightPx={cardHeightPx}
-            fallback={
-              <ProductCardMountPlaceholder
-                variant="grid"
-                widthPx={cardWidthPx}
-                heightPx={cardHeightPx}
+    <div className="flex w-full min-w-0 flex-col">
+      {mobileGrid}
+
+      <div className="hidden w-full lg:block">
+        <div
+          className={getProductsCatalogGridClassName(viewMode)}
+          style={{
+            columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+            rowGap: rowGapPx,
+          }}
+        >
+          {sortedProducts.map((product, index) => (
+            <LazyWhenVisible
+              key={product.id}
+              eager={resolveProductCardEagerMount(index, viewMode)}
+              minHeightPx={cardHeightPx}
+              fallback={
+                <ProductCardMountPlaceholder
+                  variant="grid"
+                  widthPx={cardWidthPx}
+                  heightPx={cardHeightPx}
+                />
+              }
+            >
+              <HomeProductCard
+                product={product}
+                layoutWidthPx={cardWidthPx}
+                layoutHeightPx={cardHeightPx}
+                compactPanel={viewMode === 'grid-4'}
+                imagePriority={resolveProductCardImagePriority(index, viewMode)}
               />
-            }
-          >
-            <HomeProductCard
-              product={product}
-              layoutWidthPx={cardWidthPx}
-              layoutHeightPx={cardHeightPx}
-              compactPanel={viewMode === 'grid-4'}
-              imagePriority={resolveProductCardImagePriority(index, viewMode)}
-            />
-          </LazyWhenVisible>
-        ))}
+            </LazyWhenVisible>
+          ))}
+        </div>
       </div>
 
       {loadMoreCta}

@@ -10,6 +10,9 @@ export const CART_DRAWER_Z_INDEX = 90;
 /** Desktop drawer width in pixels. */
 export const CART_DRAWER_MAX_WIDTH_PX = 420;
 
+/** Mobile drawer width as a percentage of the viewport (leaves room for close tab + backdrop tap). */
+export const CART_DRAWER_MOBILE_WIDTH_PERCENT = 87;
+
 /** Side-tab close pill — total width (px); half sits under drawer edge. */
 export const CART_DRAWER_CLOSE_TAB_WIDTH_PX = 80;
 
