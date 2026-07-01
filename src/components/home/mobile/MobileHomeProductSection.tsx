@@ -6,6 +6,7 @@ import {
   MOBILE_HOME_ASSETS,
   MOBILE_HOME_HORIZONTAL_PADDING_PX,
   MOBILE_HOME_PRODUCT_CARD_GAP_PX,
+  MOBILE_HOME_PRODUCT_CARD_TOP_BLEED_PX,
   MOBILE_HOME_PRODUCT_CARD_WIDTH_PX,
   MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX,
   MOBILE_HOME_SECTION_SEE_ALL_BUTTON_PADDING_PX,
@@ -17,8 +18,8 @@ import {
 } from '../../../constants/mobile-home';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { HomeProductCardData } from '../HomeProductCard';
+import { HomeProductCard } from '../HomeProductCard';
 import { MobileCarouselDots } from './MobileCarouselDots';
-import { MobileHomeProductCard } from './MobileHomeProductCard';
 import { useHorizontalScrollIndex } from './useHorizontalScrollIndex';
 
 interface MobileHomeProductSectionProps {
@@ -39,7 +40,7 @@ export function MobileHomeProductSection({
 
   return (
     <section
-      className="relative w-full max-w-full overflow-x-hidden"
+      className="relative w-full max-w-full overflow-x-clip overflow-y-visible"
       aria-labelledby="mobile-for-you-heading"
       style={{ paddingLeft: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2, paddingRight: MOBILE_HOME_HORIZONTAL_PADDING_PX - 2 }}
     >
@@ -79,11 +80,20 @@ export function MobileHomeProductSection({
 
       <div
         ref={scrollRef}
-        className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto pb-4"
-        style={{ gap: MOBILE_HOME_PRODUCT_CARD_GAP_PX }}
+        className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto overflow-y-visible pb-4"
+        style={{
+          gap: MOBILE_HOME_PRODUCT_CARD_GAP_PX,
+          paddingTop: MOBILE_HOME_PRODUCT_CARD_TOP_BLEED_PX,
+        }}
       >
         {products.map((product) => (
-          <MobileHomeProductCard key={product.id} product={product} />
+          <div key={product.id} className="shrink-0 snap-start">
+            <HomeProductCard
+              product={product}
+              layoutWidthPx={MOBILE_HOME_PRODUCT_CARD_WIDTH_PX}
+              compactPanel
+            />
+          </div>
         ))}
       </div>
 
