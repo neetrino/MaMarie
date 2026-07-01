@@ -5,11 +5,15 @@ import { apiClient } from '../../lib/api-client';
 import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { WISHLIST_KEY } from '../../lib/storageCounts';
+import { logger } from '../../lib/utils/logger';
+import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../../lib/product-card-lazy';
 import type { WishlistUpdatedDetail } from '../../components/hooks/useWishlist';
 import { WishlistEmptyState } from '../../components/wishlist/WishlistEmptyState';
 import { HomeSectionHeadingRow } from '../../components/home/HomeSectionHeading';
 import { mapToHomeProductCard } from '../../components/home/best-products-data';
 import { HomeProductCard } from '../../components/home/HomeProductCard';
+import { ProductCardMountPlaceholder } from '../../components/home/ProductCardMountPlaceholder';
+import { LazyWhenVisible } from '../../components/LazyWhenVisible';
 import {
   BEST_PRODUCTS_ASSETS,
   BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
@@ -55,6 +59,8 @@ interface WishlistProduct {
   reviewsCount?: number;
 }
 
+const WISHLIST_VIEW_MODE = 'wishlist-grid-4' as const;
+
 function getWishlist(): string[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -71,6 +77,7 @@ function getWishlist(): string[] {
 export default function WishlistPage() {
   const { t } = useTranslation();
   const [products, setProducts] = useState<WishlistProduct[]>([]);
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchWishlistProducts = useCallback(async (idsToLoad: string[]) => {
@@ -118,7 +125,7 @@ export default function WishlistPage() {
         );
       }
     } catch (error) {
-      console.error('[Wishlist] Error fetching wishlist products:', error);
+      logger.error('[Wishlist] Error fetching wishlist products', { error });
     } finally {
       setLoading(false);
     }
@@ -126,11 +133,13 @@ export default function WishlistPage() {
 
   useEffect(() => {
     const ids = getWishlist();
-    fetchWishlistProducts(ids);
+    setWishlistIds(ids);
+    void fetchWishlistProducts(ids);
 
     const handleWishlistUpdate = (event: Event) => {
       const wishlistDetail = (event as CustomEvent<WishlistUpdatedDetail | null>).detail;
       const updatedIds = wishlistDetail?.ids ?? getWishlist();
+      setWishlistIds(updatedIds);
 
       setProducts((prev) => {
         const filtered = prev.filter((product) => updatedIds.includes(product.id));
@@ -153,25 +162,15 @@ export default function WishlistPage() {
     [products],
   );
 
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="animate-pulse" aria-busy="true">
-          <div
-            className="rounded bg-gray-200/80"
-            style={{ minHeight: WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX, maxWidth: '40%' }}
-          />
-          <div className="mt-8 h-64 rounded bg-gray-200" />
-        </div>
-      </div>
-    );
-  }
+  const hasSavedItems = wishlistIds.length > 0;
+  const showEmptyState = !loading && products.length === 0 && !hasSavedItems;
+  const gridItemCount = loading && cardProducts.length === 0 ? wishlistIds.length : cardProducts.length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div
         style={
-          products.length === 0
+          showEmptyState
             ? { marginBottom: WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX }
             : undefined
         }
@@ -191,8 +190,10 @@ export default function WishlistPage() {
         />
       </div>
 
-      {products.length > 0 ? (
-        <div className="w-full" style={{ paddingTop: BEST_PRODUCTS_GRID_OFFSET_TOP_PX }}>
+      {showEmptyState ? (
+        <WishlistEmptyState t={t} />
+      ) : gridItemCount > 0 ? (
+        <div className="w-full" style={{ paddingTop: BEST_PRODUCTS_GRID_OFFSET_TOP_PX }} aria-busy={loading}>
           <div
             className={getProductsCatalogGridClassName('grid-4')}
             style={{
@@ -201,19 +202,40 @@ export default function WishlistPage() {
             }}
           >
             {cardProducts.map((product, index) => (
-              <HomeProductCard
+              <LazyWhenVisible
                 key={product.id}
-                product={product}
-                layoutWidthPx={WISHLIST_CARD_WIDTH_PX}
-                layoutHeightPx={WISHLIST_CARD_HEIGHT_PX}
-                imagePriority={index < 8}
-              />
+                eager={resolveProductCardEagerMount(index, WISHLIST_VIEW_MODE)}
+                minHeightPx={WISHLIST_CARD_HEIGHT_PX}
+                fallback={
+                  <ProductCardMountPlaceholder
+                    variant="grid"
+                    widthPx={WISHLIST_CARD_WIDTH_PX}
+                    heightPx={WISHLIST_CARD_HEIGHT_PX}
+                  />
+                }
+              >
+                <HomeProductCard
+                  product={product}
+                  layoutWidthPx={WISHLIST_CARD_WIDTH_PX}
+                  layoutHeightPx={WISHLIST_CARD_HEIGHT_PX}
+                  imagePriority={resolveProductCardImagePriority(index, WISHLIST_VIEW_MODE)}
+                />
+              </LazyWhenVisible>
             ))}
+
+            {loading && cardProducts.length === 0
+              ? wishlistIds.map((id) => (
+                  <ProductCardMountPlaceholder
+                    key={`wishlist-placeholder-${id}`}
+                    variant="grid"
+                    widthPx={WISHLIST_CARD_WIDTH_PX}
+                    heightPx={WISHLIST_CARD_HEIGHT_PX}
+                  />
+                ))
+              : null}
           </div>
         </div>
-      ) : (
-        <WishlistEmptyState t={t} />
-      )}
+      ) : null}
     </div>
   );
 }

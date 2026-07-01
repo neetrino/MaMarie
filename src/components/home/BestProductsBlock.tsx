@@ -8,10 +8,16 @@ import {
   BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX,
   BEST_PRODUCTS_HEADING_PADDING_Y_PX,
   BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX,
+  HOME_PRODUCT_CARD_HEIGHT_PX,
+  HOME_PRODUCT_CARD_WIDTH_PX,
 } from '../../constants/home-sections';
 import { useTranslation } from '../../lib/i18n-client';
+import { LAZY_LOAD_ROOT_MARGIN_PX } from '../../constants/lazy-loading';
+import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../../lib/product-card-lazy';
+import { LazyWhenVisible } from '../LazyWhenVisible';
 import type { HomeProductCardData } from './HomeProductCard';
 import { HomeProductCard } from './HomeProductCard';
+import { ProductCardMountPlaceholder } from './ProductCardMountPlaceholder';
 import { HomeSectionHeadingRow } from './HomeSectionHeading';
 
 interface BestProductsBlockProps {
@@ -42,8 +48,25 @@ export function BestProductsBlock({ products }: BestProductsBlockProps) {
           gap: BEST_PRODUCTS_CARD_GAP_PX,
         }}
       >
-        {products.map((product) => (
-          <HomeProductCard key={product.id} product={product} />
+        {products.map((product, index) => (
+          <LazyWhenVisible
+            key={product.id}
+            eager={resolveProductCardEagerMount(index, 'grid-4')}
+            minHeightPx={HOME_PRODUCT_CARD_HEIGHT_PX}
+            prefetchHorizontalPx={LAZY_LOAD_ROOT_MARGIN_PX}
+            fallback={
+              <ProductCardMountPlaceholder
+                variant="grid"
+                widthPx={HOME_PRODUCT_CARD_WIDTH_PX}
+                heightPx={HOME_PRODUCT_CARD_HEIGHT_PX}
+              />
+            }
+          >
+            <HomeProductCard
+              product={product}
+              imagePriority={resolveProductCardImagePriority(index, 'grid-4')}
+            />
+          </LazyWhenVisible>
         ))}
       </div>
     </>

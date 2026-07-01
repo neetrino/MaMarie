@@ -89,7 +89,6 @@ export function ProductsCatalogGridSection() {
     params,
     isFetching,
     isOptimistic,
-    isServerOnlyFetch,
     gridRevision,
     sortBy,
     updateParams,
@@ -105,8 +104,7 @@ export function ProductsCatalogGridSection() {
 
   const showStaleGrid = products.length > 0;
   const showInitialLoading = isFetching && !showStaleGrid && !isOptimistic;
-  const showBlockingOverlay = isFetching && showStaleGrid && !isOptimistic && !isServerOnlyFetch;
-  const showInlineUpdating = isFetching && showStaleGrid && !isOptimistic && isServerOnlyFetch;
+  const showInlineUpdating = isFetching && showStaleGrid && !isOptimistic;
 
   return (
     <div
@@ -115,13 +113,6 @@ export function ProductsCatalogGridSection() {
       aria-busy={isFetching}
     >
       {showInlineUpdating ? <ProductsCatalogInlineUpdating /> : null}
-
-      {showBlockingOverlay ? (
-        <div
-          className="pointer-events-none absolute inset-0 z-10 rounded-2xl bg-white/50 backdrop-blur-[1px]"
-          aria-hidden
-        />
-      ) : null}
 
       {showInitialLoading ? (
         <ProductsCatalogGridLoading />

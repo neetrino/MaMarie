@@ -16,7 +16,11 @@ import {
 } from '../constants/home-sections';
 import { getStoredLanguage, type LanguageCode } from '../lib/language';
 import { t } from '../lib/i18n';
+import { LAZY_LOAD_ROOT_MARGIN_PX } from '../constants/lazy-loading';
+import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../lib/product-card-lazy';
 import { HomeSectionHeadingRow } from './home/HomeSectionHeading';
+import { ProductCardMountPlaceholder } from './home/ProductCardMountPlaceholder';
+import { LazyWhenVisible } from './LazyWhenVisible';
 import { useRelatedProducts } from './hooks/useRelatedProducts';
 import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 
@@ -96,11 +100,27 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
             style={relatedRowStyle}
           >
             {products.map((product, index) => (
-              <RelatedProductCard
+              <LazyWhenVisible
                 key={product.id}
-                product={product}
-                imagePriority={index < 4}
-              />
+                eager={resolveProductCardEagerMount(index, 'grid-4')}
+                minHeightPx={PRODUCTS_CATALOG_CARD_HEIGHT_PX}
+                prefetchHorizontalPx={LAZY_LOAD_ROOT_MARGIN_PX}
+                className="shrink-0 snap-start"
+                fallback={
+                  <div className="shrink-0 snap-start" style={{ width: PRODUCTS_CATALOG_CARD_WIDTH_PX }}>
+                    <ProductCardMountPlaceholder
+                      variant="grid"
+                      widthPx={PRODUCTS_CATALOG_CARD_WIDTH_PX}
+                      heightPx={PRODUCTS_CATALOG_CARD_HEIGHT_PX}
+                    />
+                  </div>
+                }
+              >
+                <RelatedProductCard
+                  product={product}
+                  imagePriority={resolveProductCardImagePriority(index, 'grid-4')}
+                />
+              </LazyWhenVisible>
             ))}
           </div>
         )}

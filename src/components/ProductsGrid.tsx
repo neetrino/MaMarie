@@ -15,11 +15,15 @@ import {
   PRODUCTS_CATALOG_CTA_WIDTH_PX,
   getProductsCatalogGridClassName,
   PRODUCTS_CATALOG_LIST_ROW_GAP_PX,
+  PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
 } from '../constants/products-catalog';
 import { mapToHomeProductCard } from './home/best-products-data';
 import { HomeProductCard } from './home/HomeProductCard';
 import { HomeProductCardListRow } from './home/HomeProductCardListRow';
+import { ProductCardMountPlaceholder } from './home/ProductCardMountPlaceholder';
+import { LazyWhenVisible } from './LazyWhenVisible';
 import { useTranslation } from '../lib/i18n-client';
+import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../lib/product-card-lazy';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
 import type {
@@ -144,11 +148,17 @@ export const ProductsGrid = memo(function ProductsGrid({
           style={{ gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }}
         >
           {sortedProducts.map((product, index) => (
-            <HomeProductCardListRow
+            <LazyWhenVisible
               key={product.id}
-              product={product}
-              imagePriority={index < 6}
-            />
+              eager={resolveProductCardEagerMount(index, viewMode)}
+              minHeightPx={PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX}
+              fallback={<ProductCardMountPlaceholder variant="list" />}
+            >
+              <HomeProductCardListRow
+                product={product}
+                imagePriority={resolveProductCardImagePriority(index, viewMode)}
+              />
+            </LazyWhenVisible>
           ))}
         </div>
         {loadMoreCta}
@@ -166,14 +176,26 @@ export const ProductsGrid = memo(function ProductsGrid({
         }}
       >
         {sortedProducts.map((product, index) => (
-          <HomeProductCard
+          <LazyWhenVisible
             key={product.id}
-            product={product}
-            layoutWidthPx={cardWidthPx}
-            layoutHeightPx={cardHeightPx}
-            compactPanel={viewMode === 'grid-4'}
-            imagePriority={index < 6}
-          />
+            eager={resolveProductCardEagerMount(index, viewMode)}
+            minHeightPx={cardHeightPx}
+            fallback={
+              <ProductCardMountPlaceholder
+                variant="grid"
+                widthPx={cardWidthPx}
+                heightPx={cardHeightPx}
+              />
+            }
+          >
+            <HomeProductCard
+              product={product}
+              layoutWidthPx={cardWidthPx}
+              layoutHeightPx={cardHeightPx}
+              compactPanel={viewMode === 'grid-4'}
+              imagePriority={resolveProductCardImagePriority(index, viewMode)}
+            />
+          </LazyWhenVisible>
         ))}
       </div>
 
