@@ -1,3 +1,11 @@
+import {
+  HOME_PRODUCT_CARD_IMAGE_TOP_PX,
+  HOME_PRODUCT_CARD_WIDTH_PX,
+  homeSectionColumnWidthPx,
+} from './home-sections';
+import { PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX } from './products-catalog';
+import { resolveHomeProductCardHeightPx } from '../lib/home-product-card-layout';
+
 /** Figma `66:506` — empty wishlist illustration width (px). */
 export const WISHLIST_EMPTY_ILLUSTRATION_WIDTH_PX = 328;
 
@@ -50,6 +58,28 @@ export const WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX = 16;
 export const WISHLIST_PAGE_TITLE_FONT_SIZE_PX = 40;
 export const WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX = 44;
 export const WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX = 52;
+
+/** Tailwind `max-w-7xl` (1280) minus `lg:px-8` horizontal padding (32×2). */
+export const WISHLIST_PAGE_CONTENT_WIDTH_PX = 1280 - 64;
+
+export const WISHLIST_CARD_COLUMNS = 4;
+
+/** Four cards per row — sized to fill the wishlist page content width (no sidebar). */
+export const WISHLIST_CARD_WIDTH_PX = Math.floor(
+  homeSectionColumnWidthPx(
+    WISHLIST_CARD_COLUMNS,
+    PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+    WISHLIST_PAGE_CONTENT_WIDTH_PX,
+  ),
+);
+
+export const WISHLIST_CARD_HEIGHT_PX = resolveHomeProductCardHeightPx(WISHLIST_CARD_WIDTH_PX);
+
+/** Clears product image overhang between wishlist rows. */
+export const WISHLIST_CARD_ROW_GAP_PX =
+  Math.abs(
+    HOME_PRODUCT_CARD_IMAGE_TOP_PX * (WISHLIST_CARD_WIDTH_PX / HOME_PRODUCT_CARD_WIDTH_PX),
+  ) + 8;
 
 export const WISHLIST_EMPTY_ASSETS = {
   illustration: '/assets/wishlist/empty-heart.png',
