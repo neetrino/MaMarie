@@ -10,23 +10,15 @@ import {
   HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS,
   HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX,
   HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX,
+  HEADER_MOBILE_LANGUAGE_DROPDOWN_PADDING_PX,
   HEADER_MOBILE_LANGUAGE_ICON_SIZE_PX,
   HEADER_MOBILE_MENU_ICON_SIZE_PX,
   HEADER_MOBILE_PILL_CONTENT_INSET_PX,
   HEADER_PILL_APPEAR_DURATION_MS,
   MOBILE_NAV_MENU_BUTTON_ANIMATION_MS,
 } from '../../constants/header';
-import {
-  setStoredLanguage,
-  type LanguageCode,
-} from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
-
-const HEADER_LANGUAGES: ReadonlyArray<{ code: LanguageCode; label: string }> = [
-  { code: 'en', label: 'EN' },
-  { code: 'hy', label: 'AM' },
-  { code: 'ru', label: 'RU' },
-];
+import { HeaderLanguageSwitcher } from './HeaderLanguageSwitcher';
 
 function MobileIconButton({
   label,
@@ -78,7 +70,7 @@ export function HeaderMobileActions({
   menuId,
   onMenuToggle,
 }: HeaderMobileActionsProps) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [isLanguageDropdownVisible, setIsLanguageDropdownVisible] = useState(false);
   const [isLanguageDropdownExpanded, setIsLanguageDropdownExpanded] = useState(false);
@@ -142,15 +134,6 @@ export function HeaderMobileActions({
     };
   }, [clearLanguageCloseTimer]);
 
-  const handleLanguageChange = (langCode: LanguageCode) => {
-    if (langCode === lang) {
-      closeLanguageDropdown();
-      return;
-    }
-    setStoredLanguage(langCode);
-    closeLanguageDropdown();
-  };
-
   return (
     <div
       className="relative flex items-center transition-transform ease-out"
@@ -185,31 +168,19 @@ export function HeaderMobileActions({
 
         {isLanguageDropdownVisible ? (
           <div
-            role="menu"
-            className={`absolute right-0 z-50 origin-top overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-lg transition-all ease-out ${
+            className={`absolute right-0 z-50 origin-top rounded-2xl border border-gray-200 bg-white shadow-lg transition-all ease-out ${
               isLanguageDropdownExpanded
                 ? 'pointer-events-auto translate-y-0 opacity-100'
                 : 'pointer-events-none -translate-y-2 opacity-0'
             }`}
             style={{
               top: `calc(100% + ${HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX}px)`,
+              padding: HEADER_MOBILE_LANGUAGE_DROPDOWN_PADDING_PX,
               minWidth: HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX,
               transitionDuration: `${HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS}ms`,
             }}
           >
-            {HEADER_LANGUAGES.map(({ code, label }) => (
-              <button
-                key={code}
-                type="button"
-                role="menuitem"
-                onClick={() => handleLanguageChange(code)}
-                className={`block w-full rounded-xl px-3 py-2 text-left text-sm font-medium ${
-                  code === lang ? 'bg-brand-pink text-white' : 'text-brand-brown hover:bg-gray-50'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+            <HeaderLanguageSwitcher />
           </div>
         ) : null}
       </div>

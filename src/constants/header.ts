@@ -1,4 +1,5 @@
 import { LOGO_HEADER_HEIGHT_PX } from './brand';
+import { HEADER_LANGUAGE_SWITCHER_WIDTH_PX } from './header-languages';
 import { MOBILE_HOME_HORIZONTAL_PADDING_PX } from './mobile-home';
 
 /** Scroll distance before home navbar switches to pill mode. */
@@ -94,7 +95,10 @@ export const MOBILE_NAV_MENU_BUTTON_ANIMATION_MS = 280;
 export const HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS = 300;
 /** Gap between language button and dropdown panel. */
 export const HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX = 6;
-export const HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX = 120;
+export const HEADER_MOBILE_LANGUAGE_DROPDOWN_PADDING_PX = 8;
+/** Panel width = switcher + horizontal padding on both sides. */
+export const HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX =
+  HEADER_LANGUAGE_SWITCHER_WIDTH_PX + HEADER_MOBILE_LANGUAGE_DROPDOWN_PADDING_PX * 2;
 
 /** Main content top inset — keeps pages below the fixed navbar (not used on `/`). */
 export const HEADER_CONTENT_CLEARANCE_MOBILE_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;
