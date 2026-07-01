@@ -92,6 +92,7 @@ export function MobileHomeProductSection({
               product={product}
               layoutWidthPx={MOBILE_HOME_PRODUCT_CARD_WIDTH_PX}
               compactPanel
+              disableHoverEffects
             />
           </div>
         ))}

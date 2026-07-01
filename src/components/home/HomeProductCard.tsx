@@ -70,6 +70,8 @@ interface HomeProductCardProps {
   compactPanel?: boolean;
   /** Preload image for above-the-fold catalog cards. */
   imagePriority?: boolean;
+  /** Static card — no hover lift, size badges, or cart/image transitions (mobile home). */
+  disableHoverEffects?: boolean;
 }
 
 function areHomeProductCardPropsEqual(
@@ -80,7 +82,8 @@ function areHomeProductCardPropsEqual(
     prev.layoutWidthPx !== next.layoutWidthPx ||
     prev.layoutHeightPx !== next.layoutHeightPx ||
     prev.compactPanel !== next.compactPanel ||
-    prev.imagePriority !== next.imagePriority
+    prev.imagePriority !== next.imagePriority ||
+    prev.disableHoverEffects !== next.disableHoverEffects
   ) {
     return false;
   }
@@ -109,6 +112,7 @@ function HomeProductCardComponent({
   layoutHeightPx,
   compactPanel = false,
   imagePriority = false,
+  disableHoverEffects = false,
 }: HomeProductCardProps) {
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
@@ -309,7 +313,9 @@ function HomeProductCardComponent({
 
   return (
     <article
-      className="home-product-card relative shrink-0 overflow-visible"
+      className={`home-product-card relative shrink-0 overflow-visible${
+        disableHoverEffects ? ' home-product-card--static' : ''
+      }`}
       style={{ width: cardWidth, height: cardHeight, ...buildHomeProductCardCssVars(layoutWidthPx) }}
     >
       <div
@@ -342,7 +348,9 @@ function HomeProductCardComponent({
           </div>
         </Link>
 
-        <HomeProductCardSizeBadges sizes={product.sizes} layoutWidthPx={layoutWidthPx} />
+        {!disableHoverEffects ? (
+          <HomeProductCardSizeBadges sizes={product.sizes} layoutWidthPx={layoutWidthPx} />
+        ) : null}
 
         <button
           type="button"
