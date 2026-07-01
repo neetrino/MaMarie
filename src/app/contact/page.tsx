@@ -40,7 +40,7 @@ export default function ContactPage() {
                 >
                   <PhoneIcon />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{t('contact.callToUs.title')}</h3>
+                <h3 className="text-xl font-semibold text-brand-pink">{t('contact.callToUs.title')}</h3>
               </div>
               <p className="mb-2 text-gray-600">{t('contact.callToUs.description')}</p>
               <a href={`tel:${t('contact.phone')}`} className="font-medium text-orange-500 hover:text-orange-600">
@@ -56,7 +56,7 @@ export default function ContactPage() {
                 >
                   <EnvelopeIcon />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{t('contact.writeToUs.title')}</h3>
+                <h3 className="text-xl font-semibold text-brand-pink">{t('contact.writeToUs.title')}</h3>
               </div>
               <p className="mb-2 text-gray-600">{t('contact.writeToUs.description')}</p>
               <a href={`mailto:${t('contact.email')}`} className="font-medium text-orange-500 hover:text-orange-600">
@@ -72,7 +72,7 @@ export default function ContactPage() {
                 >
                   <MapPinIcon />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">{t('contact.headquarter.title')}</h3>
+                <h3 className="text-xl font-semibold text-brand-pink">{t('contact.headquarter.title')}</h3>
               </div>
               <div className="mb-2 space-y-1 text-gray-600">
                 <p>{t('contact.headquarter.hours.weekdays')}</p>
