@@ -19,6 +19,8 @@ import {
 import {
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX,
+  PRODUCTS_CATALOG_LIST_HEART_RIGHT_PX,
+  PRODUCTS_CATALOG_LIST_HEART_TOP_PX,
   PRODUCTS_CATALOG_LIST_PANEL_PADDING_X_PX,
   PRODUCTS_CATALOG_LIST_PANEL_PADDING_Y_PX,
   PRODUCTS_CATALOG_LIST_PRICE_TO_ACTIONS_GAP_PX,
@@ -204,8 +206,8 @@ function HomeProductCardListRowComponent({
               isInWishlist ? 'text-red-600' : 'text-white'
             }`}
             style={{
-              top: lp(12),
-              right: lp(12),
+              top: lp(PRODUCTS_CATALOG_LIST_HEART_TOP_PX),
+              right: lp(PRODUCTS_CATALOG_LIST_HEART_RIGHT_PX),
               width: lp(HOME_PRODUCT_CARD_HEART_SIZE_PX),
               height: lp(HOME_PRODUCT_CARD_HEART_SIZE_PX),
             }}
