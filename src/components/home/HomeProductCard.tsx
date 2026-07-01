@@ -21,6 +21,7 @@ import {
   HOME_PRODUCT_CARD_PRICE_COLOR,
   HOME_PRODUCT_CARD_RADIUS_PX,
   HOME_PRODUCT_CARD_RATING_COLOR,
+  HOME_PRODUCT_CARD_RATING_STAR_TEXT_GAP_PX,
   HOME_PRODUCT_CARD_TEXT_DARK,
   HOME_PRODUCT_CARD_TEXT_MUTED,
   HOME_PRODUCT_CARD_WIDTH_PX,
@@ -182,7 +183,27 @@ function HomeProductCardComponent({
     </div>
   );
 
-  const ratingRow = (
+  const ratingRow = compactPanel ? (
+    <div
+      className="flex items-center justify-end whitespace-nowrap"
+      style={{
+        height: typography.ratingLineHeightPx,
+        gap: lp(HOME_PRODUCT_CARD_RATING_STAR_TEXT_GAP_PX),
+        color: HOME_PRODUCT_CARD_RATING_COLOR,
+        fontSize: typography.ratingSizePx,
+        lineHeight: `${typography.ratingLineHeightPx}px`,
+      }}
+    >
+      <Image
+        src={HOME_PRODUCT_CARD_ASSETS.star}
+        alt=""
+        width={typography.ratingStarSizePx}
+        height={typography.ratingStarSizePx}
+        className="shrink-0"
+      />
+      <span className="font-normal">{ratingLabel}</span>
+    </div>
+  ) : (
     <div className="relative shrink-0" style={{ width: lp(71), height: typography.ratingLineHeightPx }}>
       <Image
         src={HOME_PRODUCT_CARD_ASSETS.star}
@@ -261,15 +282,6 @@ function HomeProductCardComponent({
     />
   );
 
-  const priceFooter = (
-    <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
-      {priceRow}
-      <div className="home-product-card-actions flex shrink-0 flex-col items-end justify-center">
-        {cartButton}
-      </div>
-    </div>
-  );
-
   const standardPanelContent = (
     <div className="flex w-full items-start justify-between" style={{ gap: lp(8) }}>
       <div
@@ -293,21 +305,26 @@ function HomeProductCardComponent({
   );
 
   const compactPanelContent = (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex h-full min-h-0 w-full flex-col">
       <div className="flex w-full items-center justify-between" style={{ gap: lp(8) }}>
         <div className="min-w-0 flex-1">{titleLine}</div>
         {ratingRow}
       </div>
 
       <div
-        className="flex w-full flex-1 flex-col justify-center"
+        className="flex flex-1 flex-col justify-center"
         style={{ gap: HOME_PRODUCT_CARD_COMPACT_DESCRIPTION_TO_SWATCHES_GAP_PX }}
       >
         {subtitleLine}
         {colorSwatches}
       </div>
 
-      {priceFooter}
+      <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
+        {priceRow}
+        <div className="home-product-card-actions flex shrink-0 items-center justify-center">
+          {cartButton}
+        </div>
+      </div>
     </div>
   );
 
