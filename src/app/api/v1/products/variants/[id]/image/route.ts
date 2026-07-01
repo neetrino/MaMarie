@@ -51,7 +51,7 @@ export async function GET(
         return new NextResponse(null, { status: 404 });
       }
 
-      return new NextResponse(parsed.buffer, {
+      return new NextResponse(new Uint8Array(parsed.buffer), {
         headers: {
           'Content-Type': parsed.mime,
           'Cache-Control': CACHE_CONTROL,

@@ -34,7 +34,7 @@ function formatItemsCount(count: number, t: (key: string) => string): string {
 interface CartDrawerPanelProps {
   visible: boolean;
   onClose: () => void;
-  panelRef: RefObject<HTMLDivElement | null>;
+  panelRef: RefObject<HTMLDivElement>;
   cart: Cart | null;
   loading: boolean;
   currency: string;
