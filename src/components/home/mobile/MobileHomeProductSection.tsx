@@ -7,6 +7,10 @@ import {
   MOBILE_HOME_HORIZONTAL_PADDING_PX,
   MOBILE_HOME_PRODUCT_CARD_GAP_PX,
   MOBILE_HOME_PRODUCT_CARD_WIDTH_PX,
+  MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX,
+  MOBILE_HOME_SECTION_SEE_ALL_BUTTON_PADDING_PX,
+  MOBILE_HOME_SECTION_SEE_ALL_BUTTON_RADIUS_PX,
+  MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX,
   MOBILE_HOME_SECTION_TITLE_COLOR,
   MOBILE_HOME_SECTION_TITLE_LINE_HEIGHT_PX,
   MOBILE_HOME_SECTION_TITLE_SIZE_PX,
@@ -54,10 +58,22 @@ export function MobileHomeProductSection({
 
         <Link
           href={seeAllHref}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[20px] transition-opacity hover:opacity-80"
+          className="flex shrink-0 items-center justify-center bg-white transition-opacity hover:opacity-80"
+          style={{
+            width: MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX,
+            height: MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX,
+            borderRadius: MOBILE_HOME_SECTION_SEE_ALL_BUTTON_RADIUS_PX,
+            padding: MOBILE_HOME_SECTION_SEE_ALL_BUTTON_PADDING_PX,
+          }}
           aria-label={t('common.search.seeAll')}
         >
-          <Image src={MOBILE_HOME_ASSETS.chevronSection} alt="" width={40} height={40} />
+          <Image
+            src={MOBILE_HOME_ASSETS.sectionSeeAllArrow}
+            alt=""
+            width={MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX}
+            height={MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX}
+            className="rotate-90"
+          />
         </Link>
       </div>
 

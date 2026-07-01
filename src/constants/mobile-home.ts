@@ -61,6 +61,11 @@ export const MOBILE_HOME_GENDER_BOYS_BG = '#5281e1';
 export const MOBILE_HOME_SECTION_TITLE_SIZE_PX = 35;
 export const MOBILE_HOME_SECTION_TITLE_LINE_HEIGHT_PX = 45;
 export const MOBILE_HOME_SECTION_TITLE_COLOR = 'rgba(0, 0, 0, 0.72)';
+/** Figma `74:789` — white see-all pill next to section title. */
+export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX = 40;
+export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_RADIUS_PX = 20;
+export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_PADDING_PX = 10;
+export const MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX = 20;
 
 export const MOBILE_HOME_PRODUCT_CARD_WIDTH_PX = 184;
 export const MOBILE_HOME_PRODUCT_CARD_HEIGHT_PX = 330;
@@ -84,7 +89,8 @@ export const MOBILE_HOME_ASSETS = {
   /** Figma `74:750` — material-symbols:search-rounded. */
   search: '/assets/home/mobile/icon-search-rounded.svg',
   chevronCta: '/assets/home/icon-chevron-right.svg',
-  chevronSection: '/assets/home/icon-chevron-right-pink.svg',
+  /** Figma `74:790` — glyphs:arrow-bold inside `74:789`. */
+  sectionSeeAllArrow: '/assets/home/mobile/section-see-all-arrow.svg',
   saleBannerGirl: '/assets/home/mobile/sale-banner-girl.png',
   saleBannerArrow: '/assets/home/mobile/sale-banner-arrow.svg',
   genderChevronGirls: '/assets/home/mobile/gender-chevron-girls.svg',
