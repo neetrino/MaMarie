@@ -14,6 +14,7 @@ import {
   CART_DRAWER_CLOSE_TAB_WIDTH_PX,
   CART_DRAWER_CLOSE_TAB_Z_INDEX,
   CART_DRAWER_MAX_WIDTH_PX,
+  CART_DRAWER_MOBILE_WIDTH_PERCENT,
   CART_DRAWER_OPEN_EVENT,
   CART_DRAWER_PANEL_TRANSITION_MS,
   CART_DRAWER_PANEL_Z_INDEX,
@@ -107,7 +108,7 @@ function CartDrawerPanel({
         type="button"
         tabIndex={-1}
         aria-hidden
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ease-in-out motion-reduce:transition-none ${
+        className={`fixed inset-0 rounded-none bg-black/40 backdrop-blur-sm transition-opacity duration-200 ease-in-out motion-reduce:transition-none ${
           visible ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
@@ -115,14 +116,17 @@ function CartDrawerPanel({
 
       <div
         ref={panelRef}
-        className={`relative h-dvh max-h-dvh w-full transition-transform duration-300 ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+        className={`relative h-dvh max-h-dvh w-[var(--cart-drawer-mobile-width)] sm:w-full transition-transform duration-300 ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
           visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
         }`}
-        style={{ maxWidth: CART_DRAWER_MAX_WIDTH_PX }}
+        style={{
+          maxWidth: CART_DRAWER_MAX_WIDTH_PX,
+          ['--cart-drawer-mobile-width' as string]: `${CART_DRAWER_MOBILE_WIDTH_PERCENT}%`,
+        }}
       >
         <CartDrawerCloseTab onClose={onClose} closeLabel={t('common.buttons.close')} />
         <aside
-          className="relative flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl max-sm:rounded-none sm:rounded-l-3xl"
+          className="relative flex h-full w-full flex-col overflow-hidden rounded-l-3xl bg-white shadow-2xl"
           style={{ zIndex: CART_DRAWER_PANEL_Z_INDEX }}
           role="dialog"
           aria-modal="true"
