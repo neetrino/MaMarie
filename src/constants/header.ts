@@ -90,6 +90,12 @@ export const MOBILE_NAV_MENU_EXIT_ANIMATION_MS = 260;
 /** Burger ↔ close icon crossfade on the mobile menu button. */
 export const MOBILE_NAV_MENU_BUTTON_ANIMATION_MS = 280;
 
+/** Mobile header language globe — dropdown fade/slide (matches desktop currency pill). */
+export const HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS = 300;
+/** Gap between language button and dropdown panel. */
+export const HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX = 6;
+export const HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX = 120;
+
 /** Main content top inset — keeps pages below the fixed navbar (not used on `/`). */
 export const HEADER_CONTENT_CLEARANCE_MOBILE_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;
 

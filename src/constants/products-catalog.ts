@@ -139,6 +139,11 @@ export const PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX = 231;
 export const PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX = 16;
 export const PRODUCTS_CATALOG_SORT_ICON_SIZE_PX = 16;
 export const PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX = 25;
+
+/** Sort dropdown fade/slide — matches header language/currency pills. */
+export const PRODUCTS_CATALOG_SORT_DROPDOWN_ANIMATION_MS = 300;
+export const PRODUCTS_CATALOG_SORT_DROPDOWN_GAP_PX = 8;
+export const PRODUCTS_CATALOG_SORT_DROPDOWN_WIDTH_PX = 224;
 export const PRODUCTS_CATALOG_ASSETS = {
   sortSliders: '/assets/products/icon-sort-sliders.svg',
 } as const;

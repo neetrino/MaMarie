@@ -1,12 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import {
-  PRODUCTS_CATALOG_ASSETS,
-  PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX,
-  PRODUCTS_CATALOG_FILTER_CHEVRON_SRC,
   PRODUCTS_CATALOG_MOBILE_ACTION_FONT_SIZE_PX,
   PRODUCTS_CATALOG_MOBILE_ACTION_LINE_HEIGHT_PX,
   PRODUCTS_CATALOG_MOBILE_ACTION_PILL_HEIGHT_PX,
@@ -16,10 +12,7 @@ import {
   PRODUCTS_CATALOG_MOBILE_FILTER_PILL_TEXT_COLOR,
   PRODUCTS_CATALOG_PILL_HEIGHT_PX,
   PRODUCTS_CATALOG_PILL_RADIUS_PX,
-  PRODUCTS_CATALOG_SORT_ICON_SIZE_PX,
-  PRODUCTS_CATALOG_SORT_PILL_BG,
   PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
-  PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX,
   PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
   PRODUCTS_CATALOG_VIEW_PILL_BG,
   PRODUCTS_CATALOG_VIEW_MODES,
@@ -27,11 +20,15 @@ import {
 } from '../constants/products-catalog';
 import { MOBILE_FILTERS_EVENT } from '../lib/events';
 import { useTranslation } from '../lib/i18n-client';
+import {
+  ProductsCatalogSortDropdown,
+  type ProductsCatalogSortOption,
+} from './products/ProductsCatalogSortDropdown';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
 import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
+type SortOption = ProductsCatalogSortOption;
 
 const VIEW_MODE_LABEL_KEYS: Record<ProductsCatalogViewMode, string> = {
   list: 'list',
@@ -111,8 +108,6 @@ function ProductsHeaderContent() {
   const { t } = useTranslation();
   const { viewMode, setViewMode } = useProductsCatalogViewMode();
   const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const sortDropdownRef = useRef<HTMLDivElement>(null);
 
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: 'default', label: t('products.header.sort.default') },
@@ -129,23 +124,12 @@ function ProductsHeaderContent() {
     }
   }, [searchParams, catalog?.sortBy]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!sortDropdownRef.current?.contains(event.target as Node)) {
-        setShowSortDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleViewModeChange = (mode: ProductsCatalogViewMode) => {
     setViewMode(mode);
   };
 
   const handleSortChange = (option: SortOption) => {
     setSortBy(option);
-    setShowSortDropdown(false);
     applyPatch({
       sort: option === 'default' ? undefined : option,
     });
@@ -206,80 +190,12 @@ function ProductsHeaderContent() {
         ))}
       </div>
 
-      <div className="relative shrink-0" ref={sortDropdownRef}>
-        <button
-          type="button"
-          onClick={() => setShowSortDropdown((open) => !open)}
-          className="inline-flex shrink-0 items-center gap-2 font-medium text-white lg:hidden"
-          style={{
-            ...mobileActionPillStyle,
-            backgroundColor: PRODUCTS_CATALOG_SORT_PILL_BG,
-          }}
-          aria-expanded={showSortDropdown}
-        >
-          <span className="whitespace-nowrap">{currentSortLabel}</span>
-          <Image
-            src={PRODUCTS_CATALOG_FILTER_CHEVRON_SRC}
-            alt=""
-            width={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
-            height={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
-            aria-hidden
-            className={`shrink-0 brightness-0 invert transition-transform duration-200 ease-in-out ${showSortDropdown ? 'rotate-180' : 'rotate-0'}`}
-          />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setShowSortDropdown((open) => !open)}
-          className="hidden items-center gap-3 px-6 font-normal text-white lg:flex"
-          style={{
-            height: PRODUCTS_CATALOG_PILL_HEIGHT_PX,
-            borderRadius: PRODUCTS_CATALOG_PILL_RADIUS_PX,
-            backgroundColor: PRODUCTS_CATALOG_SORT_PILL_BG,
-            width: PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
-            fontSize: PRODUCTS_CATALOG_SORT_TEXT_SIZE_PX,
-            lineHeight: '24px',
-          }}
-          aria-expanded={showSortDropdown}
-        >
-          <Image
-            src={PRODUCTS_CATALOG_ASSETS.sortSliders}
-            alt=""
-            width={PRODUCTS_CATALOG_SORT_ICON_SIZE_PX}
-            height={PRODUCTS_CATALOG_SORT_ICON_SIZE_PX}
-            aria-hidden
-            className="shrink-0"
-          />
-          <span className="whitespace-nowrap">{currentSortLabel}</span>
-          <Image
-            src={PRODUCTS_CATALOG_FILTER_CHEVRON_SRC}
-            alt=""
-            width={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
-            height={PRODUCTS_CATALOG_FILTER_CHEVRON_SIZE_PX}
-            aria-hidden
-            className={`ml-auto shrink-0 brightness-0 invert transition-transform duration-200 ease-in-out ${showSortDropdown ? 'rotate-180' : 'rotate-0'}`}
-          />
-        </button>
-
-        {showSortDropdown ? (
-          <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-[#f0f0f0] bg-white shadow-lg">
-            {sortOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleSortChange(option.value)}
-                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                  sortBy === option.value
-                    ? 'bg-[#fdf2f5] font-semibold text-[#57423b]'
-                    : 'text-[#555] hover:bg-[#fafafa]'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
+      <ProductsCatalogSortDropdown
+        sortBy={sortBy}
+        sortOptions={sortOptions}
+        currentSortLabel={currentSortLabel}
+        onSortChange={handleSortChange}
+      />
     </div>
   );
 }
