@@ -25,7 +25,15 @@ export function MainContent({ children }: MainContentProps) {
 
   const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
 
-  if (pathname === '/' || pathname.startsWith('/supersudo')) {
+  if (pathname === '/') {
+    return (
+      <main className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white">
+        {children}
+      </main>
+    );
+  }
+
+  if (pathname.startsWith('/supersudo')) {
     return <main className={mainBase}>{children}</main>;
   }
 

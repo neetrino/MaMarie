@@ -1,5 +1,6 @@
 import { BRAND_COLORS } from './brand';
 import { HOME_PRODUCT_CARD_ASSETS } from './home-sections';
+import { MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX } from './mobile-bottom-nav';
 
 /** Figma mobile home artboard — 375×2147 (`MobileApp`). */
 export const MOBILE_HOME_DESIGN_WIDTH_PX = 375;
@@ -7,6 +8,11 @@ export const MOBILE_HOME_DESIGN_WIDTH_PX = 375;
 export const MOBILE_HOME_BG = '#f1f1f3';
 export const MOBILE_HOME_SECTION_GAP_PX = 50;
 export const MOBILE_HOME_HORIZONTAL_PADDING_PX = 20;
+/** Slightly tighter than full nav shell — less empty strip above bottom bar. */
+export const MOBILE_HOME_BOTTOM_NAV_CLEARANCE_OFFSET_PX = 10;
+export const MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX =
+  MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX - MOBILE_HOME_BOTTOM_NAV_CLEARANCE_OFFSET_PX;
+export const MOBILE_HOME_BOTTOM_CONTENT_PADDING_PX = 20;
 
 export const MOBILE_HOME_SEARCH_HEIGHT_PX = 48;
 export const MOBILE_HOME_SEARCH_RADIUS_PX = 70;
