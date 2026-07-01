@@ -22,8 +22,8 @@ import {
   CONTACT_FORM_SUBMIT_FONT_SIZE_PX,
   CONTACT_FORM_SUBMIT_HEIGHT_PX,
   CONTACT_FORM_SUBMIT_MARGIN_TOP_PX,
-  CONTACT_FORM_TEXTAREA_MIN_HEIGHT_PX,
 } from '../../constants/contact-form';
+import { ContactFormMessageField } from './ContactFormMessageField';
 import { ContactFormStrawberry } from './ContactFormStrawberry';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
@@ -50,7 +50,6 @@ interface ContactFormFieldProps {
   placeholder: string;
   required?: boolean;
   type?: 'text' | 'email';
-  multiline?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
@@ -61,7 +60,6 @@ function ContactFormField({
   placeholder,
   required = false,
   type = 'text',
-  multiline = false,
   onChange,
 }: ContactFormFieldProps) {
   const sharedStyle = {
@@ -86,36 +84,20 @@ function ContactFormField({
       >
         {label}
       </label>
-      {multiline ? (
-        <textarea
-          id={id}
-          name={id}
-          required={required}
-          value={value}
-          onChange={onChange}
-          className={`${CONTACT_FORM_INPUT_CLASS} resize-y py-3`}
-          style={{
-            ...sharedStyle,
-            minHeight: CONTACT_FORM_TEXTAREA_MIN_HEIGHT_PX,
-          }}
-          placeholder={placeholder}
-        />
-      ) : (
-        <input
-          id={id}
-          name={id}
-          type={type}
-          required={required}
-          value={value}
-          onChange={onChange}
-          className={CONTACT_FORM_INPUT_CLASS}
-          style={{
-            ...sharedStyle,
-            height: CONTACT_FORM_INPUT_HEIGHT_PX,
-          }}
-          placeholder={placeholder}
-        />
-      )}
+      <input
+        id={id}
+        name={id}
+        type={type}
+        required={required}
+        value={value}
+        onChange={onChange}
+        className={CONTACT_FORM_INPUT_CLASS}
+        style={{
+          ...sharedStyle,
+          height: CONTACT_FORM_INPUT_HEIGHT_PX,
+        }}
+        placeholder={placeholder}
+      />
     </div>
   );
 }
@@ -202,13 +184,12 @@ export function ContactForm() {
           onChange={handleChange}
           required
         />
-        <ContactFormField
+        <ContactFormMessageField
           id="message"
           label={t('contact.form.message')}
           placeholder={t('contact.form.messagePlaceholder')}
           value={formData.message}
           onChange={handleChange}
-          multiline
           required
         />
 
