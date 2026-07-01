@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { memo, useMemo } from 'react';
 import {
-  PRODUCTS_CATALOG_CARD_GAP_PX,
+  PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
+  PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX,
   PRODUCTS_CATALOG_CARD_HEIGHT_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX,
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
@@ -11,10 +14,17 @@ import {
   PRODUCTS_CATALOG_CTA_HEIGHT_PX,
   PRODUCTS_CATALOG_CTA_INSET_SHADOW,
   PRODUCTS_CATALOG_CTA_WIDTH_PX,
+  getProductsCatalogGridClassName,
+  PRODUCTS_CATALOG_LIST_ROW_GAP_PX,
+  PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX,
 } from '../constants/products-catalog';
 import { mapToHomeProductCard } from './home/best-products-data';
 import { HomeProductCard } from './home/HomeProductCard';
+import { HomeProductCardListRow } from './home/HomeProductCardListRow';
+import { ProductCardMountPlaceholder } from './home/ProductCardMountPlaceholder';
+import { LazyWhenVisible } from './LazyWhenVisible';
 import { useTranslation } from '../lib/i18n-client';
+import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../lib/product-card-lazy';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
 import type {
@@ -88,9 +98,11 @@ export const ProductsGrid = memo(function ProductsGrid({
   const cardWidthPx =
     viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX : PRODUCTS_CATALOG_CARD_WIDTH_PX;
   const cardHeightPx =
-    viewMode === 'grid-4'
-      ? Math.round(cardWidthPx * (PRODUCTS_CATALOG_CARD_HEIGHT_PX / PRODUCTS_CATALOG_CARD_WIDTH_PX))
-      : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
+    viewMode === 'grid-4' ? PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX : PRODUCTS_CATALOG_CARD_HEIGHT_PX;
+  const rowGapPx =
+    viewMode === 'grid-3'
+      ? PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX
+      : PRODUCTS_CATALOG_CARD_ROW_GAP_PX;
 
   if (sortedProducts.length === 0) {
     return (
@@ -99,54 +111,100 @@ export const ProductsGrid = memo(function ProductsGrid({
       </div>
     );
   }
+
+  const loadMoreCta =
+    onLoadMore && hasMore ? (
+      <button
+        type="button"
+        onClick={onLoadMore}
+        disabled={isLoadingMore}
+        className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
+        style={{
+          width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
+          height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
+          borderRadius: 9999,
+          backgroundColor: PRODUCTS_CATALOG_CTA_BG,
+          boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
+        }}
+      >
+        {t('products.catalog.seeAll')}
+      </button>
+    ) : loadMoreHref ? (
+      <Link
+        href={loadMoreHref}
+        className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
+        style={{
+          width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
+          height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
+          borderRadius: 9999,
+          backgroundColor: PRODUCTS_CATALOG_CTA_BG,
+          boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
+        }}
+      >
+        {t('products.catalog.seeAll')}
+      </Link>
+    ) : null;
+
+  if (viewMode === 'list') {
+    return (
+      <div className="flex w-full flex-col items-center">
+        <div
+          className={getProductsCatalogGridClassName(viewMode)}
+          style={{ gap: PRODUCTS_CATALOG_LIST_ROW_GAP_PX }}
+        >
+          {sortedProducts.map((product, index) => (
+            <LazyWhenVisible
+              key={product.id}
+              eager={resolveProductCardEagerMount(index, viewMode)}
+              minHeightPx={PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX}
+              fallback={<ProductCardMountPlaceholder variant="list" />}
+            >
+              <HomeProductCardListRow
+                product={product}
+                imagePriority={resolveProductCardImagePriority(index, viewMode)}
+              />
+            </LazyWhenVisible>
+          ))}
+        </div>
+        {loadMoreCta}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center">
       <div
-        className="flex w-full flex-wrap justify-center lg:justify-start"
-        style={{ gap: PRODUCTS_CATALOG_CARD_GAP_PX }}
+        className={getProductsCatalogGridClassName(viewMode)}
+        style={{
+          columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+          rowGap: rowGapPx,
+        }}
       >
         {sortedProducts.map((product, index) => (
-          <HomeProductCard
+          <LazyWhenVisible
             key={product.id}
-            product={product}
-            layoutWidthPx={cardWidthPx}
-            layoutHeightPx={cardHeightPx}
-            imagePriority={index < 6}
-          />
+            eager={resolveProductCardEagerMount(index, viewMode)}
+            minHeightPx={cardHeightPx}
+            fallback={
+              <ProductCardMountPlaceholder
+                variant="grid"
+                widthPx={cardWidthPx}
+                heightPx={cardHeightPx}
+              />
+            }
+          >
+            <HomeProductCard
+              product={product}
+              layoutWidthPx={cardWidthPx}
+              layoutHeightPx={cardHeightPx}
+              compactPanel={viewMode === 'grid-4'}
+              imagePriority={resolveProductCardImagePriority(index, viewMode)}
+            />
+          </LazyWhenVisible>
         ))}
       </div>
 
-      {onLoadMore && hasMore ? (
-        <button
-          type="button"
-          onClick={onLoadMore}
-          disabled={isLoadingMore}
-          className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
-          style={{
-            width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
-            height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
-            borderRadius: 9999,
-            backgroundColor: PRODUCTS_CATALOG_CTA_BG,
-            boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
-          }}
-        >
-          {t('products.catalog.seeAll')}
-        </button>
-      ) : loadMoreHref ? (
-        <Link
-          href={loadMoreHref}
-          className="mt-10 flex items-center justify-center font-bold text-white transition-opacity hover:opacity-90"
-          style={{
-            width: PRODUCTS_CATALOG_CTA_WIDTH_PX,
-            height: PRODUCTS_CATALOG_CTA_HEIGHT_PX,
-            borderRadius: 9999,
-            backgroundColor: PRODUCTS_CATALOG_CTA_BG,
-            boxShadow: PRODUCTS_CATALOG_CTA_INSET_SHADOW,
-          }}
-        >
-          {t('products.catalog.seeAll')}
-        </Link>
-      ) : null}
+      {loadMoreCta}
     </div>
   );
 });

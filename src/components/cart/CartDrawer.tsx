@@ -1,18 +1,30 @@
 'use client';
 
-import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import {
+  CART_DRAWER_CLOSE_BUTTON_TOP_PX,
   CART_DRAWER_CLOSE_EVENT,
+  CART_DRAWER_CLOSE_ICON_OFFSET_X_PX,
+  CART_DRAWER_CLOSE_ICON_SIZE_PX,
+  CART_DRAWER_CLOSE_ICON_STROKE_WIDTH,
+  CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
+  CART_DRAWER_CLOSE_TAB_HOVER_SCALE,
+  CART_DRAWER_CLOSE_TAB_TRANSITION_MS,
+  CART_DRAWER_CLOSE_TAB_WIDTH_PX,
+  CART_DRAWER_CLOSE_TAB_Z_INDEX,
   CART_DRAWER_MAX_WIDTH_PX,
   CART_DRAWER_OPEN_EVENT,
-  CART_DRAWER_Z_INDEX,
+  CART_DRAWER_PANEL_TRANSITION_MS,
+  CART_DRAWER_PANEL_Z_INDEX,
 } from '../../constants/cart-drawer';
 import type { Cart } from '../../app/cart/types';
+import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
 import { CartDrawerItemRow } from './CartDrawerItemRow';
 import { CartDrawerSummary } from './CartDrawerSummary';
+import { CartEmptyState } from './CartEmptyState';
 import { useCartState } from './useCartState';
+import styles from './CartDrawerCloseTab.module.css';
 
 function formatItemsCount(count: number, t: (key: string) => string): string {
   const label = count === 1 ? t('common.cart.item') : t('common.cart.items');
@@ -20,7 +32,9 @@ function formatItemsCount(count: number, t: (key: string) => string): string {
 }
 
 interface CartDrawerPanelProps {
+  visible: boolean;
   onClose: () => void;
+  panelRef: RefObject<HTMLDivElement>;
   cart: Cart | null;
   loading: boolean;
   currency: string;
@@ -29,8 +43,53 @@ interface CartDrawerPanelProps {
   t: (key: string) => string;
 }
 
-function CartDrawerPanel({
+function CartDrawerCloseTab({
   onClose,
+  closeLabel,
+}: {
+  onClose: () => void;
+  closeLabel: string;
+}) {
+  const tabRadiusPx = CART_DRAWER_CLOSE_TAB_HEIGHT_PX / 2;
+
+  return (
+    <button
+      type="button"
+      onClick={onClose}
+      className={`${styles.closeTab} absolute flex items-center justify-center bg-brand-pink text-white`}
+      style={{
+        top: CART_DRAWER_CLOSE_BUTTON_TOP_PX,
+        left: 0,
+        zIndex: CART_DRAWER_CLOSE_TAB_Z_INDEX,
+        width: CART_DRAWER_CLOSE_TAB_WIDTH_PX,
+        height: CART_DRAWER_CLOSE_TAB_HEIGHT_PX,
+        borderRadius: tabRadiusPx,
+        paddingRight: CART_DRAWER_CLOSE_TAB_WIDTH_PX / 2,
+        ['--cart-drawer-close-tab-hover-scale' as string]: CART_DRAWER_CLOSE_TAB_HOVER_SCALE,
+        ['--cart-drawer-close-tab-transition-ms' as string]: `${CART_DRAWER_CLOSE_TAB_TRANSITION_MS}ms`,
+      }}
+      aria-label={closeLabel}
+    >
+      <svg
+        width={CART_DRAWER_CLOSE_ICON_SIZE_PX}
+        height={CART_DRAWER_CLOSE_ICON_SIZE_PX}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={CART_DRAWER_CLOSE_ICON_STROKE_WIDTH}
+        aria-hidden
+        style={{ transform: `translateX(${CART_DRAWER_CLOSE_ICON_OFFSET_X_PX}px)` }}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  );
+}
+
+function CartDrawerPanel({
+  visible,
+  onClose,
+  panelRef,
   cart,
   loading,
   currency,
@@ -43,88 +102,128 @@ function CartDrawerPanel({
   const headerItemsCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
   return (
-    <div
-      className="fixed inset-0 flex justify-end bg-black/40 backdrop-blur-sm"
-      style={{ zIndex: CART_DRAWER_Z_INDEX }}
-      onClick={onClose}
-    >
-      <aside
-        className="flex h-dvh max-h-dvh w-full max-w-full flex-col overflow-hidden bg-white shadow-2xl max-sm:rounded-none sm:rounded-l-3xl"
-        style={{ maxWidth: CART_DRAWER_MAX_WIDTH_PX }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cart-drawer-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <header className="flex items-start justify-between border-b border-gray-100 px-6 py-5">
-          <div>
-            <h2 id="cart-drawer-title" className="text-xl font-bold text-gray-900">
-              {t('common.cart.title')}
-            </h2>
-            {headerItemsCount > 0 ? (
-              <p className="mt-1 text-sm text-gray-500">
-                {formatItemsCount(headerItemsCount, t)}
-              </p>
-            ) : null}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
-            aria-label={t('common.buttons.close')}
-          >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </header>
+    <div className="fixed inset-0 z-[90] flex justify-end overscroll-none">
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ease-in-out motion-reduce:transition-none ${
+          visible ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      />
 
-        <div className="flex min-h-0 flex-1 flex-col">
-          {showLoading ? (
-            <div className="flex-1 px-6 py-8">
-              <div className="animate-pulse space-y-6">
-                <div className="h-20 rounded-xl bg-gray-100" />
-                <div className="h-20 rounded-xl bg-gray-100" />
-              </div>
+      <div
+        ref={panelRef}
+        className={`relative h-dvh max-h-dvh w-full transition-transform duration-300 ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+          visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
+        }`}
+        style={{ maxWidth: CART_DRAWER_MAX_WIDTH_PX }}
+      >
+        <CartDrawerCloseTab onClose={onClose} closeLabel={t('common.buttons.close')} />
+        <aside
+          className="relative flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl max-sm:rounded-none sm:rounded-l-3xl"
+          style={{ zIndex: CART_DRAWER_PANEL_Z_INDEX }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cart-drawer-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="flex items-center border-b border-gray-100 px-6 py-5">
+            <div className="flex min-h-10 flex-col justify-center">
+              <h2 id="cart-drawer-title" className="text-xl font-bold leading-tight text-gray-900">
+                {t('common.cart.title')}
+              </h2>
+              {headerItemsCount > 0 ? (
+                <p className="mt-1 text-sm text-gray-500">
+                  {formatItemsCount(headerItemsCount, t)}
+                </p>
+              ) : null}
             </div>
-          ) : !hasItems ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-              <p className="text-lg font-semibold text-gray-900">{t('common.cart.empty')}</p>
-              <Link
-                href="/products"
-                onClick={onClose}
-                className="mt-6 rounded-2xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
-              >
-                {t('common.buttons.browseProducts')}
-              </Link>
-            </div>
-          ) : (
-            <>
-              <div className="flex-1 overflow-y-auto px-6 py-4">
-                {cart?.items.map((item) => (
-                  <CartDrawerItemRow
-                    key={item.id}
-                    item={item}
-                    currency={currency}
-                    onRemove={onRemoveItem}
-                    onUpdateQuantity={onUpdateQuantity}
-                    t={t}
-                  />
-                ))}
+          </header>
+
+          <div className="flex min-h-0 flex-1 flex-col">
+            {showLoading ? (
+              <div className="flex-1 px-6 py-8">
+                <div className="animate-pulse space-y-6">
+                  <div className="h-20 rounded-xl bg-gray-100" />
+                  <div className="h-20 rounded-xl bg-gray-100" />
+                </div>
               </div>
-              {cart ? <CartDrawerSummary cart={cart} currency={currency} t={t} /> : null}
-            </>
-          )}
-        </div>
-      </aside>
+            ) : !hasItems ? (
+              <CartEmptyState t={t} onCtaClick={onClose} />
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  {cart?.items.map((item) => (
+                    <CartDrawerItemRow
+                      key={item.id}
+                      item={item}
+                      currency={currency}
+                      onRemove={onRemoveItem}
+                      onUpdateQuantity={onUpdateQuantity}
+                      t={t}
+                    />
+                  ))}
+                </div>
+                {cart ? <CartDrawerSummary cart={cart} currency={currency} t={t} /> : null}
+              </>
+            )}
+          </div>
+        </aside>
+      </div>
     </div>
   );
+}
+
+/** Keeps drawer mounted through exit; double rAF ensures enter transition paints off-screen first. */
+function useCartDrawerTransition(open: boolean): { rendered: boolean; visible: boolean } {
+  const [rendered, setRendered] = useState(open);
+  const [visible, setVisible] = useState(false);
+
+  useLayoutEffect(() => {
+    if (open) {
+      setRendered(true);
+      setVisible(false);
+      return;
+    }
+
+    setVisible(false);
+  }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      let innerFrameId = 0;
+      const outerFrameId = requestAnimationFrame(() => {
+        innerFrameId = requestAnimationFrame(() => {
+          setVisible(true);
+        });
+      });
+
+      return () => {
+        cancelAnimationFrame(outerFrameId);
+        cancelAnimationFrame(innerFrameId);
+      };
+    }
+
+    const timer = window.setTimeout(() => {
+      setRendered(false);
+    }, CART_DRAWER_PANEL_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [open]);
+
+  return { rendered, visible };
 }
 
 /** Global cart drawer — slides in from the right when `openCartDrawer()` is called. */
 export function CartDrawer() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { rendered, visible } = useCartDrawerTransition(open);
   const cartState = useCartState({ enabled: true });
   const { refreshCart, ...cartPanelProps } = cartState;
 
@@ -158,11 +257,37 @@ export function CartDrawer() {
   }, [open, refreshCart]);
 
   useEffect(() => {
-    if (!open) {
+    if (!rendered) {
       return;
     }
 
-    document.body.style.overflow = 'hidden';
+    lockBodyScroll();
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (panelRef.current?.contains(target)) {
+        return;
+      }
+
+      event.preventDefault();
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      unlockBodyScroll();
+    };
+  }, [rendered]);
+
+  useEffect(() => {
+    if (!rendered) {
+      return;
+    }
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -173,17 +298,21 @@ export function CartDrawer() {
     window.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleEscape);
     };
-  }, [open, handleClose]);
+  }, [rendered, handleClose]);
 
-  if (!mounted || !open) {
+  if (!mounted || !rendered) {
     return null;
   }
 
   return createPortal(
-    <CartDrawerPanel onClose={handleClose} {...cartPanelProps} />,
+    <CartDrawerPanel
+      visible={visible}
+      onClose={handleClose}
+      panelRef={panelRef}
+      {...cartPanelProps}
+    />,
     document.body,
   );
 }

@@ -29,6 +29,26 @@ interface VariantBuilderProps {
   generateSlug: (title: string) => string;
 }
 
+function getAttributesToShow(
+  selectedAttributesForVariants: Set<string>,
+  isEditMode: boolean,
+  variant: GeneratedVariant | undefined,
+  attributes: Attribute[],
+): string[] {
+  if (selectedAttributesForVariants.size > 0) {
+    return Array.from(selectedAttributesForVariants);
+  }
+  if (isEditMode && variant) {
+    const attrIds = new Set<string>();
+    variant.selectedValueIds.forEach((valueId) => {
+      const attr = attributes.find((a) => a.values.some((v) => v.id === valueId));
+      if (attr) attrIds.add(attr.id);
+    });
+    return Array.from(attrIds);
+  }
+  return [];
+}
+
 export function VariantBuilder({
   generatedVariants,
   attributes,
@@ -50,28 +70,11 @@ export function VariantBuilder({
 }: VariantBuilderProps) {
   const { t } = useTranslation();
 
-  // Get attributes to show in table header
-  const getAttributesToShow = (variant?: GeneratedVariant) => {
-    if (selectedAttributesForVariants.size > 0) {
-      return Array.from(selectedAttributesForVariants);
-    }
-    if (isEditMode && variant) {
-      // Extract unique attribute IDs from this variant's values
-      const attrIds = new Set<string>();
-      variant.selectedValueIds.forEach((valueId) => {
-        const attr = attributes.find((a) => a.values.some((v) => v.id === valueId));
-        if (attr) attrIds.add(attr.id);
-      });
-      return Array.from(attrIds);
-    }
-    return [];
-  };
-
   const attributesToShow =
     selectedAttributesForVariants.size > 0
       ? Array.from(selectedAttributesForVariants)
       : generatedVariants.length > 0
-        ? getAttributesToShow(generatedVariants[0])
+        ? getAttributesToShow(selectedAttributesForVariants, isEditMode, generatedVariants[0], attributes)
         : [];
 
   const hasVariantsTable = attributesToShow.length > 0 || generatedVariants.length > 0;
@@ -208,7 +211,12 @@ export function VariantBuilder({
                     </tr>
                   )}
                   {generatedVariants.map((variant) => {
-                    const variantAttributesToShow = getAttributesToShow(variant);
+                    const variantAttributesToShow = getAttributesToShow(
+                      selectedAttributesForVariants,
+                      isEditMode,
+                      variant,
+                      attributes,
+                    );
 
                     return (
                       <tr key={variant.id} className="hover:bg-gray-50">

@@ -5,6 +5,11 @@ import {
   cleanImageUrls,
   separateMainAndVariantImages,
 } from "../../utils/image-utils";
+import {
+  stripInlineDataImages,
+  toAttributeValueStorefrontImageUrl,
+  toVariantStorefrontImageUrl,
+} from "../../utils/storefront-image-url";
 import { logger } from "../../utils/logger";
 import { getOutOfStockLabel } from "./utils";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
@@ -98,8 +103,8 @@ function transformMedia(
   });
   const { main } = separateMainAndVariantImages(mediaAsStrings, variantImages);
   
-  // Clean and validate final main images
-  const cleanedMain = cleanImageUrls(main);
+  // Clean and validate final main images (never inline base64 in storefront JSON)
+  const cleanedMain = stripInlineDataImages(cleanImageUrls(main));
   
   logger.debug('Main media images count (after cleanup)', { count: cleanedMain.length });
   logger.debug('Variant images excluded', { count: variantImages.length });
@@ -170,16 +175,7 @@ function transformLabels(
  * Transform variant image URL
  */
 function transformVariantImageUrl(variant: ProductVariantWithOptions): string | null {
-  if (!variant.imageUrl) {
-    return null;
-  }
-
-  // Use smartSplitUrls to handle comma-separated URLs
-  const urls = smartSplitUrls(variant.imageUrl);
-  // Process and validate each URL
-  const processedUrls = urls.map(url => processImageUrl(url)).filter((url): url is string => url !== null);
-  // Use first valid URL, or join if multiple (comma-separated)
-  return processedUrls.length > 0 ? processedUrls.join(',') : null;
+  return toVariantStorefrontImageUrl(variant.id, variant.imageUrl);
 }
 
 /**
@@ -304,7 +300,7 @@ function transformProductAttributes(
               id: val.id,
               value: val.value,
               label: valTranslation?.label || val.value,
-              imageUrl: val.imageUrl || null,
+              imageUrl: toAttributeValueStorefrontImageUrl(val.imageUrl),
               colors: val.colors || null,
             };
           }) : [],

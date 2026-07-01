@@ -9,9 +9,12 @@ import {
 } from '../../app/cart/cart-handlers';
 import { formatCartLineAmountInCurrency } from '../../app/cart/cart-summary-labels';
 import type { CartItem } from '../../app/cart/types';
+import {
+  CART_DRAWER_ITEM_THUMB_RADIUS_PX,
+  CART_DRAWER_ITEM_THUMB_SIZE_PX,
+} from '../../constants/cart-drawer';
+import { HOME_PRODUCT_CARD_ASSETS, HOME_PRODUCT_CARD_BG } from '../../constants/home-sections';
 import type { CurrencyCode } from '../../lib/currency';
-import { processImageUrl } from '../../lib/utils/image-utils';
-import { ProductImagePlaceholder } from '../ProductImagePlaceholder';
 
 interface CartDrawerItemRowProps {
   item: CartItem;
@@ -29,13 +32,20 @@ export function CartDrawerItemRow({
   t,
 }: CartDrawerItemRowProps) {
   const currencyCode = currency as CurrencyCode;
-  const imageSrc = processImageUrl(item.variant.product.image);
+  const rawImage = item.variant.product.image;
   const [imageError, setImageError] = useState(false);
   const [displayQuantity, setDisplayQuantity] = useState(item.quantity);
+
+  const imageSrc =
+    rawImage && !imageError ? rawImage : HOME_PRODUCT_CARD_ASSETS.placeholderImage;
 
   useEffect(() => {
     setDisplayQuantity(item.quantity);
   }, [item.id, item.quantity]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [rawImage]);
 
   const atMaxStock = isCartItemAtMaxStock(item.variant.stock, displayQuantity);
   const lineTotal = item.price * displayQuantity;
@@ -55,32 +65,31 @@ export function CartDrawerItemRow({
   };
 
   return (
-    <article className="border-b border-gray-100 py-5 first:pt-0 last:border-b-0">
-      <div className="flex items-start gap-4">
+    <article className="border-b border-gray-100 py-4 first:pt-0 last:border-b-0">
+      <div className="flex items-start gap-3">
         <Link
           href={`/products/${item.variant.product.slug}`}
-          className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-gray-100"
+          className="relative block shrink-0 overflow-hidden"
+          style={{
+            width: CART_DRAWER_ITEM_THUMB_SIZE_PX,
+            height: CART_DRAWER_ITEM_THUMB_SIZE_PX,
+            borderRadius: CART_DRAWER_ITEM_THUMB_RADIUS_PX,
+            backgroundColor: HOME_PRODUCT_CARD_BG,
+          }}
         >
-          {!imageSrc || imageError ? (
-            <ProductImagePlaceholder
-              className="h-full w-full"
-              aria-label={item.variant.product.title}
-            />
-          ) : (
-            <Image
-              src={imageSrc}
-              alt={item.variant.product.title}
-              fill
-              className="object-contain p-1"
-              sizes="80px"
-              unoptimized
-              onError={() => setImageError(true)}
-            />
-          )}
+          <Image
+            src={imageSrc}
+            alt={item.variant.product.title}
+            fill
+            className="object-contain p-1"
+            sizes={`${CART_DRAWER_ITEM_THUMB_SIZE_PX}px`}
+            unoptimized
+            onError={() => setImageError(true)}
+          />
         </Link>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <Link
                 href={`/products/${item.variant.product.slug}`}
@@ -105,7 +114,7 @@ export function CartDrawerItemRow({
             </button>
           </div>
 
-          <div className="mt-3 flex justify-end">
+          <div className="mt-2 flex justify-end">
             <div className="inline-flex items-center rounded-full border border-gray-200 bg-sky-50/70 px-1 py-1">
               <button
                 type="button"

@@ -10,6 +10,7 @@ import type { Cart } from '../../app/cart/types';
 import { useCartDeliveryEstimate } from '../../app/cart/use-cart-delivery-estimate';
 import type { CurrencyCode } from '../../lib/currency';
 import { closeCartDrawer } from '../../lib/cart-drawer';
+import { CART_DRAWER_CHECKOUT_BUTTON_HEIGHT_PX } from '../../constants/cart-drawer';
 
 interface CartDrawerSummaryProps {
   cart: Cart;
@@ -54,7 +55,8 @@ export function CartDrawerSummary({ cart, currency, t }: CartDrawerSummaryProps)
       <Link
         href="/checkout"
         onClick={closeCartDrawer}
-        className="mt-5 flex w-full items-center justify-center rounded-2xl bg-sky-50 px-4 py-4 text-sm font-bold uppercase tracking-wide text-gray-900 shadow-sm transition-colors hover:bg-sky-100"
+        className="mt-5 flex w-full items-center justify-center rounded-full bg-brand-pink px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        style={{ minHeight: CART_DRAWER_CHECKOUT_BUTTON_HEIGHT_PX }}
       >
         {t('common.buttons.proceedToCheckout')}
       </Link>

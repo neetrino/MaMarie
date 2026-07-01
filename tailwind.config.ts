@@ -23,6 +23,7 @@ const config: Config = {
           muted: '#4b5563',
           'on-pink': '#f5f5f5',
           sky: '#c2ddf9',
+          cart: '#96d0ff',
         },
       },
       fontFamily: {

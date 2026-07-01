@@ -1,4 +1,5 @@
 import { Suspense, type CSSProperties } from 'react';
+import { DesktopFluidFrame } from '../../components/DesktopFluidFrame';
 import {
   PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX,
   PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX,
@@ -8,7 +9,7 @@ import { ProductsCatalogSkeleton } from './ProductsCatalogSkeleton';
 
 const catalogOffsetStyle = {
   ['--products-catalog-offset-mobile']: `${PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX}px`,
-  ['--products-catalog-offset-desktop']: `${PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX}px`,
+  ['--products-catalog-offset-desktop']: `calc(${PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,
 } as CSSProperties;
 
 /**
@@ -24,9 +25,11 @@ export default function ProductsPage({
       className="min-h-screen w-full max-w-full bg-white pb-16 pt-[var(--products-catalog-offset-mobile)] lg:pt-[var(--products-catalog-offset-desktop)]"
       style={catalogOffsetStyle}
     >
-      <Suspense fallback={<ProductsCatalogSkeleton />}>
-        <ProductsCatalog searchParams={searchParams} />
-      </Suspense>
+      <DesktopFluidFrame>
+        <Suspense fallback={<ProductsCatalogSkeleton />}>
+          <ProductsCatalog searchParams={searchParams} />
+        </Suspense>
+      </DesktopFluidFrame>
     </div>
   );
 }

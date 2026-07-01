@@ -53,7 +53,14 @@ export async function readJsonCache<T>(key: string): Promise<T | null> {
 }
 
 export async function writeJsonCache(key: string, ttlSeconds: number, body: unknown): Promise<void> {
-  await cacheService.setex(key, ttlSeconds, JSON.stringify(body));
+  const payload = JSON.stringify(body);
+  const MAX_CACHE_BYTES = 512_000;
+
+  if (payload.length > MAX_CACHE_BYTES) {
+    return;
+  }
+
+  await cacheService.setex(key, ttlSeconds, payload);
 }
 
 /** After category create/update/delete (admin). */

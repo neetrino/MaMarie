@@ -93,8 +93,13 @@ export function ProductInfoAndActions({
   getOptionValue,
   getRequiredAttributesMessage,
 }: ProductInfoAndActionsProps) {
+  const showRegularPrice = Boolean(
+    originalPrice || (compareAtPrice && compareAtPrice > price),
+  );
+  const regularPriceValue = originalPrice || compareAtPrice || 0;
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="flex-1">
         {product.brand && (
           <div className="mb-2 flex items-center gap-2">
@@ -123,21 +128,17 @@ export function ProductInfoAndActions({
           language={language}
         />
         <div className="mb-6">
-          <div className="flex flex-col gap-1">
-            {/* Discounted price with discount percentage */}
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
-              {discountPercent && discountPercent > 0 && (
-                <span className="text-lg font-semibold text-blue-600">
-                  -{discountPercent}%
-                </span>
-              )}
-            </div>
-            {/* Original price below discounted price - full width, not inline */}
-            {(originalPrice || (compareAtPrice && compareAtPrice > price)) && (
-              <p className="text-xl text-gray-500 line-through decoration-gray-400 mt-1">
-                {formatPrice(originalPrice || compareAtPrice || 0, currency as CurrencyCode)}
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
+            {showRegularPrice && (
+              <p className="text-xl text-gray-500 line-through decoration-gray-400">
+                {formatPrice(regularPriceValue, currency as CurrencyCode)}
               </p>
+            )}
+            {discountPercent && discountPercent > 0 && (
+              <span className="text-lg font-semibold text-blue-600">
+                -{discountPercent}%
+              </span>
             )}
           </div>
         </div>
@@ -174,8 +175,8 @@ export function ProductInfoAndActions({
         </div>
       </div>
       
-      {/* Action Buttons - Aligned with bottom of image */}
-      <div className="mt-auto pt-6">
+      {/* Action buttons — bottom-aligned with gallery image on desktop */}
+      <div className="mt-auto lg:pt-0 pt-6">
         {/* Show required attributes message if needed */}
         {isVariationRequired && (
           <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -198,8 +199,8 @@ export function ProductInfoAndActions({
             </p>
           </div>
         )}
-        <div className="flex items-center gap-3 pt-4 border-t">
-          <div className="flex items-center border rounded-xl overflow-hidden bg-gray-50">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center border rounded-full overflow-hidden bg-gray-50">
             <button 
               onClick={() => onQuantityAdjust(-1)} 
               disabled={quantity <= 1}
@@ -218,20 +219,24 @@ export function ProductInfoAndActions({
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 
-            className="flex-1 h-12 bg-gray-900 text-white rounded-xl uppercase font-bold disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full uppercase font-bold transition-colors hover:brightness-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
             onClick={onAddToCart}
           >
             {isAddingToCart ? t(language, 'product.adding') : (isOutOfStock ? t(language, 'product.outOfStock') : (isVariationRequired ? getRequiredAttributesMessage() : (hasUnavailableAttributes ? t(language, 'product.outOfStock') : t(language, 'product.addToCart'))))}
           </button>
           <button 
             onClick={onCompareToggle} 
-            className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all duration-200 ${isInCompare ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${isInCompare ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
           >
             <CompareIcon isActive={isInCompare} />
           </button>
           <button 
             onClick={onAddToWishlist} 
-            className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center ${isInWishlist ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
+            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+              isInWishlist
+                ? 'border-gray-200 text-red-600'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
           >
             <Heart fill={isInWishlist ? 'currentColor' : 'none'} />
           </button>

@@ -20,6 +20,7 @@ export interface HomeSectionHeadingRowProps {
   seeAllLabel: string;
   color: string;
   chevronSrc: string;
+  titleFontSizePx?: number;
   titleLineHeightPx?: number;
   minHeightPx?: number;
   headingPaddingYPx?: number;
@@ -34,6 +35,7 @@ export function HomeSectionHeadingRow({
   seeAllLabel,
   color,
   chevronSrc,
+  titleFontSizePx = HOME_SECTION_TITLE_FONT_SIZE_PX,
   titleLineHeightPx = HOME_SECTION_HEADING_TITLE_LINE_HEIGHT_PX,
   minHeightPx = HOME_SECTION_HEADING_MIN_HEIGHT_PX,
   headingPaddingYPx = HOME_SECTION_HEADING_PADDING_Y_PX,
@@ -53,7 +55,7 @@ export function HomeSectionHeadingRow({
         className="shrink-0 font-black"
         style={{
           color,
-          fontSize: HOME_SECTION_TITLE_FONT_SIZE_PX,
+          fontSize: titleFontSizePx,
           lineHeight: `${titleLineHeightPx}px`,
         }}
       >

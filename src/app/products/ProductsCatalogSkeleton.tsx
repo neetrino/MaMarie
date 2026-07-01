@@ -3,12 +3,18 @@ import {
   HomeSectionContent,
 } from '../../components/home/HomeSectionShell';
 import {
+  PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
+  PRODUCTS_CATALOG_CARD_WIDTH_PX,
+  PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
   PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX,
   PRODUCTS_CATALOG_MAIN_GAP_PX,
   PRODUCTS_CATALOG_PILL_HEIGHT_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
   PRODUCTS_CATALOG_SORT_PILL_WIDTH_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
+  getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
 
 /**
@@ -60,12 +66,21 @@ export function ProductsCatalogSkeleton() {
           </div>
 
           <div style={{ paddingTop: PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX }}>
-            <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+            <div
+              className={getProductsCatalogGridClassName(PRODUCTS_CATALOG_DEFAULT_VIEW_MODE)}
+              style={{
+                columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+                rowGap: PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX,
+              }}
+            >
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={index}
                   className="rounded-[30px] bg-[#f9e490]/60"
-                  style={{ width: 344, height: 371 }}
+                  style={{
+                    width: PRODUCTS_CATALOG_CARD_WIDTH_PX,
+                    height: PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+                  }}
                 />
               ))}
             </div>

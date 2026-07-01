@@ -7,8 +7,12 @@ interface LazyWhenVisibleProps {
   children: ReactNode;
   minHeightPx: number;
   rootMarginPx?: number;
+  /** Extra horizontal prefetch for sideways scroll rows (related products, mobile best sellers). */
+  prefetchHorizontalPx?: number;
   className?: string;
   fallback?: ReactNode;
+  /** Skip the observer and mount children immediately (above-the-fold slots). */
+  eager?: boolean;
 }
 
 /**
@@ -19,13 +23,19 @@ export function LazyWhenVisible({
   children,
   minHeightPx,
   rootMarginPx = LAZY_LOAD_ROOT_MARGIN_PX,
+  prefetchHorizontalPx = 0,
   className,
   fallback,
+  eager = false,
 }: LazyWhenVisibleProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(eager);
 
   useEffect(() => {
+    if (eager) {
+      return;
+    }
+
     const node = ref.current;
     if (!node || isVisible) {
       return;
@@ -38,12 +48,12 @@ export function LazyWhenVisible({
           observer.disconnect();
         }
       },
-      { rootMargin: `${rootMarginPx}px 0px` },
+      { rootMargin: `${rootMarginPx}px ${prefetchHorizontalPx}px` },
     );
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [isVisible, rootMarginPx]);
+  }, [eager, isVisible, prefetchHorizontalPx, rootMarginPx]);
 
   const style: CSSProperties | undefined = isVisible ? undefined : { minHeight: minHeightPx };
 

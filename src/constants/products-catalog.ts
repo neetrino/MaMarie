@@ -4,9 +4,14 @@ import {
   HEADER_CONTENT_CLEARANCE_MOBILE_PX,
 } from './header';
 import {
-  HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX,
   HOME_PRODUCT_CARD_DESIGN_WIDTH_PX,
+  HOME_PRODUCT_CARD_IMAGE_TOP_PX,
+  HOME_PRODUCT_CARD_WIDTH_PX,
+  HOME_SECTION_CONTENT_MAX_WIDTH_PX,
+  BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
+  homeSectionColumnWidthPx,
 } from './home-sections';
+import { resolveHomeProductCardHeightPx } from '../lib/home-product-card-layout';
 
 /** Figma shop page — catalog layout tokens. Horizontal insets use `HomeContentHorizontalFrame` (same as navbar pill). */
 
@@ -26,13 +31,58 @@ export const PRODUCTS_CATALOG_TOP_ROW_PB_PX = 16;
 /** Product grid top inset below breadcrumb / sort row. */
 export const PRODUCTS_CATALOG_GRID_OFFSET_TOP_PX = 104;
 
-export const PRODUCTS_CATALOG_CARD_GAP_PX = 12;
-export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;
-export const PRODUCTS_CATALOG_CARD_WIDTH_PX = 344;
+/** PDP related products — title → card row (same as home best-products; image sits in this inset). */
+export const RELATED_PRODUCTS_GRID_OFFSET_TOP_PX = BEST_PRODUCTS_GRID_OFFSET_TOP_PX;
 
-export const PRODUCTS_CATALOG_CARD_HEIGHT_PX = Math.round(
-  PRODUCTS_CATALOG_CARD_WIDTH_PX *
-    (HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX / HOME_PRODUCT_CARD_DESIGN_WIDTH_PX),
+/** Horizontal space between catalog cards. */
+export const PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX = 24;
+
+/** PDP related row — slightly tighter than shop grid. */
+export const RELATED_PRODUCTS_CARD_GAP_PX = 8;
+export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;
+export const PRODUCTS_CATALOG_GRID4_COLUMNS = 4;
+
+/** Product grid width beside the filter sidebar (1354 − sidebar − gap). */
+export const PRODUCTS_CATALOG_MAIN_CONTENT_WIDTH_PX =
+  HOME_SECTION_CONTENT_MAX_WIDTH_PX -
+  PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX -
+  PRODUCTS_CATALOG_MAIN_GAP_PX;
+
+/** Fits exactly three cards per row in the catalog main column. */
+export const PRODUCTS_CATALOG_CARD_WIDTH_PX = Math.floor(
+  homeSectionColumnWidthPx(
+    PRODUCTS_CATALOG_CARD_COLUMNS,
+    PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+    PRODUCTS_CATALOG_MAIN_CONTENT_WIDTH_PX,
+  ),
+);
+
+/** Minimum clearance below image overhang — grid-4 uses this unchanged. */
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_BUFFER_PX = 8;
+
+/** Extra breathing room between grid-3 rows (shop catalog default view). */
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_BUFFER_PX = 26;
+
+function productsCatalogCardImageOverhangGapPx(cardWidthPx: number): number {
+  return Math.abs(
+    HOME_PRODUCT_CARD_IMAGE_TOP_PX * (cardWidthPx / HOME_PRODUCT_CARD_WIDTH_PX),
+  );
+}
+
+/**
+ * Vertical space between rows — product images sit above the card (`HOME_PRODUCT_CARD_IMAGE_TOP_PX`).
+ * Row gap must clear that overhang so cards do not overlap.
+ */
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_PX =
+  productsCatalogCardImageOverhangGapPx(PRODUCTS_CATALOG_CARD_WIDTH_PX) +
+  PRODUCTS_CATALOG_CARD_ROW_GAP_BUFFER_PX;
+
+export const PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_PX =
+  productsCatalogCardImageOverhangGapPx(PRODUCTS_CATALOG_CARD_WIDTH_PX) +
+  PRODUCTS_CATALOG_CARD_ROW_GAP_GRID3_BUFFER_PX;
+
+export const PRODUCTS_CATALOG_CARD_HEIGHT_PX = resolveHomeProductCardHeightPx(
+  PRODUCTS_CATALOG_CARD_WIDTH_PX,
 );
 
 export const PRODUCTS_CATALOG_CARD_LAYOUT_SCALE =
@@ -75,19 +125,58 @@ export type ProductsCatalogViewMode = (typeof PRODUCTS_CATALOG_VIEW_MODES)[numbe
 export const PRODUCTS_CATALOG_DEFAULT_VIEW_MODE: ProductsCatalogViewMode =
   PRODUCTS_CATALOG_VIEW_MODES[1];
 
-/** Four-column card width — fits same row as three 344px cards. */
+/** Fits exactly four cards per row in the catalog main column. */
 export const PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX = Math.floor(
-  (PRODUCTS_CATALOG_CARD_WIDTH_PX * PRODUCTS_CATALOG_CARD_COLUMNS +
-    PRODUCTS_CATALOG_CARD_GAP_PX * (PRODUCTS_CATALOG_CARD_COLUMNS - 1) -
-    PRODUCTS_CATALOG_CARD_GAP_PX * (4 - 1)) /
-    4,
+  homeSectionColumnWidthPx(
+    PRODUCTS_CATALOG_GRID4_COLUMNS,
+    PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+    PRODUCTS_CATALOG_MAIN_CONTENT_WIDTH_PX,
+  ),
 );
+
+export const PRODUCTS_CATALOG_CARD_HEIGHT_GRID4_PX = resolveHomeProductCardHeightPx(
+  PRODUCTS_CATALOG_CARD_WIDTH_GRID4_PX,
+);
+
+const PRODUCTS_CATALOG_GRID_BASE_CLASS =
+  'grid w-full overflow-visible justify-items-center lg:justify-items-start';
+
+/** Responsive catalog grid — 3 or 4 columns on desktop beside the sidebar. */
+export function getProductsCatalogGridClassName(
+  viewMode: ProductsCatalogViewMode,
+): string {
+  if (viewMode === 'list') {
+    return 'flex w-full flex-col overflow-visible';
+  }
+
+  if (viewMode === 'grid-4') {
+    return `${PRODUCTS_CATALOG_GRID_BASE_CLASS} grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`;
+  }
+
+  return `${PRODUCTS_CATALOG_GRID_BASE_CLASS} grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`;
+}
 
 export function normalizeProductsCatalogViewMode(value: string | null): ProductsCatalogViewMode {
   if (value === 'list' || value === 'grid-3' || value === 'grid-4') {
     return value;
   }
   return PRODUCTS_CATALOG_DEFAULT_VIEW_MODE;
+}
+
+/** Page size per catalog view mode. */
+export const PRODUCTS_CATALOG_PAGE_LIMIT_LIST = 10;
+export const PRODUCTS_CATALOG_PAGE_LIMIT_GRID3 = 12;
+export const PRODUCTS_CATALOG_PAGE_LIMIT_GRID4 = 16;
+
+/** Resolves API page size for the active catalog view mode. */
+export function resolveProductsCatalogPageLimit(viewMode: ProductsCatalogViewMode): number {
+  if (viewMode === 'list') {
+    return PRODUCTS_CATALOG_PAGE_LIMIT_LIST;
+  }
+  if (viewMode === 'grid-4') {
+    return PRODUCTS_CATALOG_PAGE_LIMIT_GRID4;
+  }
+  return PRODUCTS_CATALOG_PAGE_LIMIT_GRID3;
 }
 
 export const PRODUCTS_CATALOG_CTA_WIDTH_PX = 200;
@@ -104,3 +193,17 @@ export const PRODUCTS_CATALOG_CLIENT_POOL_LIMIT = 200;
 
 /** Debounce delay before server fetch when catalog search query changes. */
 export const PRODUCTS_CATALOG_SEARCH_DEBOUNCE_MS = 300;
+
+/** List view — full-width horizontal product row. */
+export const PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX = 128;
+export const PRODUCTS_CATALOG_LIST_ROW_GAP_PX = 12;
+export const PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX = 152;
+export const PRODUCTS_CATALOG_LIST_HEART_TOP_PX = 8;
+export const PRODUCTS_CATALOG_LIST_HEART_RIGHT_PX = 8;
+export const PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX = 30;
+export const PRODUCTS_CATALOG_LIST_ROW_BORDER_WIDTH_PX = 1;
+export const PRODUCTS_CATALOG_LIST_PANEL_PADDING_X_PX = 18;
+export const PRODUCTS_CATALOG_LIST_PANEL_PADDING_Y_PX = 14;
+export const PRODUCTS_CATALOG_LIST_PRICE_TO_ACTIONS_GAP_PX = 20;
+export const PRODUCTS_CATALOG_LIST_RATING_STAR_TEXT_GAP_PX = 4;
+export const PRODUCTS_CATALOG_LIST_RATING_TO_CART_GAP_PX = 8;

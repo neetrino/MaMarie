@@ -55,6 +55,8 @@
   "cart": {
     "title": "Shopping Cart",
     "empty": "Your cart is empty",
+    "emptyDescription": "Add products to start shopping",
+    "emptyCta": "More",
     "orderSummary": "Order Summary",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
@@ -69,8 +71,9 @@
   },
   "wishlist": {
     "title": "My Wishlist",
-    "empty": "Your wishlist is empty",
-    "emptyDescription": "Start adding products to your wishlist to save them for later.",
+    "empty": "You haven't added anything to your list yet",
+    "emptyDescription": "Nothing here yet — find and add your favorite products",
+    "emptyCta": "More",
     "totalCount": "Total items in wishlist",
     "tableHeaders": {
       "productName": "Product Name",

@@ -62,6 +62,7 @@ export function MobileHomeProductCard({ product }: MobileHomeProductCardProps) {
     event.preventDefault();
     event.stopPropagation();
     toggleWishlist();
+    event.currentTarget.blur();
   };
 
   const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {

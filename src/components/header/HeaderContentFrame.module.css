@@ -1,0 +1,13 @@
+/** Logo → login horizontal track — sync with `HeaderContentFrame` CSS vars. */
+.frame {
+  width: 100%;
+  padding-left: var(--header-content-inset-left-mobile);
+  padding-right: var(--header-content-inset-right-mobile);
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    padding-left: var(--header-content-inset-left-desktop);
+    padding-right: var(--header-content-inset-right-desktop);
+  }
+}

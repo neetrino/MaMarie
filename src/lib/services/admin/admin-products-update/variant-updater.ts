@@ -23,8 +23,8 @@ async function findVariant(
   variantToUpdate: { id: string } | null;
   variantIdToUse: string | null;
 }> {
-  let variantToUpdate: { id: string } | null = null;
-  let variantIdToUse: string | null = null;
+  const variantToUpdate: { id: string } | null = null;
+  const variantIdToUse: string | null = null;
   
   // First check by ID if provided — trust the preloaded set, no extra query
   if (variant.id && existingVariantIds.has(variant.id)) {

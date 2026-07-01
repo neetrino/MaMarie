@@ -2,60 +2,42 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import type { CSSProperties, MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 import {
-  HOME_PRODUCT_CARD_ACTIONS_GAP_PX,
-  HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX,
   HOME_PRODUCT_CARD_ASSETS,
-  HOME_PRODUCT_CARD_BG,
   HOME_PRODUCT_CARD_CART_BG,
-  HOME_PRODUCT_CARD_CART_ICON_HOVER_LEFT_PX,
-  HOME_PRODUCT_CARD_CART_ICON_HOVER_TOP_PX,
-  HOME_PRODUCT_CARD_CART_ICON_LEFT_PX,
   HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX,
-  HOME_PRODUCT_CARD_CART_ICON_SIZE_PX,
-  HOME_PRODUCT_CARD_CART_ICON_TOP_PX,
-  HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX,
-  HOME_PRODUCT_CARD_CART_SIZE_PX,
   HOME_PRODUCT_CARD_COMPARE_COLOR,
-  HOME_PRODUCT_CARD_COMPARE_SIZE_PX,
-  HOME_PRODUCT_CARD_HEIGHT_PX,
   HOME_PRODUCT_CARD_HEART_RIGHT_PX,
   HOME_PRODUCT_CARD_HEART_SIZE_PX,
   HOME_PRODUCT_CARD_HEART_TOP_PX,
-  HOME_PRODUCT_CARD_HOVER_BG,
-  HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX,
-  HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX,
-  HOME_PRODUCT_CARD_IMAGE_LEFT_PX,
-  HOME_PRODUCT_CARD_IMAGE_TOP_PX,
   HOME_PRODUCT_CARD_IMAGE_WIDTH_PX,
-  HOME_PRODUCT_CARD_LIFT_PX,
   HOME_PRODUCT_CARD_PANEL_HEIGHT_PX,
   HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX,
   HOME_PRODUCT_CARD_PANEL_RADIUS_PX,
   HOME_PRODUCT_CARD_PANEL_TOP_PX,
   HOME_PRODUCT_CARD_PANEL_WIDTH_PX,
   HOME_PRODUCT_CARD_PRICE_COLOR,
-  HOME_PRODUCT_CARD_PRICE_SIZE_PX,
   HOME_PRODUCT_CARD_RADIUS_PX,
   HOME_PRODUCT_CARD_RATING_COLOR,
-  HOME_PRODUCT_CARD_RATING_SIZE_PX,
-  HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX,
   HOME_PRODUCT_CARD_TEXT_DARK,
   HOME_PRODUCT_CARD_TEXT_MUTED,
-  HOME_PRODUCT_CARD_TITLE_SIZE_PX,
   HOME_PRODUCT_CARD_WIDTH_PX,
 } from '../../constants/home-sections';
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCurrency } from '../hooks/useCurrency';
 import { useWishlist } from '../hooks/useWishlist';
 import { formatPrice } from '../../lib/currency';
+import {
+  homeProductCardLayoutPx,
+  HOME_PRODUCT_CARD_COMPACT_DESCRIPTION_TO_SWATCHES_GAP_PX,
+  resolveHomeProductCardHeightPx,
+  resolveHomeProductCardTypography,
+} from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { WishlistIcon } from '../icons/WishlistIcon';
+import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
 import { HomeProductCardSizeBadges } from './HomeProductCardSizeBadges';
 import type {
@@ -84,44 +66,10 @@ interface HomeProductCardProps {
   product: HomeProductCardData;
   layoutWidthPx?: number;
   layoutHeightPx?: number;
+  /** Tighter panel typography — catalog 4-column view. */
+  compactPanel?: boolean;
   /** Preload image for above-the-fold catalog cards. */
   imagePriority?: boolean;
-}
-
-function resolveComparePrice(product: HomeProductCardData): number | null {
-  const candidates = [product.originalPrice, product.compareAtPrice];
-  for (const value of candidates) {
-    if (value != null && value > product.price) {
-      return value;
-    }
-  }
-  return null;
-}
-
-function buildCardCssVars(): CSSProperties {
-  return {
-    '--home-product-card-image-left-default': `${HOME_PRODUCT_CARD_IMAGE_LEFT_PX}px`,
-    '--home-product-card-image-top-default': `${HOME_PRODUCT_CARD_IMAGE_TOP_PX}px`,
-    '--home-product-card-image-width-default': `${HOME_PRODUCT_CARD_IMAGE_WIDTH_PX}px`,
-    '--home-product-card-image-height-default': `${HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX}px`,
-    '--home-product-card-image-left-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX}px`,
-    '--home-product-card-image-top-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX}px`,
-    '--home-product-card-image-width-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX}px`,
-    '--home-product-card-image-height-hover': `${HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX}px`,
-    '--home-product-card-bg-default': HOME_PRODUCT_CARD_BG,
-    '--home-product-card-bg-hover': HOME_PRODUCT_CARD_HOVER_BG,
-    '--home-product-card-actions-gap-default': `${HOME_PRODUCT_CARD_ACTIONS_GAP_PX}px`,
-    '--home-product-card-actions-gap-hover': `${HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX}px`,
-    '--home-product-card-cart-size-default': `${HOME_PRODUCT_CARD_CART_SIZE_PX}px`,
-    '--home-product-card-cart-size-hover': `${HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX}px`,
-    '--home-product-card-cart-icon-size-default': `${HOME_PRODUCT_CARD_CART_ICON_SIZE_PX}px`,
-    '--home-product-card-cart-icon-size-hover': `${HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}px`,
-    '--home-product-card-cart-icon-left-default': `${HOME_PRODUCT_CARD_CART_ICON_LEFT_PX}px`,
-    '--home-product-card-cart-icon-top-default': `${HOME_PRODUCT_CARD_CART_ICON_TOP_PX}px`,
-    '--home-product-card-cart-icon-left-hover': `${HOME_PRODUCT_CARD_CART_ICON_HOVER_LEFT_PX}px`,
-    '--home-product-card-cart-icon-top-hover': `${HOME_PRODUCT_CARD_CART_ICON_HOVER_TOP_PX}px`,
-    '--home-product-card-lift-hover': `${-HOME_PRODUCT_CARD_LIFT_PX}px`,
-  } as CSSProperties;
 }
 
 function areHomeProductCardPropsEqual(
@@ -131,6 +79,7 @@ function areHomeProductCardPropsEqual(
   if (
     prev.layoutWidthPx !== next.layoutWidthPx ||
     prev.layoutHeightPx !== next.layoutHeightPx ||
+    prev.compactPanel !== next.compactPanel ||
     prev.imagePriority !== next.imagePriority
   ) {
     return false;
@@ -158,6 +107,7 @@ function HomeProductCardComponent({
   product,
   layoutWidthPx,
   layoutHeightPx,
+  compactPanel = false,
   imagePriority = false,
 }: HomeProductCardProps) {
   const currency = useCurrency();
@@ -187,6 +137,7 @@ function HomeProductCardComponent({
     event.preventDefault();
     event.stopPropagation();
     toggleWishlist();
+    event.currentTarget.blur();
   };
 
   const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
@@ -194,19 +145,176 @@ function HomeProductCardComponent({
     event.stopPropagation();
     const origin = event.currentTarget;
     addToCart({ origin, imageUrl: product.image });
+    event.currentTarget.blur();
   };
 
+  const lp = (value: number) => homeProductCardLayoutPx(value, layoutWidthPx);
   const cardWidth = layoutWidthPx ?? HOME_PRODUCT_CARD_WIDTH_PX;
-  const cardHeight = layoutHeightPx ?? HOME_PRODUCT_CARD_HEIGHT_PX;
+  const cardHeight = resolveHomeProductCardHeightPx(layoutWidthPx, layoutHeightPx);
+  const typography = resolveHomeProductCardTypography(layoutWidthPx, compactPanel);
+
+  const priceRow = (
+    <div
+      className="flex items-center whitespace-nowrap"
+      style={{ gap: lp(16), lineHeight: `${typography.priceLineHeightPx}px` }}
+    >
+      <p
+        className="font-bold"
+        style={{ color: HOME_PRODUCT_CARD_PRICE_COLOR, fontSize: typography.priceSizePx }}
+      >
+        {formatPrice(product.price, currency)}
+      </p>
+      {comparePrice != null ? (
+        <p
+          className="font-normal line-through"
+          style={{
+            color: HOME_PRODUCT_CARD_COMPARE_COLOR,
+            fontSize: typography.compareSizePx,
+          }}
+        >
+          {formatPrice(comparePrice, currency)}
+        </p>
+      ) : null}
+    </div>
+  );
+
+  const ratingRow = (
+    <div className="relative shrink-0" style={{ width: lp(71), height: typography.ratingLineHeightPx }}>
+      <Image
+        src={HOME_PRODUCT_CARD_ASSETS.star}
+        alt=""
+        width={typography.ratingStarSizePx}
+        height={typography.ratingStarSizePx}
+        className="absolute top-0"
+        style={{ left: lp(-7) }}
+      />
+      <p
+        className="absolute whitespace-nowrap font-normal"
+        style={{
+          left: lp(11),
+          top: 0,
+          color: HOME_PRODUCT_CARD_RATING_COLOR,
+          fontSize: typography.ratingSizePx,
+          lineHeight: `${typography.ratingLineHeightPx}px`,
+        }}
+      >
+        {ratingLabel}
+      </p>
+    </div>
+  );
+
+  const cartButton = (
+    <button
+      type="button"
+      onClick={handleAddToCart}
+      disabled={!product.inStock || isAddingToCart}
+      aria-label="Add to cart"
+      className="home-product-card-cart relative shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
+      style={{ backgroundColor: HOME_PRODUCT_CARD_CART_BG }}
+    >
+      <Image
+        src={HOME_PRODUCT_CARD_ASSETS.cart}
+        alt=""
+        width={HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}
+        height={HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}
+        className="home-product-card-cart-icon absolute"
+      />
+    </button>
+  );
+
+  const subtitleLine = (
+    <p
+      className="truncate font-normal"
+      style={{
+        color: HOME_PRODUCT_CARD_TEXT_MUTED,
+        fontSize: typography.subtitleSizePx,
+        lineHeight: `${typography.subtitleLineHeightPx}px`,
+      }}
+    >
+      {subtitle}
+    </p>
+  );
+
+  const titleLine = (
+    <Link
+      href={`/products/${product.slug}`}
+      className="truncate font-bold"
+      style={{
+        color: HOME_PRODUCT_CARD_TEXT_DARK,
+        fontSize: typography.titleSizePx,
+        lineHeight: `${typography.titleLineHeightPx}px`,
+      }}
+    >
+      {product.title}
+    </Link>
+  );
+
+  const colorSwatches = (
+    <HomeProductCardColorSwatches
+      colors={product.colors}
+      layoutWidthPx={layoutWidthPx}
+      maxVisible={typography.colorSwatchMaxVisible}
+    />
+  );
+
+  const priceFooter = (
+    <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
+      {priceRow}
+      <div className="home-product-card-actions flex shrink-0 flex-col items-end justify-center">
+        {cartButton}
+      </div>
+    </div>
+  );
+
+  const standardPanelContent = (
+    <div className="flex w-full items-start justify-between" style={{ gap: lp(8) }}>
+      <div
+        className="flex min-w-0 flex-col"
+        style={{ gap: lp(7), width: lp(HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX) }}
+      >
+        {titleLine}
+        {subtitleLine}
+        {colorSwatches}
+        {priceRow}
+      </div>
+
+      <div
+        className="home-product-card-actions flex shrink-0 flex-col items-end justify-center"
+        style={{ width: lp(100) }}
+      >
+        {ratingRow}
+        {cartButton}
+      </div>
+    </div>
+  );
+
+  const compactPanelContent = (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex w-full items-center justify-between" style={{ gap: lp(8) }}>
+        <div className="min-w-0 flex-1">{titleLine}</div>
+        {ratingRow}
+      </div>
+
+      <div
+        className="flex w-full flex-1 flex-col justify-center"
+        style={{ gap: HOME_PRODUCT_CARD_COMPACT_DESCRIPTION_TO_SWATCHES_GAP_PX }}
+      >
+        {subtitleLine}
+        {colorSwatches}
+      </div>
+
+      {priceFooter}
+    </div>
+  );
 
   return (
     <article
-      className="home-product-card relative shrink-0"
-      style={{ width: cardWidth, height: cardHeight, ...buildCardCssVars() }}
+      className="home-product-card relative shrink-0 overflow-visible"
+      style={{ width: cardWidth, height: cardHeight, ...buildHomeProductCardCssVars(layoutWidthPx) }}
     >
       <div
         className="home-product-card-surface relative h-full w-full overflow-visible"
-        style={{ borderRadius: HOME_PRODUCT_CARD_RADIUS_PX }}
+        style={{ borderRadius: lp(HOME_PRODUCT_CARD_RADIUS_PX) }}
       >
         <Link
           href={`/products/${product.slug}`}
@@ -227,14 +335,14 @@ function HomeProductCardComponent({
               fill
               priority={imagePriority}
               loading={imagePriority ? 'eager' : 'lazy'}
-              sizes={`${HOME_PRODUCT_CARD_IMAGE_WIDTH_PX}px`}
+              sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
               className="object-contain"
               onError={() => setImageError(true)}
             />
           </div>
         </Link>
 
-        <HomeProductCardSizeBadges sizes={product.sizes} />
+        <HomeProductCardSizeBadges sizes={product.sizes} layoutWidthPx={layoutWidthPx} />
 
         <button
           type="button"
@@ -245,119 +353,29 @@ function HomeProductCardComponent({
             isInWishlist ? 'text-red-600' : 'text-white'
           }`}
           style={{
-            top: HOME_PRODUCT_CARD_HEART_TOP_PX,
-            right: HOME_PRODUCT_CARD_HEART_RIGHT_PX,
-            width: HOME_PRODUCT_CARD_HEART_SIZE_PX,
-            height: HOME_PRODUCT_CARD_HEART_SIZE_PX,
+            top: lp(HOME_PRODUCT_CARD_HEART_TOP_PX),
+            right: lp(HOME_PRODUCT_CARD_HEART_RIGHT_PX),
+            width: lp(HOME_PRODUCT_CARD_HEART_SIZE_PX),
+            height: lp(HOME_PRODUCT_CARD_HEART_SIZE_PX),
           }}
         >
-          <WishlistIcon isActive={isInWishlist} size={HOME_PRODUCT_CARD_HEART_SIZE_PX} />
+          <WishlistIcon isActive={isInWishlist} size={lp(HOME_PRODUCT_CARD_HEART_SIZE_PX)} />
         </button>
 
         <div
-          className="absolute left-1/2 flex -translate-x-1/2 items-start justify-between bg-white"
+          className="absolute left-1/2 flex w-full -translate-x-1/2 flex-col bg-white"
           style={{
-            top: HOME_PRODUCT_CARD_PANEL_TOP_PX,
-            width: HOME_PRODUCT_CARD_PANEL_WIDTH_PX,
-            height: HOME_PRODUCT_CARD_PANEL_HEIGHT_PX,
-            borderRadius: HOME_PRODUCT_CARD_PANEL_RADIUS_PX,
-            paddingTop: 23,
-            paddingBottom: 9,
-            paddingLeft: 18,
-            paddingRight: 20,
+            top: lp(HOME_PRODUCT_CARD_PANEL_TOP_PX),
+            width: lp(HOME_PRODUCT_CARD_PANEL_WIDTH_PX),
+            height: lp(HOME_PRODUCT_CARD_PANEL_HEIGHT_PX),
+            borderRadius: lp(HOME_PRODUCT_CARD_PANEL_RADIUS_PX),
+            paddingTop: lp(compactPanel ? 14 : 23),
+            paddingBottom: lp(9),
+            paddingLeft: lp(18),
+            paddingRight: lp(20),
           }}
         >
-          <div
-            className="flex min-w-0 flex-col"
-            style={{ gap: 7, width: HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX }}
-          >
-            <div className="flex w-full flex-col" style={{ gap: 3 }}>
-              <Link
-                href={`/products/${product.slug}`}
-                className="truncate font-bold"
-                style={{
-                  color: HOME_PRODUCT_CARD_TEXT_DARK,
-                  fontSize: HOME_PRODUCT_CARD_TITLE_SIZE_PX,
-                  lineHeight: '28px',
-                }}
-              >
-                {product.title}
-              </Link>
-              <p
-                className="truncate font-normal"
-                style={{
-                  color: HOME_PRODUCT_CARD_TEXT_MUTED,
-                  fontSize: HOME_PRODUCT_CARD_SUBTITLE_SIZE_PX,
-                  lineHeight: '28px',
-                }}
-              >
-                {subtitle}
-              </p>
-              <HomeProductCardColorSwatches colors={product.colors} />
-            </div>
-
-            <div className="flex items-start whitespace-nowrap" style={{ gap: 16, lineHeight: '24px' }}>
-              <p
-                className="font-bold"
-                style={{ color: HOME_PRODUCT_CARD_PRICE_COLOR, fontSize: HOME_PRODUCT_CARD_PRICE_SIZE_PX }}
-              >
-                {formatPrice(product.price, currency)}
-              </p>
-              {comparePrice != null ? (
-                <p
-                  className="font-normal line-through"
-                  style={{
-                    color: HOME_PRODUCT_CARD_COMPARE_COLOR,
-                    fontSize: HOME_PRODUCT_CARD_COMPARE_SIZE_PX,
-                  }}
-                >
-                  {formatPrice(comparePrice, currency)}
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="home-product-card-actions flex flex-col items-end justify-center" style={{ width: 100 }}>
-            <div className="relative" style={{ width: 71, height: 20 }}>
-              <Image
-                src={HOME_PRODUCT_CARD_ASSETS.star}
-                alt=""
-                width={14}
-                height={14}
-                className="absolute top-0"
-                style={{ left: -7 }}
-              />
-              <p
-                className="absolute whitespace-nowrap font-normal"
-                style={{
-                  left: 11,
-                  top: 0,
-                  color: HOME_PRODUCT_CARD_RATING_COLOR,
-                  fontSize: HOME_PRODUCT_CARD_RATING_SIZE_PX,
-                  lineHeight: '20px',
-                }}
-              >
-                {ratingLabel}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={!product.inStock || isAddingToCart}
-              aria-label="Add to cart"
-              className="home-product-card-cart relative shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ backgroundColor: HOME_PRODUCT_CARD_CART_BG }}
-            >
-              <Image
-                src={HOME_PRODUCT_CARD_ASSETS.cart}
-                alt=""
-                width={HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}
-                height={HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX}
-                className="home-product-card-cart-icon absolute"
-              />
-            </button>
-          </div>
+          {compactPanel ? compactPanelContent : standardPanelContent}
         </div>
       </div>
     </article>
