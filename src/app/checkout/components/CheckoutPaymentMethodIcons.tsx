@@ -15,6 +15,7 @@ import {
   CHECKOUT_PAYMENT_CARD_BADGES_GAP_PX,
   getCheckoutCardBadgeFramedBoxSize,
   CHECKOUT_PAYMENT_CASH_ICON_SIZE_MOBILE_PX,
+  CHECKOUT_PAYMENT_CASH_ICON_SIZE_DESKTOP_PX,
   CHECKOUT_PAYMENT_ICON_BOX_HEIGHT_PX,
   CHECKOUT_PAYMENT_ICON_BOX_RADIUS_PX,
   CHECKOUT_PAYMENT_IDRAM_BOX_HEIGHT_MOBILE_PX,
@@ -72,7 +73,7 @@ export function CheckoutPaymentMethodIcons({
           <CheckoutCashIcon sizePx={CHECKOUT_PAYMENT_CASH_ICON_SIZE_MOBILE_PX} />
         </div>
         <div className="hidden shrink-0 items-center justify-center lg:flex">
-          <CheckoutCashIcon sizePx={28} />
+          <CheckoutCashIcon sizePx={CHECKOUT_PAYMENT_CASH_ICON_SIZE_DESKTOP_PX} />
         </div>
       </>
     );
@@ -163,7 +164,7 @@ export function CheckoutPaymentMethodIcons({
       </div>
 
       <div
-        className="hidden flex-nowrap items-center justify-start lg:flex"
+        className="hidden shrink-0 flex-nowrap items-center justify-start lg:flex"
         style={{ gap: CHECKOUT_PAYMENT_CARD_BADGES_GAP_PX }}
       >
         {getCheckoutCardBadges().map((badge) => (

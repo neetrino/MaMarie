@@ -58,7 +58,7 @@ export function CheckoutPaymentMethodOption({
           checked={isSelected}
           onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
           disabled={isSubmitting}
-          className="self-center lg:hidden"
+          className="self-center"
         />
 
         <div className="flex w-full min-w-0 flex-1 flex-col items-start gap-1.5 lg:hidden">
@@ -66,15 +66,8 @@ export function CheckoutPaymentMethodOption({
           {icons}
         </div>
 
-        <div className="hidden min-w-0 flex-1 items-center gap-4 lg:flex">
-          <CheckoutRadio
-            {...register('paymentMethod')}
-            value={method.id}
-            checked={isSelected}
-            onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
-            disabled={isSubmitting}
-          />
-          {icons}
+        <div className="hidden min-w-0 flex-1 items-center gap-3 lg:flex lg:gap-4">
+          <div className="flex shrink-0 items-center">{icons}</div>
           <div className="min-w-0">
             <div className="font-medium text-gray-900">{method.name}</div>
             <div className="text-sm text-gray-600">{method.description}</div>
@@ -95,7 +88,7 @@ export function CheckoutPaymentMethodOption({
       />
 
       <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
-        {icons}
+        <div className="flex shrink-0 items-center">{icons}</div>
         <div className="min-w-0">
           <span className="font-medium text-gray-900 lg:hidden">{method.shortName}</span>
           <div className="hidden lg:block">
