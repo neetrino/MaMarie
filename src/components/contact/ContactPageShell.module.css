@@ -1,0 +1,18 @@
+/** Contact page — mobile insets match navbar; desktop keeps wider shell padding. */
+.shell {
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: var(--contact-page-padding-y);
+  padding-bottom: var(--contact-page-padding-y);
+  padding-left: var(--contact-page-padding-x-mobile);
+  padding-right: var(--contact-page-padding-x-mobile);
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    padding-left: var(--contact-page-padding-x-desktop);
+    padding-right: var(--contact-page-padding-x-desktop);
+  }
+}

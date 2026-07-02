@@ -2,6 +2,7 @@
 
 import { ContactForm } from '../../components/contact/ContactForm';
 import { ContactInfoBlock } from '../../components/contact/ContactInfoBlock';
+import { ContactPageShell } from '../../components/contact/ContactPageShell';
 import { CONTACT_FORM_SECTION_BG } from '../../constants/contact-form';
 import { CONTACT_PAGE_ASSETS, CONTACT_PAGE_COLUMN_GAP_PX } from '../../constants/contact-page';
 import { useTranslation } from '../../lib/i18n-client';
@@ -12,7 +13,7 @@ export default function ContactPage() {
   return (
     <div className="bg-white">
       <div style={{ backgroundColor: CONTACT_FORM_SECTION_BG }}>
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <ContactPageShell>
           <div
             className="grid grid-cols-1 lg:grid-cols-2 lg:items-stretch"
             style={{ gap: CONTACT_PAGE_COLUMN_GAP_PX }}
@@ -45,7 +46,7 @@ export default function ContactPage() {
               <ContactForm />
             </div>
           </div>
-        </div>
+        </ContactPageShell>
       </div>
     </div>
   );
