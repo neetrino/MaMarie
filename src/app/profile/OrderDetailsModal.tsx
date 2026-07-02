@@ -71,7 +71,7 @@ export function OrderDetailsModal({
       onClick={onReOrder}
       disabled={isReordering}
       variant="primary"
-      className="shrink-0"
+      className="w-full shrink-0 md:w-auto"
     >
       {isReordering ? t('profile.orderDetails.adding') : t('profile.orderDetails.reorder')}
     </ProfileClayButton>

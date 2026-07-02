@@ -89,10 +89,8 @@ export function useOrders({
   };
 
   const handleOrderClick = (orderNumber: string, e: MouseEvent<HTMLAnchorElement>) => {
-    if (window.innerWidth >= 1024) {
-      e.preventDefault();
-      loadOrderDetails(orderNumber);
-    }
+    e.preventDefault();
+    void loadOrderDetails(orderNumber);
   };
 
   const handleReOrder = async () => {

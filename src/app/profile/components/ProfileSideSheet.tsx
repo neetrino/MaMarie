@@ -3,10 +3,13 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import {
+  CART_DRAWER_MAX_WIDTH_PX,
+  CART_DRAWER_MOBILE_WIDTH_PERCENT,
+} from '../../../constants/cart-drawer';
+import {
   PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS,
   PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS,
   PROFILE_SIDE_SHEET_PANEL_Z_INDEX,
-  PROFILE_SIDE_SHEET_RADIUS_PX,
   PROFILE_SIDE_SHEET_WIDTH_PERCENT,
   PROFILE_SIDE_SHEET_Z_INDEX,
 } from '../../../constants/profile-desktop-page';
@@ -53,40 +56,40 @@ function ProfileSideSheetPanel({
 
       <div
         ref={panelRef}
-        className={`relative h-dvh max-h-dvh w-[var(--profile-side-sheet-width)] transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+        className={`relative h-dvh max-h-dvh w-[var(--profile-side-sheet-mobile-width)] sm:w-full md:w-[var(--profile-side-sheet-desktop-width)] transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
           visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
         }`}
         style={{
-          ['--profile-side-sheet-width' as string]: `${PROFILE_SIDE_SHEET_WIDTH_PERCENT}%`,
+          maxWidth: CART_DRAWER_MAX_WIDTH_PX,
+          ['--profile-side-sheet-mobile-width' as string]: `${CART_DRAWER_MOBILE_WIDTH_PERCENT}%`,
+          ['--profile-side-sheet-desktop-width' as string]: `${PROFILE_SIDE_SHEET_WIDTH_PERCENT}%`,
           transitionDuration: `${PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS}ms`,
         }}
       >
         <DrawerCloseTab edge="start" onClose={onClose} closeLabel={closeLabel} />
         <aside
-          className="profile-side-sheet relative flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl"
-          style={{
-            zIndex: PROFILE_SIDE_SHEET_PANEL_Z_INDEX,
-            borderTopLeftRadius: PROFILE_SIDE_SHEET_RADIUS_PX,
-            borderBottomLeftRadius: PROFILE_SIDE_SHEET_RADIUS_PX,
-          }}
+          className="profile-side-sheet relative flex h-full w-full flex-col overflow-hidden rounded-l-3xl bg-white shadow-2xl"
+          style={{ zIndex: PROFILE_SIDE_SHEET_PANEL_Z_INDEX }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="profile-side-sheet-title"
           onClick={(event) => event.stopPropagation()}
         >
           <header className="shrink-0 border-b border-gray-100 px-6 py-4 md:px-5">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div className="min-w-0 flex-1">
-                <h2 id="profile-side-sheet-title" className="text-lg font-bold text-gray-900">
+                <h2 id="profile-side-sheet-title" className="text-xl font-bold leading-tight text-gray-900 md:text-lg">
                   {title}
                 </h2>
                 {subtitle ? <p className="mt-1 text-sm text-gray-600">{subtitle}</p> : null}
               </div>
-              {headerActions ? <div className="shrink-0">{headerActions}</div> : null}
+              {headerActions ? <div className="shrink-0 md:self-start">{headerActions}</div> : null}
             </div>
           </header>
 
-          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 md:px-4">{children}</div>
+          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 md:px-4">
+            <div className="max-md:pb-[calc(28px+env(safe-area-inset-bottom,0px))]">{children}</div>
+          </div>
         </aside>
       </div>
     </div>
