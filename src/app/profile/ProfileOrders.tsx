@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import { Button } from '@shop/ui';
 import {
+  PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS,
+  PROFILE_DESKTOP_ORDERS_PAGE_TITLE_CLASS,
   PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
-  PROFILE_DESKTOP_SECTION_TITLE_CLASS,
 } from '../../constants/profile-desktop-page';
 import type { CurrencyCode } from '../../lib/currency';
 import type { OrderListItem } from './types';
 import { ProfileDesktopOrderCard } from './components/ProfileDesktopOrderCard';
-import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfileOrdersProps {
   orders: OrderListItem[];
@@ -38,37 +38,37 @@ export function ProfileOrders({
 }: ProfileOrdersProps) {
   if (ordersLoading) {
     return (
-      <ProfileSectionCard>
-        <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-[15px] bg-gray-100 sm:h-32" />
+      <div>
+        <h2 className={`${PROFILE_DESKTOP_ORDERS_PAGE_TITLE_CLASS} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
+        <div className={PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-44 animate-pulse rounded-[15px] border border-gray-100 bg-white sm:h-48" />
           ))}
         </div>
-      </ProfileSectionCard>
+      </div>
     );
   }
 
   if (orders.length === 0) {
     return (
-      <ProfileSectionCard>
-        <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
-        <div className="flex flex-col items-center gap-5 py-12 sm:py-16">
+      <div>
+        <h2 className={`${PROFILE_DESKTOP_ORDERS_PAGE_TITLE_CLASS} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
+        <div className="flex flex-col items-center gap-5 rounded-[15px] border border-gray-100 bg-white py-12 sm:py-16">
           <p className="max-w-sm text-center text-sm text-gray-600">{t('profile.orders.noOrders')}</p>
           <Link href="/products" className={PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}>
             {t('profile.dashboard.startShopping')}
           </Link>
         </div>
-      </ProfileSectionCard>
+      </div>
     );
   }
 
   return (
-    <ProfileSectionCard>
-      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
-      <ul className="space-y-4">
+    <div>
+      <h2 className={`${PROFILE_DESKTOP_ORDERS_PAGE_TITLE_CLASS} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
+      <ul className={PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS}>
         {orders.map((order) => (
-          <li key={order.id}>
+          <li key={order.id} className="min-w-0">
             <ProfileDesktopOrderCard
               order={order}
               currency={currency}
@@ -110,6 +110,6 @@ export function ProfileOrders({
           </div>
         </div>
       ) : null}
-    </ProfileSectionCard>
+    </div>
   );
 }

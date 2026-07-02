@@ -31,6 +31,8 @@ export const PROFILE_DESKTOP_ASSETS = {
   /** Misnamed in about-us — actually the strawberry illustration. */
   decoStrawberry: '/assets/home/about-us/deco-star.png',
   decoStar: '/assets/footer/deco-star.png',
+  /** Figma `66:457` — pink arrow in white circle on order view-details CTA. */
+  orderViewDetailsArrow: '/assets/cart/empty-cta-arrow.svg',
 } as const;
 
 export const PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS =
@@ -92,8 +94,28 @@ export const PROFILE_DESKTOP_PENDING_BADGE_CLASS =
 
 export const PROFILE_DESKTOP_SECTION_TITLE_CLASS = 'text-xl font-bold text-brand-pink';
 
+export const PROFILE_DESKTOP_ORDERS_PAGE_TITLE_CLASS = 'text-2xl font-bold text-brand-pink';
+
 export const PROFILE_DESKTOP_INNER_CARD_CLASS =
   '!rounded-[15px] border border-gray-100 bg-[#fcfcfc] transition hover:border-brand-pink/20 hover:bg-white';
+
+export const PROFILE_DESKTOP_ORDER_CARD_CLASS =
+  '!rounded-[15px] border border-gray-100 bg-white no-underline transition-transform duration-200 ease-out hover:-translate-y-1 hover:no-underline motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+
+export const PROFILE_DESKTOP_ORDER_CARD_SEPARATOR_CLASS = 'my-4 border-t border-dashed border-gray-200';
+
+export const PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS =
+  'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3';
+
+/** Figma `66:454` — compact order card view-details pill CTA. */
+export const PROFILE_DESKTOP_ORDER_VIEW_DETAILS_CTA_HEIGHT_PX = 36;
+export const PROFILE_DESKTOP_ORDER_VIEW_DETAILS_CTA_ICON_SIZE_PX = 28;
+export const PROFILE_DESKTOP_ORDER_VIEW_DETAILS_CTA_ARROW_SIZE_PX = 14;
+export const PROFILE_DESKTOP_ORDER_VIEW_DETAILS_CTA_ICON_OFFSET_X_PX = 3;
+export const PROFILE_DESKTOP_ORDER_VIEW_DETAILS_CTA_FONT_SIZE_PX = 12;
+
+export const PROFILE_DESKTOP_ORDER_VIEW_DETAILS_CTA_CLASS =
+  'flex w-full items-center justify-between rounded-full bg-brand-pink py-0.5 pl-4 pr-0.5 text-xs font-medium text-white';
 
 export const PROFILE_DESKTOP_INPUT_CLASS = '!rounded-[15px]';
 

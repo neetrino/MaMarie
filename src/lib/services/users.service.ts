@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import * as bcrypt from "bcryptjs";
+import { PROFILE_DASHBOARD_RECENT_ORDERS_LIMIT } from "../../constants/profile-dashboard";
 
 class UsersService {
   /**
@@ -404,8 +405,8 @@ class UsersService {
       ordersByStatus[order.status] = (ordersByStatus[order.status] || 0) + 1;
     });
 
-    // Get recent orders (last 5)
-    const recentOrders = orders.slice(0, 5).map((order: { id: string; number: string; status: string; paymentStatus: string; fulfillmentStatus: string; total: number; subtotal: number; discountAmount: number; shippingAmount: number; taxAmount: number; currency: string | null; createdAt: Date; items: Array<unknown> }) => ({
+    // Get recent orders for dashboard
+    const recentOrders = orders.slice(0, PROFILE_DASHBOARD_RECENT_ORDERS_LIMIT).map((order: { id: string; number: string; status: string; paymentStatus: string; fulfillmentStatus: string; total: number; subtotal: number; discountAmount: number; shippingAmount: number; taxAmount: number; currency: string | null; createdAt: Date; items: Array<unknown> }) => ({
       id: order.id,
       number: order.number,
       status: order.status,

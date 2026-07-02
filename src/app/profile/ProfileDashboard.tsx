@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import {
   PROFILE_DESKTOP_DASHBOARD_CARD_CLASS,
   PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS,
+  PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS,
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
   PROFILE_DESKTOP_STAT_CONFIG,
@@ -167,9 +168,9 @@ export function ProfileDashboard({
             </a>
           </div>
         ) : (
-          <ul className="space-y-4">
+          <ul className={PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS}>
             {dashboardData.recentOrders.map((order) => (
-              <li key={order.id}>
+              <li key={order.id} className="min-w-0">
                 <ProfileDesktopOrderCard
                   order={order}
                   currency={currency}

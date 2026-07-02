@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import {
-  PROFILE_DESKTOP_INNER_CARD_CLASS,
+  PROFILE_DESKTOP_ORDER_CARD_CLASS,
+  PROFILE_DESKTOP_ORDER_CARD_SEPARATOR_CLASS,
   PROFILE_DESKTOP_PENDING_BADGE_CLASS,
 } from '../../../constants/profile-desktop-page';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../../lib/currency';
+import { formatProfileOrderDate } from '../utils';
+import { ProfileOrderViewDetailsCta } from './ProfileOrderViewDetailsCta';
 
 interface ProfileOrderCardItem {
   id: string;
@@ -48,6 +51,21 @@ function orderTotalDisplay(order: ProfileOrderCardItem, currency: CurrencyCode):
   return formatPriceInCurrency(totalDisplay, currency);
 }
 
+function ProfileOrderShoppingBagIcon() {
+  return (
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fdeef2] text-brand-pink">
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export function ProfileDesktopOrderCard({
   order,
   currency,
@@ -61,25 +79,35 @@ export function ProfileDesktopOrderCard({
     <Link
       href={`/orders/${order.number}`}
       onClick={onClick}
-      className={`block p-5 ${PROFILE_DESKTOP_INNER_CARD_CLASS}`}
+      className={`flex h-full flex-col p-4 sm:p-5 ${PROFILE_DESKTOP_ORDER_CARD_CLASS}`}
     >
-      <div className="mb-3 flex items-start justify-between gap-4">
-        <h3 className="text-base font-bold text-gray-900">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="min-w-0 text-base font-bold text-gray-900">
           {orderNumberLabel}
           {order.number}
         </h3>
-        <p className="shrink-0 text-lg font-bold text-brand-pink">{orderTotalDisplay(order, currency)}</p>
+        <span className={`${PROFILE_DESKTOP_PENDING_BADGE_CLASS} shrink-0`}>{order.status}</span>
       </div>
-      <div className="mb-3 flex flex-wrap gap-2">
-        <span className={PROFILE_DESKTOP_PENDING_BADGE_CLASS}>{order.status}</span>
-        <span className={PROFILE_DESKTOP_PENDING_BADGE_CLASS}>{order.paymentStatus}</span>
+      <p className="mt-2 text-lg font-bold leading-none text-brand-pink sm:text-xl">
+        {orderTotalDisplay(order, currency)}
+      </p>
+
+      <div className={PROFILE_DESKTOP_ORDER_CARD_SEPARATOR_CLASS} aria-hidden />
+
+      <div className="flex items-start gap-3">
+        <ProfileOrderShoppingBagIcon />
+        <div className="min-w-0 pt-0.5 text-sm leading-relaxed text-gray-600">
+          <p>
+            {order.itemsCount} {itemLabel} •
+          </p>
+          <p>
+            {placedOnLabel} {formatProfileOrderDate(order.createdAt)}
+          </p>
+        </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
-        <p>
-          {order.itemsCount} {itemLabel} • {placedOnLabel}{' '}
-          {new Date(order.createdAt).toLocaleDateString()}
-        </p>
-        <span className="font-semibold text-brand-pink">{viewDetailsLabel}</span>
+
+      <div className="mt-auto pt-5">
+        <ProfileOrderViewDetailsCta label={viewDetailsLabel} />
       </div>
     </Link>
   );
