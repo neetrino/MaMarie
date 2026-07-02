@@ -1,7 +1,13 @@
 import type { FormEvent } from 'react';
-import { Button, Input, Card } from '@shop/ui';
-import { PROFILE_DESKTOP_CARD_CLASS } from '../../constants/profile-desktop-page';
+import { Button, Input } from '@shop/ui';
+import {
+  PROFILE_DESKTOP_INPUT_CLASS,
+  PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
+  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+} from '../../constants/profile-desktop-page';
 import type { UserProfile } from './types';
+import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfilePersonalInfoProps {
   personalInfo: {
@@ -26,10 +32,10 @@ export function ProfilePersonalInfo({
   t,
 }: ProfilePersonalInfoProps) {
   return (
-    <Card className={`p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
-      <div className="mb-8 border-b border-gray-100 pb-5 sm:mb-10 sm:pb-6">
-        <h2 className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl">{t('profile.personal.title')}</h2>
-      </div>
+    <ProfileSectionCard>
+      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-6 sm:mb-8`}>
+        {t('profile.personal.title')}
+      </h2>
       <form onSubmit={onSave} className="mx-auto max-w-xl space-y-6 lg:mx-0 lg:max-w-2xl">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
           <Input
@@ -37,12 +43,14 @@ export function ProfilePersonalInfo({
             value={personalInfo.firstName}
             onChange={(e) => setPersonalInfo({ ...personalInfo, firstName: e.target.value })}
             placeholder={t('profile.personal.firstNamePlaceholder')}
+            className={PROFILE_DESKTOP_INPUT_CLASS}
           />
           <Input
             label={t('profile.personal.lastName')}
             value={personalInfo.lastName}
             onChange={(e) => setPersonalInfo({ ...personalInfo, lastName: e.target.value })}
             placeholder={t('profile.personal.lastNamePlaceholder')}
+            className={PROFILE_DESKTOP_INPUT_CLASS}
           />
         </div>
         <Input
@@ -51,6 +59,7 @@ export function ProfilePersonalInfo({
           value={personalInfo.email}
           onChange={(e) => setPersonalInfo({ ...personalInfo, email: e.target.value })}
           placeholder={t('profile.personal.emailPlaceholder')}
+          className={PROFILE_DESKTOP_INPUT_CLASS}
         />
         <Input
           label={t('profile.personal.phone')}
@@ -58,12 +67,13 @@ export function ProfilePersonalInfo({
           value={personalInfo.phone}
           onChange={(e) => setPersonalInfo({ ...personalInfo, phone: e.target.value })}
           placeholder={t('profile.personal.phonePlaceholder')}
+          className={PROFILE_DESKTOP_INPUT_CLASS}
         />
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4 sm:pt-4">
           <Button
             type="button"
             variant="outline"
-            className="h-11 w-full rounded-xl sm:w-auto"
+            className={`w-full sm:w-auto ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
             onClick={() => {
               setPersonalInfo({
                 firstName: profile?.firstName || '',
@@ -75,11 +85,16 @@ export function ProfilePersonalInfo({
           >
             {t('profile.personal.cancel')}
           </Button>
-          <Button type="submit" variant="primary" className="h-11 w-full rounded-xl sm:w-auto" disabled={savingPersonal}>
+          <Button
+            type="submit"
+            variant="primary"
+            className={`w-full sm:w-auto ${PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}`}
+            disabled={savingPersonal}
+          >
             {savingPersonal ? t('profile.personal.saving') : t('profile.personal.save')}
           </Button>
         </div>
       </form>
-    </Card>
+    </ProfileSectionCard>
   );
 }

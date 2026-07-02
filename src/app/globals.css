@@ -366,6 +366,45 @@ main.profile-page-main {
   }
 }
 
+main.profile-page-main .profile-btn-primary {
+  border-radius: 15px !important;
+  border-width: 0 !important;
+  background-color: #ef95aa !important;
+  color: #ffffff !important;
+}
+
+main.profile-page-main .profile-btn-primary:hover:not(:disabled) {
+  background-color: #e8879e !important;
+}
+
+main.profile-page-main .profile-btn-primary:focus-visible {
+  outline: 2px solid #ef95aa;
+  outline-offset: 2px;
+}
+
+main.profile-page-main .profile-btn-outline {
+  border-radius: 15px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #111827 !important;
+}
+
+main.profile-page-main .profile-btn-outline:hover:not(:disabled) {
+  background-color: #f9fafb !important;
+}
+
+main.profile-page-main .profile-btn-danger {
+  background-color: #b91c1c !important;
+}
+
+main.profile-page-main .profile-btn-danger:hover:not(:disabled) {
+  background-color: #991b1b !important;
+}
+
+main.profile-page-main .profile-btn-danger:focus-visible {
+  outline-color: #b91c1c;
+}
+
 @media (min-width: 1024px) {
   main.home-main-surface.order-page-main {
     background-color: #ffffff;

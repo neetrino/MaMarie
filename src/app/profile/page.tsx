@@ -7,7 +7,7 @@ import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
-import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
+import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_ALERT_ERROR_CLASS, PROFILE_DESKTOP_ALERT_SUCCESS_CLASS, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
@@ -154,8 +154,8 @@ function ProfilePageContent() {
 
   const tabContent = (
     <>
-      {error && <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>}
-      {success && <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-600">{success}</div>}
+      {error ? <div className={PROFILE_DESKTOP_ALERT_ERROR_CLASS}>{error}</div> : null}
+      {success ? <div className={PROFILE_DESKTOP_ALERT_SUCCESS_CLASS}>{success}</div> : null}
       {activeTab === 'dashboard' && (
         <ProfileDashboard
           dashboardData={dashboardData}

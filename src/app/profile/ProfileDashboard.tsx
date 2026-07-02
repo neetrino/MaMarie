@@ -2,13 +2,16 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 import {
   PROFILE_DESKTOP_CARD_CLASS,
-  PROFILE_DESKTOP_PENDING_BADGE_CLASS,
+  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_CLASS,
   PROFILE_DESKTOP_STAT_CONFIG,
   PROFILE_DESKTOP_STAT_THEMES,
   type ProfileDesktopStatTheme,
 } from '../../constants/profile-desktop-page';
-import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
+import { formatPriceInCurrency, type CurrencyCode } from '../../lib/currency';
 import type { DashboardData, ProfileTab } from './types';
+import { ProfileDesktopOrderCard } from './components/ProfileDesktopOrderCard';
+import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfileDashboardProps {
   dashboardData: DashboardData | null;
@@ -17,27 +20,6 @@ interface ProfileDashboardProps {
   onTabChange: (tab: ProfileTab) => void;
   onOrderClick: (orderNumber: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
-}
-
-function orderTotalDisplay(
-  order: DashboardData['recentOrders'][number],
-  currency: CurrencyCode,
-): string {
-  if (order.subtotal !== undefined && order.discountAmount !== undefined && order.taxAmount !== undefined) {
-    const subtotalAMD = convertPrice(order.subtotal, 'USD', 'AMD');
-    const discountAMD = convertPrice(order.discountAmount, 'USD', 'AMD');
-    const taxAMD = convertPrice(order.taxAmount, 'USD', 'AMD');
-    const totalWithoutShippingAMD = subtotalAMD - discountAMD + taxAMD;
-    const totalDisplay =
-      currency === 'AMD' ? totalWithoutShippingAMD : convertPrice(totalWithoutShippingAMD, 'AMD', currency);
-    return formatPriceInCurrency(totalDisplay, currency);
-  }
-  const totalAMD = convertPrice(order.total, 'USD', 'AMD');
-  const shippingAMD = order.shippingAmount || 0;
-  const totalWithoutShippingAMD = totalAMD - shippingAMD;
-  const totalDisplay =
-    currency === 'AMD' ? totalWithoutShippingAMD : convertPrice(totalWithoutShippingAMD, 'AMD', currency);
-  return formatPriceInCurrency(totalDisplay, currency);
 }
 
 function ProfileDesktopStatCard({
@@ -106,9 +88,9 @@ export function ProfileDashboard({
 
   if (!dashboardData) {
     return (
-      <div className={`p-10 text-center ${PROFILE_DESKTOP_CARD_CLASS}`}>
-        <p className="text-sm text-gray-600">{t('profile.dashboard.failedToLoad')}</p>
-      </div>
+      <ProfileSectionCard>
+        <p className="text-center text-sm text-gray-600">{t('profile.dashboard.failedToLoad')}</p>
+      </ProfileSectionCard>
     );
   }
 
@@ -164,9 +146,9 @@ export function ProfileDashboard({
         ))}
       </div>
 
-      <div className={`p-6 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
+      <ProfileSectionCard>
         <div className="mb-6 flex items-center justify-between gap-4">
-          <h2 className="text-xl font-bold text-brand-pink">{t('profile.dashboard.recentOrders')}</h2>
+          <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.dashboard.recentOrders')}</h2>
           <button
             type="button"
             onClick={() => onTabChange('orders')}
@@ -180,10 +162,7 @@ export function ProfileDashboard({
         {dashboardData.recentOrders.length === 0 ? (
           <div className="flex flex-col items-center gap-5 py-12">
             <p className="max-w-sm text-center text-sm text-gray-600">{t('profile.dashboard.noOrders')}</p>
-            <a
-              href="/products"
-              className="inline-flex items-center justify-center rounded-full bg-brand-pink px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
+            <a href="/products" className={PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}>
               {t('profile.dashboard.startShopping')}
             </a>
           </div>
@@ -191,38 +170,20 @@ export function ProfileDashboard({
           <ul className="space-y-4">
             {dashboardData.recentOrders.map((order) => (
               <li key={order.id}>
-                <a
-                  href={`/orders/${order.number}`}
+                <ProfileDesktopOrderCard
+                  order={order}
+                  currency={currency}
+                  orderNumberLabel={t('profile.orders.orderNumber')}
+                  itemLabel={order.itemsCount !== 1 ? t('profile.orders.items') : t('profile.orders.item')}
+                  placedOnLabel={t('profile.dashboard.placedOn')}
+                  viewDetailsLabel={t('profile.dashboard.viewDetails')}
                   onClick={(e) => onOrderClick(order.number, e)}
-                  className="block rounded-[15px] border border-gray-100 bg-[#fcfcfc] p-5 transition hover:border-brand-pink/20 hover:bg-white"
-                >
-                  <div className="mb-3 flex items-start justify-between gap-4">
-                    <h3 className="text-base font-bold text-gray-900">
-                      {t('profile.orders.orderNumber')}
-                      {order.number}
-                    </h3>
-                    <p className="shrink-0 text-lg font-bold text-brand-pink">
-                      {orderTotalDisplay(order, currency)}
-                    </p>
-                  </div>
-                  <div className="mb-3 flex flex-wrap gap-2">
-                    <span className={PROFILE_DESKTOP_PENDING_BADGE_CLASS}>{order.status}</span>
-                    <span className={PROFILE_DESKTOP_PENDING_BADGE_CLASS}>{order.paymentStatus}</span>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">
-                    <p>
-                      {order.itemsCount}{' '}
-                      {order.itemsCount !== 1 ? t('profile.orders.items') : t('profile.orders.item')} •{' '}
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </p>
-                    <span className="font-semibold text-brand-pink">{t('profile.dashboard.viewDetails')}</span>
-                  </div>
-                </a>
+                />
               </li>
             ))}
           </ul>
         )}
-      </div>
+      </ProfileSectionCard>
     </div>
   );
 }

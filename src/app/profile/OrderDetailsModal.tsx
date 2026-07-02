@@ -1,4 +1,8 @@
-    import { Button, Card } from '@shop/ui';
+import { Button, Card } from '@shop/ui';
+import {
+  PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
+  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
+} from '../../constants/profile-desktop-page';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
@@ -69,6 +73,7 @@ export function OrderDetailsModal({
                 disabled={isReordering}
                 variant="primary"
                 size="sm"
+                className={PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}
               >
                 {isReordering ? t('profile.orderDetails.adding') : t('profile.orderDetails.reorder')}
               </Button>
@@ -94,7 +99,9 @@ export function OrderDetailsModal({
             ) : orderDetailsError ? (
               <div className="text-center py-12">
                 <p className="text-red-600 mb-4">{orderDetailsError}</p>
-                <Button onClick={onClose} variant="outline">{t('profile.orderDetails.close')}</Button>
+                <Button onClick={onClose} variant="outline" className={PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}>
+                  {t('profile.orderDetails.close')}
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

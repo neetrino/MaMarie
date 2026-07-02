@@ -46,7 +46,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconBackground: '#e8f8ef',
     iconForeground: '#5cb176',
     valueColor: '#5cb176',
-    decoration: '/assets/home/product-card/icon-heart.svg',
+    decoration: PROFILE_DESKTOP_ASSETS.decoStar,
   },
 } as const;
 
@@ -70,3 +70,28 @@ export const PROFILE_DESKTOP_TAB_ICON_THEME: Record<ProfileTab, ProfileMobileIco
 
 export const PROFILE_DESKTOP_PENDING_BADGE_CLASS =
   'inline-flex rounded-full bg-[#fef8e3] px-3 py-1 text-xs font-medium capitalize text-[#57423b]';
+
+export const PROFILE_DESKTOP_SECTION_TITLE_CLASS = 'text-xl font-bold text-brand-pink';
+
+export const PROFILE_DESKTOP_INNER_CARD_CLASS =
+  'rounded-[15px] border border-gray-100 bg-[#fcfcfc] transition hover:border-brand-pink/20 hover:bg-white';
+
+export const PROFILE_DESKTOP_INPUT_CLASS = '!rounded-[15px]';
+
+export const PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS =
+  'profile-btn-primary inline-flex h-11 items-center justify-center px-6 text-sm font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-50';
+
+export const PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS =
+  'profile-btn-outline inline-flex h-11 items-center justify-center px-6 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50';
+
+export const PROFILE_DESKTOP_DANGER_BUTTON_CLASS =
+  'profile-btn-primary profile-btn-danger inline-flex h-11 items-center justify-center px-6 text-sm font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-50';
+
+export const PROFILE_DESKTOP_ALERT_ERROR_CLASS =
+  'rounded-[15px] border border-red-200 bg-red-50 p-4 text-sm text-red-600';
+
+export const PROFILE_DESKTOP_ALERT_SUCCESS_CLASS =
+  'rounded-[15px] border border-green-200 bg-green-50 p-4 text-sm text-green-600';
+
+export const PROFILE_DESKTOP_DEFAULT_BADGE_CLASS =
+  'inline-flex rounded-full bg-[#e8f4fd] px-3 py-1 text-xs font-medium text-[#5281e1]';

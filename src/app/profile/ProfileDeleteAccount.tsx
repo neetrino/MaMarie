@@ -1,7 +1,12 @@
 import type { FormEvent } from 'react';
-import { Button, Input, Card } from '@shop/ui';
-import { PROFILE_DESKTOP_CARD_CLASS } from '../../constants/profile-desktop-page';
+import { Button, Input } from '@shop/ui';
+import {
+  PROFILE_DESKTOP_DANGER_BUTTON_CLASS,
+  PROFILE_DESKTOP_INPUT_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+} from '../../constants/profile-desktop-page';
 import type { UserProfile } from './types';
+import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfileDeleteAccountProps {
   profile: UserProfile | null;
@@ -30,18 +35,18 @@ export function ProfileDeleteAccount({
 }: ProfileDeleteAccountProps) {
   if (!profile) {
     return (
-      <Card className={`p-6 sm:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
+      <ProfileSectionCard>
         <p className="text-sm text-gray-600">{t('profile.common.loadingProfile')}</p>
-      </Card>
+      </ProfileSectionCard>
     );
   }
 
   const hasPassword = profile.hasPassword ?? true;
 
   return (
-    <Card className={`border border-red-200 bg-red-50/30 p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
+    <ProfileSectionCard className="border border-red-200 bg-red-50/30">
       <div className="mb-6 space-y-2 sm:mb-8">
-        <h2 className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl">{t('profile.deleteAccount.title')}</h2>
+        <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.deleteAccount.title')}</h2>
         <p className="max-w-2xl text-sm leading-relaxed text-gray-700">{t('profile.deleteAccount.description')}</p>
       </div>
 
@@ -60,6 +65,7 @@ export function ProfileDeleteAccount({
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('profile.deleteAccount.currentPasswordPlaceholder')}
             autoComplete="current-password"
+            className={PROFILE_DESKTOP_INPUT_CLASS}
             required
           />
         ) : (
@@ -70,6 +76,7 @@ export function ProfileDeleteAccount({
             onChange={(e) => setConfirmation(e.target.value)}
             placeholder={t('profile.deleteAccount.confirmationPlaceholder')}
             autoComplete="off"
+            className={PROFILE_DESKTOP_INPUT_CLASS}
             required
           />
         )}
@@ -88,13 +95,13 @@ export function ProfileDeleteAccount({
           <Button
             type="submit"
             variant="primary"
-            className="h-11 w-full rounded-xl !bg-red-700 hover:!bg-red-800 focus:!ring-red-600 sm:w-auto"
+            className={`w-full sm:w-auto ${PROFILE_DESKTOP_DANGER_BUTTON_CLASS}`}
             disabled={deleting || !acknowledged}
           >
             {deleting ? t('profile.deleteAccount.deleting') : t('profile.deleteAccount.submit')}
           </Button>
         </div>
       </form>
-    </Card>
+    </ProfileSectionCard>
   );
 }
