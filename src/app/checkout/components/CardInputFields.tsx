@@ -1,6 +1,6 @@
 'use client';
 
-import { Input } from '@shop/ui';
+import { CheckoutInput } from './CheckoutInput';
 import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatCardNumber, formatCardExpiry, formatCardCvv } from '../utils/card-formatters';
@@ -24,7 +24,7 @@ export function CardInputFields({
   return (
     <div className="space-y-4">
       <div>
-        <Input
+        <CheckoutInput
           label={t('checkout.form.cardNumber')}
           type="text"
           placeholder={t('checkout.placeholders.cardNumber')}
@@ -40,7 +40,7 @@ export function CardInputFields({
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Input
+          <CheckoutInput
             label={t('checkout.form.expiryDate')}
             type="text"
             placeholder={t('checkout.placeholders.expiryDate')}
@@ -55,7 +55,7 @@ export function CardInputFields({
           />
         </div>
         <div>
-          <Input
+          <CheckoutInput
             label={t('checkout.form.cvv')}
             type="text"
             placeholder={t('checkout.placeholders.cvv')}
@@ -71,7 +71,7 @@ export function CardInputFields({
         </div>
       </div>
       <div>
-        <Input
+        <CheckoutInput
           label={t('checkout.form.cardHolderName')}
           type="text"
           placeholder={t('checkout.placeholders.cardHolderName')}

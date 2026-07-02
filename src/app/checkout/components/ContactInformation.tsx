@@ -1,6 +1,7 @@
 'use client';
 
-import { Input } from '@shop/ui';
+import { CheckoutInput } from './CheckoutInput';
+import { CHECKOUT_FORM_ALERT_CLASS } from '../constants/checkout-ui';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
 import { CheckoutFormData } from '../types';
@@ -22,7 +23,7 @@ export function ContactInformation({
     <div className="space-y-4 mb-6">
       <h3 className="text-lg font-semibold text-gray-900">{t('checkout.contactInformation')}</h3>
       <div>
-        <Input
+        <CheckoutInput
           label={t('checkout.form.email')}
           type="email"
           {...register('email')}
@@ -31,7 +32,7 @@ export function ContactInformation({
         />
       </div>
       <div>
-        <Input
+        <CheckoutInput
           label={t('checkout.form.phone')}
           type="tel"
           placeholder={t('checkout.placeholders.phone')}
@@ -41,7 +42,7 @@ export function ContactInformation({
         />
       </div>
       {(errors.email || errors.phone) && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+        <div className={`border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
           <p className="text-sm text-red-600">
             {errors.email?.message || errors.phone?.message}
           </p>

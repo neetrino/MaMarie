@@ -1,25 +1,20 @@
 'use client';
 
-import { Card, Button } from '@shop/ui';
+import { useMemo } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
 import { formatPriceInCurrency } from '../../lib/currency';
-
-interface Cart {
-  id: string;
-  items: any[];
-  totals: {
-    subtotal: number;
-    discount: number;
-    shipping: number;
-    tax: number;
-    total: number;
-    currency: string;
-  };
-  itemsCount: number;
-}
+import { CHECKOUT_ORDER_SUMMARY_MAX_WIDTH_PX } from '../../constants/checkout-page';
+import { buildReceiptBottomClipPath } from '@/lib/receipt-bottom-clip-path';
+import { CheckoutPrimaryButton } from './components/CheckoutPrimaryButton';
+import {
+  CHECKOUT_FORM_ALERT_CLASS,
+  CHECKOUT_ORDER_SUMMARY_WRAP_CLASS,
+  CHECKOUT_RECEIPT_INNER_CLASS,
+  CHECKOUT_RECEIPT_OUTER_CLASS,
+  CHECKOUT_SECTION_TITLE_CLASS,
+} from './constants/checkout-ui';
 
 interface OrderSummaryProps {
-  cart: Cart | null;
   orderSummary: {
     subtotalDisplay: number;
     taxDisplay: number;
@@ -37,7 +32,6 @@ interface OrderSummaryProps {
 }
 
 export function OrderSummary({
-  cart,
   orderSummary,
   currency,
   shippingMethod,
@@ -49,60 +43,75 @@ export function OrderSummary({
   onPlaceOrder,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
+  const receiptClipPath = useMemo(() => buildReceiptBottomClipPath(), []);
+
+  const shippingLabel =
+    shippingMethod === 'pickup'
+      ? t('checkout.shipping.freePickup')
+      : loadingDeliveryPrice
+        ? t('checkout.shipping.loading')
+        : deliveryPrice !== null
+          ? formatPriceInCurrency(orderSummary.shippingDisplay, currency) +
+            (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
+          : t('checkout.shipping.enterCity');
 
   return (
-    <div>
-      <Card className="p-6 sticky top-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">{t('checkout.orderSummary')}</h2>
-        <div className="space-y-4 mb-6">
-          <div className="flex justify-between text-gray-600">
-            <span>{t('checkout.summary.subtotal')}</span>
-            <span>{formatPriceInCurrency(orderSummary.subtotalDisplay, currency)}</span>
-          </div>
-          <div className="flex justify-between text-gray-600">
-            <span>{t('checkout.summary.shipping')}</span>
-            <span>
-              {shippingMethod === 'pickup' 
-                ? t('checkout.shipping.freePickup')
-                : loadingDeliveryPrice
-                  ? t('checkout.shipping.loading')
-                  : deliveryPrice !== null
-                    ? formatPriceInCurrency(orderSummary.shippingDisplay, currency) + (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-                    : t('checkout.shipping.enterCity')}
-            </span>
-          </div>
-          <div className="flex justify-between text-gray-600">
-            <span>{t('checkout.summary.tax')}</span>
-            <span>{formatPriceInCurrency(orderSummary.taxDisplay, currency)}</span>
-          </div>
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex justify-between text-lg font-bold text-gray-900">
-              <span>{t('checkout.summary.total')}</span>
-              <span>
-                {formatPriceInCurrency(orderSummary.totalDisplay, currency)}
+    <div
+      className={`lg:sticky lg:top-24 lg:self-start ${CHECKOUT_ORDER_SUMMARY_WRAP_CLASS}`}
+      style={{ maxWidth: CHECKOUT_ORDER_SUMMARY_MAX_WIDTH_PX }}
+    >
+      <div className={CHECKOUT_RECEIPT_OUTER_CLASS}>
+        <section
+          className={CHECKOUT_RECEIPT_INNER_CLASS}
+          style={{ clipPath: receiptClipPath }}
+          aria-labelledby="checkout-order-summary-heading"
+        >
+          <h2 id="checkout-order-summary-heading" className={CHECKOUT_SECTION_TITLE_CLASS}>
+            {t('checkout.orderSummary')}
+          </h2>
+
+          <div className="mt-5 space-y-3 text-sm text-gray-600">
+            <div className="flex justify-between gap-3">
+              <span>{t('checkout.summary.subtotal')}</span>
+              <span className="font-medium text-gray-900">
+                {formatPriceInCurrency(orderSummary.subtotalDisplay, currency)}
+              </span>
+            </div>
+            <div className="flex justify-between gap-3">
+              <span>{t('checkout.summary.shipping')}</span>
+              <span className="text-right font-medium text-gray-900">{shippingLabel}</span>
+            </div>
+            <div className="flex justify-between gap-3">
+              <span>{t('checkout.summary.tax')}</span>
+              <span className="font-medium text-gray-900">
+                {formatPriceInCurrency(orderSummary.taxDisplay, currency)}
               </span>
             </div>
           </div>
-        </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="mt-4 border-t border-dashed border-gray-300 pt-4">
+            <div className="flex justify-between gap-3 text-base font-bold text-gray-900 sm:text-lg">
+              <span>{t('checkout.summary.total')}</span>
+              <span>{formatPriceInCurrency(orderSummary.totalDisplay, currency)}</span>
+            </div>
           </div>
-        )}
 
-        <Button
-          type="submit"
-          variant="primary"
-          className="w-full"
-          size="lg"
-          disabled={isSubmitting}
-          onClick={onPlaceOrder}
-        >
-          {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
-        </Button>
-      </Card>
+          {error && (
+            <div className={`mt-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
+          <CheckoutPrimaryButton
+            type="submit"
+            className="mt-6"
+            disabled={isSubmitting}
+            onClick={onPlaceOrder}
+          >
+            {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
+          </CheckoutPrimaryButton>
+        </section>
+      </div>
     </div>
   );
 }
-
