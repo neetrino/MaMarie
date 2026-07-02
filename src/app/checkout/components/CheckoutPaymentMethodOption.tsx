@@ -37,57 +37,73 @@ export function CheckoutPaymentMethodOption({
   onSelect,
 }: CheckoutPaymentMethodOptionProps) {
   const isCardMethod = method.id === 'arca';
+  const idramLogoError = logoErrors[method.id] ?? false;
+  const onIdramLogoError = () => onLogoError(method.id);
+
+  const icons = (
+    <CheckoutPaymentMethodIcons
+      methodId={method.id}
+      idramLogoError={idramLogoError}
+      onIdramLogoError={onIdramLogoError}
+      mobileCardFramed={isCardMethod}
+    />
+  );
+
+  if (isCardMethod) {
+    return (
+      <label className={paymentOptionClass(isSelected)}>
+        <CheckoutRadio
+          {...register('paymentMethod')}
+          value={method.id}
+          checked={isSelected}
+          onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
+          disabled={isSubmitting}
+          className="self-center lg:hidden"
+        />
+
+        <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 lg:hidden">
+          <span className="font-medium text-gray-900">{method.shortName}</span>
+          {icons}
+        </div>
+
+        <div className="hidden min-w-0 flex-1 items-center gap-4 lg:flex">
+          <CheckoutRadio
+            {...register('paymentMethod')}
+            value={method.id}
+            checked={isSelected}
+            onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
+            disabled={isSubmitting}
+          />
+          {icons}
+          <div className="min-w-0">
+            <div className="font-medium text-gray-900">{method.name}</div>
+            <div className="text-sm text-gray-600">{method.description}</div>
+          </div>
+        </div>
+      </label>
+    );
+  }
 
   return (
     <label className={paymentOptionClass(isSelected)}>
       <CheckoutRadio
         {...register('paymentMethod')}
-        tone="blue"
         value={method.id}
         checked={isSelected}
         onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
         disabled={isSubmitting}
       />
 
-      {isCardMethod ? (
-        <>
-          <div className="flex min-w-0 flex-1 flex-col gap-3 lg:hidden">
-            <span className="font-medium text-gray-900">{method.name}</span>
-            <CheckoutPaymentMethodIcons
-              methodId={method.id}
-              idramLogoError={false}
-              onIdramLogoError={() => {}}
-            />
-          </div>
-
-          <div className="hidden min-w-0 flex-1 items-center gap-4 lg:flex">
-            <CheckoutPaymentMethodIcons
-              methodId={method.id}
-              idramLogoError={false}
-              onIdramLogoError={() => {}}
-            />
-            <div className="min-w-0">
-              <div className="font-medium text-gray-900">{method.name}</div>
-              <div className="text-sm text-gray-600">{method.description}</div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
-          <CheckoutPaymentMethodIcons
-            methodId={method.id}
-            idramLogoError={logoErrors[method.id] ?? false}
-            onIdramLogoError={() => onLogoError(method.id)}
-          />
-          <div className="min-w-0">
-            <span className="font-medium text-gray-900 lg:hidden">{method.shortName}</span>
-            <div className="hidden lg:block">
-              <div className="font-medium text-gray-900">{method.name}</div>
-              <div className="text-sm text-gray-600">{method.description}</div>
-            </div>
+      <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
+        {icons}
+        <div className="min-w-0">
+          <span className="font-medium text-gray-900 lg:hidden">{method.shortName}</span>
+          <div className="hidden lg:block">
+            <div className="font-medium text-gray-900">{method.name}</div>
+            <div className="text-sm text-gray-600">{method.description}</div>
           </div>
         </div>
-      )}
+      </div>
     </label>
   );
 }

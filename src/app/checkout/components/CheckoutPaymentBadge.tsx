@@ -1,59 +1,87 @@
 'use client';
 
 import Image from 'next/image';
-import type { FooterPaymentBadge } from '../../../constants/footer';
-import { FOOTER_PAYMENT_BADGE_HEIGHT_PX } from '../../../constants/footer';
+import type {
+  CheckoutCardBadgeFramedBoxSize,
+  CheckoutCardPaymentBadge,
+} from '../constants/checkout-payment-ui';
 
 interface CheckoutPaymentBadgeProps {
-  badge: FooterPaymentBadge;
-  heightPx: number;
+  badge: CheckoutCardPaymentBadge;
+  logoHeightPx: number;
   radiusPx: number;
-  /** Stretches badge width and logo horizontally without increasing height. */
-  widthScale?: number;
+  paddingPx: number;
+  framed?: boolean;
+  /** Same frame for Visa / Mastercard / ArCa (Visa-sized box). */
+  framedBoxSize?: CheckoutCardBadgeFramedBoxSize;
 }
 
-function scaleBadgePx(valuePx: number, heightPx: number, widthScale = 1): number {
-  return Math.round(valuePx * (heightPx / FOOTER_PAYMENT_BADGE_HEIGHT_PX) * widthScale);
+function getLogoSize(
+  badge: CheckoutCardPaymentBadge,
+  logoHeightPx: number,
+): { widthPx: number; heightPx: number } {
+  const scale = logoHeightPx / badge.sourceHeightPx;
+
+  return {
+    widthPx: Math.round(badge.sourceWidthPx * scale),
+    heightPx: logoHeightPx,
+  };
 }
 
-/** Footer payment badge scaled for checkout card row (Visa / Mastercard / ArCa). */
+/** Checkout card logo (Visa / Mastercard / ArCa) — optional framed box like Figma. */
 export function CheckoutPaymentBadge({
   badge,
-  heightPx,
+  logoHeightPx,
   radiusPx,
-  widthScale = 1,
+  paddingPx,
+  framed = false,
+  framedBoxSize,
 }: CheckoutPaymentBadgeProps) {
-  const heightScale = heightPx / FOOTER_PAYMENT_BADGE_HEIGHT_PX;
-  const widthPx = scaleBadgePx(badge.widthPx, heightPx, widthScale);
-  const logoLeftPx = scaleBadgePx(badge.logoLeftPx, heightPx, widthScale);
-  const logoTopPx = badge.logoTopPx * heightScale;
-  const logoWidthPx = scaleBadgePx(badge.logoWidthPx, heightPx, widthScale);
-  const logoHeightPx = Math.round(badge.logoHeightPx * heightScale);
+  const logoSize = getLogoSize(badge, logoHeightPx);
+
+  if (!framed) {
+    return (
+      <Image
+        src={badge.src}
+        alt={badge.alt}
+        width={logoSize.widthPx}
+        height={logoSize.heightPx}
+        className="shrink-0 object-contain object-left"
+        style={{ height: logoSize.heightPx, width: logoSize.widthPx }}
+        unoptimized
+      />
+    );
+  }
+
+  const boxWidthPx = framedBoxSize?.widthPx ?? logoSize.widthPx + paddingPx * 2;
+  const boxHeightPx = framedBoxSize?.heightPx ?? logoSize.heightPx + paddingPx * 2;
+  const innerLogoScale = badge.innerLogoScale ?? 1;
 
   return (
     <div
-      className="relative shrink-0 overflow-hidden border border-gray-200 bg-white"
+      className="box-border flex shrink-0 items-center justify-center overflow-hidden border border-gray-200 bg-white"
       style={{
-        width: widthPx,
-        height: heightPx,
+        width: boxWidthPx,
+        height: boxHeightPx,
         borderRadius: radiusPx,
+        padding: paddingPx,
       }}
     >
       <div
-        className="absolute"
-        style={{
-          left: logoLeftPx,
-          top: logoTopPx,
-          width: logoWidthPx,
-          height: logoHeightPx,
-        }}
+        className="relative h-full w-full"
+        style={
+          innerLogoScale !== 1
+            ? { transform: `scale(${innerLogoScale})`, transformOrigin: 'center' }
+            : undefined
+        }
       >
         <Image
-          src={badge.logoSrc}
+          src={badge.src}
           alt={badge.alt}
           fill
-          sizes={`${logoWidthPx}px`}
+          sizes={`${boxWidthPx}px`}
           className="object-contain object-center"
+          unoptimized
         />
       </div>
     </div>
