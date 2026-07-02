@@ -363,6 +363,35 @@ main.profile-page-main {
 @media (min-width: 768px) {
   main.profile-page-main {
     background-color: #faf8f5;
+    box-sizing: border-box;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .layout-shell-mobile-bottom-clearance:has(.profile-desktop-page) {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    background-color: #faf8f5;
+  }
+
+  .profile-desktop-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(239, 149, 170, 0.45) transparent;
+  }
+
+  .profile-desktop-sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(239, 149, 170, 0.45) transparent;
+  }
+
+  .profile-desktop-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(239, 149, 170, 0.45) transparent;
   }
 }
 

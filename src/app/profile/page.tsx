@@ -7,7 +7,7 @@ import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
-import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_ALERT_ERROR_CLASS, PROFILE_DESKTOP_ALERT_SUCCESS_CLASS, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
+import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_ALERT_ERROR_CLASS, PROFILE_DESKTOP_ALERT_SUCCESS_CLASS, PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX, PROFILE_DESKTOP_SHELL_PADDING_TOP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
@@ -248,22 +248,26 @@ function ProfilePageContent() {
       >
         {tabContent}
       </ProfileMobilePage>
-      <div className="profile-desktop-page hidden md:block">
-        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+      <div className="profile-desktop-page hidden md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden">
+        <div
+          className="profile-desktop-page__shell mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 lg:px-8"
+          style={{
+            paddingTop: PROFILE_DESKTOP_SHELL_PADDING_TOP_PX,
+            paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX,
+          }}
+        >
           <div
-            className="flex items-start"
+            className="profile-desktop-page__layout flex min-h-0 flex-1"
             style={{ gap: PROFILE_DESKTOP_CONTENT_GAP_PX }}
           >
             <aside
-              className="sticky top-24 shrink-0 self-start"
+              className="profile-desktop-sidebar h-full shrink-0"
               style={{ width: PROFILE_DESKTOP_SIDEBAR_WIDTH_PX }}
             >
               <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
             </aside>
-            <div className="relative min-w-0 flex-1">
-              <div className="relative z-10">
-                {tabContent}
-              </div>
+            <div className="profile-desktop-content min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain">
+              {tabContent}
             </div>
           </div>
         </div>

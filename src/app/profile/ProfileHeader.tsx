@@ -113,40 +113,42 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout,
 
   return (
     <div
-      className={`relative overflow-hidden p-5 ${PROFILE_DESKTOP_CARD_CLASS}`}
+      className={`relative flex h-full min-h-0 flex-col p-5 ${PROFILE_DESKTOP_CARD_CLASS}`}
       aria-label="Profile navigation"
     >
-      <div className="flex flex-col items-center gap-4 text-center">
-        <ProfileMobileAvatar
-          firstName={profile?.firstName}
-          lastName={profile?.lastName}
-          avatarUrl={
-            profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
-          }
-        />
-        <div className="min-w-0">
-          {hasSplitName ? (
-            <p className="text-lg font-bold text-gray-900">
-              {profile?.firstName} {profile?.lastName}
-            </p>
-          ) : (
-            <p className="text-lg font-bold text-gray-900">
-              {profile?.firstName || profile?.lastName || t('profile.myProfile')}
-            </p>
-          )}
+      <div className="shrink-0">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <ProfileMobileAvatar
+            firstName={profile?.firstName}
+            lastName={profile?.lastName}
+            avatarUrl={
+              profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
+            }
+          />
+          <div className="min-w-0">
+            {hasSplitName ? (
+              <p className="text-lg font-bold text-gray-900">
+                {profile?.firstName} {profile?.lastName}
+              </p>
+            ) : (
+              <p className="text-lg font-bold text-gray-900">
+                {profile?.firstName || profile?.lastName || t('profile.myProfile')}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-2">
+          {profile?.email ? (
+            <ProfileDesktopContactRow icon={<MailIcon className="h-4 w-4" />} value={profile.email} />
+          ) : null}
+          {profile?.phone ? (
+            <ProfileDesktopContactRow icon={<PhoneIcon className="h-4 w-4" />} value={profile.phone} />
+          ) : null}
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-2">
-        {profile?.email ? (
-          <ProfileDesktopContactRow icon={<MailIcon className="h-4 w-4" />} value={profile.email} />
-        ) : null}
-        {profile?.phone ? (
-          <ProfileDesktopContactRow icon={<PhoneIcon className="h-4 w-4" />} value={profile.phone} />
-        ) : null}
-      </div>
-
-      <div className="mt-6 border-t border-gray-100 pt-4">
+      <div className="profile-desktop-sidebar-scroll mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-gray-100 pt-4">
         <ProfileDesktopTabNav tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
         <button
           type="button"
