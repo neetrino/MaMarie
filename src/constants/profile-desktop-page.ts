@@ -15,8 +15,14 @@ export const PROFILE_DESKTOP_SHELL_PADDING_TOP_PX = 12;
 export const PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX = 20;
 export const PROFILE_DESKTOP_CONTENT_GAP_PX = 40;
 
-export const PROFILE_DESKTOP_CARD_CLASS =
-  '!rounded-[15px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.06)] ring-1 ring-gray-100/80';
+export const PROFILE_DESKTOP_CARD_BASE_CLASS = '!rounded-[15px] bg-white ring-1 ring-gray-100/80';
+
+export const PROFILE_DESKTOP_CARD_CLASS = `${PROFILE_DESKTOP_CARD_BASE_CLASS} shadow-[0_4px_24px_rgba(0,0,0,0.06)]`;
+
+/** Dashboard stat panels and sections — flat clay, no drop shadow. */
+export const PROFILE_DESKTOP_DASHBOARD_CARD_CLASS = PROFILE_DESKTOP_CARD_BASE_CLASS;
+
+export const PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS = '!shadow-none';
 
 export const PROFILE_DESKTOP_ASSETS = {
   chevronRight: '/assets/home/icon-chevron-right-pink.svg',
@@ -27,30 +33,39 @@ export const PROFILE_DESKTOP_ASSETS = {
   decoStar: '/assets/footer/deco-star.png',
 } as const;
 
+export const PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS =
+  '[&>svg]:block [&>svg]:h-5 [&>svg]:w-5 [&>svg]:shrink-0';
+export const PROFILE_DESKTOP_STAT_ICON_INNER_LARGE_CLASS =
+  '[&>svg]:block [&>svg]:h-7 [&>svg]:w-7 [&>svg]:shrink-0 [&>svg]:translate-y-0.5';
+
 export const PROFILE_DESKTOP_STAT_THEMES = {
   pink: {
     iconBackground: '#fdeef2',
     iconForeground: BRAND_COLORS.pink,
     valueColor: BRAND_COLORS.pink,
     decoration: PROFILE_DESKTOP_ASSETS.decoBow,
+    iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   yellow: {
     iconBackground: '#fef8e3',
     iconForeground: '#e8b84a',
     valueColor: '#d4a017',
     decoration: PROFILE_DESKTOP_ASSETS.decoStrawberry,
+    iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   blue: {
     iconBackground: '#e8f4fd',
     iconForeground: '#5281e1',
     valueColor: '#5281e1',
     decoration: PROFILE_DESKTOP_ASSETS.decoHeadphones,
+    iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   green: {
     iconBackground: '#e8f8ef',
     iconForeground: '#5cb176',
     valueColor: '#5cb176',
     decoration: PROFILE_DESKTOP_ASSETS.decoStar,
+    iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_LARGE_CLASS,
   },
 } as const;
 

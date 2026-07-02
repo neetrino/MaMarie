@@ -86,7 +86,7 @@ function ProfileSideSheetPanel({
             </div>
           </header>
 
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
+          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
         </aside>
       </div>
     </div>

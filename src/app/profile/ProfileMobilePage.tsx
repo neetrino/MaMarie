@@ -157,7 +157,7 @@ export function ProfileMobilePage({
                 </svg>
               </button>
             </div>
-            <div className="h-[calc(72vh-4.75rem)] overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
+            <div className="profile-scroll-area h-[calc(72vh-4.75rem)] overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
           </div>
         </div>
       ) : null}

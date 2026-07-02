@@ -360,6 +360,24 @@ main.profile-page-main {
   background-color: #f1f1f3;
 }
 
+.profile-scroll-area {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.profile-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+
+html:has(main.profile-page-main) {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html:has(main.profile-page-main)::-webkit-scrollbar {
+  display: none;
+}
+
 @media (min-width: 768px) {
   main.profile-page-main {
     background-color: #faf8f5;
@@ -377,21 +395,6 @@ main.profile-page-main {
     min-height: 0;
     overflow: hidden;
     background-color: #faf8f5;
-  }
-
-  .profile-desktop-sidebar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(239, 149, 170, 0.45) transparent;
-  }
-
-  .profile-desktop-sidebar-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(239, 149, 170, 0.45) transparent;
-  }
-
-  .profile-desktop-content {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(239, 149, 170, 0.45) transparent;
   }
 }
 

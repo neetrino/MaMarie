@@ -266,7 +266,10 @@ function ProfilePageContent() {
             >
               <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
             </aside>
-            <div className="profile-desktop-content min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain">
+            <div
+              className="profile-desktop-content profile-scroll-area min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain"
+              style={{ paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX }}
+            >
               {tabContent}
             </div>
           </div>

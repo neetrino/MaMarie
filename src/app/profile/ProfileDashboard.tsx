@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import {
-  PROFILE_DESKTOP_CARD_CLASS,
+  PROFILE_DESKTOP_DASHBOARD_CARD_CLASS,
+  PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS,
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
   PROFILE_DESKTOP_STAT_CONFIG,
@@ -37,9 +38,9 @@ function ProfileDesktopStatCard({
   const isSvgDecoration = palette.decoration.endsWith('.svg');
 
   return (
-    <div className={`relative overflow-hidden p-6 ${PROFILE_DESKTOP_CARD_CLASS}`}>
+    <div className={`relative overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS}`}>
       <div
-        className="mb-4 flex h-11 w-11 items-center justify-center rounded-full [&>svg]:h-5 [&>svg]:w-5"
+        className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${palette.iconInnerClass}`}
         style={{
           backgroundColor: palette.iconBackground,
           color: palette.iconForeground,
@@ -88,7 +89,7 @@ export function ProfileDashboard({
 
   if (!dashboardData) {
     return (
-      <ProfileSectionCard>
+      <ProfileSectionCard className={PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS}>
         <p className="text-center text-sm text-gray-600">{t('profile.dashboard.failedToLoad')}</p>
       </ProfileSectionCard>
     );
@@ -145,7 +146,7 @@ export function ProfileDashboard({
         ))}
       </div>
 
-      <ProfileSectionCard>
+      <ProfileSectionCard className={PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS}>
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.dashboard.recentOrders')}</h2>
           <button

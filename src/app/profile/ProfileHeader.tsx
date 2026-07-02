@@ -148,7 +148,7 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout,
         </div>
       </div>
 
-      <div className="profile-desktop-sidebar-scroll mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-gray-100 pt-4">
+      <div className="profile-desktop-sidebar-scroll profile-scroll-area mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-gray-100 pt-4">
         <ProfileDesktopTabNav tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
         <button
           type="button"
