@@ -1,6 +1,7 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { useProfilePage } from './useProfilePage';
@@ -72,7 +73,19 @@ function ProfilePageContent() {
     deletingAccount,
     handleDeleteAccount,
   } = useProfilePage();
+  const searchParams = useSearchParams();
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (!tab || tab === 'dashboard') {
+      return;
+    }
+
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      setIsMobileSheetOpen(true);
+    }
+  }, [searchParams]);
 
   if (authLoading || loading) {
     return (

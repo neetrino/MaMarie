@@ -452,6 +452,7 @@ main.profile-page-main .profile-btn-danger:focus-visible,
 @media (min-width: 1024px) {
   main.home-main-surface.order-page-main {
     background-color: #ffffff;
+    min-height: calc(100dvh - var(--header-clearance-desktop));
   }
 }
 

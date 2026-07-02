@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
-import { getStoredCurrency } from '../../../lib/currency';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ErrorState } from './components/ErrorState';
@@ -20,7 +19,6 @@ export default function OrderPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currency, setCurrency] = useState(getStoredCurrency());
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -29,16 +27,6 @@ export default function OrderPage() {
     }
 
     fetchOrder();
-
-    const handleCurrencyUpdate = () => {
-      setCurrency(getStoredCurrency());
-    };
-
-    window.addEventListener('currency-updated', handleCurrencyUpdate);
-
-    return () => {
-      window.removeEventListener('currency-updated', handleCurrencyUpdate);
-    };
   }, [isLoggedIn, params.number, router]);
 
   async function fetchOrder() {
@@ -66,5 +54,5 @@ export default function OrderPage() {
     );
   }
 
-  return <OrderPageContent order={order} currency={currency} />;
+  return <OrderPageContent order={order} />;
 }

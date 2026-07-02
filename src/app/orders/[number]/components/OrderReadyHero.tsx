@@ -1,9 +1,9 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import {
   MOBILE_ORDER_ACCENT_COLOR,
   MOBILE_ORDER_ASSETS,
-  MOBILE_ORDER_RECEIPT_SECTION_ID,
   MOBILE_ORDER_HEADLINE_COLOR,
   MOBILE_ORDER_HEADLINE_FONT_SIZE_PX,
   MOBILE_ORDER_HEADLINE_LINE_GAP_PX,
@@ -34,13 +34,11 @@ interface OrderReadyHeroProps {
 
 export function OrderReadyHero({ order }: OrderReadyHeroProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const copy = resolveMobileOrderHeroCopy(order, t);
 
   const handleMoreClick = () => {
-    document.getElementById(MOBILE_ORDER_RECEIPT_SECTION_ID)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+    router.push('/profile?tab=orders');
   };
 
   const headlineFontSizePx =

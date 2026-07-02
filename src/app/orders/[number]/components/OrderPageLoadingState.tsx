@@ -1,18 +1,11 @@
 'use client';
 
-import { MobileHomeSearchField } from '../../../../components/home/mobile/MobileHomeSearchField';
 import { OrderPageShell } from './OrderPageShell';
-import styles from './OrderPageShell.module.css';
 
 export function OrderPageLoadingState() {
   return (
     <OrderPageShell>
-      <div className="lg:hidden">
-        <MobileHomeSearchField />
-      </div>
-      <div
-        className={`mx-auto w-full max-w-[328px] animate-pulse ${styles.heroOffset}`}
-      >
+      <div className="mx-auto w-full max-w-[328px] animate-pulse">
         <div
           className="mx-auto rounded-3xl bg-white/70"
           style={{ width: 313, height: 302, maxWidth: '100%' }}

@@ -1,17 +1,9 @@
 import { BRAND_COLORS } from './brand';
-import {
-  MOBILE_HOME_BG,
-  MOBILE_HOME_BOTTOM_CONTENT_PADDING_PX,
-  MOBILE_HOME_HORIZONTAL_PADDING_PX,
-} from './mobile-home';
+import { MOBILE_HOME_BG, MOBILE_HOME_HORIZONTAL_PADDING_PX } from './mobile-home';
 
 /** Figma `66:432` — mobile order ready state. */
 export const MOBILE_ORDER_PAGE_BG = MOBILE_HOME_BG;
 export const MOBILE_ORDER_PAGE_HORIZONTAL_PADDING_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
-export const MOBILE_ORDER_PAGE_PADDING_TOP_PX = 12;
-export const MOBILE_ORDER_PAGE_PADDING_BOTTOM_PX = MOBILE_HOME_BOTTOM_CONTENT_PADDING_PX;
-
-export const MOBILE_ORDER_SEARCH_TO_HERO_GAP_PX = 41;
 
 export const MOBILE_ORDER_HERO_ILLUSTRATION_WIDTH_PX = 313;
 export const MOBILE_ORDER_HERO_ILLUSTRATION_HEIGHT_PX = 302;
@@ -44,20 +36,10 @@ export const MOBILE_ORDER_MORE_BUTTON_ARROW_SIZE_PX = 40;
 export const MOBILE_ORDER_MORE_BUTTON_ARROW_ICON_SIZE_PX = 20;
 export const MOBILE_ORDER_MORE_BUTTON_BG = BRAND_COLORS.pink;
 
-export const MOBILE_ORDER_DETAILS_SECTION_GAP_PX = 24;
-export const MOBILE_ORDER_DETAILS_SECTION_ID = 'order-details';
-/** «Ավելին» scroll target — top of the receipt panel. */
-export const MOBILE_ORDER_RECEIPT_SECTION_ID = 'order-receipt';
-/** Extra space below the fixed navbar when scrolling to the receipt. */
-export const MOBILE_ORDER_RECEIPT_SCROLL_GAP_BELOW_HEADER_PX = 12;
-
 /** Desktop — centered column, white page surface. */
 export const DESKTOP_ORDER_PAGE_BG = '#ffffff';
 export const DESKTOP_ORDER_PAGE_MAX_WIDTH_PX = 640;
 export const DESKTOP_ORDER_PAGE_PADDING_X_PX = 24;
-export const DESKTOP_ORDER_PAGE_PADDING_TOP_PX = 48;
-export const DESKTOP_ORDER_PAGE_PADDING_BOTTOM_PX = 48;
-export const DESKTOP_ORDER_HERO_TO_DETAILS_GAP_PX = 48;
 
 export const MOBILE_ORDER_ASSETS = {
   readyBasket: '/assets/orders/ready-basket.png',
