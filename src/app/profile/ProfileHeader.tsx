@@ -73,10 +73,16 @@ function ProfileDesktopTabNav({
             aria-selected={isActive}
             onClick={() => onTabChange(tab.id)}
             className={`flex w-full items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left transition-colors ${
-              isActive
-                ? 'border-brand-pink bg-brand-pink/10 pl-[calc(0.75rem-4px)]'
-                : 'border-transparent hover:bg-white/70'
+              isActive ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-white/70'
             }`}
+            style={
+              isActive
+                ? {
+                    borderLeftColor: theme.foreground,
+                    backgroundColor: theme.background,
+                  }
+                : undefined
+            }
           >
             <span
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:h-5 [&>svg]:w-5"
@@ -88,9 +94,10 @@ function ProfileDesktopTabNav({
               {tab.icon}
             </span>
             <span
-              className={`min-w-0 flex-1 text-sm font-medium text-gray-800 ${
-                isMultilineLabel ? 'whitespace-pre-line leading-snug' : ''
-              }`}
+              className={`min-w-0 flex-1 text-sm font-medium ${
+                isActive ? 'font-semibold' : 'text-gray-800'
+              } ${isMultilineLabel ? 'whitespace-pre-line leading-snug' : ''}`}
+              style={isActive ? { color: theme.foreground } : undefined}
             >
               {tab.label}
             </span>
