@@ -33,7 +33,18 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
-  if (pathname === '/wishlist' || pathname.startsWith('/wishlist/')) {
+  if (pathname.startsWith('/wishlist')) {
+    return (
+      <main
+        className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
+  if (pathname.startsWith('/orders')) {
     return (
       <main
         className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"

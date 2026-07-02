@@ -343,7 +343,8 @@
   /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home + wishlist + products mobile; default shell stays 114px. */
   .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
-  .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page) {
+  .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-order-page) {
     background-color: #f1f1f3;
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
   }

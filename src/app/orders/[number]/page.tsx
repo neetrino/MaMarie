@@ -13,6 +13,9 @@ import { ShippingAddress } from './components/ShippingAddress';
 import { OrderPageHeader } from './components/OrderPageHeader';
 import { OrderHelpCard } from './components/OrderHelpCard';
 import { OrderSuccessFooterActions } from './components/OrderSuccessFooterActions';
+import { MobileOrderLoadingState } from './components/MobileOrderLoadingState';
+import { MobileOrderPageContent } from './components/MobileOrderPageContent';
+import { MobileOrderPageShell } from './components/MobileOrderPageShell';
 import type { Order } from './types';
 import {
   ORDER_DETAIL_INNER_CLASS,
@@ -63,39 +66,57 @@ export default function OrderPage() {
 
   if (loading) {
     return (
-      <div className={ORDER_DETAIL_PAGE_SURFACE_CLASS}>
-        <LoadingState />
-      </div>
+      <>
+        <div className="lg:hidden">
+          <MobileOrderLoadingState />
+        </div>
+        <div className={`hidden lg:block ${ORDER_DETAIL_PAGE_SURFACE_CLASS}`}>
+          <LoadingState />
+        </div>
+      </>
     );
   }
 
   if (error || !order) {
     return (
-      <div className={ORDER_DETAIL_PAGE_SURFACE_CLASS}>
-        <ErrorState error={error} />
-      </div>
+      <>
+        <div className="lg:hidden">
+          <MobileOrderPageShell>
+            <ErrorState error={error} />
+          </MobileOrderPageShell>
+        </div>
+        <div className={`hidden lg:block ${ORDER_DETAIL_PAGE_SURFACE_CLASS}`}>
+          <ErrorState error={error} />
+        </div>
+      </>
     );
   }
 
   return (
-    <div className={ORDER_DETAIL_PAGE_SURFACE_CLASS}>
-      <div className={ORDER_DETAIL_INNER_CLASS}>
-        <OrderPageHeader orderNumber={order.number} placedAt={order.createdAt} />
-        <OrderItems
-          items={order.items}
-          currency={currency}
-          presentation="highlight"
-          orderTotals={order.totals}
-        />
-        <OrderHelpCard />
-        <OrderSuccessFooterActions />
-
-        {order.shippingAddress && (
-          <section className="mt-4 space-y-6 border-t border-gray-200 pt-10">
-            <ShippingAddress shippingAddress={order.shippingAddress} />
-          </section>
-        )}
+    <>
+      <div className="lg:hidden">
+        <MobileOrderPageContent order={order} currency={currency} />
       </div>
-    </div>
+
+      <div className={`hidden lg:block ${ORDER_DETAIL_PAGE_SURFACE_CLASS}`}>
+        <div className={ORDER_DETAIL_INNER_CLASS}>
+          <OrderPageHeader orderNumber={order.number} placedAt={order.createdAt} />
+          <OrderItems
+            items={order.items}
+            currency={currency}
+            presentation="highlight"
+            orderTotals={order.totals}
+          />
+          <OrderHelpCard />
+          <OrderSuccessFooterActions />
+
+          {order.shippingAddress && (
+            <section className="mt-4 space-y-6 border-t border-gray-200 pt-10">
+              <ShippingAddress shippingAddress={order.shippingAddress} />
+            </section>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
