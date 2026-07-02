@@ -9,6 +9,9 @@ import {
   MOBILE_ORDER_HEADLINE_LINE_GAP_PX,
   MOBILE_ORDER_HEADLINE_LINE_HEIGHT,
   MOBILE_ORDER_HEADLINE_TO_BUTTON_GAP_PX,
+  MOBILE_ORDER_HEADLINE_TO_SUBTITLE_GAP_PX,
+  MOBILE_ORDER_PLACED_HEADLINE_FONT_SIZE_PX,
+  MOBILE_ORDER_PLACED_HEADLINE_MAX_WIDTH_PX,
   MOBILE_ORDER_HERO_BLOCK_GAP_PX,
   MOBILE_ORDER_HERO_ILLUSTRATION_HEIGHT_PX,
   MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_LEFT_PERCENT,
@@ -39,6 +42,11 @@ export function MobileOrderReadyHero({ order }: MobileOrderReadyHeroProps) {
       block: 'start',
     });
   };
+
+  const headlineFontSizePx =
+    copy.variant === 'placed'
+      ? MOBILE_ORDER_PLACED_HEADLINE_FONT_SIZE_PX
+      : MOBILE_ORDER_HEADLINE_FONT_SIZE_PX;
 
   return (
     <div
@@ -72,23 +80,37 @@ export function MobileOrderReadyHero({ order }: MobileOrderReadyHeroProps) {
         className="flex w-full flex-col items-center"
         style={{ gap: MOBILE_ORDER_HEADLINE_TO_BUTTON_GAP_PX }}
       >
-        <div
-          className="flex w-full flex-col items-center text-center"
-          style={{ gap: MOBILE_ORDER_HEADLINE_LINE_GAP_PX }}
-        >
+        <div className="flex w-full flex-col items-center text-center">
           <div
-            className="font-bold"
+            className="flex flex-col font-bold"
             style={{
-              fontSize: MOBILE_ORDER_HEADLINE_FONT_SIZE_PX,
+              fontSize: headlineFontSizePx,
               lineHeight: MOBILE_ORDER_HEADLINE_LINE_HEIGHT,
+              maxWidth:
+                copy.variant === 'placed' ? MOBILE_ORDER_PLACED_HEADLINE_MAX_WIDTH_PX : undefined,
+              gap: MOBILE_ORDER_HEADLINE_LINE_GAP_PX,
             }}
           >
-            <p style={{ color: MOBILE_ORDER_ACCENT_COLOR }}>{copy.accent}</p>
-            <p style={{ color: MOBILE_ORDER_HEADLINE_COLOR }}>{copy.title}</p>
+            {copy.variant === 'ready' ? (
+              <>
+                <p style={{ color: MOBILE_ORDER_ACCENT_COLOR }}>{copy.accent}</p>
+                <p style={{ color: MOBILE_ORDER_HEADLINE_COLOR }}>{copy.titleLines[0]}</p>
+              </>
+            ) : (
+              <>
+                <p className="whitespace-nowrap" style={{ color: MOBILE_ORDER_HEADLINE_COLOR }}>
+                  {copy.titleLines[0]}
+                </p>
+                <p className="whitespace-nowrap" style={{ color: MOBILE_ORDER_HEADLINE_COLOR }}>
+                  {copy.titleLines[1]}
+                </p>
+              </>
+            )}
           </div>
           <p
             className="w-full text-center"
             style={{
+              marginTop: MOBILE_ORDER_HEADLINE_TO_SUBTITLE_GAP_PX,
               fontSize: MOBILE_ORDER_SUBTITLE_FONT_SIZE_PX,
               lineHeight: MOBILE_ORDER_SUBTITLE_LINE_HEIGHT,
               color: MOBILE_ORDER_SUBTITLE_COLOR,
@@ -99,7 +121,11 @@ export function MobileOrderReadyHero({ order }: MobileOrderReadyHeroProps) {
           </p>
         </div>
 
-        <MobileOrderMoreButton label={t('orders.mobile.more')} onClick={handleMoreClick} />
+        <MobileOrderMoreButton
+          label={t('orders.mobile.more')}
+          labelFontSizePx={headlineFontSizePx}
+          onClick={handleMoreClick}
+        />
       </div>
     </div>
   );

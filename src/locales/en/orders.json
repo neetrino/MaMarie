@@ -18,7 +18,8 @@
     },
     "placed": {
       "accent": "Confirmed",
-      "title": "Your order was placed successfully",
+      "titleLine1": "Your order was",
+      "titleLine2": "placed successfully",
       "subtitle": "Thank you for your order"
     }
   },
@@ -66,9 +67,3 @@
     "quantity": "Quantity: {qty} × {price} = {total}"
   }
 }
-
-
-
-
-
-

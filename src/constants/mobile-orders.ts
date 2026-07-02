@@ -22,9 +22,13 @@ export const MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_TOP_PERCENT = -14.49;
 
 export const MOBILE_ORDER_HERO_BLOCK_GAP_PX = 16;
 export const MOBILE_ORDER_HEADLINE_LINE_GAP_PX = 5;
-export const MOBILE_ORDER_HEADLINE_TO_BUTTON_GAP_PX = 35;
+/** Space below headline lines, before subtitle. */
+export const MOBILE_ORDER_HEADLINE_TO_SUBTITLE_GAP_PX = 20;
+export const MOBILE_ORDER_HEADLINE_TO_BUTTON_GAP_PX = 28;
 
 export const MOBILE_ORDER_HEADLINE_FONT_SIZE_PX = 24;
+export const MOBILE_ORDER_PLACED_HEADLINE_FONT_SIZE_PX = 20;
+export const MOBILE_ORDER_PLACED_HEADLINE_MAX_WIDTH_PX = 328;
 export const MOBILE_ORDER_HEADLINE_LINE_HEIGHT = 1.2;
 export const MOBILE_ORDER_SUBTITLE_FONT_SIZE_PX = 14;
 export const MOBILE_ORDER_SUBTITLE_LINE_HEIGHT = 1.5;
@@ -33,10 +37,11 @@ export const MOBILE_ORDER_HEADLINE_COLOR = '#1c1b1b';
 export const MOBILE_ORDER_ACCENT_COLOR = BRAND_COLORS.pink;
 
 export const MOBILE_ORDER_MORE_BUTTON_PADDING_Y_PX = 5;
-export const MOBILE_ORDER_MORE_BUTTON_PADDING_RIGHT_PX = 9;
+export const MOBILE_ORDER_MORE_BUTTON_PADDING_LEFT_PX = 36;
+export const MOBILE_ORDER_MORE_BUTTON_PADDING_RIGHT_PX = 12;
+export const MOBILE_ORDER_MORE_BUTTON_LABEL_TO_ARROW_GAP_PX = 36;
 export const MOBILE_ORDER_MORE_BUTTON_ARROW_SIZE_PX = 40;
 export const MOBILE_ORDER_MORE_BUTTON_ARROW_ICON_SIZE_PX = 20;
-export const MOBILE_ORDER_MORE_BUTTON_FONT_SIZE_PX = 14;
 export const MOBILE_ORDER_MORE_BUTTON_BG = BRAND_COLORS.pink;
 
 export const MOBILE_ORDER_DETAILS_SECTION_GAP_PX = 24;
@@ -44,5 +49,5 @@ export const MOBILE_ORDER_DETAILS_SECTION_ID = 'order-details';
 
 export const MOBILE_ORDER_ASSETS = {
   readyBasket: '/assets/orders/ready-basket.png',
-  moreButtonArrow: '/assets/orders/more-button-arrow.png',
+  moreButtonArrow: '/assets/orders/more-button-arrow.svg',
 } as const;

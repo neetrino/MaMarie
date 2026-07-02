@@ -1,8 +1,9 @@
 import type { Order } from '../types';
 
 interface MobileOrderHeroCopy {
+  variant: 'ready' | 'placed';
   accent: string;
-  title: string;
+  titleLines: readonly string[];
   subtitle: string;
 }
 
@@ -26,15 +27,20 @@ function isReadyForDelivery(order: Order): boolean {
 export function resolveMobileOrderHeroCopy(order: Order, t: TranslateFn): MobileOrderHeroCopy {
   if (isReadyForDelivery(order)) {
     return {
+      variant: 'ready',
       accent: t('orders.mobile.ready.accent'),
-      title: t('orders.mobile.ready.title'),
+      titleLines: [t('orders.mobile.ready.title')],
       subtitle: t('orders.mobile.ready.subtitle'),
     };
   }
 
   return {
+    variant: 'placed',
     accent: t('orders.mobile.placed.accent'),
-    title: t('orders.mobile.placed.title'),
+    titleLines: [
+      t('orders.mobile.placed.titleLine1'),
+      t('orders.mobile.placed.titleLine2'),
+    ],
     subtitle: t('orders.mobile.placed.subtitle'),
   };
 }
