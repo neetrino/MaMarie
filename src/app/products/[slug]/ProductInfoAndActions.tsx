@@ -118,15 +118,18 @@ export function ProductInfoAndActions({
             <p className="text-sm text-gray-500">{product.brand.name}</p>
           </div>
         )}
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          {getProductText(language, product.id, 'title') || product.title}
-        </h1>
-        <ProductRatingSummary
-          averageRating={averageRating}
-          reviewsCount={reviewsCount}
-          onReviewsClick={onScrollToReviews}
-          language={language}
-        />
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <h1 className="min-w-0 flex-1 text-4xl font-bold text-gray-900">
+            {getProductText(language, product.id, 'title') || product.title}
+          </h1>
+          <ProductRatingSummary
+            averageRating={averageRating}
+            reviewsCount={reviewsCount}
+            onReviewsClick={onScrollToReviews}
+            language={language}
+            className="mb-0 shrink-0 justify-end"
+          />
+        </div>
         <div className="mb-6">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
