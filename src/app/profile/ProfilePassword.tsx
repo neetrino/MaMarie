@@ -1,10 +1,11 @@
 import type { FormEvent } from 'react';
-import { Button, Input } from '@shop/ui';
+import { Input } from '@shop/ui';
 import {
   PROFILE_DESKTOP_INPUT_CLASS,
-  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
 } from '../../constants/profile-desktop-page';
+import { ProfileClayButton } from './components/ProfileClayButton';
 import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfilePasswordProps {
@@ -28,7 +29,7 @@ export function ProfilePassword({
 }: ProfilePasswordProps) {
   return (
     <ProfileSectionCard>
-      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-6 sm:mb-8`}>
+      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS}`}>
         {t('profile.password.title')}
       </h2>
       <form onSubmit={onSave} className="mx-auto max-w-xl space-y-6 lg:mx-0 lg:max-w-2xl">
@@ -60,14 +61,14 @@ export function ProfilePassword({
           required
         />
         <div className="pt-2 sm:pt-4">
-          <Button
+          <ProfileClayButton
             type="submit"
             variant="primary"
-            className={`w-full sm:w-auto ${PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}`}
+            className="w-full sm:w-auto"
             disabled={savingPassword}
           >
             {savingPassword ? t('profile.password.changing') : t('profile.password.change')}
-          </Button>
+          </ProfileClayButton>
         </div>
       </form>
     </ProfileSectionCard>

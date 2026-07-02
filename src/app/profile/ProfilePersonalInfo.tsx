@@ -1,12 +1,12 @@
 import type { FormEvent } from 'react';
-import { Button, Input } from '@shop/ui';
+import { Input } from '@shop/ui';
 import {
   PROFILE_DESKTOP_INPUT_CLASS,
-  PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
-  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
 } from '../../constants/profile-desktop-page';
 import type { UserProfile } from './types';
+import { ProfileClayButton } from './components/ProfileClayButton';
 import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfilePersonalInfoProps {
@@ -33,7 +33,7 @@ export function ProfilePersonalInfo({
 }: ProfilePersonalInfoProps) {
   return (
     <ProfileSectionCard>
-      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-6 sm:mb-8`}>
+      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS}`}>
         {t('profile.personal.title')}
       </h2>
       <form onSubmit={onSave} className="mx-auto max-w-xl space-y-6 lg:mx-0 lg:max-w-2xl">
@@ -70,10 +70,10 @@ export function ProfilePersonalInfo({
           className={PROFILE_DESKTOP_INPUT_CLASS}
         />
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4 sm:pt-4">
-          <Button
+          <ProfileClayButton
             type="button"
-            variant="outline"
-            className={`w-full sm:w-auto ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
+            variant="secondary"
+            className="w-full sm:w-auto"
             onClick={() => {
               setPersonalInfo({
                 firstName: profile?.firstName || '',
@@ -84,15 +84,15 @@ export function ProfilePersonalInfo({
             }}
           >
             {t('profile.personal.cancel')}
-          </Button>
-          <Button
+          </ProfileClayButton>
+          <ProfileClayButton
             type="submit"
             variant="primary"
-            className={`w-full sm:w-auto ${PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}`}
+            className="w-full sm:w-auto"
             disabled={savingPersonal}
           >
             {savingPersonal ? t('profile.personal.saving') : t('profile.personal.save')}
-          </Button>
+          </ProfileClayButton>
         </div>
       </form>
     </ProfileSectionCard>

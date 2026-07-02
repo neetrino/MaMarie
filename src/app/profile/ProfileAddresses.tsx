@@ -1,13 +1,13 @@
 import type { FormEvent } from 'react';
-import { Button, Input } from '@shop/ui';
+import { Input } from '@shop/ui';
 import {
   PROFILE_DESKTOP_DEFAULT_BADGE_CLASS,
   PROFILE_DESKTOP_INPUT_CLASS,
-  PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
-  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
 } from '../../constants/profile-desktop-page';
 import type { Address, UserProfile } from './types';
+import { ProfileClayButton } from './components/ProfileClayButton';
 import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfileAddressesProps {
@@ -43,18 +43,19 @@ export function ProfileAddresses({
 }: ProfileAddressesProps) {
   return (
     <ProfileSectionCard>
-      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+      <div className={`${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between`}>
         <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.addresses.title')}</h2>
-        <Button
-          variant="primary"
-          className={`w-full shrink-0 sm:w-auto ${PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}`}
+        <ProfileClayButton
+          type="button"
+          variant={showAddressForm ? 'secondary' : 'primary'}
+          className="w-full shrink-0 sm:w-auto"
           onClick={() => {
             onResetForm();
             setShowAddressForm(!showAddressForm);
           }}
         >
           {showAddressForm ? t('profile.addresses.form.cancel') : `+ ${t('profile.addresses.addNew')}`}
-        </Button>
+        </ProfileClayButton>
       </div>
 
       {showAddressForm ? (
@@ -91,21 +92,21 @@ export function ProfileAddresses({
             <span className="text-sm text-gray-700">{t('profile.addresses.form.isDefault')}</span>
           </label>
           <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:gap-3">
-            <Button
+            <ProfileClayButton
               type="button"
-              variant="outline"
-              className={`w-full sm:w-auto ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
+              variant="secondary"
+              className="w-full sm:w-auto"
               onClick={() => {
                 setShowAddressForm(false);
                 onResetForm();
               }}
             >
               {t('profile.addresses.form.cancel')}
-            </Button>
-            <Button
+            </ProfileClayButton>
+            <ProfileClayButton
               type="submit"
               variant="primary"
-              className={`w-full sm:w-auto ${PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}`}
+              className="w-full sm:w-auto"
               disabled={savingAddress}
             >
               {savingAddress
@@ -113,7 +114,7 @@ export function ProfileAddresses({
                 : editingAddress
                   ? t('profile.addresses.form.update')
                   : t('profile.addresses.form.add')}
-            </Button>
+            </ProfileClayButton>
           </div>
         </form>
       ) : null}
@@ -132,31 +133,31 @@ export function ProfileAddresses({
                 </div>
                 <div className="flex flex-wrap gap-2 pt-4 lg:pt-0">
                   {!address.isDefault ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={`min-h-9 flex-1 sm:flex-initial ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
+                    <ProfileClayButton
+                      type="button"
+                      variant="secondary"
+                      className="flex-1 sm:flex-initial"
                       onClick={() => onSetDefault((address.id || address._id)!)}
                     >
                       {t('profile.addresses.setDefault')}
-                    </Button>
+                    </ProfileClayButton>
                   ) : null}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`min-h-9 flex-1 sm:flex-initial ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
+                  <ProfileClayButton
+                    type="button"
+                    variant="secondary"
+                    className="flex-1 sm:flex-initial"
                     onClick={() => onEdit(address)}
                   >
                     {t('profile.addresses.edit')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`min-h-9 flex-1 text-red-600 hover:text-red-700 sm:flex-initial ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
+                  </ProfileClayButton>
+                  <ProfileClayButton
+                    type="button"
+                    variant="danger"
+                    className="flex-1 sm:flex-initial"
                     onClick={() => onDelete((address.id || address._id)!)}
                   >
                     {t('profile.addresses.delete')}
-                  </Button>
+                  </ProfileClayButton>
                 </div>
               </div>
             </div>

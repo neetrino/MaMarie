@@ -94,6 +94,12 @@ export const PROFILE_DESKTOP_PENDING_BADGE_CLASS =
 
 export const PROFILE_DESKTOP_SECTION_TITLE_CLASS = 'text-xl font-bold text-brand-pink';
 
+/** Space between section title row and form/content below (+3px vs previous mb-6/mb-8). */
+export const PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS = 'mb-[27px] sm:mb-[35px]';
+
+/** Space between block above and form fields (+3px vs previous mb-8/mb-10). */
+export const PROFILE_DESKTOP_SECTION_TO_FORM_SPACING_CLASS = 'mb-[35px] sm:mb-[43px]';
+
 export const PROFILE_DESKTOP_ORDERS_PAGE_TITLE_CLASS = 'text-2xl font-bold text-brand-pink';
 
 export const PROFILE_DESKTOP_INNER_CARD_CLASS =

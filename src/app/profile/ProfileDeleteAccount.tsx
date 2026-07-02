@@ -1,11 +1,13 @@
 import type { FormEvent } from 'react';
-import { Button, Input } from '@shop/ui';
+import { Input } from '@shop/ui';
 import {
-  PROFILE_DESKTOP_DANGER_BUTTON_CLASS,
   PROFILE_DESKTOP_INPUT_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
+  PROFILE_DESKTOP_SECTION_TO_FORM_SPACING_CLASS,
 } from '../../constants/profile-desktop-page';
 import type { UserProfile } from './types';
+import { ProfileClayButton } from './components/ProfileClayButton';
 import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfileDeleteAccountProps {
@@ -50,7 +52,7 @@ export function ProfileDeleteAccount({
         <p className="max-w-2xl text-sm leading-relaxed text-gray-700">{t('profile.deleteAccount.description')}</p>
       </div>
 
-      <ul className="mb-8 max-w-2xl list-disc space-y-2 pl-5 text-sm text-gray-600 sm:mb-10">
+      <ul className={`${PROFILE_DESKTOP_SECTION_TO_FORM_SPACING_CLASS} max-w-2xl list-disc space-y-2 pl-5 text-sm text-gray-600`}>
         <li>{t('profile.deleteAccount.pointOrders')}</li>
         <li>{t('profile.deleteAccount.pointLogin')}</li>
         <li>{t('profile.deleteAccount.pointData')}</li>
@@ -92,14 +94,14 @@ export function ProfileDeleteAccount({
         </label>
 
         <div className="pt-1 sm:pt-2">
-          <Button
+          <ProfileClayButton
             type="submit"
-            variant="primary"
-            className={`w-full sm:w-auto ${PROFILE_DESKTOP_DANGER_BUTTON_CLASS}`}
+            variant="danger"
+            className="w-full sm:w-auto"
             disabled={deleting || !acknowledged}
           >
             {deleting ? t('profile.deleteAccount.deleting') : t('profile.deleteAccount.submit')}
-          </Button>
+          </ProfileClayButton>
         </div>
       </form>
     </ProfileSectionCard>
