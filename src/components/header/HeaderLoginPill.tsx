@@ -3,20 +3,28 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { BRAND_ASSETS } from '../../constants/brand';
 import {
   HEADER_LOGIN_ICON_SIZE_PX,
   HEADER_LOGIN_PILL_HEIGHT_PX,
   HEADER_LOGIN_PILL_WIDTH_PX,
+  HEADER_PROFILE_MENU_DROPDOWN_ANIMATION_MS,
+  HEADER_PROFILE_MENU_DROPDOWN_GAP_PX,
 } from '../../constants/header';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 
 type Translate = ReturnType<typeof useTranslation>['t'];
 
-const menuLinkClassName =
-  'block px-4 py-2.5 text-sm font-medium text-brand-brown transition-colors hover:bg-brand-pink/35';
+const profileMenuItemBaseClassName =
+  'flex items-center whitespace-nowrap rounded-[18px] px-3 py-2 text-left text-sm font-medium leading-[15px] text-brand-muted transition-colors';
+
+const profileMenuProfileItemClassName = `${profileMenuItemBaseClassName} hover:bg-[#5cb176] hover:text-white`;
+
+const profileMenuAdminItemClassName = `${profileMenuItemBaseClassName} hover:bg-[#5281e1] hover:text-white`;
+
+const profileMenuLogoutItemClassName = `${profileMenuItemBaseClassName} hover:bg-brand-pink hover:text-brand-on-pink`;
 
 function AccountPillIcon() {
   return (
@@ -70,6 +78,7 @@ function AccountPillButton({
       aria-label={label}
       aria-controls={menuId}
       aria-expanded={menuOpen}
+      aria-haspopup="menu"
       disabled={disabled}
       onClick={onClick}
     >
@@ -78,83 +87,58 @@ function AccountPillButton({
   );
 }
 
-function HeaderMenuLink({
-  href,
-  label,
-  onClose,
-}: {
-  href: string;
-  label: string;
-  onClose: () => void;
-}) {
-  return (
-    <Link href={href} role="menuitem" className={menuLinkClassName} onClick={onClose}>
-      {label}
-    </Link>
-  );
-}
-
 function HeaderProfileMenu({
   id,
   isAdmin,
+  isExpanded,
   t,
   onClose,
   onLogout,
 }: {
   id: string;
   isAdmin: boolean;
+  isExpanded: boolean;
   t: Translate;
   onClose: () => void;
   onLogout: () => void;
 }) {
   return (
-    <>
-      <button
-        type="button"
-        className="fixed inset-0 z-40 cursor-default bg-transparent"
-        aria-label={t('common.buttons.close')}
+    <div
+      id={id}
+      role="menu"
+      className={`absolute right-0 z-50 flex w-max origin-top flex-col gap-1 rounded-[22px] bg-brand-yellow p-1.5 transition-all ease-out ${
+        isExpanded
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-2 opacity-0'
+      }`}
+      style={{
+        top: `calc(100% + ${HEADER_PROFILE_MENU_DROPDOWN_GAP_PX}px)`,
+        transitionDuration: `${HEADER_PROFILE_MENU_DROPDOWN_ANIMATION_MS}ms`,
+      }}
+    >
+      <Link
+        href="/profile"
+        role="menuitem"
+        className={profileMenuProfileItemClassName}
         onClick={onClose}
-      />
-      <div
-        id={id}
-        role="menu"
-        className="absolute right-0 top-[calc(100%+8px)] z-50 w-44 overflow-hidden rounded-2xl border border-gray-100 bg-white py-2 shadow-[0_12px_32px_rgba(87,66,59,0.16)]"
       >
-        <HeaderMenuLink href="/profile" label={t('common.navigation.profile')} onClose={onClose} />
-        {isAdmin ? (
-          <HeaderMenuLink href="/supersudo" label={t('common.navigation.admin')} onClose={onClose} />
-        ) : null}
-        <button
-          type="button"
+        {t('common.navigation.profile')}
+      </Link>
+      {isAdmin ? (
+        <Link
+          href="/supersudo"
           role="menuitem"
-          className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
-          onClick={onLogout}
+          className={profileMenuAdminItemClassName}
+          onClick={onClose}
         >
-          {t('common.navigation.logout')}
-        </button>
-      </div>
-    </>
+          {t('common.navigation.admin')}
+        </Link>
+      ) : null}
+      <button type="button" role="menuitem" className={profileMenuLogoutItemClassName} onClick={onLogout}>
+        {t('common.navigation.logout')}
+      </button>
+    </div>
   );
-}
-
-function useCloseOnEscape(isOpen: boolean, onClose: () => void) {
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-
-    return () => {
-      window.removeEventListener('keydown', handleEscape);
-    };
-  }, [isOpen, onClose]);
 }
 
 /** Figma `51:335` — yellow login pill beside currency selector. */
@@ -162,16 +146,85 @@ export function HeaderLoginPill() {
   const { isLoggedIn, isAdmin, isLoading, logout } = useAuth();
   const { t } = useTranslation();
   const pathname = usePathname() ?? '';
-  const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 
   const label = isLoggedIn
     ? t('common.navigation.profile')
     : t('common.navigation.login');
   const loginHref = `/login?redirect=${encodeURIComponent(pathname || '/')}`;
-  const closeMenu = () => setMenuOpen(false);
 
-  useCloseOnEscape(menuOpen, closeMenu);
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    clearCloseTimer();
+    setMenuOpen(false);
+    setIsMenuExpanded(false);
+    closeTimerRef.current = setTimeout(() => {
+      setIsMenuVisible(false);
+      closeTimerRef.current = null;
+    }, HEADER_PROFILE_MENU_DROPDOWN_ANIMATION_MS);
+  }, [clearCloseTimer]);
+
+  const openMenu = useCallback(() => {
+    clearCloseTimer();
+    setMenuOpen(true);
+    setIsMenuVisible(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsMenuExpanded(true);
+      });
+    });
+  }, [clearCloseTimer]);
+
+  const toggleMenu = useCallback(() => {
+    if (menuOpen) {
+      closeMenu();
+      return;
+    }
+    openMenu();
+  }, [closeMenu, menuOpen, openMenu]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeMenu();
+      }
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [closeMenu, menuOpen]);
+
+  useEffect(() => {
+    return () => {
+      clearCloseTimer();
+    };
+  }, [clearCloseTimer]);
 
   if (isLoading) {
     return <AccountPillButton label={label} disabled />;
@@ -187,15 +240,24 @@ export function HeaderLoginPill() {
   }
 
   return (
-    <div className="relative shrink-0">
+    <div ref={containerRef} className="relative shrink-0">
       <AccountPillButton
         label={label}
         menuId={menuId}
         menuOpen={menuOpen}
-        onClick={() => setMenuOpen((open) => !open)}
+        onClick={toggleMenu}
       />
 
-      {menuOpen ? <HeaderProfileMenu id={menuId} isAdmin={isAdmin} t={t} onClose={closeMenu} onLogout={handleLogout} /> : null}
+      {isMenuVisible ? (
+        <HeaderProfileMenu
+          id={menuId}
+          isAdmin={isAdmin}
+          isExpanded={isMenuExpanded}
+          t={t}
+          onClose={closeMenu}
+          onLogout={handleLogout}
+        />
+      ) : null}
     </div>
   );
 }
