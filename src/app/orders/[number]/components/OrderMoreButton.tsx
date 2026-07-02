@@ -11,14 +11,14 @@ import {
   MOBILE_ORDER_ASSETS,
 } from '../../../../constants/mobile-orders';
 
-interface MobileOrderMoreButtonProps {
+interface OrderMoreButtonProps {
   label: string;
   labelFontSizePx: number;
   onClick: () => void;
 }
 
 /** Figma `66:454` — compact pink pill CTA with white arrow disc. */
-export function MobileOrderMoreButton({ label, labelFontSizePx, onClick }: MobileOrderMoreButtonProps) {
+export function OrderMoreButton({ label, labelFontSizePx, onClick }: OrderMoreButtonProps) {
   return (
     <button
       type="button"

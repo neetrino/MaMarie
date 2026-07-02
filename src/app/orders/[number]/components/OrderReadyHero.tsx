@@ -3,7 +3,7 @@
 import {
   MOBILE_ORDER_ACCENT_COLOR,
   MOBILE_ORDER_ASSETS,
-  MOBILE_ORDER_DETAILS_SECTION_ID,
+  MOBILE_ORDER_RECEIPT_SECTION_ID,
   MOBILE_ORDER_HEADLINE_COLOR,
   MOBILE_ORDER_HEADLINE_FONT_SIZE_PX,
   MOBILE_ORDER_HEADLINE_LINE_GAP_PX,
@@ -26,18 +26,18 @@ import {
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Order } from '../types';
 import { resolveMobileOrderHeroCopy } from '../utils/resolve-mobile-order-hero-copy';
-import { MobileOrderMoreButton } from './MobileOrderMoreButton';
+import { OrderMoreButton } from './OrderMoreButton';
 
-interface MobileOrderReadyHeroProps {
+interface OrderReadyHeroProps {
   order: Order;
 }
 
-export function MobileOrderReadyHero({ order }: MobileOrderReadyHeroProps) {
+export function OrderReadyHero({ order }: OrderReadyHeroProps) {
   const { t } = useTranslation();
   const copy = resolveMobileOrderHeroCopy(order, t);
 
   const handleMoreClick = () => {
-    document.getElementById(MOBILE_ORDER_DETAILS_SECTION_ID)?.scrollIntoView({
+    document.getElementById(MOBILE_ORDER_RECEIPT_SECTION_ID)?.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
     });
@@ -121,7 +121,7 @@ export function MobileOrderReadyHero({ order }: MobileOrderReadyHeroProps) {
           </p>
         </div>
 
-        <MobileOrderMoreButton
+        <OrderMoreButton
           label={t('orders.mobile.more')}
           labelFontSizePx={headlineFontSizePx}
           onClick={handleMoreClick}

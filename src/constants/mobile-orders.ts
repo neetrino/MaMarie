@@ -46,6 +46,18 @@ export const MOBILE_ORDER_MORE_BUTTON_BG = BRAND_COLORS.pink;
 
 export const MOBILE_ORDER_DETAILS_SECTION_GAP_PX = 24;
 export const MOBILE_ORDER_DETAILS_SECTION_ID = 'order-details';
+/** «Ավելին» scroll target — top of the receipt panel. */
+export const MOBILE_ORDER_RECEIPT_SECTION_ID = 'order-receipt';
+/** Extra space below the fixed navbar when scrolling to the receipt. */
+export const MOBILE_ORDER_RECEIPT_SCROLL_GAP_BELOW_HEADER_PX = 12;
+
+/** Desktop — centered column, white page surface. */
+export const DESKTOP_ORDER_PAGE_BG = '#ffffff';
+export const DESKTOP_ORDER_PAGE_MAX_WIDTH_PX = 640;
+export const DESKTOP_ORDER_PAGE_PADDING_X_PX = 24;
+export const DESKTOP_ORDER_PAGE_PADDING_TOP_PX = 48;
+export const DESKTOP_ORDER_PAGE_PADDING_BOTTOM_PX = 48;
+export const DESKTOP_ORDER_HERO_TO_DETAILS_GAP_PX = 48;
 
 export const MOBILE_ORDER_ASSETS = {
   readyBasket: '/assets/orders/ready-basket.png',

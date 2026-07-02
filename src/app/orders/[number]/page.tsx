@@ -6,21 +6,11 @@ import { apiClient } from '../../../lib/api-client';
 import { getStoredCurrency } from '../../../lib/currency';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
-import { LoadingState } from './components/LoadingState';
 import { ErrorState } from './components/ErrorState';
-import { OrderItems } from './components/OrderItems';
-import { ShippingAddress } from './components/ShippingAddress';
-import { OrderPageHeader } from './components/OrderPageHeader';
-import { OrderHelpCard } from './components/OrderHelpCard';
-import { OrderSuccessFooterActions } from './components/OrderSuccessFooterActions';
-import { MobileOrderLoadingState } from './components/MobileOrderLoadingState';
-import { MobileOrderPageContent } from './components/MobileOrderPageContent';
-import { MobileOrderPageShell } from './components/MobileOrderPageShell';
+import { OrderPageContent } from './components/OrderPageContent';
+import { OrderPageLoadingState } from './components/OrderPageLoadingState';
+import { OrderPageShell } from './components/OrderPageShell';
 import type { Order } from './types';
-import {
-  ORDER_DETAIL_INNER_CLASS,
-  ORDER_DETAIL_PAGE_SURFACE_CLASS,
-} from './constants/order-detail-ui';
 
 export default function OrderPage() {
   const params = useParams();
@@ -65,58 +55,16 @@ export default function OrderPage() {
   }
 
   if (loading) {
-    return (
-      <>
-        <div className="lg:hidden">
-          <MobileOrderLoadingState />
-        </div>
-        <div className={`hidden lg:block ${ORDER_DETAIL_PAGE_SURFACE_CLASS}`}>
-          <LoadingState />
-        </div>
-      </>
-    );
+    return <OrderPageLoadingState />;
   }
 
   if (error || !order) {
     return (
-      <>
-        <div className="lg:hidden">
-          <MobileOrderPageShell>
-            <ErrorState error={error} />
-          </MobileOrderPageShell>
-        </div>
-        <div className={`hidden lg:block ${ORDER_DETAIL_PAGE_SURFACE_CLASS}`}>
-          <ErrorState error={error} />
-        </div>
-      </>
+      <OrderPageShell>
+        <ErrorState error={error} />
+      </OrderPageShell>
     );
   }
 
-  return (
-    <>
-      <div className="lg:hidden">
-        <MobileOrderPageContent order={order} currency={currency} />
-      </div>
-
-      <div className={`hidden lg:block ${ORDER_DETAIL_PAGE_SURFACE_CLASS}`}>
-        <div className={ORDER_DETAIL_INNER_CLASS}>
-          <OrderPageHeader orderNumber={order.number} placedAt={order.createdAt} />
-          <OrderItems
-            items={order.items}
-            currency={currency}
-            presentation="highlight"
-            orderTotals={order.totals}
-          />
-          <OrderHelpCard />
-          <OrderSuccessFooterActions />
-
-          {order.shippingAddress && (
-            <section className="mt-4 space-y-6 border-t border-gray-200 pt-10">
-              <ShippingAddress shippingAddress={order.shippingAddress} />
-            </section>
-          )}
-        </div>
-      </div>
-    </>
-  );
+  return <OrderPageContent order={order} currency={currency} />;
 }

@@ -1,9 +1,0 @@
-.shell {
-  width: 100%;
-  max-width: 100%;
-  padding-top: var(--mobile-order-page-padding-top);
-  padding-bottom: var(--mobile-order-page-padding-bottom);
-  padding-left: var(--mobile-order-page-padding-x);
-  padding-right: var(--mobile-order-page-padding-x);
-  background-color: var(--mobile-order-page-bg);
-}
