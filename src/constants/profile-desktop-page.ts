@@ -20,7 +20,9 @@ export const PROFILE_DESKTOP_ASSETS = {
   chevronRight: '/assets/home/icon-chevron-right-pink.svg',
   decoBow: '/assets/home/about-us/deco-bow.png',
   decoHeadphones: '/assets/home/about-us/deco-headphones.png',
-  decoStar: '/assets/home/about-us/deco-star.png',
+  /** Misnamed in about-us — actually the strawberry illustration. */
+  decoStrawberry: '/assets/home/about-us/deco-star.png',
+  decoStar: '/assets/footer/deco-star.png',
 } as const;
 
 export const PROFILE_DESKTOP_STAT_THEMES = {
@@ -34,7 +36,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconBackground: '#fef8e3',
     iconForeground: '#e8b84a',
     valueColor: '#d4a017',
-    decoration: PROFILE_DESKTOP_ASSETS.decoStar,
+    decoration: PROFILE_DESKTOP_ASSETS.decoStrawberry,
   },
   blue: {
     iconBackground: '#e8f4fd',
