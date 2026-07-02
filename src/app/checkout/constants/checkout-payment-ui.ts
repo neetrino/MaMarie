@@ -23,6 +23,8 @@ export const CHECKOUT_PAYMENT_CARD_BADGE_BOX_HEIGHT_PX = 34;
 export const CHECKOUT_PAYMENT_CARD_BADGE_LOGO_HEIGHT_PX =
   CHECKOUT_PAYMENT_CARD_BADGE_BOX_HEIGHT_PX - CHECKOUT_PAYMENT_CARD_BADGE_PADDING_PX * 2;
 export const CHECKOUT_PAYMENT_CARD_BADGE_ORDER = ['Visa', 'Mastercard', 'ArCa'] as const;
+/** Visa — slight shrink inside the shared frame. */
+export const CHECKOUT_PAYMENT_VISA_INNER_LOGO_SCALE = 0.9;
 /** ArCa square source — zoom inside the shared Visa-width frame. */
 export const CHECKOUT_PAYMENT_ARCA_INNER_LOGO_SCALE = 3.5;
 /** Mastercard — slight zoom inside the shared frame. */
@@ -75,6 +77,7 @@ export const CHECKOUT_CARD_PAYMENT_BADGES: CheckoutCardPaymentBadge[] = [
     src: '/assets/payments/checkout/visa.png',
     sourceWidthPx: 877,
     sourceHeightPx: 284,
+    innerLogoScale: CHECKOUT_PAYMENT_VISA_INNER_LOGO_SCALE,
   },
   {
     alt: 'Mastercard',

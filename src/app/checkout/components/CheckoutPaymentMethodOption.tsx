@@ -61,7 +61,7 @@ export function CheckoutPaymentMethodOption({
           className="self-center lg:hidden"
         />
 
-        <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 lg:hidden">
+        <div className="flex w-full min-w-0 flex-1 flex-col items-start gap-1.5 lg:hidden">
           <span className="font-medium text-gray-900">{method.shortName}</span>
           {icons}
         </div>
