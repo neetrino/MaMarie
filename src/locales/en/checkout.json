@@ -36,7 +36,21 @@
     "deliveryDescription": "We will deliver your order to your address",
     "freePickup": "Free (Store Pickup)",
     "loading": "Loading...",
-    "enterCity": "Enter City"
+    "enterCity": "Enter City",
+    "selectCity": "Select city"
+  },
+  "deliveryCities": {
+    "yerevan": "Yerevan",
+    "aragatsotn": "Aragatsotn",
+    "ararat": "Ararat",
+    "armavir": "Armavir",
+    "gegharkunik": "Gegharkunik",
+    "kotayk": "Kotayk",
+    "lori": "Lori",
+    "shirak": "Shirak",
+    "syunik": "Syunik",
+    "tavush": "Tavush",
+    "vayotsDzor": "Vayots Dzor"
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",

@@ -9,6 +9,7 @@ import {
   CHECKOUT_SECTION_CARD_CLASS,
   CHECKOUT_SECTION_TITLE_CLASS,
 } from './constants/checkout-ui';
+import { resolveCheckoutDeliveryCityDisplayLabel } from './constants/checkout-delivery-cities';
 
 interface OrderSummaryProps {
   orderSummary: {
@@ -39,6 +40,7 @@ export function OrderSummary({
   onPlaceOrder,
 }: OrderSummaryProps) {
   const { t } = useTranslation();
+  const shippingCityLabel = resolveCheckoutDeliveryCityDisplayLabel(t, shippingCity);
 
   const shippingLabel =
     shippingMethod === 'pickup'
@@ -47,8 +49,8 @@ export function OrderSummary({
         ? t('checkout.shipping.loading')
         : deliveryPrice !== null
           ? formatPriceInCurrency(orderSummary.shippingDisplay, currency) +
-            (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-          : t('checkout.shipping.enterCity');
+            (shippingCityLabel ? ` (${shippingCityLabel})` : ` (${t('checkout.shipping.delivery')})`)
+          : t('checkout.shipping.selectCity');
 
   return (
     <div className={`lg:sticky lg:top-24 lg:self-start ${CHECKOUT_ORDER_SUMMARY_WRAP_CLASS}`}>

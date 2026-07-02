@@ -2,6 +2,7 @@
 
 import { useTranslation } from '../../../lib/i18n-client';
 import { CHECKOUT_FORM_ALERT_CLASS } from '../constants/checkout-ui';
+import { resolveCheckoutDeliveryCityDisplayLabel } from '../constants/checkout-delivery-cities';
 import { formatPriceInCurrency } from '../../../lib/currency';
 import { Cart } from '../types';
 
@@ -30,6 +31,7 @@ export function OrderSummaryModal({
   deliveryPrice,
 }: OrderSummaryModalProps) {
   const { t } = useTranslation();
+  const shippingCityLabel = resolveCheckoutDeliveryCityDisplayLabel(t, shippingCity);
 
   if (!cart) {
     return null;
@@ -42,8 +44,8 @@ export function OrderSummaryModal({
         ? t('checkout.shipping.loading')
         : deliveryPrice !== null
           ? formatPriceInCurrency(orderSummary.shippingDisplay, currency) +
-            (shippingCity ? ` (${shippingCity})` : ` (${t('checkout.shipping.delivery')})`)
-          : t('checkout.shipping.enterCity');
+            (shippingCityLabel ? ` (${shippingCityLabel})` : ` (${t('checkout.shipping.delivery')})`)
+          : t('checkout.shipping.selectCity');
 
   return (
     <div className={`space-y-2 bg-brand-pink/5 p-4 ring-1 ring-brand-pink/20 ${CHECKOUT_FORM_ALERT_CLASS}`}>

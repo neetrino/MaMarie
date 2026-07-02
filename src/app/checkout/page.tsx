@@ -91,6 +91,7 @@ export default function CheckoutPage() {
           <CheckoutForm
             register={register}
             setValue={setValue}
+            shippingCity={shippingCity}
             errors={errors}
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}

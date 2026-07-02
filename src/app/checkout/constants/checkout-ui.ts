@@ -31,3 +31,11 @@ export const CHECKOUT_SECONDARY_BUTTON_CLASS =
 /** Order summary — full width on mobile; narrow column on desktop. */
 export const CHECKOUT_ORDER_SUMMARY_WRAP_CLASS =
   'w-full lg:ml-auto lg:mr-0 lg:max-w-[300px]';
+
+/** Custom select — closed / open border (Figma delivery city picker). */
+export const CHECKOUT_SELECT_BORDER_CLASS = 'border-gray-300';
+export const CHECKOUT_SELECT_BORDER_OPEN_CLASS = 'border-[#71b5f5]';
+export const CHECKOUT_SELECT_DROPDOWN_ANIMATION_MS = 150;
+export const CHECKOUT_SELECT_DROPDOWN_GAP_PX = 6;
+export const CHECKOUT_SELECT_TRIGGER_MIN_HEIGHT_PX = 42;
+export const CHECKOUT_SELECT_CHEVRON_SIZE_PX = 16;

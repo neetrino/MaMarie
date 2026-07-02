@@ -36,7 +36,21 @@
     "deliveryDescription": "Мы доставим ваш заказ по вашему адресу",
     "freePickup": "Бесплатно (Самовывоз)",
     "loading": "Загрузка...",
-    "enterCity": "Введите город"
+    "enterCity": "Введите город",
+    "selectCity": "Выберите город"
+  },
+  "deliveryCities": {
+    "yerevan": "Ереван",
+    "aragatsotn": "Арагацотн",
+    "ararat": "Арарат",
+    "armavir": "Армавир",
+    "gegharkunik": "Гехаркуник",
+    "kotayk": "Котайк",
+    "lori": "Лори",
+    "shirak": "Ширак",
+    "syunik": "Сюник",
+    "tavush": "Тавуш",
+    "vayotsDzor": "Вайоц Дзор"
   },
   "payment": {
     "cashOnDelivery": "Наложенный платеж",

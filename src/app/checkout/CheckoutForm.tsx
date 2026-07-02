@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckoutDeliveryCitySelect } from './components/CheckoutDeliveryCitySelect';
 import { CheckoutInput } from './components/CheckoutInput';
 import { CheckoutPaymentMethodOption } from './components/CheckoutPaymentMethodOption';
 import { CheckoutRadio } from './components/CheckoutRadio';
@@ -20,6 +21,7 @@ import type { PaymentMethod } from './utils/payment-methods';
 interface CheckoutFormProps {
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
+  shippingCity: string | undefined;
   errors: FieldErrors<CheckoutFormData>;
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
@@ -40,6 +42,7 @@ function optionClass(isSelected: boolean): string {
 export function CheckoutForm({
   register,
   setValue,
+  shippingCity,
   errors,
   isSubmitting,
   shippingMethod,
@@ -143,19 +146,16 @@ export function CheckoutForm({
             </div>
           ) : null}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <CheckoutInput
-              label={t('checkout.form.city')}
-              type="text"
-              placeholder={t('checkout.placeholders.city')}
-              {...register('shippingCity', {
-                onChange: () => {
-                  if (error && error.includes('shipping address')) {
-                    setError(null);
-                  }
-                },
-              })}
+            <CheckoutDeliveryCitySelect
+              shippingCity={shippingCity}
+              setValue={setValue}
               error={errors.shippingCity?.message}
               disabled={isSubmitting}
+              onChange={() => {
+                if (error && error.includes('shipping address')) {
+                  setError(null);
+                }
+              }}
             />
             <CheckoutInput
               label={t('checkout.form.address')}

@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckoutDeliveryCitySelect } from './CheckoutDeliveryCitySelect';
 import { CheckoutInput } from './CheckoutInput';
 import { CheckoutPrimaryButton } from './CheckoutPrimaryButton';
 import { CHECKOUT_FORM_ALERT_CLASS, CHECKOUT_SECONDARY_BUTTON_CLASS } from '../constants/checkout-ui';
@@ -107,11 +108,9 @@ export function ShippingAddressModal({
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('checkout.shippingAddress')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <CheckoutInput
-                    label={t('checkout.form.city')}
-                    type="text"
-                    placeholder={t('checkout.placeholders.city')}
-                    {...register('shippingCity')}
+                  <CheckoutDeliveryCitySelect
+                    shippingCity={shippingCity}
+                    setValue={setValue}
                     error={errors.shippingCity?.message}
                     disabled={isSubmitting}
                   />
