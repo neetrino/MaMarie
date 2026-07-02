@@ -1,9 +1,17 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
 import { Home } from 'lucide-react';
-import { UserAvatar } from '../../components/UserAvatar';
+import { useEffect, type ReactNode } from 'react';
+import {
+  PROFILE_MOBILE_CARD_RADIUS_PX,
+  PROFILE_MOBILE_EMAIL_COLOR,
+  PROFILE_MOBILE_NAME_COLOR,
+  PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+  PROFILE_MOBILE_TAB_ICON_THEME,
+} from '../../constants/profile-mobile-page';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
+import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
+import { ProfileMobileMenuRow } from './components/ProfileMobileMenuRow';
 
 interface ProfileMobilePageProps {
   profile: UserProfile | null;
@@ -24,6 +32,22 @@ function getDisplayName(profile: UserProfile | null, t: (_key: string) => string
   return profile?.firstName || profile?.lastName || t('profile.myProfile');
 }
 
+function buildMenuOrder(tabs: ProfileTabConfig[]): ProfileTabConfig[] {
+  const dashboard = tabs.find((tab) => tab.id === 'dashboard');
+  const password = tabs.find((tab) => tab.id === 'password');
+  const deleteAccount = tabs.find((tab) => tab.id === 'deleteAccount');
+  const middleTabs = tabs.filter(
+    (tab) => tab.id !== 'dashboard' && tab.id !== 'password' && tab.id !== 'deleteAccount',
+  );
+
+  return [
+    ...(dashboard ? [dashboard] : []),
+    ...middleTabs,
+    ...(password ? [password] : []),
+    ...(deleteAccount ? [deleteAccount] : []),
+  ];
+}
+
 export function ProfileMobilePage({
   profile,
   tabs,
@@ -37,9 +61,7 @@ export function ProfileMobilePage({
 }: ProfileMobilePageProps) {
   const displayName = getDisplayName(profile, t);
   const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? t('profile.myProfile');
-  const dashboardTab = tabs.find((tab) => tab.id === 'dashboard');
-  const passwordTab = tabs.find((tab) => tab.id === 'password');
-  const otherTabs = tabs.filter((tab) => tab.id !== 'dashboard' && tab.id !== 'password');
+  const orderedTabs = buildMenuOrder(tabs);
 
   useEffect(() => {
     if (!isSheetOpen) return;
@@ -51,109 +73,74 @@ export function ProfileMobilePage({
   }, [isSheetOpen]);
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-8 pt-6 md:hidden">
-      <div className="rounded-[2rem] bg-white px-5 pb-7 pt-5 shadow-sm ring-1 ring-gray-200/80">
-
-        <div className="mb-5 flex items-center gap-4">
-          <UserAvatar
-            firstName={profile?.firstName}
-            lastName={profile?.lastName}
-            avatarUrl={profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null}
-            size="lg"
-            className="h-20 w-20 text-xl"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xl font-semibold text-gray-900">{displayName}</p>
-            {profile?.email && <p className="truncate text-sm text-gray-600">{profile.email}</p>}
+    <div className="profile-mobile-page md:hidden">
+      <div
+        className="mx-auto w-full max-w-md pt-2"
+        style={{
+          paddingLeft: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+          paddingRight: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+        }}
+      >
+        <div
+          className="relative overflow-hidden bg-white px-5 pt-6 shadow-sm ring-1 ring-gray-200/70"
+          style={{ borderRadius: PROFILE_MOBILE_CARD_RADIUS_PX }}
+        >
+          <div className="mb-6 flex items-center gap-4">
+            <ProfileMobileAvatar
+              firstName={profile?.firstName}
+              lastName={profile?.lastName}
+              avatarUrl={
+                profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
+              }
+            />
+            <div className="min-w-0 flex-1">
+              <p
+                className="truncate text-xl font-bold"
+                style={{ color: PROFILE_MOBILE_NAME_COLOR }}
+              >
+                {displayName}
+              </p>
+              {profile?.email ? (
+                <p
+                  className="truncate text-sm"
+                  style={{ color: PROFILE_MOBILE_EMAIL_COLOR }}
+                >
+                  {profile.email}
+                </p>
+              ) : null}
+            </div>
           </div>
-        </div>
 
-        <div className="divide-y divide-gray-100 rounded-2xl border border-gray-200/80 bg-white">
-          {dashboardTab && (
-            <>
-              <button
-                type="button"
-                onClick={() => onTabSelect(dashboardTab.id)}
-                className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-              >
-                <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                  <span className="text-gray-500">
-                    <Home className="h-5 w-5" strokeWidth={1.75} />
-                  </span>
-                  Home
-                </span>
-                <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </>
-          )}
-          {otherTabs
-            .filter((tab) => tab.id !== 'deleteAccount')
-            .map((tab) => (
-              <button
+          <div className="-mx-5 divide-y divide-gray-100 border-t border-gray-100">
+            {orderedTabs.map((tab) => (
+              <ProfileMobileMenuRow
                 key={tab.id}
-                type="button"
+                label={tab.id === 'dashboard' ? 'Home' : tab.label}
+                icon={
+                  tab.id === 'dashboard' ? (
+                    <Home className="h-5 w-5" strokeWidth={1.75} />
+                  ) : (
+                    tab.icon
+                  )
+                }
+                iconTheme={PROFILE_MOBILE_TAB_ICON_THEME[tab.id]}
                 onClick={() => onTabSelect(tab.id)}
-                className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-              >
-                <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                  <span className="text-gray-500">{tab.icon}</span>
-                  {tab.label}
-                </span>
-                <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+              />
             ))}
-          {passwordTab && (
-            <button
-              type="button"
-              onClick={() => onTabSelect(passwordTab.id)}
-              className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-            >
-              <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                <span className="text-gray-500">{passwordTab.icon}</span>
-                {passwordTab.label}
-              </span>
-              <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          )}
-          {otherTabs
-            .filter((tab) => tab.id === 'deleteAccount')
-            .map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => onTabSelect(tab.id)}
-              className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-            >
-              <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                <span className="text-gray-500">{tab.icon}</span>
-                {tab.label}
-              </span>
-              <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left text-red-600"
-          >
-            <span className="text-base font-semibold">{t('common.navigation.logout')}</span>
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+            <ProfileMobileMenuRow
+              label={t('common.navigation.logout')}
+              onClick={onLogout}
+              variant="logout"
+            />
+          </div>
         </div>
       </div>
 
-      {isSheetOpen && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-black/35 backdrop-blur-[1px]" onClick={onCloseSheet}>
+      {isSheetOpen ? (
+        <div
+          className="fixed inset-0 z-[70] flex items-end bg-black/35 backdrop-blur-[1px]"
+          onClick={onCloseSheet}
+        >
           <div
             role="dialog"
             aria-modal="true"
@@ -179,7 +166,7 @@ export function ProfileMobilePage({
             <div className="h-[calc(72vh-4.75rem)] overflow-y-auto px-4 py-4">{children}</div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

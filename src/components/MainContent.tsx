@@ -73,7 +73,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/profile')) {
     return (
       <main
-        className={`${mainBase} md:pt-[var(--header-clearance-desktop)]`}
+        className={`${mainBase} home-main-surface order-page-main max-lg:pt-0 md:pt-[var(--header-clearance-desktop)]`}
         style={
           {
             ['--header-clearance-desktop']: `calc(${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,
