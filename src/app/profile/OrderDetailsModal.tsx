@@ -1,16 +1,14 @@
 'use client';
 
 import { useRef } from 'react';
-import { Button } from '@shop/ui';
 import {
-  PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
   PROFILE_DESKTOP_PENDING_BADGE_CLASS,
-  PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
 } from '../../constants/profile-desktop-page';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { getColorValue } from './utils';
 import type { OrderDetails } from './types';
+import { ProfileClayButton } from './components/ProfileClayButton';
 import { ProfileSectionCard } from './components/ProfileSectionCard';
 import { ProfileSideSheet } from './components/ProfileSideSheet';
 
@@ -68,14 +66,15 @@ export function OrderDetailsModal({
   }
 
   const headerActions = (
-    <Button
+    <ProfileClayButton
+      type="button"
       onClick={onReOrder}
       disabled={isReordering}
       variant="primary"
-      className={`w-full sm:w-auto ${PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}`}
+      className="shrink-0"
     >
       {isReordering ? t('profile.orderDetails.adding') : t('profile.orderDetails.reorder')}
-    </Button>
+    </ProfileClayButton>
   );
 
   return (
@@ -95,9 +94,9 @@ export function OrderDetailsModal({
       ) : orderDetailsError ? (
         <div className="flex flex-col items-center py-12 text-center">
           <p className="mb-4 text-sm text-red-600">{orderDetailsError}</p>
-          <Button onClick={onClose} variant="outline" className={PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}>
+          <ProfileClayButton type="button" onClick={onClose} variant="secondary" className="w-full sm:w-auto">
             {t('profile.orderDetails.close')}
-          </Button>
+          </ProfileClayButton>
         </div>
       ) : (
         <div className="space-y-4">

@@ -75,14 +75,14 @@ function ProfileSideSheetPanel({
           onClick={(event) => event.stopPropagation()}
         >
           <header className="shrink-0 border-b border-gray-100 px-5 py-4">
-            <div className="space-y-3">
-              <div>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
                 <h2 id="profile-side-sheet-title" className="text-lg font-bold text-gray-900">
                   {title}
                 </h2>
                 {subtitle ? <p className="mt-1 text-sm text-gray-600">{subtitle}</p> : null}
               </div>
-              {headerActions ? <div className="flex flex-wrap gap-2">{headerActions}</div> : null}
+              {headerActions ? <div className="shrink-0">{headerActions}</div> : null}
             </div>
           </header>
 
