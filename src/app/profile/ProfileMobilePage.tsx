@@ -9,11 +9,13 @@ import {
   PROFILE_MOBILE_TAB_ICON_THEME,
   PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
+  PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX,
   PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH,
   PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_Z_INDEX,
 } from '../../constants/profile-mobile-page';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
+import { useBottomSheetDragDismiss } from '../../lib/use-bottom-sheet-drag-dismiss';
 import { useDrawerTransition } from '../../lib/use-drawer-transition';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
@@ -76,6 +78,27 @@ export function ProfileMobilePage({
     isSheetOpen,
     PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
   );
+  const {
+    dragOffsetY,
+    isDragging,
+    scrollAreaRef,
+    panelDragStyle,
+    resetDrag,
+    headerPointerHandlers,
+    scrollAreaPointerHandlers,
+    panelPointerHandlers,
+  } = useBottomSheetDragDismiss({
+    enabled: sheetRendered && sheetVisible,
+    panelRef: sheetPanelRef,
+    onDismiss: onCloseSheet,
+    dismissThresholdPx: PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX,
+  });
+
+  useEffect(() => {
+    if (!isSheetOpen) {
+      resetDrag();
+    }
+  }, [isSheetOpen, resetDrag]);
 
   useEffect(() => {
     if (!sheetRendered) {
@@ -125,34 +148,37 @@ export function ProfileMobilePage({
         role="dialog"
         aria-modal="true"
         aria-label={activeTabLabel}
-        className={`flex w-full flex-col overflow-hidden bg-white shadow-2xl transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
-          sheetVisible ? 'translate-y-0' : 'translate-y-full motion-reduce:translate-y-0'
-        }`}
+        className={`flex w-full flex-col overflow-hidden bg-white shadow-2xl ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+          isDragging || dragOffsetY > 0
+            ? ''
+            : sheetVisible
+              ? 'translate-y-0'
+              : 'translate-y-full motion-reduce:translate-y-0'
+        } ${isDragging || dragOffsetY > 0 ? '' : 'transition-transform'}`}
         style={{
           height: `${PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH}dvh`,
           borderTopLeftRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
           borderTopRightRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
-          transitionDuration: `${PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS}ms`,
+          transitionDuration:
+            isDragging || dragOffsetY > 0 ? '0ms' : `${PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS}ms`,
+          ...panelDragStyle,
         }}
         onClick={(event) => event.stopPropagation()}
+        {...panelPointerHandlers}
       >
-        <div className="shrink-0">
-          <div className="mx-auto mt-2 h-1.5 w-14 rounded-full bg-gray-300" />
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+        <div className="shrink-0 touch-none select-none" {...headerPointerHandlers}>
+          <div className="mx-auto mt-2 h-1.5 w-14 cursor-grab rounded-full bg-gray-300 active:cursor-grabbing" />
+          <div className="border-b border-gray-100 px-5 py-4">
             <h2 className="text-lg font-semibold text-gray-900">{activeTabLabel}</h2>
-            <button
-              type="button"
-              onClick={onCloseSheet}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600"
-              aria-label={t('profile.orderDetails.close')}
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
         </div>
-        <div className="profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4">
+        <div
+          ref={scrollAreaRef}
+          className={`profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overscroll-contain px-4 pt-4 ${
+            isDragging ? 'touch-none overflow-hidden' : 'overflow-y-auto'
+          }`}
+          {...scrollAreaPointerHandlers}
+        >
           <div
             style={{
               paddingBottom: `calc(${PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX}px + env(safe-area-inset-bottom, 0px))`,
