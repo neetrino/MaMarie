@@ -369,6 +369,10 @@ main.profile-page-main {
   display: none;
 }
 
+.profile-mobile-tab-sheet-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
 html:has(main.profile-page-main) {
   -ms-overflow-style: none;
   scrollbar-width: none;

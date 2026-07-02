@@ -10,6 +10,12 @@ export const PROFILE_MOBILE_MENU_ICON_BOX_SIZE_PX = 40;
 export const PROFILE_MOBILE_MENU_ICON_BOX_RADIUS_PX = 12;
 export const PROFILE_MOBILE_CHEVRON_SIZE_PX = 18;
 
+/** Bottom sheet — tab content (orders, personal, etc.). */
+export const PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH = 72;
+/** Above mobile bottom nav (`MOBILE_BOTTOM_NAV_Z_INDEX` = 70). */
+export const PROFILE_MOBILE_TAB_SHEET_Z_INDEX = 90;
+export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX = 24;
+
 export const PROFILE_MOBILE_EMAIL_COLOR = '#6b7280';
 
 export const PROFILE_MOBILE_ASSETS = {

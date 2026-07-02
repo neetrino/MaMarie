@@ -1,14 +1,17 @@
 'use client';
 
-import { Home } from 'lucide-react';
-import { type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import {
   PROFILE_MOBILE_CARD_RADIUS_PX,
   PROFILE_MOBILE_EMAIL_COLOR,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
+  PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
+  PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH,
+  PROFILE_MOBILE_TAB_SHEET_Z_INDEX,
 } from '../../constants/profile-mobile-page';
-import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
+import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
 import { ProfileMobileMenuRow } from './components/ProfileMobileMenuRow';
@@ -37,7 +40,10 @@ function buildMenuOrder(tabs: ProfileTabConfig[]): ProfileTabConfig[] {
   const password = tabs.find((tab) => tab.id === 'password');
   const deleteAccount = tabs.find((tab) => tab.id === 'deleteAccount');
   const middleTabs = tabs.filter(
-    (tab) => tab.id !== 'dashboard' && tab.id !== 'password' && tab.id !== 'deleteAccount',
+    (tab) =>
+      tab.id !== 'dashboard' &&
+      tab.id !== 'password' &&
+      tab.id !== 'deleteAccount',
   );
 
   return [
@@ -62,8 +68,83 @@ export function ProfileMobilePage({
   const displayName = getDisplayName(profile, t);
   const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? t('profile.myProfile');
   const orderedTabs = buildMenuOrder(tabs);
+  const sheetPanelRef = useRef<HTMLDivElement>(null);
 
-  useBodyScrollLock(isSheetOpen);
+  useEffect(() => {
+    if (!isSheetOpen) {
+      return;
+    }
+
+    lockBodyScroll();
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (sheetPanelRef.current?.contains(target)) {
+        return;
+      }
+
+      event.preventDefault();
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      unlockBodyScroll();
+    };
+  }, [isSheetOpen]);
+
+  const sheetOverlay = isSheetOpen ? (
+    <div
+      className="fixed inset-0 flex items-end bg-black/35 backdrop-blur-[1px]"
+      style={{ zIndex: PROFILE_MOBILE_TAB_SHEET_Z_INDEX }}
+      onClick={onCloseSheet}
+    >
+      <div
+        ref={sheetPanelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={activeTabLabel}
+        className="flex w-full flex-col overflow-hidden bg-white shadow-2xl"
+        style={{
+          height: `${PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH}dvh`,
+          borderTopLeftRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
+          borderTopRightRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
+        }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="shrink-0">
+          <div className="mx-auto mt-2 h-1.5 w-14 rounded-full bg-gray-300" />
+          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+            <h2 className="text-lg font-semibold text-gray-900">{activeTabLabel}</h2>
+            <button
+              type="button"
+              onClick={onCloseSheet}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600"
+              aria-label={t('profile.orderDetails.close')}
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className="profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-4">
+          <div
+            style={{
+              paddingBottom: `calc(${PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX}px + env(safe-area-inset-bottom, 0px))`,
+            }}
+          >
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div className="profile-mobile-page md:hidden">
@@ -101,18 +182,12 @@ export function ProfileMobilePage({
             </div>
           </div>
 
-          <div className="-mx-5 divide-y divide-gray-100 border-t border-gray-100">
+          <div className="-mx-5 divide-y divide-gray-100">
             {orderedTabs.map((tab) => (
               <ProfileMobileMenuRow
                 key={tab.id}
-                label={tab.id === 'dashboard' ? 'Home' : tab.label}
-                icon={
-                  tab.id === 'dashboard' ? (
-                    <Home className="h-5 w-5" strokeWidth={1.75} />
-                  ) : (
-                    tab.icon
-                  )
-                }
+                label={tab.label}
+                icon={tab.icon}
                 iconTheme={PROFILE_MOBILE_TAB_ICON_THEME[tab.id]}
                 onClick={() => onTabSelect(tab.id)}
               />
@@ -126,41 +201,7 @@ export function ProfileMobilePage({
         </div>
       </div>
 
-      {isSheetOpen ? (
-        <div
-          className="fixed inset-0 z-[70] flex items-end bg-black/35 backdrop-blur-[1px]"
-          onClick={onCloseSheet}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={activeTabLabel}
-            className="w-full overflow-hidden bg-white shadow-2xl"
-            style={{
-              height: '72vh',
-              borderTopLeftRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
-              borderTopRightRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
-            }}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="mx-auto mt-2 h-1.5 w-14 rounded-full bg-gray-300" />
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">{activeTabLabel}</h2>
-              <button
-                type="button"
-                onClick={onCloseSheet}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600"
-                aria-label={t('profile.orderDetails.close')}
-              >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="profile-scroll-area h-[calc(72vh-4.75rem)] overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
-          </div>
-        </div>
-      ) : null}
+      {sheetOverlay ? createPortal(sheetOverlay, document.body) : null}
     </div>
   );
 }

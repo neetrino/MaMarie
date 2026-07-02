@@ -134,8 +134,8 @@ export function ProfileDashboard({
   };
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+    <div className="space-y-6 pb-2 md:space-y-8 md:pb-0">
+      <div className="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
         {PROFILE_DESKTOP_STAT_CONFIG.map(({ key, theme }) => (
           <ProfileDesktopStatCard
             key={key}
@@ -168,7 +168,7 @@ export function ProfileDashboard({
             </a>
           </div>
         ) : (
-          <ul className={PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS}>
+          <ul className={`${PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS} max-md:gap-3`}>
             {dashboardData.recentOrders.map((order) => (
               <li key={order.id} className="min-w-0">
                 <ProfileDesktopOrderCard
