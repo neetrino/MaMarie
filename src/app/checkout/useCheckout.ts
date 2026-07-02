@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { handleRemoveItem } from '../cart/cart-handlers';
 import { getStoredCurrency } from '../../lib/currency';
 import { getStoredLanguage } from '../../lib/language';
 import { useAuth } from '../../lib/auth/AuthContext';
@@ -58,7 +59,7 @@ export function useCheckout() {
   const shippingCity = watch('shippingCity');
 
   const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(shippingMethod, shippingCity);
-  const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const { cart, loading, fetchCart, setCart } = useCart(isLoggedIn);
   useUserProfile(isLoggedIn, isLoading, setValue);
 
   const { submitOrder } = useOrderSubmission({
@@ -140,6 +141,12 @@ export function useCheckout() {
     submitOrder(data);
   };
 
+  const handleRemoveCartItem = useCallback(
+    (itemId: string) =>
+      handleRemoveItem(itemId, isLoggedIn, setCart, fetchCart, t('common.messages.product')),
+    [fetchCart, isLoggedIn, setCart, t],
+  );
+
   return {
     // State
     cart,
@@ -171,6 +178,7 @@ export function useCheckout() {
     // Actions
     handlePlaceOrder,
     onSubmit,
+    handleRemoveCartItem,
     // Auth
     isLoggedIn,
   };

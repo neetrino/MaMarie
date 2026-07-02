@@ -33,6 +33,6 @@ export function useCart(isLoggedIn: boolean) {
     fetchCart();
   }, [fetchCart]);
 
-  return { cart, loading, error, setError, fetchCart };
+  return { cart, loading, error, setError, fetchCart, setCart };
 }
 

@@ -5,6 +5,9 @@
   "shippingAddress": "Shipping Address",
   "paymentMethod": "Payment Method",
   "orderSummary": "Order Summary",
+  "orderItemsPreview": {
+    "title": "Your order items"
+  },
   "form": {
     "firstName": "First Name",
     "lastName": "Last Name",

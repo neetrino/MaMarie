@@ -5,6 +5,9 @@
   "shippingAddress": "Адрес доставки",
   "paymentMethod": "Способ оплаты",
   "orderSummary": "Итоги заказа",
+  "orderItemsPreview": {
+    "title": "Товары в заказе"
+  },
   "form": {
     "firstName": "Имя",
     "lastName": "Фамилия",

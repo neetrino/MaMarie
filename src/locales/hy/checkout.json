@@ -5,6 +5,9 @@
   "shippingAddress": "Առաքման հասցե",
   "paymentMethod": "Վճարման եղանակ",
   "orderSummary": "Պատվերի ամփոփում",
+  "orderItemsPreview": {
+    "title": "Ձեր պատվերի ապրանքները"
+  },
   "form": {
     "firstName": "Անուն",
     "lastName": "Ազգանուն",

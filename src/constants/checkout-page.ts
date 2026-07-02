@@ -26,6 +26,9 @@ export const CHECKOUT_GRID_GAP_PX = 32;
 /** Order summary receipt panel max width (px). */
 export const CHECKOUT_ORDER_SUMMARY_MAX_WIDTH_PX = 300;
 
+/** Order items preview thumbnail (px). */
+export const CHECKOUT_ORDER_ITEMS_THUMB_SIZE_PX = 88;
+
 /** Primary CTA pill — matches cart drawer checkout button. */
 export const CHECKOUT_PRIMARY_BUTTON_HEIGHT_PX = 50;
 

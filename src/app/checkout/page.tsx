@@ -4,9 +4,14 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
+import { CheckoutOrderItemsPreview } from './components/CheckoutOrderItemsPreview';
 import { CheckoutPageShell, checkoutPageShellStyles } from './components/CheckoutPageShell';
 import { CheckoutPrimaryButton } from './components/CheckoutPrimaryButton';
-import { CHECKOUT_PAGE_TITLE_CLASS, CHECKOUT_SECTION_CARD_CLASS } from './constants/checkout-ui';
+import {
+  CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS,
+  CHECKOUT_PAGE_TITLE_CLASS,
+  CHECKOUT_SECTION_CARD_CLASS,
+} from './constants/checkout-ui';
 import { OrderSummary } from './OrderSummary';
 import { useCheckout } from './useCheckout';
 
@@ -16,6 +21,7 @@ function CheckoutSkeleton() {
       <div className={checkoutPageShellStyles.titleOffset}>
         <div className="h-8 w-40 animate-pulse rounded-lg bg-gray-200" />
       </div>
+      <div className={`${CHECKOUT_SECTION_CARD_CLASS} mb-6 h-40 animate-pulse bg-gray-100`} />
       <div className={`grid grid-cols-1 lg:grid-cols-3 ${checkoutPageShellStyles.formGrid}`}>
         <div className={`lg:col-span-2 ${checkoutPageShellStyles.formSections} flex flex-col`}>
           <div className={`${CHECKOUT_SECTION_CARD_CLASS} h-64 animate-pulse bg-gray-100`} />
@@ -57,6 +63,7 @@ export default function CheckoutPage() {
     orderSummary,
     handlePlaceOrder,
     onSubmit,
+    handleRemoveCartItem,
     isLoggedIn,
   } = useCheckout();
 
@@ -85,6 +92,13 @@ export default function CheckoutPage() {
       <h1 className={`${CHECKOUT_PAGE_TITLE_CLASS} ${checkoutPageShellStyles.titleOffset}`}>
         {t('checkout.title')}
       </h1>
+
+      <CheckoutOrderItemsPreview
+        cart={cart}
+        onRemoveItem={handleRemoveCartItem}
+        t={t}
+        className={CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS}
+      />
 
       <form onSubmit={handlePlaceOrder}>
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${checkoutPageShellStyles.formGrid}`}>

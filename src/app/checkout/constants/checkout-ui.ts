@@ -32,6 +32,29 @@ export const CHECKOUT_SECONDARY_BUTTON_CLASS =
 export const CHECKOUT_ORDER_SUMMARY_WRAP_CLASS =
   'w-full lg:ml-auto lg:mr-0 lg:max-w-[300px]';
 
+/** Order items preview — top of checkout (Figma). */
+export const CHECKOUT_ORDER_ITEMS_PREVIEW_CARD_CLASS =
+  'rounded-[15px] border border-gray-200 bg-white px-5 py-4 sm:px-6 sm:py-5';
+
+export const CHECKOUT_ORDER_ITEMS_PREVIEW_TITLE_CLASS =
+  'text-sm font-bold uppercase tracking-wide text-gray-900';
+
+export const CHECKOUT_ORDER_ITEMS_PREVIEW_COUNT_CLASS = 'shrink-0 text-sm text-gray-500';
+
+export const CHECKOUT_ORDER_ITEMS_PREVIEW_LIST_CLASS =
+  'flex gap-6 overflow-x-auto overscroll-x-contain pt-4';
+
+export const CHECKOUT_ORDER_ITEMS_THUMB_FRAME_CLASS =
+  'relative overflow-hidden rounded-xl border border-gray-200 bg-white';
+
+export const CHECKOUT_ORDER_ITEMS_REMOVE_BUTTON_CLASS =
+  'absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-800';
+
+export const CHECKOUT_ORDER_ITEMS_NAME_CLASS =
+  'mt-2 max-w-[6.5rem] text-center text-xs font-bold uppercase leading-snug text-gray-900';
+
+export const CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS = 'mb-6';
+
 /** Custom select — closed / open border (Figma delivery city picker). */
 export const CHECKOUT_SELECT_BORDER_CLASS = 'border-gray-300';
 export const CHECKOUT_SELECT_BORDER_OPEN_CLASS = 'border-[#71b5f5]';
