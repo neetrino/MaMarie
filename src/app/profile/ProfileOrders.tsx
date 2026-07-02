@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button, Card } from '@shop/ui';
+import { PROFILE_DESKTOP_CARD_CLASS } from '../../constants/profile-desktop-page';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor } from './utils';
 import type { OrderListItem } from './types';
@@ -50,7 +51,7 @@ export function ProfileOrders({
 
   if (ordersLoading) {
     return (
-      <Card className="rounded-2xl border border-gray-200/80 p-5 shadow-none sm:p-7 lg:p-8">
+      <Card className={`p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
         <h2 className={`${titleClass} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
         <div className="space-y-3 sm:space-y-4">
           {[1, 2, 3].map((i) => (
@@ -63,7 +64,7 @@ export function ProfileOrders({
 
   if (orders.length === 0) {
     return (
-      <Card className="rounded-2xl border border-gray-200/80 p-5 shadow-none sm:p-7 lg:p-8">
+      <Card className={`p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
         <h2 className={`${titleClass} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
         <div className="flex flex-col items-center gap-5 py-12 sm:py-16">
           <p className="max-w-sm text-center text-sm text-gray-600">{t('profile.orders.noOrders')}</p>
@@ -76,7 +77,7 @@ export function ProfileOrders({
   }
 
   return (
-    <Card className="rounded-2xl border border-gray-200/80 p-5 shadow-none sm:p-7 lg:p-8">
+    <Card className={`p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
       <h2 className={`${titleClass} mb-6 sm:mb-8`}>{t('profile.orders.title')}</h2>
       <ul className="space-y-3 sm:space-y-4">
         {orders.map((order) => (
@@ -84,7 +85,7 @@ export function ProfileOrders({
             <Link
               href={`/orders/${order.number}`}
               onClick={(e) => onOrderClick(order.number, e)}
-              className="block rounded-2xl border border-gray-200 bg-gray-50/40 p-4 transition hover:border-gray-300 hover:bg-white sm:p-5"
+              className="block rounded-[15px] border border-gray-200 bg-gray-50/40 p-4 transition hover:border-gray-300 hover:bg-white sm:p-5"
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                 <div className="min-w-0 flex-1 space-y-3">

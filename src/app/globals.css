@@ -356,6 +356,16 @@ main.home-main-surface.order-page-main {
   background-color: #f1f1f3;
 }
 
+main.profile-page-main {
+  background-color: #f1f1f3;
+}
+
+@media (min-width: 768px) {
+  main.profile-page-main {
+    background-color: #faf8f5;
+  }
+}
+
 @media (min-width: 1024px) {
   main.home-main-surface.order-page-main {
     background-color: #ffffff;

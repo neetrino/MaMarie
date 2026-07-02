@@ -5,7 +5,6 @@ import { useEffect, type ReactNode } from 'react';
 import {
   PROFILE_MOBILE_CARD_RADIUS_PX,
   PROFILE_MOBILE_EMAIL_COLOR,
-  PROFILE_MOBILE_NAME_COLOR,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
 } from '../../constants/profile-mobile-page';
@@ -94,10 +93,7 @@ export function ProfileMobilePage({
               }
             />
             <div className="min-w-0 flex-1">
-              <p
-                className="truncate text-xl font-bold"
-                style={{ color: PROFILE_MOBILE_NAME_COLOR }}
-              >
+              <p className="truncate text-xl font-bold text-gray-900">
                 {displayName}
               </p>
               {profile?.email ? (

@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Button, Input, Card } from '@shop/ui';
+import { PROFILE_DESKTOP_CARD_CLASS } from '../../constants/profile-desktop-page';
 import type { Address, UserProfile } from './types';
 
 interface ProfileAddressesProps {
@@ -35,7 +36,7 @@ export function ProfileAddresses({
 }: ProfileAddressesProps) {
   return (
     <div className="space-y-6 sm:space-y-8">
-      <Card className="rounded-2xl border border-gray-200/80 p-5 shadow-none sm:p-7 lg:p-8">
+      <Card className={`p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
         <div className="mb-6 flex flex-col gap-4 border-b border-gray-100 pb-5 sm:mb-8 sm:flex-row sm:items-center sm:justify-between sm:pb-6">
           <h2 className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl">{t('profile.addresses.title')}</h2>
           <Button
@@ -51,7 +52,7 @@ export function ProfileAddresses({
         </div>
 
         {showAddressForm && (
-          <form onSubmit={onSave} className="mb-8 space-y-5 rounded-2xl border border-dashed border-gray-300 bg-gray-50/50 p-4 sm:mb-10 sm:p-6">
+          <form onSubmit={onSave} className="mb-8 space-y-5 rounded-[15px] border border-dashed border-gray-300 bg-gray-50/50 p-4 sm:mb-10 sm:p-6">
             <h3 className="text-base font-semibold text-gray-900">
               {editingAddress ? t('profile.addresses.form.editTitle') : t('profile.addresses.form.addTitle')}
             </h3>
@@ -102,7 +103,7 @@ export function ProfileAddresses({
             profile.addresses.map((address, index) => (
               <div
                 key={address.id || address._id || index}
-                className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 lg:p-6"
+                className="rounded-[15px] border border-gray-200 bg-white p-4 sm:p-5 lg:p-6"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                   <div className="min-w-0 flex-1 space-y-2">

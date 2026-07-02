@@ -5,12 +5,11 @@ import type { ProfileTab } from '../app/profile/types';
 /** Mobile profile — Figma clay menu screen. */
 export const PROFILE_MOBILE_PAGE_BG = MOBILE_HOME_BG;
 export const PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
-export const PROFILE_MOBILE_CARD_RADIUS_PX = 32;
+export const PROFILE_MOBILE_CARD_RADIUS_PX = 15;
 export const PROFILE_MOBILE_MENU_ICON_BOX_SIZE_PX = 40;
 export const PROFILE_MOBILE_MENU_ICON_BOX_RADIUS_PX = 12;
 export const PROFILE_MOBILE_CHEVRON_SIZE_PX = 18;
 
-export const PROFILE_MOBILE_NAME_COLOR = BRAND_COLORS.pink;
 export const PROFILE_MOBILE_EMAIL_COLOR = '#6b7280';
 
 export const PROFILE_MOBILE_ASSETS = {

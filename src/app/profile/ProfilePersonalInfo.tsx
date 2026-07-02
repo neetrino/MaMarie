@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { Button, Input, Card } from '@shop/ui';
+import { PROFILE_DESKTOP_CARD_CLASS } from '../../constants/profile-desktop-page';
 import type { UserProfile } from './types';
 
 interface ProfilePersonalInfoProps {
@@ -25,7 +26,7 @@ export function ProfilePersonalInfo({
   t,
 }: ProfilePersonalInfoProps) {
   return (
-    <Card className="rounded-2xl border border-gray-200/80 p-5 shadow-none sm:p-7 lg:p-8">
+    <Card className={`p-5 sm:p-7 lg:p-8 ${PROFILE_DESKTOP_CARD_CLASS}`}>
       <div className="mb-8 border-b border-gray-100 pb-5 sm:mb-10 sm:pb-6">
         <h2 className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl">{t('profile.personal.title')}</h2>
       </div>

@@ -7,6 +7,7 @@ import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
+import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
@@ -75,7 +76,7 @@ function ProfilePageContent() {
 
   if (authLoading || loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 md:min-h-[50vh]">
         <div className="text-center">
           <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
         </div>
@@ -247,16 +248,24 @@ function ProfilePageContent() {
       >
         {tabContent}
       </ProfileMobilePage>
-      <div className="mx-auto hidden max-w-7xl px-4 py-8 md:block md:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-10 lg:gap-12">
-          <aside className="w-full shrink-0 md:sticky md:top-24 md:w-64 md:self-start md:border-r md:border-gray-200/90 md:pr-8 lg:w-72">
-            <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
-          </aside>
-          <main className="min-w-0 flex-1">
-            <div className="space-y-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200/80 md:space-y-8 md:p-6 lg:rounded-3xl lg:p-8">
-              {tabContent}
+      <div className="profile-desktop-page hidden md:block">
+        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+          <div
+            className="flex items-start"
+            style={{ gap: PROFILE_DESKTOP_CONTENT_GAP_PX }}
+          >
+            <aside
+              className="sticky top-24 shrink-0 self-start"
+              style={{ width: PROFILE_DESKTOP_SIDEBAR_WIDTH_PX }}
+            >
+              <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
+            </aside>
+            <div className="relative min-w-0 flex-1">
+              <div className="relative z-10">
+                {tabContent}
+              </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
       {selectedOrder && (
