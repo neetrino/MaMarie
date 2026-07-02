@@ -6,10 +6,12 @@ import {
   PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS,
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
   PROFILE_DESKTOP_STAT_CONFIG,
   PROFILE_DESKTOP_STAT_THEMES,
   type ProfileDesktopStatTheme,
 } from '../../constants/profile-desktop-page';
+import { PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS } from '../../constants/profile-mobile-page';
 import { formatPriceInCurrency, type CurrencyCode } from '../../lib/currency';
 import type { DashboardData, ProfileTab } from './types';
 import { ProfileDesktopOrderCard } from './components/ProfileDesktopOrderCard';
@@ -81,18 +83,32 @@ export function ProfileDashboard({
 }: ProfileDashboardProps) {
   if (dashboardLoading) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-16">
+      <div>
+        <h2
+          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} md:hidden`}
+        >
+          {t('profile.tabs.dashboard')}
+        </h2>
+        <div className="flex flex-col items-center justify-center gap-4 py-16">
         <div className="h-11 w-11 animate-spin rounded-full border-2 border-[#fdeef2] border-t-brand-pink" />
         <p className="text-sm text-gray-600">{t('profile.dashboard.loading')}</p>
+        </div>
       </div>
     );
   }
 
   if (!dashboardData) {
     return (
-      <ProfileSectionCard className={PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS}>
+      <div>
+        <h2
+          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} md:hidden`}
+        >
+          {t('profile.tabs.dashboard')}
+        </h2>
+        <ProfileSectionCard className={PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS}>
         <p className="text-center text-sm text-gray-600">{t('profile.dashboard.failedToLoad')}</p>
-      </ProfileSectionCard>
+        </ProfileSectionCard>
+      </div>
     );
   }
 
@@ -135,6 +151,11 @@ export function ProfileDashboard({
 
   return (
     <div className="space-y-6 pb-2 md:space-y-8 md:pb-0">
+      <h2
+        className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} md:hidden`}
+      >
+        {t('profile.tabs.dashboard')}
+      </h2>
       <div className="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
         {PROFILE_DESKTOP_STAT_CONFIG.map(({ key, theme }) => (
           <ProfileDesktopStatCard

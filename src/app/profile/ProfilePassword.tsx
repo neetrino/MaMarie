@@ -28,7 +28,7 @@ export function ProfilePassword({
   t,
 }: ProfilePasswordProps) {
   return (
-    <ProfileSectionCard>
+    <ProfileSectionCard mobileFrameless>
       <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS}`}>
         {t('profile.password.title')}
       </h2>

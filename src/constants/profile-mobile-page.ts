@@ -15,9 +15,18 @@ export const PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH = 72;
 /** Above mobile bottom nav (`MOBILE_BOTTOM_NAV_Z_INDEX` = 70). */
 export const PROFILE_MOBILE_TAB_SHEET_Z_INDEX = 90;
 export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX = 24;
+/** Space between drag handle and in-content title (replaces header divider on form tabs). */
+export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX = 45;
 export const PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS = 300;
 export const PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS = 200;
 export const PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX = 120;
+
+/** Form tabs in bottom sheet — no clay card frame on mobile. */
+export const PROFILE_MOBILE_FORM_SECTION_FRAMELESS_CLASS =
+  'max-md:!rounded-none max-md:!bg-transparent max-md:!p-0 max-md:!shadow-none max-md:!ring-0';
+
+/** Dashboard sheet title on mobile — one step up from section title (`text-xl`). */
+export const PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS = 'max-md:text-2xl';
 
 export const PROFILE_MOBILE_EMAIL_COLOR = '#6b7280';
 

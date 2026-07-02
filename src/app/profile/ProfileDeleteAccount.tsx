@@ -37,7 +37,7 @@ export function ProfileDeleteAccount({
 }: ProfileDeleteAccountProps) {
   if (!profile) {
     return (
-      <ProfileSectionCard>
+      <ProfileSectionCard mobileFrameless>
         <p className="text-sm text-gray-600">{t('profile.common.loadingProfile')}</p>
       </ProfileSectionCard>
     );
@@ -46,7 +46,7 @@ export function ProfileDeleteAccount({
   const hasPassword = profile.hasPassword ?? true;
 
   return (
-    <ProfileSectionCard className="border-0 bg-red-50/30">
+    <ProfileSectionCard mobileFrameless className="border-0 bg-red-50/30 max-md:!bg-transparent">
       <div className="mb-6 space-y-2 sm:mb-8">
         <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.deleteAccount.title')}</h2>
         <p className="max-w-2xl text-sm leading-relaxed text-gray-700">{t('profile.deleteAccount.description')}</p>

@@ -42,7 +42,7 @@ export function ProfileAddresses({
   t,
 }: ProfileAddressesProps) {
   return (
-    <ProfileSectionCard>
+    <ProfileSectionCard mobileFrameless>
       <div className={`${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between`}>
         <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.addresses.title')}</h2>
         <ProfileClayButton

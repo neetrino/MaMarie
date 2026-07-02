@@ -9,6 +9,7 @@ import {
   PROFILE_MOBILE_TAB_ICON_THEME,
   PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
+  PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX,
   PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX,
   PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH,
   PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
@@ -168,15 +169,13 @@ export function ProfileMobilePage({
       >
         <div className="shrink-0 touch-none select-none" {...headerPointerHandlers}>
           <div className="mx-auto mt-2 h-1.5 w-14 cursor-grab rounded-full bg-gray-300 active:cursor-grabbing" />
-          <div className="border-b border-gray-100 px-5 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">{activeTabLabel}</h2>
-          </div>
         </div>
         <div
           ref={scrollAreaRef}
-          className={`profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overscroll-contain px-4 pt-4 ${
+          className={`profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overscroll-contain px-4 ${
             isDragging ? 'touch-none overflow-hidden' : 'overflow-y-auto'
           }`}
+          style={{ paddingTop: PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX }}
           {...scrollAreaPointerHandlers}
         >
           <div
