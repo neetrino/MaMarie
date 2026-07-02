@@ -21,7 +21,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   const [language, setLanguage] = useState<LanguageCode>('en');
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showMessage, setShowMessage] = useState<string | null>(null);
-  const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
 
   const resolvedParams = use(params);
   const rawSlug = resolvedParams?.slug ?? '';
@@ -139,7 +138,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
       const initialVariant = variantById || variantByIndex || product.variants[0];
       setSelectedVariant(initialVariant);
       setCurrentImageIndex(0);
-      setThumbnailStartIndex(0);
     }
   }, [product, variantIdFromUrl, setSelectedVariant]);
 
@@ -167,8 +165,6 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
     images,
     currentImageIndex,
     setCurrentImageIndex,
-    thumbnailStartIndex,
-    setThumbnailStartIndex,
     currency,
     language,
     selectedVariant,
