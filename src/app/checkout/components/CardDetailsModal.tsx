@@ -4,6 +4,7 @@ import { CheckoutPrimaryButton } from './CheckoutPrimaryButton';
 import { CHECKOUT_FORM_ALERT_CLASS, CHECKOUT_SECONDARY_BUTTON_CLASS } from '../constants/checkout-ui';
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
+import { useBodyScrollLock } from '../../../lib/useBodyScrollLock';
 import { PaymentMethodLogo } from './PaymentMethodLogo';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
@@ -60,6 +61,7 @@ export function CardDetailsModal({
   onSubmit,
 }: CardDetailsModalProps) {
   const { t } = useTranslation();
+  useBodyScrollLock(isOpen);
 
   if (!isOpen) {
     return null;
@@ -80,8 +82,8 @@ export function CardDetailsModal({
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div 

@@ -1,10 +1,11 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdminProductsSubnavExpanded } from '../app/supersudo/hooks/useAdminProductsSubnavExpanded';
 import { useTranslation } from '../lib/i18n-client';
+import { useBodyScrollLock } from '../lib/useBodyScrollLock';
 import { BrandLogoLink } from './BrandLogoLink';
 
 export interface AdminMenuItem {
@@ -54,17 +55,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
   const pathname = currentPath || '/supersudo';
   const [productsNestedExpanded, toggleProductsNested] = useAdminProductsSubnavExpanded(pathname);
 
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
+  useBodyScrollLock(open);
 
   /**
    * Handles navigation button clicks inside the drawer.

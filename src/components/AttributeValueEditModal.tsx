@@ -2,6 +2,7 @@
 
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { useTranslation } from '../lib/i18n-client';
+import { useBodyScrollLock } from '../lib/useBodyScrollLock';
 import { ColorPaletteSelector } from './ColorPaletteSelector';
 import { logger } from "@/lib/utils/logger";
 
@@ -30,6 +31,7 @@ export function AttributeValueEditModal({
   onSave,
 }: AttributeValueEditModalProps) {
   const { t } = useTranslation();
+  useBodyScrollLock(isOpen);
   const [label, setLabel] = useState(value.label);
   const [colors, setColors] = useState<string[]>(value.colors || []);
   const [imageUrl, setImageUrl] = useState<string | null>(value.imageUrl || null);
@@ -118,7 +120,7 @@ export function AttributeValueEditModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-50 p-4"
       onClick={onClose}
     >
       <div

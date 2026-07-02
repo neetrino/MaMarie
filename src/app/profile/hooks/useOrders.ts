@@ -42,18 +42,6 @@ export function useOrders({
   const [orderDetailsError, setOrderDetailsError] = useState<string | null>(null);
   const [isReordering, setIsReordering] = useState(false);
 
-  // Lock body scroll when order modal is open
-  useEffect(() => {
-    if (selectedOrder) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [selectedOrder]);
-
   const loadOrders = useCallback(async () => {
     try {
       setOrdersLoading(true);

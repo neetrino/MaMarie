@@ -3,6 +3,7 @@ import {
   PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
 } from '../../constants/profile-desktop-page';
+import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../lib/currency';
 import { getStatusColor, getPaymentStatusColor, getColorValue } from './utils';
 import type { OrderDetails } from './types';
@@ -28,6 +29,8 @@ export function OrderDetailsModal({
   onReOrder,
   t,
 }: OrderDetailsModalProps) {
+  useBodyScrollLock(true);
+
   const getAttributeLabel = (key: string): string => {
     if (key === 'color' || key === 'colour') return t('profile.orderDetails.color');
     if (key === 'size') return t('profile.orderDetails.size');
@@ -49,16 +52,14 @@ export function OrderDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      {/* Backdrop */}
-      <div 
+    <div className="fixed inset-0 z-50 overflow-hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div
         className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
         onClick={onClose}
-      ></div>
+      />
 
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 flex items-center justify-center overflow-hidden p-4">
+        <div className="relative max-h-[90vh] w-full max-w-6xl overflow-y-auto overscroll-contain rounded-lg bg-white shadow-xl transition-all">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
             <div>

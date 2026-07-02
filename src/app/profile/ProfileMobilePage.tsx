@@ -1,13 +1,14 @@
 'use client';
 
 import { Home } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import {
   PROFILE_MOBILE_CARD_RADIUS_PX,
   PROFILE_MOBILE_EMAIL_COLOR,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
 } from '../../constants/profile-mobile-page';
+import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
 import { ProfileMobileMenuRow } from './components/ProfileMobileMenuRow';
@@ -62,14 +63,7 @@ export function ProfileMobilePage({
   const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? t('profile.myProfile');
   const orderedTabs = buildMenuOrder(tabs);
 
-  useEffect(() => {
-    if (!isSheetOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isSheetOpen]);
+  useBodyScrollLock(isSheetOpen);
 
   return (
     <div className="profile-mobile-page md:hidden">
@@ -163,7 +157,7 @@ export function ProfileMobilePage({
                 </svg>
               </button>
             </div>
-            <div className="h-[calc(72vh-4.75rem)] overflow-y-auto px-4 py-4">{children}</div>
+            <div className="h-[calc(72vh-4.75rem)] overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
           </div>
         </div>
       ) : null}
