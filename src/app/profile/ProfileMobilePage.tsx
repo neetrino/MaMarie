@@ -7,11 +7,14 @@ import {
   PROFILE_MOBILE_EMAIL_COLOR,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
+  PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
   PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH,
+  PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_Z_INDEX,
 } from '../../constants/profile-mobile-page';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
+import { useDrawerTransition } from '../../lib/use-drawer-transition';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
 import { ProfileMobileMenuRow } from './components/ProfileMobileMenuRow';
@@ -69,9 +72,13 @@ export function ProfileMobilePage({
   const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? t('profile.myProfile');
   const orderedTabs = buildMenuOrder(tabs);
   const sheetPanelRef = useRef<HTMLDivElement>(null);
+  const { rendered: sheetRendered, visible: sheetVisible } = useDrawerTransition(
+    isSheetOpen,
+    PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
+  );
 
   useEffect(() => {
-    if (!isSheetOpen) {
+    if (!sheetRendered) {
       return;
     }
 
@@ -96,24 +103,36 @@ export function ProfileMobilePage({
       document.removeEventListener('touchmove', handleTouchMove);
       unlockBodyScroll();
     };
-  }, [isSheetOpen]);
+  }, [sheetRendered]);
 
-  const sheetOverlay = isSheetOpen ? (
+  const sheetOverlay = sheetRendered ? (
     <div
-      className="fixed inset-0 flex items-end bg-black/35 backdrop-blur-[1px]"
+      className="fixed inset-0 flex items-end overscroll-none"
       style={{ zIndex: PROFILE_MOBILE_TAB_SHEET_Z_INDEX }}
-      onClick={onCloseSheet}
     >
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden
+        className={`fixed inset-0 rounded-none bg-black/35 backdrop-blur-[1px] transition-opacity ease-in-out motion-reduce:transition-none ${
+          sheetVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ transitionDuration: `${PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS}ms` }}
+        onClick={onCloseSheet}
+      />
       <div
         ref={sheetPanelRef}
         role="dialog"
         aria-modal="true"
         aria-label={activeTabLabel}
-        className="flex w-full flex-col overflow-hidden bg-white shadow-2xl"
+        className={`flex w-full flex-col overflow-hidden bg-white shadow-2xl transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+          sheetVisible ? 'translate-y-0' : 'translate-y-full motion-reduce:translate-y-0'
+        }`}
         style={{
           height: `${PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH}dvh`,
           borderTopLeftRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
           borderTopRightRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
+          transitionDuration: `${PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS}ms`,
         }}
         onClick={(event) => event.stopPropagation()}
       >
