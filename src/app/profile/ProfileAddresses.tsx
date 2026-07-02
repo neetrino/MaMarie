@@ -2,7 +2,6 @@ import type { FormEvent } from 'react';
 import { Button, Input } from '@shop/ui';
 import {
   PROFILE_DESKTOP_DEFAULT_BADGE_CLASS,
-  PROFILE_DESKTOP_INNER_CARD_CLASS,
   PROFILE_DESKTOP_INPUT_CLASS,
   PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS,
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
@@ -61,7 +60,7 @@ export function ProfileAddresses({
       {showAddressForm ? (
         <form
           onSubmit={onSave}
-          className="mb-8 space-y-5 rounded-[15px] border border-dashed border-gray-200 bg-[#fcfcfc] p-4 sm:mb-10 sm:p-6"
+          className="mb-8 space-y-5 rounded-[15px] bg-[#fcfcfc] p-4 sm:mb-10 sm:p-6"
         >
           <h3 className="text-base font-semibold text-gray-900">
             {editingAddress ? t('profile.addresses.form.editTitle') : t('profile.addresses.form.addTitle')}
@@ -122,7 +121,7 @@ export function ProfileAddresses({
       <div className="space-y-4">
         {profile?.addresses && profile.addresses.length > 0 ? (
           profile.addresses.map((address, index) => (
-            <div key={address.id || address._id || index} className={`p-4 sm:p-5 lg:p-6 ${PROFILE_DESKTOP_INNER_CARD_CLASS}`}>
+            <div key={address.id || address._id || index} className="rounded-[15px] bg-[#fcfcfc] p-4 transition hover:bg-white sm:p-5 lg:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                 <div className="min-w-0 flex-1 space-y-2">
                   {address.isDefault ? (
@@ -131,7 +130,7 @@ export function ProfileAddresses({
                   <p className="text-sm text-gray-800 sm:text-base">{address.addressLine1}</p>
                   <p className="text-sm text-gray-800 sm:text-base">{address.city}</p>
                 </div>
-                <div className="flex flex-wrap gap-2 border-t border-gray-100 pt-4 lg:border-0 lg:pt-0">
+                <div className="flex flex-wrap gap-2 pt-4 lg:pt-0">
                   {!address.isDefault ? (
                     <Button
                       variant="outline"
@@ -153,7 +152,7 @@ export function ProfileAddresses({
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`min-h-9 flex-1 text-red-600 hover:border-red-300 hover:text-red-700 sm:flex-initial ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
+                    className={`min-h-9 flex-1 text-red-600 hover:text-red-700 sm:flex-initial ${PROFILE_DESKTOP_OUTLINE_BUTTON_CLASS}`}
                     onClick={() => onDelete((address.id || address._id)!)}
                   >
                     {t('profile.addresses.delete')}

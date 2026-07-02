@@ -385,7 +385,7 @@ main.profile-page-main .profile-btn-primary:focus-visible {
 main.profile-page-main .profile-btn-outline {
   border-radius: 15px !important;
   background-color: #ffffff !important;
-  border: 1px solid #d1d5db !important;
+  border: 1px solid #000000 !important;
   color: #111827 !important;
 }
 

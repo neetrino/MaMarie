@@ -14,7 +14,7 @@ export const PROFILE_DESKTOP_SIDEBAR_WIDTH_PX = 280;
 export const PROFILE_DESKTOP_CONTENT_GAP_PX = 40;
 
 export const PROFILE_DESKTOP_CARD_CLASS =
-  'rounded-[15px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.06)] ring-1 ring-gray-100/80';
+  '!rounded-[15px] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.06)] ring-1 ring-gray-100/80';
 
 export const PROFILE_DESKTOP_ASSETS = {
   chevronRight: '/assets/home/icon-chevron-right-pink.svg',
@@ -74,7 +74,7 @@ export const PROFILE_DESKTOP_PENDING_BADGE_CLASS =
 export const PROFILE_DESKTOP_SECTION_TITLE_CLASS = 'text-xl font-bold text-brand-pink';
 
 export const PROFILE_DESKTOP_INNER_CARD_CLASS =
-  'rounded-[15px] border border-gray-100 bg-[#fcfcfc] transition hover:border-brand-pink/20 hover:bg-white';
+  '!rounded-[15px] border border-gray-100 bg-[#fcfcfc] transition hover:border-brand-pink/20 hover:bg-white';
 
 export const PROFILE_DESKTOP_INPUT_CLASS = '!rounded-[15px]';
 
