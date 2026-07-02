@@ -10,6 +10,7 @@ import {
   PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX,
+  PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX,
   PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX,
   PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH,
   PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
@@ -172,10 +173,14 @@ export function ProfileMobilePage({
         </div>
         <div
           ref={scrollAreaRef}
-          className={`profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overscroll-contain px-4 ${
+          className={`profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overscroll-contain ${
             isDragging ? 'touch-none overflow-hidden' : 'overflow-y-auto'
           }`}
-          style={{ paddingTop: PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX }}
+          style={{
+            paddingTop: PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX,
+            paddingLeft: PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX,
+            paddingRight: PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX,
+          }}
           {...scrollAreaPointerHandlers}
         >
           <div

@@ -14,9 +14,13 @@ export const PROFILE_MOBILE_CHEVRON_SIZE_PX = 18;
 export const PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH = 72;
 /** Above mobile bottom nav (`MOBILE_BOTTOM_NAV_Z_INDEX` = 70). */
 export const PROFILE_MOBILE_TAB_SHEET_Z_INDEX = 90;
-export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX = 24;
+export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX = 28;
 /** Space between drag handle and in-content title (replaces header divider on form tabs). */
 export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX = 45;
+/** Horizontal inset for mobile profile sheet content (`px-5`). */
+export const PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX = 20;
+/** Order-details side sheet header on mobile (`px-6`). */
+export const PROFILE_MOBILE_SIDE_SHEET_HEADER_PADDING_HORIZONTAL_PX = 24;
 export const PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS = 300;
 export const PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS = 200;
 export const PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX = 120;
@@ -27,6 +31,9 @@ export const PROFILE_MOBILE_FORM_SECTION_FRAMELESS_CLASS =
 
 /** Dashboard sheet title on mobile — one step up from section title (`text-xl`). */
 export const PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS = 'max-md:text-2xl';
+
+/** Order cards in mobile profile sheets — clay drop shadow. */
+export const PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS = 'max-md:shadow-[0_4px_24px_rgba(0,0,0,0.06)]';
 
 export const PROFILE_MOBILE_EMAIL_COLOR = '#6b7280';
 

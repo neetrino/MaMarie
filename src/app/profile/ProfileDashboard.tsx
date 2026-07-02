@@ -11,7 +11,7 @@ import {
   PROFILE_DESKTOP_STAT_THEMES,
   type ProfileDesktopStatTheme,
 } from '../../constants/profile-desktop-page';
-import { PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS } from '../../constants/profile-mobile-page';
+import { PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS, PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS } from '../../constants/profile-mobile-page';
 import { formatPriceInCurrency, type CurrencyCode } from '../../lib/currency';
 import type { DashboardData, ProfileTab } from './types';
 import { ProfileDesktopOrderCard } from './components/ProfileDesktopOrderCard';
@@ -41,7 +41,7 @@ function ProfileDesktopStatCard({
   const isSvgDecoration = palette.decoration.endsWith('.svg');
 
   return (
-    <div className={`relative overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS}`}>
+    <div className={`relative overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}>
       <div
         className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${palette.iconInnerClass}`}
         style={{
@@ -168,7 +168,7 @@ export function ProfileDashboard({
         ))}
       </div>
 
-      <ProfileSectionCard className={PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS}>
+      <ProfileSectionCard mobileFrameless className={PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS}>
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.dashboard.recentOrders')}</h2>
           <button

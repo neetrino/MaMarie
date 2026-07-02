@@ -74,7 +74,7 @@ function ProfileSideSheetPanel({
           aria-labelledby="profile-side-sheet-title"
           onClick={(event) => event.stopPropagation()}
         >
-          <header className="shrink-0 border-b border-gray-100 px-5 py-4">
+          <header className="shrink-0 border-b border-gray-100 px-6 py-4 md:px-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h2 id="profile-side-sheet-title" className="text-lg font-bold text-gray-900">
@@ -86,7 +86,7 @@ function ProfileSideSheetPanel({
             </div>
           </header>
 
-          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
+          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 md:px-4">{children}</div>
         </aside>
       </div>
     </div>

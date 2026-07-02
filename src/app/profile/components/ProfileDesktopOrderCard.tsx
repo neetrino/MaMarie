@@ -4,6 +4,7 @@ import {
   PROFILE_DESKTOP_ORDER_CARD_SEPARATOR_CLASS,
   PROFILE_DESKTOP_PENDING_BADGE_CLASS,
 } from '../../../constants/profile-desktop-page';
+import { PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS } from '../../../constants/profile-mobile-page';
 import { formatPriceInCurrency, convertPrice, type CurrencyCode } from '../../../lib/currency';
 import { formatProfileOrderDate } from '../utils';
 import { ProfileOrderViewDetailsCta } from './ProfileOrderViewDetailsCta';
@@ -79,7 +80,7 @@ export function ProfileDesktopOrderCard({
     <Link
       href={`/orders/${order.number}`}
       onClick={onClick}
-      className={`flex h-full flex-col p-4 sm:p-5 ${PROFILE_DESKTOP_ORDER_CARD_CLASS}`}
+      className={`flex h-full flex-col p-4 sm:p-5 ${PROFILE_DESKTOP_ORDER_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 text-base font-bold text-gray-900">
