@@ -7,12 +7,10 @@ import {
   MOBILE_ORDER_RECEIPT_SECTION_ID,
 } from '../../../../constants/mobile-orders';
 import type { Order } from '../types';
-import { OrderHelpCard } from './OrderHelpCard';
 import { OrderItems } from './OrderItems';
 import { OrderPageShell } from './OrderPageShell';
 import styles from './OrderPageShell.module.css';
 import { OrderReadyHero } from './OrderReadyHero';
-import { OrderSuccessFooterActions } from './OrderSuccessFooterActions';
 import { ShippingAddress } from './ShippingAddress';
 
 interface OrderPageContentProps {
@@ -43,8 +41,6 @@ export function OrderPageContent({ order, currency }: OrderPageContentProps) {
             orderTotals={order.totals}
           />
         </div>
-        <OrderHelpCard />
-        <OrderSuccessFooterActions />
         {order.shippingAddress && <ShippingAddress shippingAddress={order.shippingAddress} />}
       </section>
     </OrderPageShell>
