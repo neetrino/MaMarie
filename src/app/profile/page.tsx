@@ -268,18 +268,17 @@ function ProfilePageContent() {
           </div>
         </div>
       </div>
-      {selectedOrder && (
-        <OrderDetailsModal
-          selectedOrder={selectedOrder}
-          orderDetailsLoading={orderDetailsLoading}
-          orderDetailsError={orderDetailsError}
-          isReordering={isReordering}
-          currency={currency}
-          onClose={() => setSelectedOrder(null)}
-          onReOrder={handleReOrder}
-          t={t}
-        />
-      )}
+      <OrderDetailsModal
+        isOpen={Boolean(selectedOrder)}
+        selectedOrder={selectedOrder}
+        orderDetailsLoading={orderDetailsLoading}
+        orderDetailsError={orderDetailsError}
+        isReordering={isReordering}
+        currency={currency}
+        onClose={() => setSelectedOrder(null)}
+        onReOrder={handleReOrder}
+        t={t}
+      />
     </>
   );
 }

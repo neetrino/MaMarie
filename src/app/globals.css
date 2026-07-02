@@ -366,42 +366,50 @@ main.profile-page-main {
   }
 }
 
-main.profile-page-main .profile-btn-primary {
+main.profile-page-main .profile-btn-primary,
+.profile-side-sheet .profile-btn-primary {
   border-radius: 15px !important;
   border-width: 0 !important;
   background-color: #ef95aa !important;
   color: #ffffff !important;
 }
 
-main.profile-page-main .profile-btn-primary:hover:not(:disabled) {
+main.profile-page-main .profile-btn-primary:hover:not(:disabled),
+.profile-side-sheet .profile-btn-primary:hover:not(:disabled) {
   background-color: #e8879e !important;
 }
 
-main.profile-page-main .profile-btn-primary:focus-visible {
+main.profile-page-main .profile-btn-primary:focus-visible,
+.profile-side-sheet .profile-btn-primary:focus-visible {
   outline: 2px solid #ef95aa;
   outline-offset: 2px;
 }
 
-main.profile-page-main .profile-btn-outline {
+main.profile-page-main .profile-btn-outline,
+.profile-side-sheet .profile-btn-outline {
   border-radius: 15px !important;
   background-color: #ffffff !important;
   border: 1px solid #000000 !important;
   color: #111827 !important;
 }
 
-main.profile-page-main .profile-btn-outline:hover:not(:disabled) {
+main.profile-page-main .profile-btn-outline:hover:not(:disabled),
+.profile-side-sheet .profile-btn-outline:hover:not(:disabled) {
   background-color: #f9fafb !important;
 }
 
-main.profile-page-main .profile-btn-danger {
+main.profile-page-main .profile-btn-danger,
+.profile-side-sheet .profile-btn-danger {
   background-color: #b91c1c !important;
 }
 
-main.profile-page-main .profile-btn-danger:hover:not(:disabled) {
+main.profile-page-main .profile-btn-danger:hover:not(:disabled),
+.profile-side-sheet .profile-btn-danger:hover:not(:disabled) {
   background-color: #991b1b !important;
 }
 
-main.profile-page-main .profile-btn-danger:focus-visible {
+main.profile-page-main .profile-btn-danger:focus-visible,
+.profile-side-sheet .profile-btn-danger:focus-visible {
   outline-color: #b91c1c;
 }
 

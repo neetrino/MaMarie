@@ -97,3 +97,11 @@ export const PROFILE_DESKTOP_ALERT_SUCCESS_CLASS =
 
 export const PROFILE_DESKTOP_DEFAULT_BADGE_CLASS =
   'inline-flex rounded-full bg-[#e8f4fd] px-3 py-1 text-xs font-medium text-[#5281e1]';
+
+/** Profile side sheets — cart-style drawer from the right, half screen width. */
+export const PROFILE_SIDE_SHEET_WIDTH_PERCENT = 50;
+export const PROFILE_SIDE_SHEET_Z_INDEX = 95;
+export const PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS = 300;
+export const PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS = 200;
+export const PROFILE_SIDE_SHEET_PANEL_Z_INDEX = 2;
+export const PROFILE_SIDE_SHEET_RADIUS_PX = 24;
