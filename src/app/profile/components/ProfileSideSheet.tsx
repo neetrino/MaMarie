@@ -56,12 +56,12 @@ function ProfileSideSheetPanel({
 
       <div
         ref={panelRef}
-        className={`relative h-dvh max-h-dvh w-[var(--profile-side-sheet-mobile-width)] sm:w-full md:w-[var(--profile-side-sheet-desktop-width)] transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+        className={`relative h-dvh max-h-dvh w-[var(--profile-side-sheet-mobile-width)] max-w-[var(--profile-side-sheet-mobile-max-width)] md:w-[var(--profile-side-sheet-desktop-width)] md:max-w-none transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
           visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
         }`}
         style={{
-          maxWidth: CART_DRAWER_MAX_WIDTH_PX,
           ['--profile-side-sheet-mobile-width' as string]: `${CART_DRAWER_MOBILE_WIDTH_PERCENT}%`,
+          ['--profile-side-sheet-mobile-max-width' as string]: `${CART_DRAWER_MAX_WIDTH_PX}px`,
           ['--profile-side-sheet-desktop-width' as string]: `${PROFILE_SIDE_SHEET_WIDTH_PERCENT}%`,
           transitionDuration: `${PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS}ms`,
         }}

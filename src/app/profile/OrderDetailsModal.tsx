@@ -99,8 +99,8 @@ export function OrderDetailsModal({
           </ProfileClayButton>
         </div>
       ) : (
-        <div className="space-y-4">
-          <ProfileSectionCard className="p-4 sm:p-5">
+        <div className="space-y-4 px-0.5 pb-1">
+          <ProfileSectionCard sheetElevated className="p-4 sm:p-5">
             <h3 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-4 text-base`}>
               {t('profile.orderDetails.orderStatus')}
             </h3>
@@ -112,7 +112,7 @@ export function OrderDetailsModal({
             </div>
           </ProfileSectionCard>
 
-          <ProfileSectionCard className="p-4 sm:p-5">
+          <ProfileSectionCard sheetElevated className="p-4 sm:p-5">
             <h3 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-4 text-base`}>
               {t('profile.orderDetails.orderItems')}
             </h3>
@@ -193,7 +193,7 @@ export function OrderDetailsModal({
             </div>
           </ProfileSectionCard>
 
-          <ProfileSectionCard className="p-4 sm:p-5">
+          <ProfileSectionCard sheetElevated className="p-4 sm:p-5">
             <h3 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-4 text-base`}>
               {t('profile.orderDetails.orderSummary')}
             </h3>
@@ -279,7 +279,7 @@ export function OrderDetailsModal({
             )}
           </ProfileSectionCard>
 
-          <ProfileSectionCard className="p-4 sm:p-5">
+          <ProfileSectionCard sheetElevated className="p-4 sm:p-5">
             <h3 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} mb-4 text-base`}>
               {t('profile.orderDetails.shippingMethod')}
             </h3>

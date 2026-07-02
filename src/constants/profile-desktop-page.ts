@@ -10,6 +10,8 @@ import {
 export const PROFILE_DESKTOP_PAGE_BG = '#faf8f5';
 export const PROFILE_DESKTOP_CARD_RADIUS_PX = 15;
 export const PROFILE_DESKTOP_CARD_SHADOW = '0 4px 24px rgba(0, 0, 0, 0.06)';
+export const PROFILE_ORDER_CARD_HOVER_SHADOW = '0 8px 32px rgba(0, 0, 0, 0.12)';
+export const PROFILE_ORDER_CARD_HOVER_LIFT_PX = 4;
 export const PROFILE_DESKTOP_SIDEBAR_WIDTH_PX = 280;
 export const PROFILE_DESKTOP_SHELL_PADDING_TOP_PX = 12;
 export const PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX = 20;
@@ -18,6 +20,14 @@ export const PROFILE_DESKTOP_CONTENT_GAP_PX = 40;
 export const PROFILE_DESKTOP_CARD_BASE_CLASS = '!rounded-[15px] bg-white ring-1 ring-gray-100/80';
 
 export const PROFILE_DESKTOP_CARD_CLASS = `${PROFILE_DESKTOP_CARD_BASE_CLASS} shadow-[0_4px_24px_rgba(0,0,0,0.06)]`;
+
+/** Order card hover — lift + deeper shadow on desktop only (order-details side sheet). */
+export const PROFILE_ORDER_CARD_HOVER_CLASS =
+  `md:transition-[transform,box-shadow] md:duration-200 md:ease-out md:hover:-translate-y-[${PROFILE_ORDER_CARD_HOVER_LIFT_PX}px] md:hover:shadow-[0_8px_32px_rgba(0,0,0,0.12)] md:motion-reduce:transition-none md:motion-reduce:hover:translate-y-0`;
+
+/** Section cards inside order-details side sheet — forced clay shadow + desktop hover lift. */
+export const PROFILE_ORDER_DETAILS_SHEET_CARD_CLASS =
+  `!shadow-[0_4px_24px_rgba(0,0,0,0.06)] ${PROFILE_ORDER_CARD_HOVER_CLASS}`;
 
 /** Dashboard stat panels and sections — flat clay, no drop shadow. */
 export const PROFILE_DESKTOP_DASHBOARD_CARD_CLASS = PROFILE_DESKTOP_CARD_BASE_CLASS;
