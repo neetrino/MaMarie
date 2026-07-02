@@ -40,9 +40,12 @@
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
+    "cashShort": "Cash",
     "cashOnDeliveryDescription": "Pay cash when you receive your order",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
+    "card": "By card",
+    "cardDescription": "Pay with Visa, Mastercard or ArCa card",
     "arca": "ArCa",
     "arcaDescription": "Pay with ArCa card",
     "paymentDetails": "Payment Details",

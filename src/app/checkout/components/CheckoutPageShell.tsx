@@ -37,7 +37,7 @@ interface CheckoutPageShellProps {
 /** Checkout page shell — mobile gray surface, centered desktop column. */
 export function CheckoutPageShell({ children }: CheckoutPageShellProps) {
   return (
-    <div className={styles.shell} style={checkoutPageShellVars}>
+    <div className={`checkout-page ${styles.shell}`} style={checkoutPageShellVars}>
       {children}
     </div>
   );

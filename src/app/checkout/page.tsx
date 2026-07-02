@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
-import { MobileHomeSearchField } from '../../components/home/mobile/MobileHomeSearchField';
 import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
 import { CheckoutPageShell, checkoutPageShellStyles } from './components/CheckoutPageShell';
@@ -14,9 +13,6 @@ import { useCheckout } from './useCheckout';
 function CheckoutSkeleton() {
   return (
     <CheckoutPageShell>
-      <div className="lg:hidden">
-        <MobileHomeSearchField />
-      </div>
       <div className={checkoutPageShellStyles.titleOffset}>
         <div className="h-8 w-40 animate-pulse rounded-lg bg-gray-200" />
       </div>
@@ -71,9 +67,6 @@ export default function CheckoutPage() {
   if (!cart || cart.items.length === 0) {
     return (
       <CheckoutPageShell>
-        <div className="lg:hidden">
-          <MobileHomeSearchField />
-        </div>
         <h1 className={`${CHECKOUT_PAGE_TITLE_CLASS} ${checkoutPageShellStyles.titleOffset}`}>
           {t('checkout.title')}
         </h1>
@@ -89,10 +82,6 @@ export default function CheckoutPage() {
 
   return (
     <CheckoutPageShell>
-      <div className="lg:hidden">
-        <MobileHomeSearchField />
-      </div>
-
       <h1 className={`${CHECKOUT_PAGE_TITLE_CLASS} ${checkoutPageShellStyles.titleOffset}`}>
         {t('checkout.title')}
       </h1>

@@ -1,16 +1,9 @@
 import { CHECKOUT_PRIMARY_BUTTON_HEIGHT_PX } from '../../../constants/checkout-page';
-import {
-  ORDER_SUCCESS_RECEIPT_OUTER_CLASS,
-} from '../../orders/[number]/constants/order-success-ui';
 
 /** Text inputs, option cards, alerts — 15px (`CHECKOUT_FORM_RADIUS_PX`). */
 export const CHECKOUT_FORM_INPUT_CLASS = '!rounded-[15px]';
 export const CHECKOUT_FORM_OPTION_RADIUS_CLASS = 'rounded-[15px]';
 export const CHECKOUT_FORM_ALERT_CLASS = 'rounded-[15px]';
-
-/** Native radio — pink accent, no focus ring. */
-export const CHECKOUT_RADIO_INPUT_CLASS =
-  'mr-4 shrink-0 accent-brand-pink outline-none [-webkit-tap-highlight-color:transparent] focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 active:outline-none';
 
 /** White section card — profile / order page pattern. */
 export const CHECKOUT_SECTION_CARD_CLASS =
@@ -35,10 +28,6 @@ export const CHECKOUT_PRIMARY_BUTTON_STYLE = {
 export const CHECKOUT_SECONDARY_BUTTON_CLASS =
   'inline-flex w-full items-center justify-center rounded-full border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 disabled:cursor-not-allowed disabled:opacity-50';
 
-/** Order summary — slightly narrower receipt with tighter horizontal padding. */
-export const CHECKOUT_ORDER_SUMMARY_WRAP_CLASS = 'mx-auto w-full lg:ml-auto lg:mr-0';
-
-export const CHECKOUT_RECEIPT_OUTER_CLASS = ORDER_SUCCESS_RECEIPT_OUTER_CLASS;
-
-export const CHECKOUT_RECEIPT_INNER_CLASS =
-  'rounded-t-2xl border border-b-0 border-gray-200 bg-white px-5 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8';
+/** Order summary — full width on mobile; narrow column on desktop. */
+export const CHECKOUT_ORDER_SUMMARY_WRAP_CLASS =
+  'w-full lg:ml-auto lg:mr-0 lg:max-w-[300px]';

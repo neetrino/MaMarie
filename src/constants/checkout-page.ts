@@ -7,7 +7,9 @@ import {
 /** Mobile checkout page — same surface as home / order confirmation. */
 export const CHECKOUT_PAGE_BG = MOBILE_HOME_BG;
 export const CHECKOUT_PAGE_HORIZONTAL_PADDING_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
-export const CHECKOUT_PAGE_PADDING_TOP_PX = 12;
+/** Space below fixed navbar before page title (mobile). */
+export const CHECKOUT_PAGE_NAVBAR_GAP_MOBILE_PX = 45;
+export const CHECKOUT_PAGE_PADDING_TOP_PX = CHECKOUT_PAGE_NAVBAR_GAP_MOBILE_PX;
 export const CHECKOUT_PAGE_PADDING_BOTTOM_PX = MOBILE_HOME_BOTTOM_CONTENT_PADDING_PX;
 
 /** Desktop — wider column for form + summary side-by-side. */

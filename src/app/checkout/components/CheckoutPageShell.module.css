@@ -2,6 +2,7 @@
   width: 100%;
   max-width: 100%;
   min-height: 100%;
+  flex: 1;
   padding-top: var(--checkout-page-padding-top);
   padding-bottom: var(--checkout-page-padding-bottom);
   padding-left: var(--checkout-page-padding-x);
