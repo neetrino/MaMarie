@@ -21,6 +21,7 @@ import {
   PROFILE_MOBILE_TAB_SHEET_Z_INDEX,
 } from '../../constants/profile-mobile-page';
 import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
+import { DRAWER_TOUCH_SCROLL_ROOT_ATTR, preventTouchMoveUnlessInsideDrawer } from '../../lib/drawer-touch-scroll-guard';
 import { useBottomSheetDragDismiss } from '../../lib/use-bottom-sheet-drag-dismiss';
 import { useDrawerTransition } from '../../lib/use-drawer-transition';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
@@ -117,16 +118,7 @@ export function ProfileMobilePage({
     lockBodyScroll();
 
     const handleTouchMove = (event: TouchEvent) => {
-      const target = event.target;
-      if (!(target instanceof Node)) {
-        return;
-      }
-
-      if (sheetPanelRef.current?.contains(target)) {
-        return;
-      }
-
-      event.preventDefault();
+      preventTouchMoveUnlessInsideDrawer(event, [sheetPanelRef.current, scrollAreaRef.current]);
     };
 
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -157,6 +149,7 @@ export function ProfileMobilePage({
         role="dialog"
         aria-modal="true"
         aria-label={activeTabLabel}
+        {...{ [DRAWER_TOUCH_SCROLL_ROOT_ATTR]: '' }}
         className={`flex w-full flex-col overflow-hidden bg-white shadow-2xl ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
           isDragging || dragOffsetY > 0
             ? ''

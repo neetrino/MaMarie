@@ -14,6 +14,7 @@ import {
   PROFILE_SIDE_SHEET_Z_INDEX,
 } from '../../../constants/profile-desktop-page';
 import { lockBodyScroll, unlockBodyScroll } from '../../../lib/body-scroll-lock';
+import { DRAWER_TOUCH_SCROLL_ROOT_ATTR, preventTouchMoveUnlessInsideDrawer } from '../../../lib/drawer-touch-scroll-guard';
 import { useDrawerTransition } from '../../../lib/use-drawer-transition';
 import { DrawerCloseTab } from '../../../components/drawer/DrawerCloseTab';
 
@@ -25,6 +26,7 @@ interface ProfileSideSheetPanelProps {
   closeLabel: string;
   onClose: () => void;
   panelRef: RefObject<HTMLDivElement>;
+  scrollRef: RefObject<HTMLDivElement>;
   children: ReactNode;
 }
 
@@ -36,6 +38,7 @@ function ProfileSideSheetPanel({
   closeLabel,
   onClose,
   panelRef,
+  scrollRef,
   children,
 }: ProfileSideSheetPanelProps) {
   return (
@@ -73,6 +76,7 @@ function ProfileSideSheetPanel({
           role="dialog"
           aria-modal="true"
           aria-labelledby="profile-side-sheet-title"
+          {...{ [DRAWER_TOUCH_SCROLL_ROOT_ATTR]: '' }}
           onClick={(event) => event.stopPropagation()}
         >
           <header className="shrink-0 border-b border-gray-100 px-6 py-4 lg:px-5">
@@ -87,7 +91,10 @@ function ProfileSideSheetPanel({
             </div>
           </header>
 
-          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 lg:px-4">
+          <div
+            ref={scrollRef}
+            className="profile-scroll-area profile-side-sheet-scroll profile-mobile-tab-sheet-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 lg:px-4"
+          >
             <div className="max-lg:pb-[calc(28px+env(safe-area-inset-bottom,0px))]">{children}</div>
           </div>
         </aside>
@@ -117,6 +124,7 @@ export function ProfileSideSheet({
   children,
 }: ProfileSideSheetProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { rendered, visible } = useDrawerTransition(isOpen, PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS);
 
   useEffect(() => {
@@ -127,16 +135,7 @@ export function ProfileSideSheet({
     lockBodyScroll();
 
     const handleTouchMove = (event: TouchEvent) => {
-      const target = event.target;
-      if (!(target instanceof Node)) {
-        return;
-      }
-
-      if (panelRef.current?.contains(target)) {
-        return;
-      }
-
-      event.preventDefault();
+      preventTouchMoveUnlessInsideDrawer(event, [panelRef.current, scrollRef.current]);
     };
 
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -178,6 +177,7 @@ export function ProfileSideSheet({
       closeLabel={closeLabel}
       onClose={onClose}
       panelRef={panelRef}
+      scrollRef={scrollRef}
     >
       {children}
     </ProfileSideSheetPanel>,

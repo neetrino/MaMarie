@@ -381,6 +381,12 @@ main.profile-page-main {
 
 .profile-mobile-tab-sheet-scroll {
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.profile-side-sheet-scroll {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 html:has(main.profile-page-main) {
