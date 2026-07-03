@@ -98,6 +98,7 @@ function LoginPageContent() {
               className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
               value={email}
               error={fieldErrors.email}
+              showErrorMessage={false}
               onChange={(e) => {
                 setEmail(e.target.value);
                 setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
@@ -117,6 +118,7 @@ function LoginPageContent() {
                 className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={password}
                 error={fieldErrors.password}
+                showErrorMessage={false}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));

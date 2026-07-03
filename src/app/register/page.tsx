@@ -133,6 +133,7 @@ export default function RegisterPage() {
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={firstName}
                 error={fieldErrors.firstName}
+                showErrorMessage={false}
                 onChange={(e) => {
                   setFirstName(e.target.value);
                   setFieldErrors((prev) => clearAuthFieldError(prev, 'firstName'));
@@ -152,6 +153,7 @@ export default function RegisterPage() {
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={lastName}
                 error={fieldErrors.lastName}
+                showErrorMessage={false}
                 onChange={(e) => {
                   setLastName(e.target.value);
                   setFieldErrors((prev) => clearAuthFieldError(prev, 'lastName'));
@@ -173,6 +175,7 @@ export default function RegisterPage() {
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={email}
                 error={fieldErrors.email}
+                showErrorMessage={false}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setFieldErrors((prev) => {
@@ -195,6 +198,7 @@ export default function RegisterPage() {
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={phone}
                 error={fieldErrors.phone}
+                showErrorMessage={false}
                 onChange={(e) => {
                   setPhone(e.target.value);
                   setFieldErrors((prev) => {
@@ -221,6 +225,7 @@ export default function RegisterPage() {
                   className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                   value={password}
                   error={fieldErrors.password}
+                  showErrorMessage={false}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
@@ -257,6 +262,7 @@ export default function RegisterPage() {
                   className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                   value={confirmPassword}
                   error={fieldErrors.confirmPassword}
+                  showErrorMessage={false}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
                     setFieldErrors((prev) => clearAuthFieldError(prev, 'confirmPassword'));
@@ -303,9 +309,6 @@ export default function RegisterPage() {
               </Link>
             </label>
           </div>
-          {fieldErrors.terms && (
-            <p className="-mt-2 text-sm text-error">{fieldErrors.terms}</p>
-          )}
           <ProfileClayButton
             variant="primary"
             className="w-full"
