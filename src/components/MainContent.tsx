@@ -24,6 +24,7 @@ export function MainContent({ children }: MainContentProps) {
   const pathname = usePathname() ?? '';
 
   const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
+  const mainContentBase = 'w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
 
   if (pathname === '/') {
     return (
@@ -69,7 +70,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/contact')) {
     return (
       <main
-        className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        className="home-main-surface w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
         {children}
@@ -94,7 +95,7 @@ export function MainContent({ children }: MainContentProps) {
 
   if (pathname.startsWith('/products')) {
     return (
-      <main className={`${mainBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
+      <main className={`${mainContentBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
     );
   }
 

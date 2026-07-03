@@ -22,7 +22,7 @@ export default function ProductsPage({
 }) {
   return (
     <div
-      className="mobile-products-catalog-page min-h-screen w-full max-w-full max-lg:bg-[#f1f1f3] max-lg:pb-5 pt-[var(--products-catalog-offset-mobile)] lg:bg-white lg:pb-16 lg:pt-[var(--products-catalog-offset-desktop)]"
+      className="mobile-products-catalog-page w-full max-w-full max-lg:bg-[#f1f1f3] max-lg:pb-5 pt-[var(--products-catalog-offset-mobile)] lg:bg-white lg:pb-16 lg:pt-[var(--products-catalog-offset-desktop)]"
       style={catalogOffsetStyle}
     >
       <DesktopFluidFrame>
