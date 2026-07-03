@@ -162,11 +162,77 @@
     transform: translateY(-50%);
   }
 
+  .mobile-home-sale-banner {
+    max-width: var(--mobile-home-sale-banner-max-width, 370px);
+    height: var(--mobile-home-sale-banner-height, 193px);
+  }
+
+  .mobile-home-sale-cta {
+    left: var(--mobile-home-sale-cta-left, 18px);
+    top: var(--mobile-home-sale-cta-top, 128px);
+    width: var(--mobile-home-sale-cta-width, 176px);
+    height: var(--mobile-home-sale-cta-height, 50px);
+  }
+
+  .mobile-home-sale-cta__label {
+    text-align: center;
+  }
+
+  .mobile-home-sale-cta__chevron {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobile-home-sale-cta__arrow {
+    width: 20px;
+    height: 20px;
+  }
+
   .mobile-home-sale-discount {
     font-family: Mirage;
     font-size: 75px;
     line-height: 45px;
     transform: translateY(-50%);
+  }
+
+  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — iPad mini within mobile layout. */
+  @media (min-width: 744px) and (max-width: 1023px) {
+    .mobile-home-sale-banner {
+      max-width: none;
+      height: auto;
+      aspect-ratio: 370 / 193;
+      container-type: inline-size;
+    }
+
+    .mobile-home-sale-banner__canvas {
+      width: 370px;
+      height: 193px;
+      inset: auto;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%) scale(calc(100cqw / 370px));
+      transform-origin: top center;
+    }
+
+    .mobile-home-sale-cta {
+      left: var(--mobile-home-sale-cta-tablet-left, 36px);
+      top: auto;
+      bottom: var(--mobile-home-sale-cta-tablet-bottom, 24px);
+      width: var(--mobile-home-sale-cta-tablet-width, 200px);
+      height: var(--mobile-home-sale-cta-tablet-height, 54px);
+      font-size: 0.875rem;
+      transform: none;
+    }
+
+    .mobile-home-sale-cta__chevron {
+      width: var(--mobile-home-sale-cta-chevron-size, 40px);
+      height: var(--mobile-home-sale-cta-chevron-size, 40px);
+    }
+
+    .mobile-home-sale-cta__arrow {
+      width: var(--mobile-home-sale-cta-arrow-size, 20px);
+      height: var(--mobile-home-sale-cta-arrow-size, 20px);
+    }
   }
 
   .home-product-card {
