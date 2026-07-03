@@ -15,6 +15,7 @@ import { ProfileOrders } from './ProfileOrders';
 import { ProfilePassword } from './ProfilePassword';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 import { OrderDetailsModal } from './OrderDetailsModal';
+import type { ProfileTabConfig } from './types';
 import { PROFILE_MOBILE_LAYOUT_MEDIA_QUERY } from '../../constants/profile-mobile-page';
 
 function ProfilePageContent() {

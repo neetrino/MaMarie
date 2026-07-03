@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
+import { useBodyScrollLock } from '../lib/useBodyScrollLock';
 
 export interface ProfileMenuItem {
   id: string;

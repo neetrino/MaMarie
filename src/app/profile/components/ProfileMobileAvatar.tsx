@@ -22,9 +22,8 @@ export function ProfileMobileAvatar({
     height: sizePx,
   } as const;
   const alt = `${firstName ?? ''} ${lastName ?? ''}`.trim() || 'Profile';
-  const isCustomAvatar = Boolean(avatarUrl);
 
-  if (isCustomAvatar) {
+  if (avatarUrl) {
     return (
       <div
         className="relative shrink-0 rounded-full bg-white p-[3px] shadow-[0_0_0_1px_rgba(255,255,255,0.9)]"

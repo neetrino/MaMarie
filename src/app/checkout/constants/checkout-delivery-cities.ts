@@ -30,6 +30,10 @@ export const CHECKOUT_DELIVERY_CITY_I18N_KEYS: Record<CheckoutDeliveryCity, stri
   'Vayots Dzor': 'vayotsDzor',
 };
 
+export function isCheckoutDeliveryCity(value: string): value is CheckoutDeliveryCity {
+  return (CHECKOUT_DELIVERY_CITY_VALUES as readonly string[]).includes(value);
+}
+
 export function getCheckoutDeliveryCityLabel(
   t: (key: string) => string,
   city: CheckoutDeliveryCity,

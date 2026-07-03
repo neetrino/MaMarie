@@ -24,7 +24,7 @@ interface PendingDrag {
 
 interface UseBottomSheetDragDismissOptions {
   enabled: boolean;
-  panelRef: RefObject<HTMLDivElement | null>;
+  panelRef: RefObject<HTMLDivElement>;
   onDismiss: () => void;
   dismissThresholdPx: number;
 }
@@ -32,7 +32,7 @@ interface UseBottomSheetDragDismissOptions {
 interface UseBottomSheetDragDismissResult {
   dragOffsetY: number;
   isDragging: boolean;
-  scrollAreaRef: RefObject<HTMLDivElement | null>;
+  scrollAreaRef: RefObject<HTMLDivElement>;
   panelDragStyle: CSSProperties;
   resetDrag: () => void;
   headerPointerHandlers: {
