@@ -3,10 +3,14 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
+  PROFILE_MOBILE_CARD_CLASS,
   PROFILE_MOBILE_CARD_RADIUS_PX,
   PROFILE_MOBILE_EMAIL_COLOR,
+  PROFILE_MOBILE_HEADER_CARD_PADDING_PX,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+  PROFILE_MOBILE_SECTION_GAP_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
+  PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
   PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
   PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX,
@@ -22,6 +26,7 @@ import { useDrawerTransition } from '../../lib/use-drawer-transition';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
 import { ProfileMobileMenuRow } from './components/ProfileMobileMenuRow';
+import { ProfileMobileLogoutButton } from './components/ProfileMobileLogoutButton';
 
 interface ProfileMobilePageProps {
   profile: UserProfile | null;
@@ -75,6 +80,8 @@ export function ProfileMobilePage({
   const displayName = getDisplayName(profile, t);
   const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? t('profile.myProfile');
   const orderedTabs = buildMenuOrder(tabs);
+  const menuTabs = orderedTabs.filter((tab) => tab.id !== 'deleteAccount');
+  const deleteAccountTab = orderedTabs.find((tab) => tab.id === 'deleteAccount');
   const sheetPanelRef = useRef<HTMLDivElement>(null);
   const { rendered: sheetRendered, visible: sheetVisible } = useDrawerTransition(
     isSheetOpen,
@@ -205,48 +212,70 @@ export function ProfileMobilePage({
         }}
       >
         <div
-          className="relative overflow-hidden bg-white px-5 pt-6 shadow-sm ring-1 ring-gray-200/70"
-          style={{ borderRadius: PROFILE_MOBILE_CARD_RADIUS_PX }}
+          className="flex flex-col"
+          style={{ gap: PROFILE_MOBILE_SECTION_GAP_PX }}
         >
-          <div className="mb-6 flex items-center gap-4">
-            <ProfileMobileAvatar
-              firstName={profile?.firstName}
-              lastName={profile?.lastName}
-              avatarUrl={
-                profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
-              }
-            />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xl font-bold text-gray-900">
-                {displayName}
-              </p>
-              {profile?.email ? (
-                <p
-                  className="truncate text-sm"
-                  style={{ color: PROFILE_MOBILE_EMAIL_COLOR }}
-                >
-                  {profile.email}
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="-mx-5 divide-y divide-gray-100">
-            {orderedTabs.map((tab) => (
-              <ProfileMobileMenuRow
-                key={tab.id}
-                label={tab.label}
-                icon={tab.icon}
-                iconTheme={PROFILE_MOBILE_TAB_ICON_THEME[tab.id]}
-                onClick={() => onTabSelect(tab.id)}
+          <section
+            className={PROFILE_MOBILE_CARD_CLASS}
+            style={{ padding: PROFILE_MOBILE_HEADER_CARD_PADDING_PX }}
+            aria-label={t('profile.myProfile')}
+          >
+            <div className="flex items-center gap-4">
+              <ProfileMobileAvatar
+                firstName={profile?.firstName}
+                lastName={profile?.lastName}
+                avatarUrl={
+                  profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
+                }
               />
-            ))}
-            <ProfileMobileMenuRow
-              label={t('common.navigation.logout')}
-              onClick={onLogout}
-              variant="logout"
-            />
-          </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xl font-bold text-gray-900">{displayName}</p>
+                {profile?.email ? (
+                  <p
+                    className="truncate text-sm"
+                    style={{ color: PROFILE_MOBILE_EMAIL_COLOR }}
+                  >
+                    {profile.email}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          </section>
+
+          <nav
+            className={`${PROFILE_MOBILE_CARD_CLASS} overflow-hidden`}
+            style={{
+              paddingTop: PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
+              paddingBottom: PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
+            }}
+            aria-label={t('common.navigation.profile')}
+          >
+            <div className="divide-y divide-gray-100">
+              {menuTabs.map((tab) => (
+                <ProfileMobileMenuRow
+                  key={tab.id}
+                  label={tab.label}
+                  icon={tab.icon}
+                  iconTheme={PROFILE_MOBILE_TAB_ICON_THEME[tab.id]}
+                  onClick={() => onTabSelect(tab.id)}
+                />
+              ))}
+            </div>
+            {deleteAccountTab ? (
+              <ProfileMobileMenuRow
+                label={deleteAccountTab.label}
+                icon={deleteAccountTab.icon}
+                iconTheme={PROFILE_MOBILE_TAB_ICON_THEME.deleteAccount}
+                variant="danger"
+                onClick={() => onTabSelect(deleteAccountTab.id)}
+              />
+            ) : null}
+          </nav>
+
+          <ProfileMobileLogoutButton
+            label={t('common.navigation.logout')}
+            onClick={onLogout}
+          />
         </div>
       </div>
 

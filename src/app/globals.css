@@ -350,10 +350,15 @@
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
-  .layout-shell-mobile-bottom-clearance:has(.checkout-page),
-  .layout-shell-mobile-bottom-clearance:has(.profile-mobile-page) {
+  .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
     background-color: #f1f1f3;
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Profile — less space under logout before bottom nav. */
+  .layout-shell-mobile-bottom-clearance:has(.profile-mobile-page) {
+    background-color: #f1f1f3;
+    padding-bottom: max(92px, env(safe-area-inset-bottom, 0px));
   }
 }
 

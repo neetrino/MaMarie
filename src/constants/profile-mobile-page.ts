@@ -6,6 +6,15 @@ import type { ProfileTab } from '../app/profile/types';
 export const PROFILE_MOBILE_PAGE_BG = MOBILE_HOME_BG;
 export const PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
 export const PROFILE_MOBILE_CARD_RADIUS_PX = 15;
+export const PROFILE_MOBILE_SECTION_GAP_PX = 16;
+/** Bottom shell clearance under logout — 12px less than catalog (104px). */
+export const PROFILE_MOBILE_BOTTOM_CLEARANCE_PX = 92;
+export const PROFILE_MOBILE_HEADER_CARD_PADDING_PX = 20;
+export const PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX = 4;
+
+export const PROFILE_MOBILE_CARD_CLASS =
+  'rounded-[15px] bg-white shadow-sm ring-1 ring-gray-200/70';
+
 export const PROFILE_MOBILE_MENU_ICON_BOX_SIZE_PX = 40;
 export const PROFILE_MOBILE_MENU_ICON_BOX_RADIUS_PX = 12;
 export const PROFILE_MOBILE_CHEVRON_SIZE_PX = 18;
