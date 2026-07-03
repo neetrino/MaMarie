@@ -245,7 +245,7 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
         onMenuClose={handleMenuClose}
       />
       <DesktopFluidFrame className="hidden lg:flex">
-        <DesktopHeaderBar showPill={isHomeRoute ? isScrolled : true} navLinks={navLinks} />
+        <DesktopHeaderBar showPill={isScrolled} navLinks={navLinks} />
       </DesktopFluidFrame>
     </header>
   );

@@ -11,6 +11,7 @@ import {
   CONTACT_PAGE_MOBILE_BG,
   CONTACT_PAGE_MOBILE_HORIZONTAL_PADDING_PX,
   CONTACT_PAGE_MOBILE_PADDING_BOTTOM_PX,
+  CONTACT_PAGE_MOBILE_PADDING_RIGHT_PX,
   CONTACT_PAGE_MOBILE_PADDING_TOP_PX,
 } from '../../constants/contact-page';
 import { useTranslation } from '../../lib/i18n-client';
@@ -19,7 +20,7 @@ const contactMobilePageStyle = {
   paddingTop: CONTACT_PAGE_MOBILE_PADDING_TOP_PX,
   paddingBottom: CONTACT_PAGE_MOBILE_PADDING_BOTTOM_PX,
   paddingLeft: CONTACT_PAGE_MOBILE_HORIZONTAL_PADDING_PX,
-  paddingRight: CONTACT_PAGE_MOBILE_HORIZONTAL_PADDING_PX,
+  paddingRight: CONTACT_PAGE_MOBILE_PADDING_RIGHT_PX,
   backgroundColor: CONTACT_PAGE_MOBILE_BG,
 } as CSSProperties;
 
@@ -68,7 +69,7 @@ export default function ContactPage() {
   return (
     <>
       <div
-        className="mobile-contact-page w-full max-w-full overflow-x-hidden lg:hidden"
+        className="mobile-contact-page w-full max-w-full overflow-x-clip lg:hidden"
         style={contactMobilePageStyle}
       >
         <ContactPageShell variant="mobileTrack">
