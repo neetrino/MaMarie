@@ -7,15 +7,20 @@ interface ProfileMobileAvatarProps {
   firstName?: string | null;
   lastName?: string | null;
   avatarUrl?: string | null;
+  sizePx?: number;
 }
 
-const avatarSizeStyle = {
-  width: PROFILE_MOBILE_AVATAR_SIZE_PX,
-  height: PROFILE_MOBILE_AVATAR_SIZE_PX,
-} as const;
-
 /** Figma profile header — pink clay circle with white silhouette. */
-export function ProfileMobileAvatar({ firstName, lastName, avatarUrl }: ProfileMobileAvatarProps) {
+export function ProfileMobileAvatar({
+  firstName,
+  lastName,
+  avatarUrl,
+  sizePx = PROFILE_MOBILE_AVATAR_SIZE_PX,
+}: ProfileMobileAvatarProps) {
+  const avatarSizeStyle = {
+    width: sizePx,
+    height: sizePx,
+  } as const;
   const alt = `${firstName ?? ''} ${lastName ?? ''}`.trim() || 'Profile';
   const isCustomAvatar = Boolean(avatarUrl);
 

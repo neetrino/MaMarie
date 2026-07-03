@@ -13,6 +13,13 @@ export const PROFILE_DESKTOP_CARD_SHADOW = '0 4px 24px rgba(0, 0, 0, 0.06)';
 export const PROFILE_ORDER_CARD_HOVER_SHADOW = '0 8px 32px rgba(0, 0, 0, 0.12)';
 export const PROFILE_ORDER_CARD_HOVER_LIFT_PX = 4;
 export const PROFILE_DESKTOP_SIDEBAR_WIDTH_PX = 280;
+export const PROFILE_DESKTOP_AVATAR_SIZE_PX = 112;
+/** Sidebar header card — matches `p-5` on sides/bottom; top inset 6px tighter above avatar. */
+export const PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX = 20;
+export const PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX = 20;
+export const PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX = 14;
+/** Avatar → display name — 9px tighter than previous `gap-4` (16px). */
+export const PROFILE_DESKTOP_AVATAR_NAME_GAP_PX = 1;
 export const PROFILE_DESKTOP_SHELL_PADDING_TOP_PX = 12;
 export const PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX = 20;
 export const PROFILE_DESKTOP_CONTENT_GAP_PX = 40;

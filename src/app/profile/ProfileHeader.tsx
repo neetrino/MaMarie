@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react';
 import {
+  PROFILE_DESKTOP_AVATAR_NAME_GAP_PX,
+  PROFILE_DESKTOP_AVATAR_SIZE_PX,
   PROFILE_DESKTOP_CARD_CLASS,
+  PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX,
+  PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX,
+  PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
   PROFILE_DESKTOP_TAB_ICON_THEME,
   PROFILE_MOBILE_ICON_THEMES,
 } from '../../constants/profile-desktop-page';
@@ -113,17 +118,27 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout,
 
   return (
     <div
-      className={`relative flex h-full min-h-0 flex-col p-5 ${PROFILE_DESKTOP_CARD_CLASS}`}
+      className={`relative flex h-full min-h-0 flex-col ${PROFILE_DESKTOP_CARD_CLASS}`}
+      style={{
+        paddingTop: PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX,
+        paddingRight: PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
+        paddingBottom: PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX,
+        paddingLeft: PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
+      }}
       aria-label="Profile navigation"
     >
       <div className="shrink-0">
-        <div className="flex flex-col items-center gap-4 text-center">
+        <div
+          className="flex flex-col items-center text-center"
+          style={{ gap: PROFILE_DESKTOP_AVATAR_NAME_GAP_PX }}
+        >
           <ProfileMobileAvatar
             firstName={profile?.firstName}
             lastName={profile?.lastName}
             avatarUrl={
               profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
             }
+            sizePx={PROFILE_DESKTOP_AVATAR_SIZE_PX}
           />
           <div className="min-w-0">
             {hasSplitName ? (
