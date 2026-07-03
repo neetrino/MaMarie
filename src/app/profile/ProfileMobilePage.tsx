@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -10,6 +11,9 @@ import {
   PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
   PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+  PROFILE_MOBILE_PAGE_TOP_PADDING_PX,
+  PROFILE_MOBILE_TABLET_PAGE_TOP_GAP_PX,
+  PROFILE_MOBILE_TABLET_PAGE_TOP_PADDING_PX,
   PROFILE_MOBILE_SECTION_GAP_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
   PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
@@ -219,11 +223,16 @@ export function ProfileMobilePage({
   return (
     <div className="profile-mobile-page lg:hidden">
       <div
-        className="mx-auto w-full max-w-md pt-2"
-        style={{
-          paddingLeft: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
-          paddingRight: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
-        }}
+        className="profile-mobile-page__content mx-auto w-full max-w-md"
+        style={
+          {
+            '--profile-mobile-page-top-padding': `${PROFILE_MOBILE_PAGE_TOP_PADDING_PX}px`,
+            '--profile-mobile-tablet-page-top-gap': `${PROFILE_MOBILE_TABLET_PAGE_TOP_GAP_PX}px`,
+            '--profile-mobile-tablet-page-top-padding': `${PROFILE_MOBILE_TABLET_PAGE_TOP_PADDING_PX}px`,
+            paddingLeft: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+            paddingRight: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+          } as CSSProperties
+        }
       >
         <div
           className="flex flex-col"
