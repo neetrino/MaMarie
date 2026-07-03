@@ -99,6 +99,17 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
+  if (pathname.startsWith('/about')) {
+    return (
+      <main
+        className={`${mainContentBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
   return (
     <main
       className={`${mainBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
