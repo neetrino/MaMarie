@@ -6,7 +6,9 @@ import {
   PROFILE_MOBILE_CARD_CLASS,
   PROFILE_MOBILE_CARD_RADIUS_PX,
   PROFILE_MOBILE_EMAIL_COLOR,
-  PROFILE_MOBILE_HEADER_CARD_PADDING_PX,
+  PROFILE_MOBILE_HEADER_CARD_GAP_PX,
+  PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
+  PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
   PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
   PROFILE_MOBILE_SECTION_GAP_PX,
   PROFILE_MOBILE_TAB_ICON_THEME,
@@ -229,10 +231,18 @@ export function ProfileMobilePage({
         >
           <section
             className={PROFILE_MOBILE_CARD_CLASS}
-            style={{ padding: PROFILE_MOBILE_HEADER_CARD_PADDING_PX }}
+            style={{
+              paddingLeft: PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
+              paddingRight: PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
+              paddingTop: PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
+              paddingBottom: PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
+            }}
             aria-label={t('profile.myProfile')}
           >
-            <div className="flex items-center gap-4">
+            <div
+              className="flex items-center"
+              style={{ gap: PROFILE_MOBILE_HEADER_CARD_GAP_PX }}
+            >
               <ProfileMobileAvatar
                 firstName={profile?.firstName}
                 lastName={profile?.lastName}
@@ -241,10 +251,10 @@ export function ProfileMobilePage({
                 }
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xl font-bold text-gray-900">{displayName}</p>
+                <p className="truncate text-xl font-bold leading-tight text-gray-900">{displayName}</p>
                 {profile?.email ? (
                   <p
-                    className="truncate text-sm"
+                    className="truncate text-sm leading-snug"
                     style={{ color: PROFILE_MOBILE_EMAIL_COLOR }}
                   >
                     {profile.email}

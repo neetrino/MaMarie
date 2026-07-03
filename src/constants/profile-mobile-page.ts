@@ -9,7 +9,9 @@ export const PROFILE_MOBILE_CARD_RADIUS_PX = 15;
 export const PROFILE_MOBILE_SECTION_GAP_PX = 16;
 /** Bottom shell clearance under logout — 12px less than catalog (104px). */
 export const PROFILE_MOBILE_BOTTOM_CLEARANCE_PX = 92;
-export const PROFILE_MOBILE_HEADER_CARD_PADDING_PX = 20;
+export const PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX = 16;
+export const PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX = 8;
+export const PROFILE_MOBILE_HEADER_CARD_GAP_PX = 8;
 export const PROFILE_MOBILE_AVATAR_SIZE_PX = 96;
 export const PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX = 4;
 
