@@ -200,24 +200,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* MOBILE_WISHLIST_TABLET_GRID_COLUMNS (4) — wishlist on iPad mini. */
-  .mobile-wishlist-tablet-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   @media (min-width: 744px) and (max-width: 1023px) {
     .mobile-tablet-three-column-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .mobile-wishlist-tablet-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .mobile-wishlist-card-placeholder {
-      width: 100%;
-      aspect-ratio: 184 / 330;
-      height: auto;
     }
   }
 
@@ -356,6 +341,34 @@
   }
 }
 
+/* MOBILE_WISHLIST_TABLET_*_CONTAINER_MIN_WIDTH_PX — wishlist columns by content width. */
+.mobile-wishlist-page {
+  container-type: inline-size;
+  container-name: mobile-wishlist;
+}
+
+.mobile-wishlist-tablet-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@container mobile-wishlist (min-width: 704px) {
+  .mobile-wishlist-tablet-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mobile-wishlist-card-placeholder {
+    width: 100%;
+    aspect-ratio: 184 / 330;
+    height: auto;
+  }
+}
+
+@container mobile-wishlist (min-width: 794px) {
+  .mobile-wishlist-tablet-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 /* Policy pages typography & spacing */
 .policy-page {
   max-width: 56rem; /* ~max-w-4xl */
@@ -440,6 +453,7 @@
   /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home + wishlist + products mobile; default shell stays 114px. */
   .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
   .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
@@ -456,6 +470,16 @@
 
 main.home-main-surface.order-page-main {
   background-color: #f1f1f3;
+}
+
+/* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — reinforce fixed header on iPad tablets. */
+@media (min-width: 744px) and (max-width: 1023px) {
+  [data-site-header] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
 }
 
 main.profile-page-main {

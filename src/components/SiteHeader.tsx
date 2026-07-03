@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useId, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   HEADER_ACTIONS_GAP_PX,
 } from '../constants/brand';
@@ -200,12 +201,14 @@ function DesktopHeaderBar({
 }
 
 export function SiteHeader({ navLinks }: SiteHeaderProps) {
+  const pathname = usePathname() ?? '';
+  const isHomeRoute = pathname === '/';
   const isScrolled = useHeaderScrolled();
   const [menuOpen, setMenuOpen] = useState(false);
   const [pillFrozen, setPillFrozen] = useState<boolean | null>(null);
   const menuId = useId();
 
-  const showPill = pillFrozen ?? isScrolled;
+  const showPill = pillFrozen ?? (isHomeRoute ? isScrolled : true);
 
   const handleMenuToggle = () => {
     setMenuOpen((open) => {
@@ -242,7 +245,7 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
         onMenuClose={handleMenuClose}
       />
       <DesktopFluidFrame className="hidden lg:flex">
-        <DesktopHeaderBar showPill={isScrolled} navLinks={navLinks} />
+        <DesktopHeaderBar showPill={isHomeRoute ? isScrolled : true} navLinks={navLinks} />
       </DesktopFluidFrame>
     </header>
   );

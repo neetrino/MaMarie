@@ -23,7 +23,6 @@ import {
 } from '../../constants/home-sections';
 import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-  getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
 import {
   WISHLIST_CARD_HEIGHT_PX,
@@ -43,6 +42,7 @@ import {
   MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
   MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
   MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
+  WISHLIST_DESKTOP_GRID_CLASS,
 } from '../../constants/mobile-wishlist';
 import type {
   ProductColorOption,
@@ -255,7 +255,7 @@ export default function WishlistPage() {
       ) : gridItemCount > 0 ? (
         <div className="w-full" style={{ paddingTop: BEST_PRODUCTS_GRID_OFFSET_TOP_PX }} aria-busy={loading}>
           <div
-            className={getProductsCatalogGridClassName('grid-4')}
+            className={WISHLIST_DESKTOP_GRID_CLASS}
             style={{
               columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
               rowGap: WISHLIST_CARD_ROW_GAP_PX,

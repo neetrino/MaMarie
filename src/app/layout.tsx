@@ -37,8 +37,8 @@ export default function RootLayout({
       <body className={`${montserrat.variable} font-sans bg-white text-gray-900 antialiased min-h-full`}>
         <Suspense fallback={null}>
           <ClientProviders>
+            <ConditionalHeader navLinks={NAV_LINKS} />
             <div className="layout-shell-mobile-bottom-clearance flex min-h-screen flex-col max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pb-0">
-              <ConditionalHeader navLinks={NAV_LINKS} />
               <MainContent>{children}</MainContent>
               <ConditionalFooter />
             </div>
