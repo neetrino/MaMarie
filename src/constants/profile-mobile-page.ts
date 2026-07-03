@@ -10,6 +10,7 @@ export const PROFILE_MOBILE_SECTION_GAP_PX = 16;
 /** Bottom shell clearance under logout — 12px less than catalog (104px). */
 export const PROFILE_MOBILE_BOTTOM_CLEARANCE_PX = 92;
 export const PROFILE_MOBILE_HEADER_CARD_PADDING_PX = 20;
+export const PROFILE_MOBILE_AVATAR_SIZE_PX = 96;
 export const PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX = 4;
 
 export const PROFILE_MOBILE_CARD_CLASS =
@@ -58,6 +59,7 @@ export const PROFILE_MOBILE_EMAIL_COLOR = '#6b7280';
 
 export const PROFILE_MOBILE_ASSETS = {
   chevronRight: '/assets/home/icon-chevron-right-pink.svg',
+  defaultAvatar: '/assets/profile/default-avatar.png',
 } as const;
 
 export const PROFILE_MOBILE_ICON_THEMES = {
