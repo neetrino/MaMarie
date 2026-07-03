@@ -20,6 +20,10 @@ import {
 import { useTranslation } from '../../lib/i18n-client';
 import { HeaderLanguageSwitcher } from './HeaderLanguageSwitcher';
 
+/** MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — inline pill below `lg`. */
+const HEADER_MOBILE_LANGUAGE_TABLET_INLINE_CLASS = 'hidden min-[744px]:block shrink-0';
+const HEADER_MOBILE_LANGUAGE_PHONE_GLOBE_CLASS = 'min-[744px]:hidden';
+
 function MobileIconButton({
   label,
   onClick,
@@ -145,7 +149,7 @@ export function HeaderMobileActions({
         transitionDuration: `${HEADER_PILL_APPEAR_DURATION_MS}ms`,
       }}
     >
-      <div ref={languageContainerRef} className="relative shrink-0">
+      <div ref={languageContainerRef} className={`relative shrink-0 ${HEADER_MOBILE_LANGUAGE_PHONE_GLOBE_CLASS}`}>
         <MobileIconButton
           label={t('common.navigation.language')}
           showPill={showPill}
@@ -183,6 +187,10 @@ export function HeaderMobileActions({
             <HeaderLanguageSwitcher />
           </div>
         ) : null}
+      </div>
+
+      <div className={HEADER_MOBILE_LANGUAGE_TABLET_INLINE_CLASS}>
+        <HeaderLanguageSwitcher />
       </div>
 
       <button

@@ -27,6 +27,7 @@ import { MobileProductsCatalogTrack } from './products/MobileProductsCatalogTrac
 import { LazyWhenVisible } from './LazyWhenVisible';
 import { useTranslation } from '../lib/i18n-client';
 import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../lib/product-card-lazy';
+import { useTouchDevice } from '../lib/use-touch-device';
 import { useProductsCatalogViewMode } from './products/useProductsCatalogViewMode';
 
 import type {
@@ -73,6 +74,7 @@ export const ProductsGrid = memo(function ProductsGrid({
 }: ProductsGridProps) {
   const { t } = useTranslation();
   const { viewMode } = useProductsCatalogViewMode();
+  const isTouchDevice = useTouchDevice();
 
   const sortedProducts = useMemo(() => {
     const sorted = [...products];
@@ -215,6 +217,7 @@ export const ProductsGrid = memo(function ProductsGrid({
                 layoutWidthPx={cardWidthPx}
                 layoutHeightPx={cardHeightPx}
                 compactPanel={viewMode === 'grid-4'}
+                disableHoverEffects={isTouchDevice}
                 imagePriority={resolveProductCardImagePriority(index, viewMode)}
               />
             </LazyWhenVisible>

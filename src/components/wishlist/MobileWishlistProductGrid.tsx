@@ -1,14 +1,11 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import {
   MOBILE_WISHLIST_CARD_COLUMN_GAP_PX,
   MOBILE_WISHLIST_CARD_HEIGHT_PX,
   MOBILE_WISHLIST_CARD_ROW_GAP_PX,
   MOBILE_WISHLIST_CARD_WIDTH_PX,
-  MOBILE_WISHLIST_PAGE_BG,
-  MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
-  MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
-  MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
   MOBILE_WISHLIST_TITLE_TO_GRID_GAP_PX,
 } from '../../constants/mobile-wishlist';
 import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../../lib/product-card-lazy';
@@ -26,7 +23,7 @@ interface MobileWishlistProductGridProps {
   addToCartLabel: string;
 }
 
-/** Figma `74:796` — two-column mobile wishlist product grid. */
+/** Figma `74:796` — mobile wishlist grid (2 phone, 4 iPad mini, 3 iPad Pro). */
 export function MobileWishlistProductGrid({
   products,
   loading,
@@ -35,13 +32,12 @@ export function MobileWishlistProductGrid({
 }: MobileWishlistProductGridProps) {
   return (
     <div
-      className="grid w-full"
+      className="mobile-wishlist-tablet-grid grid w-full"
       style={{
-        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
         columnGap: MOBILE_WISHLIST_CARD_COLUMN_GAP_PX,
         rowGap: MOBILE_WISHLIST_CARD_ROW_GAP_PX,
         paddingTop: MOBILE_WISHLIST_TITLE_TO_GRID_GAP_PX,
-      }}
+      } as CSSProperties}
       aria-busy={loading}
     >
       {products.map((product, index) => (
@@ -54,6 +50,7 @@ export function MobileWishlistProductGrid({
               variant="grid"
               widthPx={MOBILE_WISHLIST_CARD_WIDTH_PX}
               heightPx={MOBILE_WISHLIST_CARD_HEIGHT_PX}
+              className="mobile-wishlist-card-placeholder w-full max-w-none"
             />
           }
         >
@@ -72,6 +69,7 @@ export function MobileWishlistProductGrid({
               variant="grid"
               widthPx={MOBILE_WISHLIST_CARD_WIDTH_PX}
               heightPx={MOBILE_WISHLIST_CARD_HEIGHT_PX}
+              className="mobile-wishlist-card-placeholder w-full max-w-none"
             />
           ))
         : null}

@@ -224,6 +224,7 @@ export function MobileBottomNavBar() {
     >
       <div className={styles.frame} style={frameStyle}>
         <div aria-hidden className={styles.bar} />
+        <div className={styles.frameTrack}>
         {activeLayout ? (
           <Image
             src={MOBILE_BOTTOM_NAV_ASSETS.circleNotch}
@@ -292,6 +293,7 @@ export function MobileBottomNavBar() {
             </Link>
           );
         })}
+        </div>
       </div>
     </nav>
   );

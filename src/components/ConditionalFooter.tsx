@@ -12,7 +12,7 @@ export function ConditionalFooter() {
     return null;
   }
   return (
-    <DesktopFluidFrame className="hidden lg:flex">
+    <DesktopFluidFrame className="mt-auto hidden lg:flex">
       <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
         <Footer />
       </LazyWhenVisible>

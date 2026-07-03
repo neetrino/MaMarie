@@ -24,6 +24,7 @@ export function MainContent({ children }: MainContentProps) {
   const pathname = usePathname() ?? '';
 
   const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
+  const mainContentBase = 'w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
 
   if (pathname === '/') {
     return (
@@ -66,6 +67,17 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
+  if (pathname.startsWith('/contact')) {
+    return (
+      <main
+        className="home-main-surface w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
   if (pathname.startsWith('/supersudo')) {
     return <main className={mainBase}>{children}</main>;
   }
@@ -73,12 +85,8 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/profile')) {
     return (
       <main
-        className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden max-lg:pt-0 lg:pt-[var(--header-clearance-desktop)]"
-        style={
-          {
-            ['--header-clearance-desktop']: `calc(${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,
-          } as CSSProperties
-        }
+        className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
       >
         {children}
       </main>
@@ -87,7 +95,18 @@ export function MainContent({ children }: MainContentProps) {
 
   if (pathname.startsWith('/products')) {
     return (
-      <main className={`${mainBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
+      <main className={`${mainContentBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
+    );
+  }
+
+  if (pathname.startsWith('/about')) {
+    return (
+      <main
+        className={`${mainContentBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
     );
   }
 

@@ -15,7 +15,7 @@ export function ConditionalHeader({ navLinks }: ConditionalHeaderProps) {
   }
   if (pathname?.startsWith('/profile')) {
     return (
-      <div className="hidden md:block">
+      <div className="profile-route-header">
         <SiteHeader navLinks={navLinks} />
       </div>
     );

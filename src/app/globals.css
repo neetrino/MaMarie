@@ -162,11 +162,88 @@
     transform: translateY(-50%);
   }
 
+  .mobile-home-sale-banner {
+    max-width: var(--mobile-home-sale-banner-max-width, 370px);
+    height: var(--mobile-home-sale-banner-height, 193px);
+  }
+
+  .mobile-home-sale-cta {
+    left: var(--mobile-home-sale-cta-left, 18px);
+    top: var(--mobile-home-sale-cta-top, 128px);
+    width: var(--mobile-home-sale-cta-width, 176px);
+    height: var(--mobile-home-sale-cta-height, 50px);
+  }
+
+  .mobile-home-sale-cta__label {
+    text-align: center;
+  }
+
+  .mobile-home-sale-cta__chevron {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobile-home-sale-cta__arrow {
+    width: 20px;
+    height: 20px;
+  }
+
   .mobile-home-sale-discount {
     font-family: Mirage;
     font-size: 75px;
     line-height: 45px;
     transform: translateY(-50%);
+  }
+
+  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — products: 3 cards per row. */
+  .mobile-tablet-three-column-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 744px) and (max-width: 1023px) {
+    .mobile-tablet-three-column-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — iPad mini within mobile layout. */
+  @media (min-width: 744px) and (max-width: 1023px) {
+    .mobile-home-sale-banner {
+      max-width: none;
+      height: auto;
+      aspect-ratio: 370 / 193;
+      container-type: inline-size;
+    }
+
+    .mobile-home-sale-banner__canvas {
+      width: 370px;
+      height: 193px;
+      inset: auto;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%) scale(calc(100cqw / 370px));
+      transform-origin: top center;
+    }
+
+    .mobile-home-sale-cta {
+      left: var(--mobile-home-sale-cta-tablet-left, 36px);
+      top: auto;
+      bottom: var(--mobile-home-sale-cta-tablet-bottom, 24px);
+      width: var(--mobile-home-sale-cta-tablet-width, 200px);
+      height: var(--mobile-home-sale-cta-tablet-height, 54px);
+      font-size: 0.875rem;
+      transform: none;
+    }
+
+    .mobile-home-sale-cta__chevron {
+      width: var(--mobile-home-sale-cta-chevron-size, 40px);
+      height: var(--mobile-home-sale-cta-chevron-size, 40px);
+    }
+
+    .mobile-home-sale-cta__arrow {
+      width: var(--mobile-home-sale-cta-arrow-size, 20px);
+      height: var(--mobile-home-sale-cta-arrow-size, 20px);
+    }
   }
 
   .home-product-card {
@@ -185,7 +262,6 @@
     --home-product-card-lift: 0px;
   }
 
-  .home-product-card:not(.home-product-card--static):hover,
   .home-product-card:not(.home-product-card--static):has(a:focus-visible) {
     z-index: 10;
     --home-product-card-image-left: var(--home-product-card-image-left-hover);
@@ -201,9 +277,40 @@
     --home-product-card-lift: var(--home-product-card-lift-hover);
   }
 
-  .home-product-card:not(.home-product-card--static):hover .home-product-card-sizes,
   .home-product-card:not(.home-product-card--static):has(a:focus-visible) .home-product-card-sizes {
     opacity: 1;
+  }
+
+  /* Desktop mouse only — iPad/touch keeps static cards like mobile home. */
+  @media (pointer: fine) and (hover: hover) {
+    .home-product-card:not(.home-product-card--static):hover {
+      z-index: 10;
+      --home-product-card-image-left: var(--home-product-card-image-left-hover);
+      --home-product-card-image-top: var(--home-product-card-image-top-hover);
+      --home-product-card-image-width: var(--home-product-card-image-width-hover);
+      --home-product-card-image-height: var(--home-product-card-image-height-hover);
+      --home-product-card-bg: var(--home-product-card-bg-hover);
+      --home-product-card-actions-gap: var(--home-product-card-actions-gap-hover);
+      --home-product-card-cart-size: var(--home-product-card-cart-size-hover);
+      --home-product-card-cart-icon-size: var(--home-product-card-cart-icon-size-hover);
+      --home-product-card-cart-icon-left: var(--home-product-card-cart-icon-left-hover);
+      --home-product-card-cart-icon-top: var(--home-product-card-cart-icon-top-hover);
+      --home-product-card-lift: var(--home-product-card-lift-hover);
+    }
+
+    .home-product-card:not(.home-product-card--static):hover .home-product-card-sizes {
+      opacity: 1;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .home-product-card:not(.home-product-card--static) .home-product-card-surface,
+    .home-product-card:not(.home-product-card--static) .home-product-card-image-wrap,
+    .home-product-card:not(.home-product-card--static) .home-product-card-actions,
+    .home-product-card:not(.home-product-card--static) .home-product-card-cart,
+    .home-product-card:not(.home-product-card--static) .home-product-card-cart-icon {
+      transition: none;
+    }
   }
 
   .home-product-card--static .home-product-card-surface,
@@ -261,6 +368,34 @@
 
   .home-product-card-sizes {
     transition: opacity var(--home-product-card-duration) var(--home-product-card-easing);
+  }
+}
+
+/* MOBILE_WISHLIST_TABLET_*_CONTAINER_MIN_WIDTH_PX — wishlist columns by content width. */
+.mobile-wishlist-page {
+  container-type: inline-size;
+  container-name: mobile-wishlist;
+}
+
+.mobile-wishlist-tablet-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@container mobile-wishlist (min-width: 704px) {
+  .mobile-wishlist-tablet-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mobile-wishlist-card-placeholder {
+    width: 100%;
+    aspect-ratio: 184 / 330;
+    height: auto;
+  }
+}
+
+@container mobile-wishlist (min-width: 794px) {
+  .mobile-wishlist-tablet-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -348,6 +483,7 @@
   /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home + wishlist + products mobile; default shell stays 114px. */
   .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
   .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
@@ -360,14 +496,56 @@
     background-color: #f1f1f3;
     padding-bottom: max(92px, env(safe-area-inset-bottom, 0px));
   }
+
+  .mobile-contact-page {
+    min-width: 0;
+    overflow-x: clip;
+  }
 }
 
 main.home-main-surface.order-page-main {
   background-color: #f1f1f3;
 }
 
+/* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — reinforce fixed header on iPad tablets. */
+@media (min-width: 744px) and (max-width: 1023px) {
+  [data-site-header] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
 main.profile-page-main {
   background-color: #f1f1f3;
+}
+
+/* PROFILE_MOBILE_HEADER_HIDDEN_MAX_VIEWPORT_PX (743) — hide top nav on phone profile only. */
+.profile-route-header {
+  display: block;
+}
+
+@media (max-width: 743px) {
+  .profile-route-header {
+    display: none;
+  }
+}
+
+/* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — profile inset below fixed navbar. */
+@media (min-width: 744px) and (max-width: 1023px) {
+  .profile-mobile-page__content {
+    padding-top: var(
+      --profile-mobile-tablet-page-top-padding,
+      calc(var(--header-clearance-mobile, 64px) + var(--profile-mobile-tablet-page-top-gap, 56px))
+    );
+  }
+}
+
+@media (max-width: 743px) {
+  .profile-mobile-page__content {
+    padding-top: var(--profile-mobile-page-top-padding, 8px);
+  }
 }
 
 .profile-scroll-area {

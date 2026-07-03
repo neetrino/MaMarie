@@ -1,10 +1,21 @@
 import { BRAND_COLORS } from './brand';
-import { MOBILE_HOME_BG, MOBILE_HOME_HORIZONTAL_PADDING_PX } from './mobile-home';
+import { HEADER_CONTENT_CLEARANCE_MOBILE_PX } from './header';
+import { MOBILE_HOME_BG, MOBILE_HOME_HORIZONTAL_PADDING_PX, MOBILE_HOME_TABLET_MIN_VIEWPORT_PX } from './mobile-home';
 import type { ProfileTab } from '../app/profile/types';
 
 /** Mobile profile — Figma clay menu screen. */
 export const PROFILE_MOBILE_PAGE_BG = MOBILE_HOME_BG;
 export const PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
+/** Phone — profile has no fixed top navbar. */
+export const PROFILE_MOBILE_PAGE_TOP_PADDING_PX = 8;
+/** iPad mini — extra space below navbar clearance before profile cards. */
+export const PROFILE_MOBILE_TABLET_PAGE_TOP_GAP_PX = 56;
+/** Total inset from viewport top — navbar clearance + gap. */
+export const PROFILE_MOBILE_TABLET_PAGE_TOP_PADDING_PX =
+  HEADER_CONTENT_CLEARANCE_MOBILE_PX + PROFILE_MOBILE_TABLET_PAGE_TOP_GAP_PX;
+/** Show top navbar on profile from iPad mini portrait up (`744px`). */
+export const PROFILE_MOBILE_HEADER_MIN_VIEWPORT_PX = MOBILE_HOME_TABLET_MIN_VIEWPORT_PX;
+export const PROFILE_MOBILE_HEADER_HIDDEN_MAX_VIEWPORT_PX = PROFILE_MOBILE_HEADER_MIN_VIEWPORT_PX - 1;
 export const PROFILE_MOBILE_CARD_RADIUS_PX = 15;
 export const PROFILE_MOBILE_SECTION_GAP_PX = 16;
 /** Bottom shell clearance under logout — 12px less than catalog (104px). */

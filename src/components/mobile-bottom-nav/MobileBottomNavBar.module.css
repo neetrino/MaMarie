@@ -27,6 +27,7 @@
  */
 .shell {
   --bottom-nav-design-width: 375;
+  --bottom-nav-slot-width: 78;
   --bottom-nav-shell-height: 114px;
   --bottom-nav-bar-height: 76px;
   --bottom-nav-bar-radius: 30px;
@@ -79,6 +80,26 @@
   box-shadow: var(--bottom-nav-shadow);
 }
 
+/* Icon + notch layout — phone artboard width, centered on iPad mini. */
+.frameTrack {
+  position: absolute;
+  inset: 0;
+}
+
+/* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — keep active icons at phone scale. */
+@media (min-width: 744px) and (max-width: 1023px) {
+  .frameTrack {
+    inset-inline: 0;
+    width: calc(var(--bottom-nav-design-width) * 1px);
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .slot {
+    width: calc(var(--bottom-nav-slot-width) * 1px);
+  }
+}
+
 .circleNotch {
   position: absolute;
   top: calc(var(--bottom-nav-notch-top-px) * 1px);
@@ -94,7 +115,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% * 78 / var(--bottom-nav-design-width));
+  width: calc(100% * var(--bottom-nav-slot-width) / var(--bottom-nav-design-width));
   height: 40px;
   border: none;
   background: transparent;
@@ -140,6 +161,7 @@
   opacity: 0;
   transform: scale(0.9);
   transition: var(--bottom-nav-transition);
+  object-fit: contain;
 }
 
 .iconLayerVisible {
@@ -150,12 +172,14 @@
 .slotIcon {
   height: 40px;
   width: auto;
-  max-width: 100%;
+  max-width: calc(var(--bottom-nav-slot-width) * 1px);
 }
 
 .slotIconImage {
   width: auto;
-  height: 100%;
+  height: 40px;
+  max-width: calc(var(--bottom-nav-slot-width) * 1px);
+  object-fit: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {

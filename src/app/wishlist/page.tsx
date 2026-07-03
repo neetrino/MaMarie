@@ -23,7 +23,6 @@ import {
 } from '../../constants/home-sections';
 import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
-  getProductsCatalogGridClassName,
 } from '../../constants/products-catalog';
 import {
   WISHLIST_CARD_HEIGHT_PX,
@@ -39,9 +38,11 @@ import {
   WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/wishlist-empty-state';
 import {
+  MOBILE_WISHLIST_PAGE_BG,
   MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
   MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
   MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
+  WISHLIST_DESKTOP_GRID_CLASS,
 } from '../../constants/mobile-wishlist';
 import type {
   ProductColorOption,
@@ -179,12 +180,13 @@ export default function WishlistPage() {
   return (
     <>
       <div
-        className="mobile-wishlist-page sm:hidden w-full max-w-full overflow-x-hidden"
+        className="mobile-wishlist-page w-full max-w-full overflow-x-hidden lg:hidden"
         style={{
           paddingTop: MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
           paddingBottom: MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
           paddingLeft: MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
           paddingRight: MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
+          backgroundColor: MOBILE_WISHLIST_PAGE_BG,
         }}
       >
         <div
@@ -225,7 +227,7 @@ export default function WishlistPage() {
         ) : null}
       </div>
 
-      <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mx-auto hidden max-w-7xl px-4 py-12 sm:px-6 lg:block lg:px-8">
       <div
         style={
           showEmptyState
@@ -253,7 +255,7 @@ export default function WishlistPage() {
       ) : gridItemCount > 0 ? (
         <div className="w-full" style={{ paddingTop: BEST_PRODUCTS_GRID_OFFSET_TOP_PX }} aria-busy={loading}>
           <div
-            className={getProductsCatalogGridClassName('grid-4')}
+            className={WISHLIST_DESKTOP_GRID_CLASS}
             style={{
               columnGap: PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
               rowGap: WISHLIST_CARD_ROW_GAP_PX,

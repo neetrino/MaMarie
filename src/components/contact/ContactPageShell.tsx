@@ -14,12 +14,15 @@ const contactPageShellVars = {
 
 interface ContactPageShellProps {
   children: ReactNode;
+  variant?: 'default' | 'mobileTrack';
 }
 
 /** Contact page outer shell — mobile content track aligned with navbar insets. */
-export function ContactPageShell({ children }: ContactPageShellProps) {
+export function ContactPageShell({ children, variant = 'default' }: ContactPageShellProps) {
+  const shellClassName = variant === 'mobileTrack' ? `${styles.shell} ${styles.shellMobileTrack}` : styles.shell;
+
   return (
-    <div className={styles.shell} style={contactPageShellVars}>
+    <div className={shellClassName} style={contactPageShellVars}>
       {children}
     </div>
   );
