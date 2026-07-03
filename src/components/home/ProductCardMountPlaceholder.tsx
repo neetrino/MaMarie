@@ -30,7 +30,7 @@ export function ProductCardMountPlaceholder({
               borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
             }
           : {
-              width: widthPx,
+              width: widthPx ?? '100%',
               height: heightPx,
               borderRadius: 30,
             }

@@ -19,9 +19,8 @@ export function MobileProductsCatalogProductGrid({
 }: MobileProductsCatalogProductGridProps) {
   return (
     <div
-      className="grid w-full min-w-0"
+      className="mobile-tablet-three-column-grid grid w-full min-w-0"
       style={{
-        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
         columnGap: MOBILE_PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
         rowGap: MOBILE_PRODUCTS_CATALOG_CARD_ROW_GAP_PX,
       }}

@@ -139,7 +139,7 @@ function MobileWishlistProductCardComponent({
   return (
     <article
       ref={cardRef}
-      className="relative w-full shrink-0 overflow-hidden"
+      className="mobile-wishlist-product-card relative w-full shrink-0 overflow-hidden"
       style={{
         height: cardHeightPx,
         borderRadius: lp(MOBILE_WISHLIST_CARD_RADIUS_PX),

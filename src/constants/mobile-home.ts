@@ -66,6 +66,8 @@ export const MOBILE_HOME_SALE_IMAGE_RADIUS_PX = 7;
 /** iPad mini portrait — tablet band within mobile layout (`< 1024px`). */
 export const MOBILE_HOME_TABLET_MIN_VIEWPORT_PX = 744;
 export const MOBILE_HOME_TABLET_LAYOUT_MEDIA_QUERY = `(min-width: ${MOBILE_HOME_TABLET_MIN_VIEWPORT_PX}px) and (max-width: 1023px)`;
+/** Product grids on tablet mobile pages — three cards per row. */
+export const MOBILE_HOME_TABLET_GRID_COLUMNS = 3;
 /** Tablet hero sale CTA — larger pill, left-aligned under copy. */
 export const MOBILE_HOME_SALE_CTA_TABLET_WIDTH_PX = 200;
 export const MOBILE_HOME_SALE_CTA_TABLET_HEIGHT_PX = 54;

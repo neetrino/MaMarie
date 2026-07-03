@@ -195,6 +195,30 @@
     transform: translateY(-50%);
   }
 
+  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — wishlist + products: 3 cards per row. */
+  .mobile-tablet-three-column-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 744px) and (max-width: 1023px) {
+    .mobile-tablet-three-column-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .mobile-tablet-three-column-grid .mobile-wishlist-product-card {
+      max-width: var(--mobile-wishlist-card-phone-width, 167px);
+      margin-inline: auto;
+    }
+
+    .mobile-wishlist-card-placeholder {
+      width: 100%;
+      max-width: var(--mobile-wishlist-card-phone-width, 167px);
+      margin-inline: auto;
+      aspect-ratio: 184 / 330;
+      height: auto;
+    }
+  }
+
   /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — iPad mini within mobile layout. */
   @media (min-width: 744px) and (max-width: 1023px) {
     .mobile-home-sale-banner {

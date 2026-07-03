@@ -39,6 +39,7 @@ import {
   WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/wishlist-empty-state';
 import {
+  MOBILE_WISHLIST_PAGE_BG,
   MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
   MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
   MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
@@ -179,12 +180,13 @@ export default function WishlistPage() {
   return (
     <>
       <div
-        className="mobile-wishlist-page sm:hidden w-full max-w-full overflow-x-hidden"
+        className="mobile-wishlist-page w-full max-w-full overflow-x-hidden lg:hidden"
         style={{
           paddingTop: MOBILE_WISHLIST_PAGE_PADDING_TOP_PX,
           paddingBottom: MOBILE_WISHLIST_PAGE_PADDING_BOTTOM_PX,
           paddingLeft: MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
           paddingRight: MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX,
+          backgroundColor: MOBILE_WISHLIST_PAGE_BG,
         }}
       >
         <div
@@ -225,7 +227,7 @@ export default function WishlistPage() {
         ) : null}
       </div>
 
-      <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mx-auto hidden max-w-7xl px-4 py-12 sm:px-6 lg:block lg:px-8">
       <div
         style={
           showEmptyState
