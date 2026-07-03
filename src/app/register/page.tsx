@@ -1,9 +1,15 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { Button, Input, Card } from '@shop/ui';
+import { Input, Card } from '@shop/ui';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth/AuthContext';
+import {
+  PROFILE_DESKTOP_ALERT_ERROR_CLASS,
+  PROFILE_DESKTOP_INPUT_CLASS,
+} from '../../constants/profile-desktop-page';
+import { AUTH_FORM_CARD_CLASS } from '../../constants/auth-form';
+import { ProfileClayButton } from '../profile/components/ProfileClayButton';
 import { useTranslation } from '../../lib/i18n-client';
 import { resolveRegisterApiError } from '../../lib/auth/client-api-error-messages';
 import { Eye, EyeOff } from 'lucide-react';
@@ -121,14 +127,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Card className="p-8">
+    <div className="mx-auto max-w-lg px-4 py-12 sm:px-6 md:max-w-2xl lg:px-8">
+      <Card className={`p-8 ${AUTH_FORM_CARD_CLASS}`}>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('register.title')}</h1>
         <p className="text-gray-600 mb-8">{t('register.subtitle')}</p>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className={`mb-4 ${PROFILE_DESKTOP_ALERT_ERROR_CLASS}`}>
+            <p>{error}</p>
           </div>
         )}
 
@@ -143,7 +149,7 @@ export default function RegisterPage() {
                 id="firstName"
                 type="text"
                 placeholder={t('register.placeholders.firstName')}
-                className="w-full"
+                className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -159,7 +165,7 @@ export default function RegisterPage() {
                 id="lastName"
                 type="text"
                 placeholder={t('register.placeholders.lastName')}
-                className="w-full"
+                className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 disabled={isSubmitting || isLoading}
@@ -167,97 +173,101 @@ export default function RegisterPage() {
               />
             </div>
           </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.email')}
-              <span className="ml-0.5 text-red-500">*</span>
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t('register.placeholders.email')}
-              className="w-full"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isSubmitting || isLoading}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.phone')}
-            </label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder={t('register.placeholders.phone')}
-              className="w-full"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={isSubmitting || isLoading}
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.password')}
-              <span className="ml-0.5 text-red-500">*</span>
-            </label>
-            <div className="relative">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                {t('register.form.email')}
+                <span className="ml-0.5 text-red-500">*</span>
+              </label>
               <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder={t('register.placeholders.password')}
-                className="w-full pr-10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="email"
+                type="email"
+                placeholder={t('register.placeholders.email')}
+                className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting || isLoading}
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                disabled={isSubmitting || isLoading}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              {t('register.passwordHint')}
-            </p>
-          </div>
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('register.form.confirmPassword')}
-              <span className="ml-0.5 text-red-500">*</span>
-            </label>
-            <div className="relative">
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                {t('register.form.phone')}
+              </label>
               <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder={t('register.placeholders.confirmPassword')}
-                className="w-full pr-10"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                id="phone"
+                type="tel"
+                placeholder={t('register.placeholders.phone')}
+                className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 disabled={isSubmitting || isLoading}
-                required
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                disabled={isSubmitting || isLoading}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                {t('register.form.password')}
+                <span className="ml-0.5 text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder={t('register.placeholders.password')}
+                  className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isSubmitting || isLoading}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  disabled={isSubmitting || isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                {t('register.passwordHint')}
+              </p>
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                {t('register.form.confirmPassword')}
+                <span className="ml-0.5 text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder={t('register.placeholders.confirmPassword')}
+                  className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isSubmitting || isLoading}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  disabled={isSubmitting || isLoading}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
           <div className="flex items-start">
@@ -290,14 +300,14 @@ export default function RegisterPage() {
           {!acceptTerms && error === t('register.errors.acceptTerms') && (
             <p className="text-xs text-red-600 -mt-2">{t('register.errors.mustAcceptTerms')}</p>
           )}
-          <Button 
-            variant="primary" 
+          <ProfileClayButton
+            variant="primary"
             className="w-full"
             type="submit"
             disabled={isSubmitting || isLoading}
           >
             {isSubmitting || isLoading ? t('register.form.creatingAccount') : t('register.form.createAccount')}
-          </Button>
+          </ProfileClayButton>
         </form>
 
         <div className="mt-6 text-center">
