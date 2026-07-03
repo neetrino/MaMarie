@@ -4,6 +4,7 @@ import { openCartDrawer } from '../../../lib/cart-drawer';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { OrderDetails, OrderListItem, ProfileTab } from '../types';
+import { createOrderDetailsPreview, type OrderDetailsClickPreview } from '../order-details-preview';
 import { logger } from "@/lib/utils/logger";
 
 interface OrdersMeta {
@@ -73,10 +74,8 @@ export function useOrders({
     }
   }, [isLoggedIn, authLoading, activeTab, loadOrders]);
 
-  const loadOrderDetails = async (orderNumber: string) => {
+  const fetchOrderDetails = async (orderNumber: string) => {
     try {
-      setOrderDetailsLoading(true);
-      setOrderDetailsError(null);
       const data = await apiClient.get<OrderDetails>(`/api/v1/orders/${orderNumber}`);
       setSelectedOrder(data);
     } catch (err: unknown) {
@@ -88,10 +87,19 @@ export function useOrders({
     }
   };
 
-  const handleOrderClick = (orderNumber: string, e: MouseEvent<HTMLAnchorElement>) => {
+  const handleOrderClick = (order: OrderDetailsClickPreview, e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    void loadOrderDetails(orderNumber);
+    setSelectedOrder(createOrderDetailsPreview(order));
+    setOrderDetailsLoading(true);
+    setOrderDetailsError(null);
+    void fetchOrderDetails(order.number);
   };
+
+  const closeOrderDetails = useCallback(() => {
+    setSelectedOrder(null);
+    setOrderDetailsLoading(false);
+    setOrderDetailsError(null);
+  }, []);
 
   const handleReOrder = async () => {
     if (!selectedOrder || !isLoggedIn) {
@@ -162,11 +170,11 @@ export function useOrders({
     setOrdersPage,
     ordersMeta,
     selectedOrder,
-    setSelectedOrder,
     orderDetailsLoading,
     orderDetailsError,
     isReordering,
     handleOrderClick,
+    closeOrderDetails,
     handleReOrder,
   };
 }

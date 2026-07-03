@@ -13,6 +13,7 @@ import {
 } from '../../constants/profile-desktop-page';
 import { PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS, PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS } from '../../constants/profile-mobile-page';
 import { formatPriceInCurrency, type CurrencyCode } from '../../lib/currency';
+import type { OrderDetailsClickPreview } from './order-details-preview';
 import type { DashboardData, ProfileTab } from './types';
 import { ProfileDesktopOrderCard } from './components/ProfileDesktopOrderCard';
 import { ProfileSectionCard } from './components/ProfileSectionCard';
@@ -22,7 +23,7 @@ interface ProfileDashboardProps {
   dashboardLoading: boolean;
   currency: CurrencyCode;
   onTabChange: (tab: ProfileTab) => void;
-  onOrderClick: (orderNumber: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onOrderClick: (order: OrderDetailsClickPreview, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
 }
 
@@ -199,7 +200,7 @@ export function ProfileDashboard({
                   itemLabel={order.itemsCount !== 1 ? t('profile.orders.items') : t('profile.orders.item')}
                   placedOnLabel={t('profile.dashboard.placedOn')}
                   viewDetailsLabel={t('profile.dashboard.viewDetails')}
-                  onClick={(e) => onOrderClick(order.number, e)}
+                  onClick={(e) => onOrderClick(order, e)}
                 />
               </li>
             ))}

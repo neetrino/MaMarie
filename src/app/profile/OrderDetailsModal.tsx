@@ -69,7 +69,7 @@ export function OrderDetailsModal({
     <ProfileClayButton
       type="button"
       onClick={onReOrder}
-      disabled={isReordering}
+      disabled={isReordering || orderDetailsLoading}
       variant="primary"
       className="w-full shrink-0 lg:w-auto"
     >

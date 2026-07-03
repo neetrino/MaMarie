@@ -7,6 +7,7 @@ import {
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
 } from '../../constants/profile-desktop-page';
 import type { CurrencyCode } from '../../lib/currency';
+import type { OrderDetailsClickPreview } from './order-details-preview';
 import type { OrderListItem } from './types';
 import { ProfileDesktopOrderCard } from './components/ProfileDesktopOrderCard';
 
@@ -22,7 +23,7 @@ interface ProfileOrdersProps {
     totalPages: number;
   } | null;
   currency: CurrencyCode;
-  onOrderClick: (orderNumber: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onOrderClick: (order: OrderDetailsClickPreview, e: React.MouseEvent<HTMLAnchorElement>) => void;
   t: (key: string) => string;
 }
 
@@ -76,7 +77,7 @@ export function ProfileOrders({
               itemLabel={order.itemsCount !== 1 ? t('profile.orders.items') : t('profile.orders.item')}
               placedOnLabel={t('profile.dashboard.placedOn')}
               viewDetailsLabel={t('profile.dashboard.viewDetails')}
-              onClick={(e) => onOrderClick(order.number, e)}
+              onClick={(e) => onOrderClick(order, e)}
             />
           </li>
         ))}

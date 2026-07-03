@@ -157,11 +157,11 @@ export function useProfilePage() {
     
     // Order details
     selectedOrder: orders.selectedOrder,
-    setSelectedOrder: orders.setSelectedOrder,
     orderDetailsLoading: orders.orderDetailsLoading,
     orderDetailsError: orders.orderDetailsError,
     isReordering: orders.isReordering,
     handleOrderClick: orders.handleOrderClick,
+    closeOrderDetails: orders.closeOrderDetails,
     handleReOrder: orders.handleReOrder,
     
     // Currency

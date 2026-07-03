@@ -57,11 +57,11 @@ function ProfilePageContent() {
     setOrdersPage,
     ordersMeta,
     selectedOrder,
-    setSelectedOrder,
     orderDetailsLoading,
     orderDetailsError,
     isReordering,
     handleOrderClick,
+    closeOrderDetails,
     handleReOrder,
     currency,
     deleteAccountPassword,
@@ -295,7 +295,7 @@ function ProfilePageContent() {
         orderDetailsError={orderDetailsError}
         isReordering={isReordering}
         currency={currency}
-        onClose={() => setSelectedOrder(null)}
+        onClose={closeOrderDetails}
         onReOrder={handleReOrder}
         t={t}
       />
