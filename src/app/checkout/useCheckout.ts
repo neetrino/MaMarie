@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getStoredCurrency } from '../../lib/currency';
-import { getStoredLanguage } from '../../lib/language';
+import { handleRemoveItem } from '../cart/cart-handlers';
+import { getStoredCurrency, DEFAULT_CURRENCY } from '../../lib/currency';
+import { getStoredLanguage, DEFAULT_LANGUAGE } from '../../lib/language';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { usePaymentMethods } from './utils/payment-methods';
@@ -20,8 +21,8 @@ export function useCheckout() {
   const { isLoggedIn, isLoading } = useAuth();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
-  const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState(getStoredLanguage());
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
+  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
@@ -58,7 +59,7 @@ export function useCheckout() {
   const shippingCity = watch('shippingCity');
 
   const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(shippingMethod, shippingCity);
-  const { cart, loading, fetchCart } = useCart(isLoggedIn);
+  const { cart, loading, fetchCart, setCart } = useCart(isLoggedIn);
   useUserProfile(isLoggedIn, isLoading, setValue);
 
   const { submitOrder } = useOrderSubmission({
@@ -140,6 +141,12 @@ export function useCheckout() {
     submitOrder(data);
   };
 
+  const handleRemoveCartItem = useCallback(
+    (itemId: string) =>
+      handleRemoveItem(itemId, isLoggedIn, setCart, fetchCart, t('common.messages.product')),
+    [fetchCart, isLoggedIn, setCart, t],
+  );
+
   return {
     // State
     cart,
@@ -171,6 +178,7 @@ export function useCheckout() {
     // Actions
     handlePlaceOrder,
     onSubmit,
+    handleRemoveCartItem,
     // Auth
     isLoggedIn,
   };

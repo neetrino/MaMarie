@@ -4,6 +4,7 @@ import { openCartDrawer } from '../../../lib/cart-drawer';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { OrderDetails, OrderListItem, ProfileTab } from '../types';
+import { createOrderDetailsPreview, type OrderDetailsClickPreview } from '../order-details-preview';
 import { logger } from "@/lib/utils/logger";
 
 interface OrdersMeta {
@@ -42,18 +43,6 @@ export function useOrders({
   const [orderDetailsError, setOrderDetailsError] = useState<string | null>(null);
   const [isReordering, setIsReordering] = useState(false);
 
-  // Lock body scroll when order modal is open
-  useEffect(() => {
-    if (selectedOrder) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [selectedOrder]);
-
   const loadOrders = useCallback(async () => {
     try {
       setOrdersLoading(true);
@@ -85,10 +74,8 @@ export function useOrders({
     }
   }, [isLoggedIn, authLoading, activeTab, loadOrders]);
 
-  const loadOrderDetails = async (orderNumber: string) => {
+  const fetchOrderDetails = async (orderNumber: string) => {
     try {
-      setOrderDetailsLoading(true);
-      setOrderDetailsError(null);
       const data = await apiClient.get<OrderDetails>(`/api/v1/orders/${orderNumber}`);
       setSelectedOrder(data);
     } catch (err: unknown) {
@@ -100,12 +87,19 @@ export function useOrders({
     }
   };
 
-  const handleOrderClick = (orderNumber: string, e: MouseEvent<HTMLAnchorElement>) => {
-    if (window.innerWidth >= 1024) {
-      e.preventDefault();
-      loadOrderDetails(orderNumber);
-    }
+  const handleOrderClick = (order: OrderDetailsClickPreview, e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setSelectedOrder(createOrderDetailsPreview(order));
+    setOrderDetailsLoading(true);
+    setOrderDetailsError(null);
+    void fetchOrderDetails(order.number);
   };
+
+  const closeOrderDetails = useCallback(() => {
+    setSelectedOrder(null);
+    setOrderDetailsLoading(false);
+    setOrderDetailsError(null);
+  }, []);
 
   const handleReOrder = async () => {
     if (!selectedOrder || !isLoggedIn) {
@@ -176,11 +170,11 @@ export function useOrders({
     setOrdersPage,
     ordersMeta,
     selectedOrder,
-    setSelectedOrder,
     orderDetailsLoading,
     orderDetailsError,
     isReordering,
     handleOrderClick,
+    closeOrderDetails,
     handleReOrder,
   };
 }

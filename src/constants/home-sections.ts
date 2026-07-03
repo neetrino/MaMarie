@@ -32,8 +32,8 @@ export const HOME_SECTION_STACK_GAP_PX = 100;
 /** Space below hero before section heading. */
 export const BEST_PRODUCTS_SECTION_OFFSET_TOP_PX = HOME_SECTION_STACK_GAP_PX;
 
-/** Product cards row — Figma `Frame 472`. */
-export const BEST_PRODUCTS_GRID_OFFSET_TOP_PX = 75;
+/** Product cards row — Figma `Frame 472` (heading → cards gap). */
+export const BEST_PRODUCTS_GRID_OFFSET_TOP_PX = 100;
 export const BEST_PRODUCTS_CARD_GAP_PX = 8;
 export const BEST_PRODUCTS_CARD_COUNT = 4;
 

@@ -143,12 +143,12 @@ export function ContactForm() {
   };
 
   return (
-    <div className="relative overflow-visible">
+    <div className="relative h-full w-full overflow-visible">
       <ContactFormStrawberry />
 
       <form
         onSubmit={handleSubmit}
-        className="relative z-0 flex flex-col"
+        className="relative z-0 flex h-full w-full flex-col"
         style={{
           backgroundColor: CONTACT_FORM_CARD_BG,
           borderRadius: CONTACT_FORM_CARD_RADIUS_PX,

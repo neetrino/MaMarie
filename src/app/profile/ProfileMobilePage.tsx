@@ -1,9 +1,39 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
-import { Home } from 'lucide-react';
-import { UserAvatar } from '../../components/UserAvatar';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  PROFILE_MOBILE_CARD_CLASS,
+  PROFILE_MOBILE_CARD_RADIUS_PX,
+  PROFILE_MOBILE_EMAIL_COLOR,
+  PROFILE_MOBILE_HEADER_CARD_GAP_PX,
+  PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
+  PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
+  PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+  PROFILE_MOBILE_SECTION_GAP_PX,
+  PROFILE_MOBILE_TAB_ICON_THEME,
+  PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
+  PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS,
+  PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX,
+  PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX,
+  PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX,
+  PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX,
+  PROFILE_MOBILE_TAB_SHEET_DRAG_HANDLE_HEIGHT_PX,
+  PROFILE_MOBILE_TAB_SHEET_DRAG_HANDLE_WIDTH_PX,
+  PROFILE_MOBILE_TAB_SHEET_DRAG_ZONE_HEIGHT_PX,
+  PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH,
+  PROFILE_MOBILE_TAB_SHEET_PANEL_EASING,
+  PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
+  PROFILE_MOBILE_TAB_SHEET_Z_INDEX,
+} from '../../constants/profile-mobile-page';
+import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
+import { DRAWER_TOUCH_SCROLL_ROOT_ATTR, preventTouchMoveUnlessInsideDrawer } from '../../lib/drawer-touch-scroll-guard';
+import { useBottomSheetDragDismiss } from '../../lib/use-bottom-sheet-drag-dismiss';
+import { useDrawerTransition } from '../../lib/use-drawer-transition';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
+import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
+import { ProfileMobileMenuRow } from './components/ProfileMobileMenuRow';
+import { ProfileMobileLogoutButton } from './components/ProfileMobileLogoutButton';
 
 interface ProfileMobilePageProps {
   profile: UserProfile | null;
@@ -24,6 +54,25 @@ function getDisplayName(profile: UserProfile | null, t: (_key: string) => string
   return profile?.firstName || profile?.lastName || t('profile.myProfile');
 }
 
+function buildMenuOrder(tabs: ProfileTabConfig[]): ProfileTabConfig[] {
+  const dashboard = tabs.find((tab) => tab.id === 'dashboard');
+  const password = tabs.find((tab) => tab.id === 'password');
+  const deleteAccount = tabs.find((tab) => tab.id === 'deleteAccount');
+  const middleTabs = tabs.filter(
+    (tab) =>
+      tab.id !== 'dashboard' &&
+      tab.id !== 'password' &&
+      tab.id !== 'deleteAccount',
+  );
+
+  return [
+    ...(dashboard ? [dashboard] : []),
+    ...middleTabs,
+    ...(password ? [password] : []),
+    ...(deleteAccount ? [deleteAccount] : []),
+  ];
+}
+
 export function ProfileMobilePage({
   profile,
   tabs,
@@ -37,149 +86,222 @@ export function ProfileMobilePage({
 }: ProfileMobilePageProps) {
   const displayName = getDisplayName(profile, t);
   const activeTabLabel = tabs.find((tab) => tab.id === activeTab)?.label ?? t('profile.myProfile');
-  const dashboardTab = tabs.find((tab) => tab.id === 'dashboard');
-  const passwordTab = tabs.find((tab) => tab.id === 'password');
-  const otherTabs = tabs.filter((tab) => tab.id !== 'dashboard' && tab.id !== 'password');
+  const orderedTabs = buildMenuOrder(tabs);
+  const menuTabs = orderedTabs.filter((tab) => tab.id !== 'deleteAccount');
+  const deleteAccountTab = orderedTabs.find((tab) => tab.id === 'deleteAccount');
+  const sheetPanelRef = useRef<HTMLDivElement>(null);
+  const { rendered: sheetRendered, visible: sheetVisible } = useDrawerTransition(
+    isSheetOpen,
+    PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS,
+  );
+  const {
+    dragOffsetY,
+    isDragging,
+    scrollAreaRef,
+    resetDrag,
+    headerPointerHandlers,
+    scrollAreaPointerHandlers,
+    panelPointerHandlers,
+  } = useBottomSheetDragDismiss({
+    enabled: sheetRendered && sheetVisible,
+    panelRef: sheetPanelRef,
+    onDismiss: onCloseSheet,
+    dismissThresholdPx: PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX,
+  });
 
   useEffect(() => {
-    if (!isSheetOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
+    if (!isSheetOpen && !sheetRendered) {
+      resetDrag();
+    }
+  }, [isSheetOpen, sheetRendered, resetDrag]);
+
+  useEffect(() => {
+    if (!sheetRendered) {
+      return;
+    }
+
+    lockBodyScroll();
+
+    const handleTouchMove = (event: TouchEvent) => {
+      preventTouchMoveUnlessInsideDrawer(event, [sheetPanelRef.current, scrollAreaRef.current]);
     };
-  }, [isSheetOpen]);
 
-  return (
-    <div className="mx-auto w-full max-w-md px-4 pb-8 pt-6 md:hidden">
-      <div className="rounded-[2rem] bg-white px-5 pb-7 pt-5 shadow-sm ring-1 ring-gray-200/80">
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
 
-        <div className="mb-5 flex items-center gap-4">
-          <UserAvatar
-            firstName={profile?.firstName}
-            lastName={profile?.lastName}
-            avatarUrl={profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null}
-            size="lg"
-            className="h-20 w-20 text-xl"
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      unlockBodyScroll();
+    };
+  }, [sheetRendered]);
+
+  const sheetPanelTransitionActive = !isDragging;
+  const sheetPanelTransform =
+    isDragging || (dragOffsetY > 0 && sheetVisible)
+      ? `translateY(${dragOffsetY}px)`
+      : sheetVisible
+        ? 'translateY(0)'
+        : 'translateY(100%)';
+
+  const sheetOverlay = sheetRendered ? (
+    <div
+      className="fixed inset-0 flex items-end overscroll-none"
+      style={{ zIndex: PROFILE_MOBILE_TAB_SHEET_Z_INDEX }}
+    >
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden
+        className={`fixed inset-0 rounded-none bg-black/35 backdrop-blur-[1px] transition-opacity motion-reduce:transition-none ${
+          sheetVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{
+          transitionDuration: `${PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS}ms`,
+          transitionTimingFunction: PROFILE_MOBILE_TAB_SHEET_PANEL_EASING,
+        }}
+        onClick={onCloseSheet}
+      />
+      <div
+        ref={sheetPanelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={activeTabLabel}
+        {...{ [DRAWER_TOUCH_SCROLL_ROOT_ATTR]: '' }}
+        className="flex w-full flex-col overflow-hidden bg-white shadow-2xl motion-reduce:transition-none motion-reduce:duration-0"
+        style={{
+          height: `${PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH}dvh`,
+          borderTopLeftRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
+          borderTopRightRadius: PROFILE_MOBILE_CARD_RADIUS_PX,
+          transform: sheetPanelTransform,
+          transition: sheetPanelTransitionActive
+            ? `transform ${PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS}ms ${PROFILE_MOBILE_TAB_SHEET_PANEL_EASING}`
+            : 'none',
+        }}
+        onClick={(event) => event.stopPropagation()}
+        {...panelPointerHandlers}
+      >
+        <div
+          className="flex shrink-0 touch-none select-none items-center justify-center"
+          style={{ minHeight: PROFILE_MOBILE_TAB_SHEET_DRAG_ZONE_HEIGHT_PX }}
+          {...headerPointerHandlers}
+        >
+          <div
+            className="cursor-grab rounded-full bg-gray-300 active:cursor-grabbing"
+            style={{
+              height: PROFILE_MOBILE_TAB_SHEET_DRAG_HANDLE_HEIGHT_PX,
+              width: PROFILE_MOBILE_TAB_SHEET_DRAG_HANDLE_WIDTH_PX,
+            }}
           />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xl font-semibold text-gray-900">{displayName}</p>
-            {profile?.email && <p className="truncate text-sm text-gray-600">{profile.email}</p>}
+        </div>
+        <div
+          ref={scrollAreaRef}
+          className={`profile-mobile-tab-sheet-scroll profile-scroll-area min-h-0 flex-1 overscroll-contain ${
+            isDragging ? 'touch-none overflow-hidden' : 'overflow-y-auto'
+          }`}
+          style={{
+            paddingTop: PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX,
+            paddingLeft: PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX,
+            paddingRight: PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX,
+          }}
+          {...scrollAreaPointerHandlers}
+        >
+          <div
+            style={{
+              paddingBottom: `calc(${PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX}px + env(safe-area-inset-bottom, 0px))`,
+            }}
+          >
+            {children}
           </div>
         </div>
+      </div>
+    </div>
+  ) : null;
 
-        <div className="divide-y divide-gray-100 rounded-2xl border border-gray-200/80 bg-white">
-          {dashboardTab && (
-            <>
-              <button
-                type="button"
-                onClick={() => onTabSelect(dashboardTab.id)}
-                className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-              >
-                <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                  <span className="text-gray-500">
-                    <Home className="h-5 w-5" strokeWidth={1.75} />
-                  </span>
-                  Home
-                </span>
-                <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </>
-          )}
-          {otherTabs
-            .filter((tab) => tab.id !== 'deleteAccount')
-            .map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => onTabSelect(tab.id)}
-                className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-              >
-                <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                  <span className="text-gray-500">{tab.icon}</span>
-                  {tab.label}
-                </span>
-                <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            ))}
-          {passwordTab && (
-            <button
-              type="button"
-              onClick={() => onTabSelect(passwordTab.id)}
-              className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-            >
-              <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                <span className="text-gray-500">{passwordTab.icon}</span>
-                {passwordTab.label}
-              </span>
-              <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          )}
-          {otherTabs
-            .filter((tab) => tab.id === 'deleteAccount')
-            .map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => onTabSelect(tab.id)}
-              className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-            >
-              <span className="flex items-center gap-3 text-base font-medium text-gray-800">
-                <span className="text-gray-500">{tab.icon}</span>
-                {tab.label}
-              </span>
-              <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left text-red-600"
+  return (
+    <div className="profile-mobile-page lg:hidden">
+      <div
+        className="mx-auto w-full max-w-md pt-2"
+        style={{
+          paddingLeft: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+          paddingRight: PROFILE_MOBILE_PAGE_HORIZONTAL_PADDING_PX,
+        }}
+      >
+        <div
+          className="flex flex-col"
+          style={{ gap: PROFILE_MOBILE_SECTION_GAP_PX }}
+        >
+          <section
+            className={PROFILE_MOBILE_CARD_CLASS}
+            style={{
+              paddingLeft: PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
+              paddingRight: PROFILE_MOBILE_HEADER_CARD_PADDING_X_PX,
+              paddingTop: PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
+              paddingBottom: PROFILE_MOBILE_HEADER_CARD_PADDING_Y_PX,
+            }}
+            aria-label={t('profile.myProfile')}
           >
-            <span className="text-base font-semibold">{t('common.navigation.logout')}</span>
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+            <div
+              className="flex items-center"
+              style={{ gap: PROFILE_MOBILE_HEADER_CARD_GAP_PX }}
+            >
+              <ProfileMobileAvatar
+                firstName={profile?.firstName}
+                lastName={profile?.lastName}
+                avatarUrl={
+                  profile?.avatarUrl || profile?.avatar || profile?.imageUrl || profile?.image || null
+                }
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xl font-bold leading-tight text-gray-900">{displayName}</p>
+                {profile?.email ? (
+                  <p
+                    className="truncate text-sm leading-snug"
+                    style={{ color: PROFILE_MOBILE_EMAIL_COLOR }}
+                  >
+                    {profile.email}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          </section>
+
+          <nav
+            className={`${PROFILE_MOBILE_CARD_CLASS} overflow-hidden`}
+            style={{
+              paddingTop: PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
+              paddingBottom: PROFILE_MOBILE_MENU_CARD_VERTICAL_PADDING_PX,
+            }}
+            aria-label={t('common.navigation.profile')}
+          >
+            <div className="divide-y divide-gray-100">
+              {menuTabs.map((tab) => (
+                <ProfileMobileMenuRow
+                  key={tab.id}
+                  label={tab.label}
+                  icon={tab.icon}
+                  iconTheme={PROFILE_MOBILE_TAB_ICON_THEME[tab.id]}
+                  onClick={() => onTabSelect(tab.id)}
+                />
+              ))}
+            </div>
+            {deleteAccountTab ? (
+              <ProfileMobileMenuRow
+                label={deleteAccountTab.label}
+                icon={deleteAccountTab.icon}
+                iconTheme={PROFILE_MOBILE_TAB_ICON_THEME.deleteAccount}
+                variant="danger"
+                onClick={() => onTabSelect(deleteAccountTab.id)}
+              />
+            ) : null}
+          </nav>
+
+          <ProfileMobileLogoutButton
+            label={t('common.navigation.logout')}
+            onClick={onLogout}
+          />
         </div>
       </div>
 
-      {isSheetOpen && (
-        <div className="fixed inset-0 z-[70] flex items-end bg-black/35 backdrop-blur-[1px]" onClick={onCloseSheet}>
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={activeTabLabel}
-            className="w-full rounded-t-3xl bg-white shadow-2xl"
-            style={{ height: '72vh' }}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="mx-auto mt-2 h-1.5 w-14 rounded-full bg-gray-300" />
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">{activeTabLabel}</h2>
-              <button
-                type="button"
-                onClick={onCloseSheet}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600"
-                aria-label={t('profile.orderDetails.close')}
-              >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="h-[calc(72vh-4.75rem)] overflow-y-auto px-4 py-4">{children}</div>
-          </div>
-        </div>
-      )}
+      {sheetOverlay ? createPortal(sheetOverlay, document.body) : null}
     </div>
   );
 }

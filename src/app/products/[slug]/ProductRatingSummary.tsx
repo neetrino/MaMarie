@@ -11,6 +11,7 @@ export interface ProductRatingSummaryProps {
   reviewsCount: number;
   onReviewsClick: () => void;
   language: LanguageCode;
+  className?: string;
 }
 
 export function ProductRatingSummary({
@@ -18,6 +19,7 @@ export function ProductRatingSummary({
   reviewsCount,
   onReviewsClick,
   language,
+  className = 'mb-5',
 }: ProductRatingSummaryProps) {
   const effectiveRating = reviewsCount > 0 ? averageRating : 5;
   const fillPercent = Math.min(100, Math.max(0, (effectiveRating / 5) * 100));
@@ -27,7 +29,7 @@ export function ProductRatingSummary({
       : t(language, 'common.reviews.reviews');
 
   return (
-    <div className="flex items-center gap-2 flex-wrap mb-5">
+    <div className={`flex items-center gap-2 flex-wrap ${className}`.trim()}>
       <div className="relative h-7 w-7 shrink-0" aria-hidden>
         <svg
           className="absolute inset-0 h-7 w-7 text-gray-200"

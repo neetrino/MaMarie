@@ -2,12 +2,23 @@
 
 import { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Button, Input, Card } from '@shop/ui';
+import { Input, Card } from '@shop/ui';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth/AuthContext';
+import {
+  PROFILE_DESKTOP_ALERT_ERROR_CLASS,
+  PROFILE_DESKTOP_INPUT_CLASS,
+} from '../../constants/profile-desktop-page';
+import { AUTH_FORM_CARD_CLASS } from '../../constants/auth-form';
+import { ProfileClayButton } from '../profile/components/ProfileClayButton';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { resolveLoginApiError } from '../../lib/auth/client-api-error-messages';
+import {
+  AuthFieldErrors,
+  clearAuthFieldError,
+  validateLoginFields,
+} from '../../lib/auth/auth-form-field-errors';
 import { Eye, EyeOff } from 'lucide-react';
 import { logger } from "@/lib/utils/logger";
 
@@ -18,6 +29,7 @@ function LoginPageContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login, isLoading, isLoggedIn, isAdmin } = useAuth();
@@ -28,24 +40,18 @@ function LoginPageContent() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
+
+    const nextFieldErrors = validateLoginFields({ email, password }, t);
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
-    logger.debug('🔐 [LOGIN PAGE] Form submitted');
-
-    // Validation
-    if (!email.trim()) {
-      setError(t('login.errors.emailRequired'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!password) {
-      setError(t('login.errors.passwordRequired'));
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
+      logger.debug('🔐 [LOGIN PAGE] Form submitted');
       logger.debug('📤 [LOGIN PAGE] Calling login function...');
       const loggedInUser = await login(email.trim(), password);
       const isUserAdmin =
@@ -53,7 +59,7 @@ function LoginPageContent() {
       const destination = isUserAdmin ? '/supersudo' : redirectTo;
       logger.debug('✅ [LOGIN PAGE] Login successful, redirecting to:', destination);
       router.push(destination);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [LOGIN PAGE] Login error:', err);
       setError(resolveLoginApiError(err instanceof Error ? err.message : String(err), t));
     } finally {
@@ -70,13 +76,13 @@ function LoginPageContent() {
 
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Card className="p-8">
+      <Card className={`p-8 ${AUTH_FORM_CARD_CLASS}`}>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
         <p className="text-gray-600 mb-8">{t('login.subtitle')}</p>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className={`mb-4 ${PROFILE_DESKTOP_ALERT_ERROR_CLASS}`}>
+            <p>{error}</p>
           </div>
         )}
 
@@ -89,11 +95,15 @@ function LoginPageContent() {
               id="email"
               type="email"
               placeholder={t('login.form.emailPlaceholder')}
-              className="w-full"
+              className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors.email}
+              showErrorMessage={false}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
+              }}
               disabled={isSubmitting || isLoading}
-              required
             />
           </div>
           <div>
@@ -105,11 +115,15 @@ function LoginPageContent() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder={t('login.form.passwordPlaceholder')}
-                className="w-full pr-10"
+                className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                error={fieldErrors.password}
+                showErrorMessage={false}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
+                }}
                 disabled={isSubmitting || isLoading}
-                required
               />
               <button
                 type="button"
@@ -143,14 +157,14 @@ function LoginPageContent() {
               {t('login.form.forgotPassword')}
             </Link>
           </div>
-          <Button 
-            variant="primary" 
+          <ProfileClayButton
+            variant="primary"
             className="w-full"
             type="submit"
             disabled={isSubmitting || isLoading}
           >
             {isSubmitting || isLoading ? t('login.form.submitting') : t('login.form.submit')}
-          </Button>
+          </ProfileClayButton>
         </form>
 
         <div className="mt-6 text-center">
@@ -170,7 +184,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card className="p-8">
+        <Card className={`p-8 ${AUTH_FORM_CARD_CLASS}`}>
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>

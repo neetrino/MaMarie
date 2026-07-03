@@ -14,6 +14,7 @@ import {
   SEARCH_MODAL_Z_INDEX,
 } from '../../constants/search-modal';
 import { useTranslation } from '../../lib/i18n-client';
+import { useBodyScrollLock } from '../../lib/useBodyScrollLock';
 import { SearchDropdown } from '../SearchDropdown';
 import { useInstantSearch, type InstantSearchResultItem } from '../hooks/useInstantSearch';
 
@@ -88,7 +89,7 @@ function SearchModalPanel({ onClose }: SearchModalPanelProps) {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 flex flex-col overflow-hidden bg-black/40 backdrop-blur-sm"
       style={{ zIndex: SEARCH_MODAL_Z_INDEX }}
       onClick={onClose}
     >
@@ -181,12 +182,12 @@ export function SearchModal() {
     };
   }, []);
 
+  useBodyScrollLock(open && mounted);
+
   useEffect(() => {
     if (!open) {
       return;
     }
-
-    document.body.style.overflow = 'hidden';
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -197,7 +198,6 @@ export function SearchModal() {
     window.addEventListener('keydown', handleEscape);
 
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleEscape);
     };
   }, [open, handleClose]);

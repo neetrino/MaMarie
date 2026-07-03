@@ -63,5 +63,12 @@ export const getColorValue = (colorName: string): string => {
   return colorMap[normalizedName] || '#CCCCCC';
 };
 
-
+/** Profile order cards — `DD.MM.YYYY` to match clay order card design. */
+export function formatProfileOrderDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+}
 

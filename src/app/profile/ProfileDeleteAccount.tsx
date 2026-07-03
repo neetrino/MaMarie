@@ -1,6 +1,14 @@
 import type { FormEvent } from 'react';
-import { Button, Input, Card } from '@shop/ui';
+import { Input } from '@shop/ui';
+import {
+  PROFILE_DESKTOP_INPUT_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_CLASS,
+  PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
+  PROFILE_DESKTOP_SECTION_TO_FORM_SPACING_CLASS,
+} from '../../constants/profile-desktop-page';
 import type { UserProfile } from './types';
+import { ProfileClayButton } from './components/ProfileClayButton';
+import { ProfileSectionCard } from './components/ProfileSectionCard';
 
 interface ProfileDeleteAccountProps {
   profile: UserProfile | null;
@@ -29,22 +37,22 @@ export function ProfileDeleteAccount({
 }: ProfileDeleteAccountProps) {
   if (!profile) {
     return (
-      <Card className="rounded-2xl border border-gray-200/80 p-6 sm:p-8">
+      <ProfileSectionCard mobileFrameless>
         <p className="text-sm text-gray-600">{t('profile.common.loadingProfile')}</p>
-      </Card>
+      </ProfileSectionCard>
     );
   }
 
   const hasPassword = profile.hasPassword ?? true;
 
   return (
-    <Card className="rounded-2xl border border-red-200 bg-red-50/30 p-5 shadow-none sm:p-7 lg:p-8">
+    <ProfileSectionCard mobileFrameless className="border-0 bg-red-50/30 max-lg:!bg-transparent">
       <div className="mb-6 space-y-2 sm:mb-8">
-        <h2 className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl">{t('profile.deleteAccount.title')}</h2>
+        <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.deleteAccount.title')}</h2>
         <p className="max-w-2xl text-sm leading-relaxed text-gray-700">{t('profile.deleteAccount.description')}</p>
       </div>
 
-      <ul className="mb-8 max-w-2xl list-disc space-y-2 pl-5 text-sm text-gray-600 sm:mb-10">
+      <ul className={`${PROFILE_DESKTOP_SECTION_TO_FORM_SPACING_CLASS} max-w-2xl list-disc space-y-2 pl-5 text-sm text-gray-600`}>
         <li>{t('profile.deleteAccount.pointOrders')}</li>
         <li>{t('profile.deleteAccount.pointLogin')}</li>
         <li>{t('profile.deleteAccount.pointData')}</li>
@@ -59,6 +67,7 @@ export function ProfileDeleteAccount({
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t('profile.deleteAccount.currentPasswordPlaceholder')}
             autoComplete="current-password"
+            className={PROFILE_DESKTOP_INPUT_CLASS}
             required
           />
         ) : (
@@ -69,6 +78,7 @@ export function ProfileDeleteAccount({
             onChange={(e) => setConfirmation(e.target.value)}
             placeholder={t('profile.deleteAccount.confirmationPlaceholder')}
             autoComplete="off"
+            className={PROFILE_DESKTOP_INPUT_CLASS}
             required
           />
         )}
@@ -84,16 +94,16 @@ export function ProfileDeleteAccount({
         </label>
 
         <div className="pt-1 sm:pt-2">
-          <Button
+          <ProfileClayButton
             type="submit"
-            variant="primary"
-            className="h-11 w-full rounded-xl !bg-red-700 hover:!bg-red-800 focus:!ring-red-600 sm:w-auto"
+            variant="danger"
+            className="w-full sm:w-auto"
             disabled={deleting || !acknowledged}
           >
             {deleting ? t('profile.deleteAccount.deleting') : t('profile.deleteAccount.submit')}
-          </Button>
+          </ProfileClayButton>
         </div>
       </form>
-    </Card>
+    </ProfileSectionCard>
   );
 }

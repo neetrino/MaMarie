@@ -1,19 +1,22 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
+import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_ALERT_ERROR_CLASS, PROFILE_DESKTOP_ALERT_SUCCESS_CLASS, PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX, PROFILE_DESKTOP_SHELL_PADDING_TOP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
 import { ProfilePassword } from './ProfilePassword';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import type { ProfileTab, ProfileTabConfig } from './types';
+import type { ProfileTabConfig } from './types';
+import { PROFILE_MOBILE_LAYOUT_MEDIA_QUERY } from '../../constants/profile-mobile-page';
 
 function ProfilePageContent() {
   const { isLoggedIn, isLoading: authLoading, logout } = useAuth();
@@ -55,11 +58,11 @@ function ProfilePageContent() {
     setOrdersPage,
     ordersMeta,
     selectedOrder,
-    setSelectedOrder,
     orderDetailsLoading,
     orderDetailsError,
     isReordering,
     handleOrderClick,
+    closeOrderDetails,
     handleReOrder,
     currency,
     deleteAccountPassword,
@@ -71,11 +74,23 @@ function ProfilePageContent() {
     deletingAccount,
     handleDeleteAccount,
   } = useProfilePage();
+  const searchParams = useSearchParams();
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (!tab || tab === 'dashboard') {
+      return;
+    }
+
+    if (window.matchMedia(PROFILE_MOBILE_LAYOUT_MEDIA_QUERY).matches) {
+      setIsMobileSheetOpen(true);
+    }
+  }, [searchParams]);
 
   if (authLoading || loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 md:min-h-[50vh]">
         <div className="text-center">
           <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
         </div>
@@ -153,8 +168,8 @@ function ProfilePageContent() {
 
   const tabContent = (
     <>
-      {error && <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">{error}</div>}
-      {success && <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-600">{success}</div>}
+      {error ? <div className={PROFILE_DESKTOP_ALERT_ERROR_CLASS}>{error}</div> : null}
+      {success ? <div className={PROFILE_DESKTOP_ALERT_SUCCESS_CLASS}>{success}</div> : null}
       {activeTab === 'dashboard' && (
         <ProfileDashboard
           dashboardData={dashboardData}
@@ -247,30 +262,44 @@ function ProfilePageContent() {
       >
         {tabContent}
       </ProfileMobilePage>
-      <div className="mx-auto hidden max-w-7xl px-4 py-8 md:block md:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-10 lg:gap-12">
-          <aside className="w-full shrink-0 md:sticky md:top-24 md:w-64 md:self-start md:border-r md:border-gray-200/90 md:pr-8 lg:w-72">
-            <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
-          </aside>
-          <main className="min-w-0 flex-1">
-            <div className="space-y-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200/80 md:space-y-8 md:p-6 lg:rounded-3xl lg:p-8">
+      <div className="profile-desktop-page hidden lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden">
+        <div
+          className="profile-desktop-page__shell mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 lg:px-8"
+          style={{
+            paddingTop: PROFILE_DESKTOP_SHELL_PADDING_TOP_PX,
+            paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX,
+          }}
+        >
+          <div
+            className="profile-desktop-page__layout flex min-h-0 flex-1"
+            style={{ gap: PROFILE_DESKTOP_CONTENT_GAP_PX }}
+          >
+            <aside
+              className="profile-desktop-sidebar h-full shrink-0"
+              style={{ width: PROFILE_DESKTOP_SIDEBAR_WIDTH_PX }}
+            >
+              <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
+            </aside>
+            <div
+              className="profile-desktop-content profile-scroll-area min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain"
+              style={{ paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX }}
+            >
               {tabContent}
             </div>
-          </main>
+          </div>
         </div>
       </div>
-      {selectedOrder && (
-        <OrderDetailsModal
-          selectedOrder={selectedOrder}
-          orderDetailsLoading={orderDetailsLoading}
-          orderDetailsError={orderDetailsError}
-          isReordering={isReordering}
-          currency={currency}
-          onClose={() => setSelectedOrder(null)}
-          onReOrder={handleReOrder}
-          t={t}
-        />
-      )}
+      <OrderDetailsModal
+        isOpen={Boolean(selectedOrder)}
+        selectedOrder={selectedOrder}
+        orderDetailsLoading={orderDetailsLoading}
+        orderDetailsError={orderDetailsError}
+        isReordering={isReordering}
+        currency={currency}
+        onClose={closeOrderDetails}
+        onReOrder={handleReOrder}
+        t={t}
+      />
     </>
   );
 }

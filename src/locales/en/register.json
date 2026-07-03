@@ -29,6 +29,8 @@
     "acceptTerms": "Please accept the Terms of Service and Privacy Policy",
     "mustAcceptTerms": "You must accept the terms to continue",
     "emailOrPhoneRequired": "Please provide email or phone number",
+    "firstNameRequired": "Please enter your first name",
+    "lastNameRequired": "Please enter your last name",
     "passwordRequired": "Please enter a password",
     "passwordMinLength": "Password must be at least 6 characters",
     "passwordsDoNotMatch": "Passwords do not match",

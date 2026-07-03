@@ -5,6 +5,9 @@
   "shippingAddress": "Shipping Address",
   "paymentMethod": "Payment Method",
   "orderSummary": "Order Summary",
+  "orderItemsPreview": {
+    "title": "Your order items"
+  },
   "form": {
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -36,13 +39,30 @@
     "deliveryDescription": "We will deliver your order to your address",
     "freePickup": "Free (Store Pickup)",
     "loading": "Loading...",
-    "enterCity": "Enter City"
+    "enterCity": "Enter City",
+    "selectCity": "Select city"
+  },
+  "deliveryCities": {
+    "yerevan": "Yerevan",
+    "aragatsotn": "Aragatsotn",
+    "ararat": "Ararat",
+    "armavir": "Armavir",
+    "gegharkunik": "Gegharkunik",
+    "kotayk": "Kotayk",
+    "lori": "Lori",
+    "shirak": "Shirak",
+    "syunik": "Syunik",
+    "tavush": "Tavush",
+    "vayotsDzor": "Vayots Dzor"
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
+    "cashShort": "Cash",
     "cashOnDeliveryDescription": "Pay cash when you receive your order",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
+    "card": "By card",
+    "cardDescription": "Pay with Visa, Mastercard or ArCa card",
     "arca": "ArCa",
     "arcaDescription": "Pay with ArCa card",
     "paymentDetails": "Payment Details",

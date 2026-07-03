@@ -2,10 +2,9 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
-import type { LanguageCode } from '../../../lib/language';
-import { getStoredLanguage } from '../../../lib/language';
+import { getStoredLanguage, DEFAULT_LANGUAGE, type LanguageCode } from '../../../lib/language';
 import { apiClient } from '../../../lib/api-client';
-import { getStoredCurrency, type CurrencyCode } from '../../../lib/currency';
+import { getStoredCurrency, DEFAULT_CURRENCY, type CurrencyCode } from '../../../lib/currency';
 import type { Product } from './types';
 import { RESERVED_ROUTES, WISHLIST_KEY, COMPARE_KEY } from './constants';
 import {
@@ -47,8 +46,8 @@ export function useProductData({
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
+  const [language, setLanguage] = useState<LanguageCode>(DEFAULT_LANGUAGE);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isInCompare, setIsInCompare] = useState(false);
   const [reviews, setReviews] = useState<Array<{ rating: number }>>([]);

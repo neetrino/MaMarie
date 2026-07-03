@@ -26,8 +26,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     images,
     currentImageIndex,
     setCurrentImageIndex,
-    thumbnailStartIndex,
-    setThumbnailStartIndex,
     currency,
     language,
     selectedColor,
@@ -154,8 +152,6 @@ export default function ProductPage({ params }: ProductPageProps) {
           language={language}
           currentImageIndex={currentImageIndex}
           onImageIndexChange={setCurrentImageIndex}
-          thumbnailStartIndex={thumbnailStartIndex}
-          onThumbnailStartIndexChange={setThumbnailStartIndex}
           mainImagePriority={currentImageIndex === 0}
         />
 

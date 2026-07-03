@@ -9,6 +9,20 @@
     "title": "Your order was placed successfully",
     "description": "Thank you for your order. We have received your request and will contact you shortly."
   },
+  "mobile": {
+    "more": "More",
+    "ready": {
+      "accent": "Ready",
+      "title": "Your order is on the way",
+      "subtitle": "Thank you"
+    },
+    "placed": {
+      "accent": "Confirmed",
+      "titleLine1": "Your order was",
+      "titleLine2": "placed successfully",
+      "subtitle": "Thank you for your order"
+    }
+  },
   "help": {
     "title": "Need help?",
     "body": "If you have questions about your order, please call us.",
@@ -53,9 +67,3 @@
     "quantity": "Quantity: {qty} × {price} = {total}"
   }
 }
-
-
-
-
-
-

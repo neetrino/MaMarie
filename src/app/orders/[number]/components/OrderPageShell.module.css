@@ -1,0 +1,25 @@
+.shell {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  padding-left: var(--order-page-padding-x);
+  padding-right: var(--order-page-padding-x);
+  background-color: var(--order-page-bg);
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    max-width: var(--order-page-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--order-page-padding-x-desktop);
+    padding-right: var(--order-page-padding-x-desktop);
+    background-color: var(--order-page-bg-desktop);
+  }
+}

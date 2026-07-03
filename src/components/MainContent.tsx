@@ -33,10 +33,32 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
-  if (pathname === '/wishlist' || pathname.startsWith('/wishlist/')) {
+  if (pathname.startsWith('/wishlist')) {
     return (
       <main
         className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
+  if (pathname.startsWith('/orders')) {
+    return (
+      <main
+        className="home-main-surface order-page-main flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
+  if (pathname.startsWith('/checkout')) {
+    return (
+      <main
+        className="home-main-surface order-page-main flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
         {children}
@@ -51,7 +73,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/profile')) {
     return (
       <main
-        className={`${mainBase} md:pt-[var(--header-clearance-desktop)]`}
+        className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden max-lg:pt-0 lg:pt-[var(--header-clearance-desktop)]"
         style={
           {
             ['--header-clearance-desktop']: `calc(${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,

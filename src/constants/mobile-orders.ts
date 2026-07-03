@@ -1,0 +1,47 @@
+import { BRAND_COLORS } from './brand';
+import { MOBILE_HOME_BG, MOBILE_HOME_HORIZONTAL_PADDING_PX } from './mobile-home';
+
+/** Figma `66:432` — mobile order ready state. */
+export const MOBILE_ORDER_PAGE_BG = MOBILE_HOME_BG;
+export const MOBILE_ORDER_PAGE_HORIZONTAL_PADDING_PX = MOBILE_HOME_HORIZONTAL_PADDING_PX;
+
+export const MOBILE_ORDER_HERO_ILLUSTRATION_WIDTH_PX = 313;
+export const MOBILE_ORDER_HERO_ILLUSTRATION_HEIGHT_PX = 302;
+export const MOBILE_ORDER_HERO_ILLUSTRATION_SCALE_WIDTH = 1.2253;
+export const MOBILE_ORDER_HERO_ILLUSTRATION_SCALE_HEIGHT = 1.2686;
+export const MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_LEFT_PERCENT = -11.26;
+export const MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_TOP_PERCENT = -14.49;
+
+export const MOBILE_ORDER_HERO_BLOCK_GAP_PX = 16;
+export const MOBILE_ORDER_HEADLINE_LINE_GAP_PX = 5;
+/** Space below headline lines, before subtitle. */
+export const MOBILE_ORDER_HEADLINE_TO_SUBTITLE_GAP_PX = 20;
+export const MOBILE_ORDER_HEADLINE_TO_BUTTON_GAP_PX = 28;
+
+export const MOBILE_ORDER_HEADLINE_FONT_SIZE_PX = 24;
+export const MOBILE_ORDER_PLACED_HEADLINE_FONT_SIZE_PX = 20;
+export const MOBILE_ORDER_PLACED_HEADLINE_MAX_WIDTH_PX = 328;
+export const MOBILE_ORDER_HEADLINE_LINE_HEIGHT = 1.2;
+export const MOBILE_ORDER_SUBTITLE_FONT_SIZE_PX = 14;
+export const MOBILE_ORDER_SUBTITLE_LINE_HEIGHT = 1.5;
+export const MOBILE_ORDER_SUBTITLE_COLOR = '#6f7384';
+export const MOBILE_ORDER_HEADLINE_COLOR = '#1c1b1b';
+export const MOBILE_ORDER_ACCENT_COLOR = BRAND_COLORS.pink;
+
+export const MOBILE_ORDER_MORE_BUTTON_PADDING_Y_PX = 5;
+export const MOBILE_ORDER_MORE_BUTTON_PADDING_LEFT_PX = 36;
+export const MOBILE_ORDER_MORE_BUTTON_PADDING_RIGHT_PX = 12;
+export const MOBILE_ORDER_MORE_BUTTON_LABEL_TO_ARROW_GAP_PX = 36;
+export const MOBILE_ORDER_MORE_BUTTON_ARROW_SIZE_PX = 40;
+export const MOBILE_ORDER_MORE_BUTTON_ARROW_ICON_SIZE_PX = 20;
+export const MOBILE_ORDER_MORE_BUTTON_BG = BRAND_COLORS.pink;
+
+/** Desktop — centered column, white page surface. */
+export const DESKTOP_ORDER_PAGE_BG = '#ffffff';
+export const DESKTOP_ORDER_PAGE_MAX_WIDTH_PX = 640;
+export const DESKTOP_ORDER_PAGE_PADDING_X_PX = 24;
+
+export const MOBILE_ORDER_ASSETS = {
+  readyBasket: '/assets/orders/ready-basket.png',
+  moreButtonArrow: '/assets/orders/more-button-arrow.svg',
+} as const;

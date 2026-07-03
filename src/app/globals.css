@@ -11,6 +11,11 @@
     font-display: swap;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-white text-gray-900;
     -webkit-user-select: none;
@@ -343,9 +348,127 @@
   /* MOBILE_HOME_BOTTOM_NAV_CLEARANCE_PX (104) — home + wishlist + products mobile; default shell stays 114px. */
   .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
-  .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page) {
+  .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
+  .layout-shell-mobile-bottom-clearance:has(.order-page),
+  .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
     background-color: #f1f1f3;
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Profile — less space under logout before bottom nav. */
+  .layout-shell-mobile-bottom-clearance:has(.profile-mobile-page) {
+    background-color: #f1f1f3;
+    padding-bottom: max(92px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+main.home-main-surface.order-page-main {
+  background-color: #f1f1f3;
+}
+
+main.profile-page-main {
+  background-color: #f1f1f3;
+}
+
+.profile-scroll-area {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.profile-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-mobile-tab-sheet-scroll {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.profile-side-sheet-scroll {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+html:has(main.profile-page-main) {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html:has(main.profile-page-main)::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  main.profile-page-main {
+    background-color: #faf8f5;
+    box-sizing: border-box;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .layout-shell-mobile-bottom-clearance:has(.profile-desktop-page) {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    background-color: #faf8f5;
+  }
+}
+
+main.profile-page-main .profile-btn-primary,
+.profile-side-sheet .profile-btn-primary {
+  border-radius: 15px !important;
+  border-width: 0 !important;
+  background-color: #ef95aa !important;
+  color: #ffffff !important;
+}
+
+main.profile-page-main .profile-btn-primary:hover:not(:disabled),
+.profile-side-sheet .profile-btn-primary:hover:not(:disabled) {
+  background-color: #e8879e !important;
+}
+
+main.profile-page-main .profile-btn-primary:focus-visible,
+.profile-side-sheet .profile-btn-primary:focus-visible {
+  outline: 2px solid #ef95aa;
+  outline-offset: 2px;
+}
+
+main.profile-page-main .profile-btn-outline,
+.profile-side-sheet .profile-btn-outline {
+  border-radius: 15px !important;
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  color: #111827 !important;
+}
+
+main.profile-page-main .profile-btn-outline:hover:not(:disabled),
+.profile-side-sheet .profile-btn-outline:hover:not(:disabled) {
+  background-color: #f9fafb !important;
+}
+
+main.profile-page-main .profile-btn-danger,
+.profile-side-sheet .profile-btn-danger {
+  background-color: #b91c1c !important;
+}
+
+main.profile-page-main .profile-btn-danger:hover:not(:disabled),
+.profile-side-sheet .profile-btn-danger:hover:not(:disabled) {
+  background-color: #991b1b !important;
+}
+
+main.profile-page-main .profile-btn-danger:focus-visible,
+.profile-side-sheet .profile-btn-danger:focus-visible {
+  outline-color: #b91c1c;
+}
+
+@media (min-width: 1024px) {
+  main.home-main-surface.order-page-main {
+    background-color: #ffffff;
+    min-height: calc(100dvh - var(--header-clearance-desktop));
   }
 }
 

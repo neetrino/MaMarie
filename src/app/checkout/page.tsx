@@ -1,17 +1,42 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Card, Button } from '@shop/ui';
 import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
+import { CheckoutOrderItemsPreview } from './components/CheckoutOrderItemsPreview';
+import { CheckoutPageShell, checkoutPageShellStyles } from './components/CheckoutPageShell';
+import { CheckoutPrimaryButton } from './components/CheckoutPrimaryButton';
+import {
+  CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS,
+  CHECKOUT_PAGE_TITLE_CLASS,
+  CHECKOUT_SECTION_CARD_CLASS,
+} from './constants/checkout-ui';
 import { OrderSummary } from './OrderSummary';
 import { useCheckout } from './useCheckout';
+
+function CheckoutSkeleton() {
+  return (
+    <CheckoutPageShell>
+      <div className={checkoutPageShellStyles.titleOffset}>
+        <div className="h-8 w-40 animate-pulse rounded-lg bg-gray-200" />
+      </div>
+      <div className={`${CHECKOUT_SECTION_CARD_CLASS} mb-6 h-40 animate-pulse bg-gray-100`} />
+      <div className={`grid grid-cols-1 lg:grid-cols-3 ${checkoutPageShellStyles.formGrid}`}>
+        <div className={`lg:col-span-2 ${checkoutPageShellStyles.formSections} flex flex-col`}>
+          <div className={`${CHECKOUT_SECTION_CARD_CLASS} h-64 animate-pulse bg-gray-100`} />
+          <div className={`${CHECKOUT_SECTION_CARD_CLASS} h-48 animate-pulse bg-gray-100`} />
+        </div>
+        <div className={`${CHECKOUT_SECTION_CARD_CLASS} h-72 animate-pulse bg-gray-100`} />
+      </div>
+    </CheckoutPageShell>
+  );
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  
+
   const {
     cart,
     loading,
@@ -38,49 +63,49 @@ export default function CheckoutPage() {
     orderSummary,
     handlePlaceOrder,
     onSubmit,
+    handleRemoveCartItem,
     isLoggedIn,
   } = useCheckout();
 
   if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="h-96 bg-gray-200 rounded"></div>
-            </div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <CheckoutSkeleton />;
   }
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
-        <Card className="p-6 text-center">
-          <p className="text-gray-600 mb-4">{t('checkout.errors.cartEmpty')}</p>
-          <Button variant="primary" onClick={() => router.push('/products')}>
+      <CheckoutPageShell>
+        <h1 className={`${CHECKOUT_PAGE_TITLE_CLASS} ${checkoutPageShellStyles.titleOffset}`}>
+          {t('checkout.title')}
+        </h1>
+        <div className={`${CHECKOUT_SECTION_CARD_CLASS} text-center`}>
+          <p className="mb-5 text-gray-600">{t('checkout.errors.cartEmpty')}</p>
+          <CheckoutPrimaryButton type="button" onClick={() => router.push('/products')}>
             {t('checkout.buttons.continueShopping')}
-          </Button>
-        </Card>
-      </div>
+          </CheckoutPrimaryButton>
+        </div>
+      </CheckoutPageShell>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('checkout.title')}</h1>
+    <CheckoutPageShell>
+      <h1 className={`${CHECKOUT_PAGE_TITLE_CLASS} ${checkoutPageShellStyles.titleOffset}`}>
+        {t('checkout.title')}
+      </h1>
+
+      <CheckoutOrderItemsPreview
+        cart={cart}
+        onRemoveItem={handleRemoveCartItem}
+        t={t}
+        className={CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS}
+      />
 
       <form onSubmit={handlePlaceOrder}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Checkout Form */}
+        <div className={`grid grid-cols-1 lg:grid-cols-3 ${checkoutPageShellStyles.formGrid}`}>
           <CheckoutForm
             register={register}
             setValue={setValue}
+            shippingCity={shippingCity}
             errors={errors}
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}
@@ -92,9 +117,7 @@ export default function CheckoutPage() {
             setError={setError}
           />
 
-          {/* Order Summary */}
           <OrderSummary
-            cart={cart}
             orderSummary={orderSummary}
             currency={currency}
             shippingMethod={shippingMethod}
@@ -137,6 +160,6 @@ export default function CheckoutPage() {
         isLoggedIn={isLoggedIn}
         onSubmit={onSubmit}
       />
-    </div>
+    </CheckoutPageShell>
   );
 }

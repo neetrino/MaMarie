@@ -1,8 +1,12 @@
 'use client';
 
-import { Button, Input } from '@shop/ui';
+import { CheckoutDeliveryCitySelect } from './CheckoutDeliveryCitySelect';
+import { CheckoutInput } from './CheckoutInput';
+import { CheckoutPrimaryButton } from './CheckoutPrimaryButton';
+import { CHECKOUT_FORM_ALERT_CLASS, CHECKOUT_SECONDARY_BUTTON_CLASS } from '../constants/checkout-ui';
 import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../../lib/i18n-client';
+import { useBodyScrollLock } from '../../../lib/useBodyScrollLock';
 import { ContactInformation } from './ContactInformation';
 import { CardInputFields } from './CardInputFields';
 import { OrderSummaryModal } from './OrderSummaryModal';
@@ -51,6 +55,7 @@ export function ShippingAddressModal({
   onSubmit,
 }: ShippingAddressModalProps) {
   const { t } = useTranslation();
+  useBodyScrollLock(isOpen);
 
   if (!isOpen) {
     return null;
@@ -67,12 +72,12 @@ export function ShippingAddressModal({
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-gray-200/80"
         onClick={(e) => e.stopPropagation()}
         style={{ zIndex: 10000 }}
       >
@@ -105,17 +110,15 @@ export function ShippingAddressModal({
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('checkout.shippingAddress')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Input
-                    label={t('checkout.form.city')}
-                    type="text"
-                    placeholder={t('checkout.placeholders.city')}
-                    {...register('shippingCity')}
+                  <CheckoutDeliveryCitySelect
+                    shippingCity={shippingCity}
+                    setValue={setValue}
                     error={errors.shippingCity?.message}
                     disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <Input
+                  <CheckoutInput
                     label={t('checkout.form.address')}
                     type="text"
                     placeholder={t('checkout.placeholders.address')}
@@ -128,7 +131,7 @@ export function ShippingAddressModal({
             </div>
 
             {(errors.shippingAddress || errors.shippingCity) && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
                 <p className="text-sm text-red-600">
                   {errors.shippingAddress?.message || errors.shippingCity?.message}
                 </p>
@@ -151,7 +154,7 @@ export function ShippingAddressModal({
             )}
 
             {paymentMethod === 'cash_on_delivery' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 mt-6">
+              <div className={`mb-6 mt-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_ALERT_CLASS}`}>
                 <p className="text-sm text-green-800">
                   <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryInfo')}
                 </p>
@@ -170,7 +173,7 @@ export function ShippingAddressModal({
           </>
         ) : (
           <div className="mb-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div className={`mb-4 border border-blue-200 bg-blue-50 p-4 ${CHECKOUT_FORM_ALERT_CLASS}`}>
               <p className="text-sm text-blue-800">
                 <strong>{t('checkout.shipping.storePickup')}:</strong> {t('checkout.messages.storePickupInfo')}
               </p>
@@ -192,7 +195,7 @@ export function ShippingAddressModal({
             )}
 
             {paymentMethod === 'cash_on_delivery' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className={`mb-6 border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_ALERT_CLASS}`}>
                 <p className="text-sm text-green-800">
                   <strong>{t('checkout.payment.cashOnDelivery')}:</strong> {t('checkout.messages.cashOnDeliveryPickup')}
                 </p>
@@ -212,18 +215,16 @@ export function ShippingAddressModal({
         )}
 
         <div className="flex gap-3">
-          <Button
+          <button
             type="button"
-            variant="outline"
-            className="flex-1"
+            className={`${CHECKOUT_SECONDARY_BUTTON_CLASS} flex-1`}
             onClick={onClose}
             disabled={isSubmitting}
           >
             {t('checkout.buttons.cancel')}
-          </Button>
-          <Button
+          </button>
+          <CheckoutPrimaryButton
             type="button"
-            variant="primary"
             className="flex-1"
             onClick={handleSubmit(
               (data) => {
@@ -235,7 +236,7 @@ export function ShippingAddressModal({
             disabled={isSubmitting}
           >
             {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.placeOrder')}
-          </Button>
+          </CheckoutPrimaryButton>
         </div>
       </div>
     </div>
