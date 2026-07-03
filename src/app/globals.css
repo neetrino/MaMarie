@@ -262,7 +262,6 @@
     --home-product-card-lift: 0px;
   }
 
-  .home-product-card:not(.home-product-card--static):hover,
   .home-product-card:not(.home-product-card--static):has(a:focus-visible) {
     z-index: 10;
     --home-product-card-image-left: var(--home-product-card-image-left-hover);
@@ -278,9 +277,40 @@
     --home-product-card-lift: var(--home-product-card-lift-hover);
   }
 
-  .home-product-card:not(.home-product-card--static):hover .home-product-card-sizes,
   .home-product-card:not(.home-product-card--static):has(a:focus-visible) .home-product-card-sizes {
     opacity: 1;
+  }
+
+  /* Desktop mouse only — iPad/touch keeps static cards like mobile home. */
+  @media (pointer: fine) and (hover: hover) {
+    .home-product-card:not(.home-product-card--static):hover {
+      z-index: 10;
+      --home-product-card-image-left: var(--home-product-card-image-left-hover);
+      --home-product-card-image-top: var(--home-product-card-image-top-hover);
+      --home-product-card-image-width: var(--home-product-card-image-width-hover);
+      --home-product-card-image-height: var(--home-product-card-image-height-hover);
+      --home-product-card-bg: var(--home-product-card-bg-hover);
+      --home-product-card-actions-gap: var(--home-product-card-actions-gap-hover);
+      --home-product-card-cart-size: var(--home-product-card-cart-size-hover);
+      --home-product-card-cart-icon-size: var(--home-product-card-cart-icon-size-hover);
+      --home-product-card-cart-icon-left: var(--home-product-card-cart-icon-left-hover);
+      --home-product-card-cart-icon-top: var(--home-product-card-cart-icon-top-hover);
+      --home-product-card-lift: var(--home-product-card-lift-hover);
+    }
+
+    .home-product-card:not(.home-product-card--static):hover .home-product-card-sizes {
+      opacity: 1;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .home-product-card:not(.home-product-card--static) .home-product-card-surface,
+    .home-product-card:not(.home-product-card--static) .home-product-card-image-wrap,
+    .home-product-card:not(.home-product-card--static) .home-product-card-actions,
+    .home-product-card:not(.home-product-card--static) .home-product-card-cart,
+    .home-product-card:not(.home-product-card--static) .home-product-card-cart-icon {
+      transition: none;
+    }
   }
 
   .home-product-card--static .home-product-card-surface,
