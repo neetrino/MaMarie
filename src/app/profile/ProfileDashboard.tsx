@@ -85,7 +85,7 @@ export function ProfileDashboard({
     return (
       <div>
         <h2
-          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} md:hidden`}
+          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} lg:hidden`}
         >
           {t('profile.tabs.dashboard')}
         </h2>
@@ -101,7 +101,7 @@ export function ProfileDashboard({
     return (
       <div>
         <h2
-          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} md:hidden`}
+          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} lg:hidden`}
         >
           {t('profile.tabs.dashboard')}
         </h2>
@@ -150,13 +150,13 @@ export function ProfileDashboard({
   };
 
   return (
-    <div className="space-y-6 pb-2 md:space-y-8 md:pb-0">
+    <div className="space-y-6 pb-2 lg:space-y-8 lg:pb-0">
       <h2
-        className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} md:hidden`}
+        className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} lg:hidden`}
       >
         {t('profile.tabs.dashboard')}
       </h2>
-      <div className="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:gap-4 xl:grid-cols-4">
         {PROFILE_DESKTOP_STAT_CONFIG.map(({ key, theme }) => (
           <ProfileDesktopStatCard
             key={key}
@@ -189,7 +189,7 @@ export function ProfileDashboard({
             </a>
           </div>
         ) : (
-          <ul className={`${PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS} max-md:gap-3`}>
+          <ul className={`${PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS} max-lg:gap-3`}>
             {dashboardData.recentOrders.map((order) => (
               <li key={order.id} className="min-w-0">
                 <ProfileDesktopOrderCard

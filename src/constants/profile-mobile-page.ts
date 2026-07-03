@@ -25,15 +25,19 @@ export const PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS = 300;
 export const PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS = 200;
 export const PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX = 120;
 
+/** Match site mobile header/footer breakpoint (`max-lg` / `< 1024px`). */
+export const PROFILE_MOBILE_LAYOUT_MAX_WIDTH_PX = 1023;
+export const PROFILE_MOBILE_LAYOUT_MEDIA_QUERY = `(max-width: ${PROFILE_MOBILE_LAYOUT_MAX_WIDTH_PX}px)`;
+
 /** Form tabs in bottom sheet — no clay card frame on mobile. */
 export const PROFILE_MOBILE_FORM_SECTION_FRAMELESS_CLASS =
-  'max-md:!rounded-none max-md:!bg-transparent max-md:!p-0 max-md:!shadow-none max-md:!ring-0';
+  'max-lg:!rounded-none max-lg:!bg-transparent max-lg:!p-0 max-lg:!shadow-none max-lg:!ring-0';
 
 /** Dashboard sheet title on mobile — one step up from section title (`text-xl`). */
-export const PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS = 'max-md:text-2xl';
+export const PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS = 'max-lg:text-2xl';
 
 /** Order cards in mobile profile sheets — clay drop shadow. */
-export const PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS = 'max-md:shadow-[0_4px_24px_rgba(0,0,0,0.06)]';
+export const PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS = 'max-lg:shadow-[0_4px_24px_rgba(0,0,0,0.06)]';
 
 export const PROFILE_MOBILE_EMAIL_COLOR = '#6b7280';
 

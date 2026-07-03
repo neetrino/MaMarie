@@ -196,7 +196,7 @@ export function ProfileMobilePage({
   ) : null;
 
   return (
-    <div className="profile-mobile-page md:hidden">
+    <div className="profile-mobile-page lg:hidden">
       <div
         className="mx-auto w-full max-w-md pt-2"
         style={{

@@ -73,7 +73,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/profile')) {
     return (
       <main
-        className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden max-lg:pt-0 md:pt-[var(--header-clearance-desktop)]"
+        className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden max-lg:pt-0 lg:pt-[var(--header-clearance-desktop)]"
         style={
           {
             ['--header-clearance-desktop']: `calc(${HEADER_CONTENT_CLEARANCE_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,

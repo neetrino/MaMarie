@@ -11,6 +11,11 @@
     font-display: swap;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   body {
     @apply bg-white text-gray-900;
     -webkit-user-select: none;
@@ -382,7 +387,7 @@ html:has(main.profile-page-main)::-webkit-scrollbar {
   display: none;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   main.profile-page-main {
     background-color: #faf8f5;
     box-sizing: border-box;

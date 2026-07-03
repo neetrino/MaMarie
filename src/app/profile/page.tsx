@@ -15,7 +15,7 @@ import { ProfileOrders } from './ProfileOrders';
 import { ProfilePassword } from './ProfilePassword';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import type { ProfileTab, ProfileTabConfig } from './types';
+import { PROFILE_MOBILE_LAYOUT_MEDIA_QUERY } from '../../constants/profile-mobile-page';
 
 function ProfilePageContent() {
   const { isLoggedIn, isLoading: authLoading, logout } = useAuth();
@@ -82,7 +82,7 @@ function ProfilePageContent() {
       return;
     }
 
-    if (window.matchMedia('(max-width: 767px)').matches) {
+    if (window.matchMedia(PROFILE_MOBILE_LAYOUT_MEDIA_QUERY).matches) {
       setIsMobileSheetOpen(true);
     }
   }, [searchParams]);
@@ -261,7 +261,7 @@ function ProfilePageContent() {
       >
         {tabContent}
       </ProfileMobilePage>
-      <div className="profile-desktop-page hidden md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden">
+      <div className="profile-desktop-page hidden lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden">
         <div
           className="profile-desktop-page__shell mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 lg:px-8"
           style={{

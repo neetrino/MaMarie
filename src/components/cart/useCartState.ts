@@ -6,7 +6,7 @@ import { handleRemoveItem, handleUpdateQuantity } from '../../app/cart/cart-hand
 import type { Cart, CartItem } from '../../app/cart/types';
 import type { CartUpdatedDetail } from '../../lib/cart-events';
 import { CART_UPDATED_EVENT, dispatchCartUpdated } from '../../lib/cart-events';
-import { getStoredCurrency } from '../../lib/currency';
+import { getStoredCurrency, DEFAULT_CURRENCY } from '../../lib/currency';
 import {
   getInstantCartDisplay,
   getGuestCartFromStorage,
@@ -95,15 +95,9 @@ export function useCartState({ enabled }: UseCartStateOptions) {
   const { t } = useTranslation();
   const productLabel = t('common.messages.product');
 
-  const [cart, setCart] = useState<Cart | null>(() => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-
-    return getGuestCartFromStorage('Product') ?? readCartSnapshot();
-  });
+  const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(false);
-  const [currency, setCurrency] = useState(getStoredCurrency());
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const cartLoadRequestRef = useRef(0);
   const hasPendingOptimisticCartRef = useRef(false);
 
@@ -227,6 +221,10 @@ export function useCartState({ enabled }: UseCartStateOptions) {
       void loadCart(silent && Boolean(instantCart));
     }
   }, [isLoggedIn, loadCart, syncCartFromLocal]);
+
+  useEffect(() => {
+    setCurrency(getStoredCurrency());
+  }, []);
 
   useEffect(() => {
     if (!enabled) {

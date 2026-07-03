@@ -56,7 +56,7 @@ function ProfileSideSheetPanel({
 
       <div
         ref={panelRef}
-        className={`relative h-dvh max-h-dvh w-[var(--profile-side-sheet-mobile-width)] max-w-[var(--profile-side-sheet-mobile-max-width)] md:w-[var(--profile-side-sheet-desktop-width)] md:max-w-none transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
+        className={`relative h-dvh max-h-dvh w-[var(--profile-side-sheet-mobile-width)] max-w-[var(--profile-side-sheet-mobile-max-width)] lg:w-[var(--profile-side-sheet-desktop-width)] lg:max-w-none transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
           visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
         }`}
         style={{
@@ -75,20 +75,20 @@ function ProfileSideSheetPanel({
           aria-labelledby="profile-side-sheet-title"
           onClick={(event) => event.stopPropagation()}
         >
-          <header className="shrink-0 border-b border-gray-100 px-6 py-4 md:px-5">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <header className="shrink-0 border-b border-gray-100 px-6 py-4 lg:px-5">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 flex-1">
-                <h2 id="profile-side-sheet-title" className="text-xl font-bold leading-tight text-gray-900 md:text-lg">
+                <h2 id="profile-side-sheet-title" className="text-xl font-bold leading-tight text-gray-900 lg:text-lg">
                   {title}
                 </h2>
                 {subtitle ? <p className="mt-1 text-sm text-gray-600">{subtitle}</p> : null}
               </div>
-              {headerActions ? <div className="shrink-0 md:self-start">{headerActions}</div> : null}
+              {headerActions ? <div className="shrink-0 lg:self-start">{headerActions}</div> : null}
             </div>
           </header>
 
-          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 md:px-4">
-            <div className="max-md:pb-[calc(28px+env(safe-area-inset-bottom,0px))]">{children}</div>
+          <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 lg:px-4">
+            <div className="max-lg:pb-[calc(28px+env(safe-area-inset-bottom,0px))]">{children}</div>
           </div>
         </aside>
       </div>

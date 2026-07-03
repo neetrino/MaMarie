@@ -16,8 +16,17 @@ if (
   );
 }
 
+/** Private LAN hosts — allow phone/tablet to load /_next/* in `next dev` (see allowedDevOrigins). */
+const DEV_LAN_ALLOWED_ORIGINS = [
+  '192.168.*.*',
+  '10.*.*.*',
+  '172.*.*.*',
+  '*.local',
+];
+
 const nextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: DEV_LAN_ALLOWED_ORIGINS,
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,
   transpilePackages: ['@shop/ui', '@shop/design-tokens', '@white-shop/db'],

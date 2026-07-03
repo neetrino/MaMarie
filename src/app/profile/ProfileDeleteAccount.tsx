@@ -46,7 +46,7 @@ export function ProfileDeleteAccount({
   const hasPassword = profile.hasPassword ?? true;
 
   return (
-    <ProfileSectionCard mobileFrameless className="border-0 bg-red-50/30 max-md:!bg-transparent">
+    <ProfileSectionCard mobileFrameless className="border-0 bg-red-50/30 max-lg:!bg-transparent">
       <div className="mb-6 space-y-2 sm:mb-8">
         <h2 className={PROFILE_DESKTOP_SECTION_TITLE_CLASS}>{t('profile.deleteAccount.title')}</h2>
         <p className="max-w-2xl text-sm leading-relaxed text-gray-700">{t('profile.deleteAccount.description')}</p>

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, use, useCallback } from 'react';
-import { getStoredCurrency } from '../../../lib/currency';
-import { getStoredLanguage, type LanguageCode } from '../../../lib/language';
+import { getStoredCurrency, DEFAULT_CURRENCY } from '../../../lib/currency';
+import { getStoredLanguage, DEFAULT_LANGUAGE, type LanguageCode } from '../../../lib/language';
 import { t } from '../../../lib/i18n';
 import { useAttributeGroups } from './useAttributeGroups';
 import { useProductImages } from './hooks/useProductImages';
@@ -17,8 +17,8 @@ import type { Product } from './types';
 
 export function useProductPage(params: Promise<{ slug?: string }>) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currency, setCurrency] = useState(getStoredCurrency());
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
+  const [language, setLanguage] = useState<LanguageCode>(DEFAULT_LANGUAGE);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showMessage, setShowMessage] = useState<string | null>(null);
 
