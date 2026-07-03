@@ -161,11 +161,13 @@ export function useBottomSheetDragDismiss({
       const deltaY = Math.max(0, event.clientY - activeDrag.startClientY);
       activeDragRef.current = null;
       setIsDragging(false);
-      setDragOffsetY(0);
 
       if (deltaY >= dismissThresholdPx) {
         onDismiss();
+        return;
       }
+
+      setDragOffsetY(0);
     },
     [dismissThresholdPx, onDismiss, panelRef],
   );

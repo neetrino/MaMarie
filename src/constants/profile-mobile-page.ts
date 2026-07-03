@@ -24,15 +24,21 @@ export const PROFILE_MOBILE_TAB_SHEET_HEIGHT_VH = 72;
 /** Above mobile bottom nav (`MOBILE_BOTTOM_NAV_Z_INDEX` = 70). */
 export const PROFILE_MOBILE_TAB_SHEET_Z_INDEX = 90;
 export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_BOTTOM_PX = 28;
-/** Space between drag handle and in-content title (replaces header divider on form tabs). */
-export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX = 45;
+/** Space between drag zone and in-content title (replaces header divider on form tabs). */
+export const PROFILE_MOBILE_TAB_SHEET_CONTENT_PADDING_TOP_PX = 16;
 /** Horizontal inset for mobile profile sheet content (`px-5`). */
 export const PROFILE_MOBILE_SHEET_CONTENT_PADDING_HORIZONTAL_PX = 20;
 /** Order-details side sheet header on mobile (`px-6`). */
 export const PROFILE_MOBILE_SIDE_SHEET_HEADER_PADDING_HORIZONTAL_PX = 24;
 export const PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS = 300;
-export const PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS = 200;
+export const PROFILE_MOBILE_TAB_SHEET_PANEL_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)';
+export const PROFILE_MOBILE_TAB_SHEET_BACKDROP_TRANSITION_MS = PROFILE_MOBILE_TAB_SHEET_PANEL_TRANSITION_MS;
 export const PROFILE_MOBILE_TAB_SHEET_DISMISS_DRAG_THRESHOLD_PX = 120;
+/** Visual grab pill in tab sheet header. */
+export const PROFILE_MOBILE_TAB_SHEET_DRAG_HANDLE_HEIGHT_PX = 6;
+export const PROFILE_MOBILE_TAB_SHEET_DRAG_HANDLE_WIDTH_PX = 56;
+/** Touch target above content — swipe down anywhere here to dismiss. */
+export const PROFILE_MOBILE_TAB_SHEET_DRAG_ZONE_HEIGHT_PX = 48;
 
 /** Match site mobile header/footer breakpoint (`max-lg` / `< 1024px`). */
 export const PROFILE_MOBILE_LAYOUT_MAX_WIDTH_PX = 1023;
