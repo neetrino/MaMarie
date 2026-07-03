@@ -23,7 +23,7 @@ interface MobileWishlistProductGridProps {
   addToCartLabel: string;
 }
 
-/** Figma `74:796` — mobile wishlist grid (2 cols phone, 3 cols iPad mini). */
+/** Figma `74:796` — mobile wishlist grid (2 cols phone, 4 cols iPad mini). */
 export function MobileWishlistProductGrid({
   products,
   loading,
@@ -32,9 +32,8 @@ export function MobileWishlistProductGrid({
 }: MobileWishlistProductGridProps) {
   return (
     <div
-      className="mobile-tablet-three-column-grid grid w-full"
+      className="mobile-wishlist-tablet-grid grid w-full"
       style={{
-        '--mobile-wishlist-card-phone-width': `${MOBILE_WISHLIST_CARD_WIDTH_PX}px`,
         columnGap: MOBILE_WISHLIST_CARD_COLUMN_GAP_PX,
         rowGap: MOBILE_WISHLIST_CARD_ROW_GAP_PX,
         paddingTop: MOBILE_WISHLIST_TITLE_TO_GRID_GAP_PX,

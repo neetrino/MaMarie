@@ -195,8 +195,13 @@
     transform: translateY(-50%);
   }
 
-  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — wishlist + products: 3 cards per row. */
+  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — products: 3 cards per row. */
   .mobile-tablet-three-column-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* MOBILE_WISHLIST_TABLET_GRID_COLUMNS (4) — wishlist on iPad mini. */
+  .mobile-wishlist-tablet-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -205,15 +210,12 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .mobile-tablet-three-column-grid .mobile-wishlist-product-card {
-      max-width: var(--mobile-wishlist-card-phone-width, 167px);
-      margin-inline: auto;
+    .mobile-wishlist-tablet-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .mobile-wishlist-card-placeholder {
       width: 100%;
-      max-width: var(--mobile-wishlist-card-phone-width, 167px);
-      margin-inline: auto;
       aspect-ratio: 184 / 330;
       height: auto;
     }
