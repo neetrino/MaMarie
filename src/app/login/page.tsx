@@ -14,6 +14,11 @@ import { ProfileClayButton } from '../profile/components/ProfileClayButton';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { resolveLoginApiError } from '../../lib/auth/client-api-error-messages';
+import {
+  AuthFieldErrors,
+  clearAuthFieldError,
+  validateLoginFields,
+} from '../../lib/auth/auth-form-field-errors';
 import { Eye, EyeOff } from 'lucide-react';
 import { logger } from "@/lib/utils/logger";
 
@@ -24,6 +29,7 @@ function LoginPageContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login, isLoading, isLoggedIn, isAdmin } = useAuth();
@@ -34,24 +40,18 @@ function LoginPageContent() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
+
+    const nextFieldErrors = validateLoginFields({ email, password }, t);
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
-    logger.debug('🔐 [LOGIN PAGE] Form submitted');
-
-    // Validation
-    if (!email.trim()) {
-      setError(t('login.errors.emailRequired'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!password) {
-      setError(t('login.errors.passwordRequired'));
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
+      logger.debug('🔐 [LOGIN PAGE] Form submitted');
       logger.debug('📤 [LOGIN PAGE] Calling login function...');
       const loggedInUser = await login(email.trim(), password);
       const isUserAdmin =
@@ -59,7 +59,7 @@ function LoginPageContent() {
       const destination = isUserAdmin ? '/supersudo' : redirectTo;
       logger.debug('✅ [LOGIN PAGE] Login successful, redirecting to:', destination);
       router.push(destination);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [LOGIN PAGE] Login error:', err);
       setError(resolveLoginApiError(err instanceof Error ? err.message : String(err), t));
     } finally {
@@ -97,9 +97,12 @@ function LoginPageContent() {
               placeholder={t('login.form.emailPlaceholder')}
               className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors.email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
+              }}
               disabled={isSubmitting || isLoading}
-              required
             />
           </div>
           <div>
@@ -113,9 +116,12 @@ function LoginPageContent() {
                 placeholder={t('login.form.passwordPlaceholder')}
                 className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                error={fieldErrors.password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
+                }}
                 disabled={isSubmitting || isLoading}
-                required
               />
               <button
                 type="button"

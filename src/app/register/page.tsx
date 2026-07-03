@@ -12,6 +12,11 @@ import { AUTH_FORM_CARD_CLASS } from '../../constants/auth-form';
 import { ProfileClayButton } from '../profile/components/ProfileClayButton';
 import { useTranslation } from '../../lib/i18n-client';
 import { resolveRegisterApiError } from '../../lib/auth/client-api-error-messages';
+import {
+  AuthFieldErrors,
+  clearAuthFieldError,
+  validateRegisterFields,
+} from '../../lib/auth/auth-form-field-errors';
 import { Eye, EyeOff } from 'lucide-react';
 import { logger } from "@/lib/utils/logger";
 
@@ -27,6 +32,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, isLoading } = useAuth();
@@ -34,56 +40,29 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
+
+    const nextFieldErrors = validateRegisterFields(
+      {
+        firstName,
+        lastName,
+        email,
+        phone,
+        password,
+        confirmPassword,
+        acceptTerms,
+      },
+      t,
+    );
+
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     logger.debug('🔐 [REGISTER PAGE] Form submitted');
-
-    // Validation - check in order of importance
-    logger.debug('🔍 [REGISTER PAGE] Validating form data...');
-    logger.debug('🔍 [REGISTER PAGE] Form state:', {
-      email: email.trim() || 'empty',
-      phone: phone.trim() || 'empty',
-      hasPassword: !!password,
-      passwordLength: password.length,
-      passwordsMatch: password === confirmPassword,
-      acceptTerms,
-    });
-
-    if (!acceptTerms) {
-      logger.debug('❌ [REGISTER PAGE] Validation failed: Terms not accepted');
-      setError(t('register.errors.acceptTerms'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!email.trim() && !phone.trim()) {
-      logger.debug('❌ [REGISTER PAGE] Validation failed: No email or phone');
-      setError(t('register.errors.emailOrPhoneRequired'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!password) {
-      logger.debug('❌ [REGISTER PAGE] Validation failed: No password');
-      setError(t('register.errors.passwordRequired'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      logger.debug('❌ [REGISTER PAGE] Validation failed: Password too short');
-      setError(t('register.errors.passwordMinLength'));
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      logger.debug('❌ [REGISTER PAGE] Validation failed: Passwords do not match');
-      setError(t('register.errors.passwordsDoNotMatch'));
-      setIsSubmitting(false);
-      return;
-    }
-
     logger.debug('✅ [REGISTER PAGE] All validations passed');
 
     try {
@@ -113,13 +92,15 @@ export default function RegisterPage() {
           window.location.href = '/';
         }
       }, 1000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [REGISTER PAGE] Registration error:', err);
-      console.error('❌ [REGISTER PAGE] Error details:', {
-        message: err.message,
-        stack: err.stack,
-        name: err.name,
-      });
+      if (err instanceof Error) {
+        console.error('❌ [REGISTER PAGE] Error details:', {
+          message: err.message,
+          stack: err.stack,
+          name: err.name,
+        });
+      }
       setError(resolveRegisterApiError(err instanceof Error ? err.message : String(err), t));
     } finally {
       setIsSubmitting(false);
@@ -151,9 +132,12 @@ export default function RegisterPage() {
                 placeholder={t('register.placeholders.firstName')}
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                error={fieldErrors.firstName}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                  setFieldErrors((prev) => clearAuthFieldError(prev, 'firstName'));
+                }}
                 disabled={isSubmitting || isLoading}
-                required
               />
             </div>
             <div>
@@ -167,9 +151,12 @@ export default function RegisterPage() {
                 placeholder={t('register.placeholders.lastName')}
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                error={fieldErrors.lastName}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                  setFieldErrors((prev) => clearAuthFieldError(prev, 'lastName'));
+                }}
                 disabled={isSubmitting || isLoading}
-                required
               />
             </div>
           </div>
@@ -185,9 +172,16 @@ export default function RegisterPage() {
                 placeholder={t('register.placeholders.email')}
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                error={fieldErrors.email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setFieldErrors((prev) => {
+                    let next = clearAuthFieldError(prev, 'email');
+                    next = clearAuthFieldError(next, 'phone');
+                    return next;
+                  });
+                }}
                 disabled={isSubmitting || isLoading}
-                required
               />
             </div>
             <div>
@@ -200,7 +194,15 @@ export default function RegisterPage() {
                 placeholder={t('register.placeholders.phone')}
                 className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                error={fieldErrors.phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setFieldErrors((prev) => {
+                    let next = clearAuthFieldError(prev, 'phone');
+                    next = clearAuthFieldError(next, 'email');
+                    return next;
+                  });
+                }}
                 disabled={isSubmitting || isLoading}
               />
             </div>
@@ -218,9 +220,12 @@ export default function RegisterPage() {
                   placeholder={t('register.placeholders.password')}
                   className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  error={fieldErrors.password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
+                  }}
                   disabled={isSubmitting || isLoading}
-                  required
                 />
                 <button
                   type="button"
@@ -251,9 +256,12 @@ export default function RegisterPage() {
                   placeholder={t('register.placeholders.confirmPassword')}
                   className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  error={fieldErrors.confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setFieldErrors((prev) => clearAuthFieldError(prev, 'confirmPassword'));
+                  }}
                   disabled={isSubmitting || isLoading}
-                  required
                 />
                 <button
                   type="button"
@@ -277,14 +285,12 @@ export default function RegisterPage() {
               checked={acceptTerms}
               onChange={(e) => {
                 setAcceptTerms(e.target.checked);
-                // Clear error when checkbox is checked
-                if (e.target.checked && error === t('register.errors.acceptTerms')) {
-                  setError(null);
-                }
+                setFieldErrors((prev) => clearAuthFieldError(prev, 'terms'));
               }}
-              className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className={`mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${
+                fieldErrors.terms ? 'border-error' : ''
+              }`}
               disabled={isSubmitting || isLoading}
-              required
             />
             <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
               {t('register.form.acceptTerms')}{' '}
@@ -297,8 +303,8 @@ export default function RegisterPage() {
               </Link>
             </label>
           </div>
-          {!acceptTerms && error === t('register.errors.acceptTerms') && (
-            <p className="text-xs text-red-600 -mt-2">{t('register.errors.mustAcceptTerms')}</p>
+          {fieldErrors.terms && (
+            <p className="-mt-2 text-sm text-error">{fieldErrors.terms}</p>
           )}
           <ProfileClayButton
             variant="primary"
