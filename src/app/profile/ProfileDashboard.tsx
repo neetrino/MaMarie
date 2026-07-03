@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import {
   PROFILE_DESKTOP_DASHBOARD_CARD_CLASS,
@@ -185,9 +186,9 @@ export function ProfileDashboard({
         {dashboardData.recentOrders.length === 0 ? (
           <div className="flex flex-col items-center gap-5 py-12">
             <p className="max-w-sm text-center text-sm text-gray-600">{t('profile.dashboard.noOrders')}</p>
-            <a href="/products" className={PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}>
+            <Link href="/products" className={PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS}>
               {t('profile.dashboard.startShopping')}
-            </a>
+            </Link>
           </div>
         ) : (
           <ul className={`${PROFILE_DESKTOP_ORDER_CARD_GRID_CLASS} max-lg:gap-3`}>

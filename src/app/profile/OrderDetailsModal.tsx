@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useState } from 'react';
 import {
   PROFILE_DESKTOP_PENDING_BADGE_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
@@ -55,12 +55,15 @@ export function OrderDetailsModal({
   onReOrder,
   t,
 }: OrderDetailsModalProps) {
-  const displayedOrderRef = useRef<OrderDetails | null>(null);
-  if (selectedOrder) {
-    displayedOrderRef.current = selectedOrder;
-  }
+  const [displayedOrder, setDisplayedOrder] = useState<OrderDetails | null>(null);
 
-  const order = displayedOrderRef.current;
+  useEffect(() => {
+    if (selectedOrder) {
+      setDisplayedOrder(selectedOrder);
+    }
+  }, [selectedOrder]);
+
+  const order = displayedOrder;
   if (!order) {
     return null;
   }
