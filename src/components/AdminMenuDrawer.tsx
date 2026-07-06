@@ -2,11 +2,20 @@
 
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAdminProductsSubnavExpanded } from '../app/supersudo/hooks/useAdminProductsSubnavExpanded';
+import { isAdminTabPathActive } from '../app/supersudo/admin-nav-utils';
+import { ADMIN_MENU_ICON_THEME } from '../constants/admin-desktop-page';
+import {
+  PROFILE_MOBILE_ASSETS,
+  PROFILE_MOBILE_CARD_CLASS,
+  PROFILE_MOBILE_CHEVRON_SIZE_PX,
+  PROFILE_MOBILE_ICON_THEMES,
+} from '../constants/profile-mobile-page';
 import { useTranslation } from '../lib/i18n-client';
 import { useBodyScrollLock } from '../lib/useBodyScrollLock';
-import { BrandLogoLink } from './BrandLogoLink';
+import { AdminBrandLogoLink } from './AdminBrandLogoLink';
 
 export interface AdminMenuItem {
   id: string;
@@ -23,26 +32,69 @@ interface AdminMenuDrawerProps {
   currentPath: string;
 }
 
-function isDrawerTabPathActive(tabPath: string, pathname: string): boolean {
-  return (
-    pathname === tabPath ||
-    (tabPath === '/supersudo' && pathname === '/supersudo') ||
-    (tabPath !== '/supersudo' && pathname.startsWith(tabPath))
-  );
-}
-
 function isDrawerNestedProductTabVisible(
   tab: AdminMenuItem,
   pathname: string,
-  productsNestedExpanded: boolean
+  productsNestedExpanded: boolean,
 ): boolean {
   if (tab.parentGroupId !== 'products') {
     return true;
   }
-  if (isDrawerTabPathActive(tab.path, pathname)) {
+  if (isAdminTabPathActive(tab.path, pathname)) {
     return true;
   }
   return productsNestedExpanded;
+}
+
+function AdminDrawerMenuRow({
+  label,
+  icon,
+  iconTheme = 'pink',
+  isActive,
+  isSubCategory = false,
+  onClick,
+}: {
+  label: string;
+  icon: ReactNode;
+  iconTheme?: keyof typeof PROFILE_MOBILE_ICON_THEMES;
+  isActive: boolean;
+  isSubCategory?: boolean;
+  onClick: () => void;
+}) {
+  const theme = PROFILE_MOBILE_ICON_THEMES[iconTheme];
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-gray-50/80 ${
+        isSubCategory ? 'pl-8 pr-4' : 'px-4'
+      } ${isActive ? 'bg-[#faf8f5]' : ''}`}
+    >
+      <span className="flex min-w-0 items-center gap-3">
+        <span
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:h-5 [&>svg]:w-5"
+          style={{
+            backgroundColor: theme.background,
+            color: theme.foreground,
+          }}
+        >
+          {icon}
+        </span>
+        <span className={`truncate text-base ${isActive ? 'font-semibold text-gray-900' : 'font-medium text-gray-800'}`}>
+          {label}
+        </span>
+      </span>
+      <Image
+        src={PROFILE_MOBILE_ASSETS.chevronRight}
+        alt=""
+        width={PROFILE_MOBILE_CHEVRON_SIZE_PX}
+        height={PROFILE_MOBILE_CHEVRON_SIZE_PX}
+        aria-hidden
+        className="shrink-0 opacity-80"
+      />
+    </button>
+  );
 }
 
 /**
@@ -57,9 +109,6 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
 
   useBodyScrollLock(open);
 
-  /**
-   * Handles navigation button clicks inside the drawer.
-   */
   const handleNavigate = (path: string) => {
     router.push(path);
     setOpen(false);
@@ -72,135 +121,100 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
         aria-expanded={open}
         aria-controls="admin-menu-drawer-panel"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm"
+        className="inline-flex items-center gap-2 rounded-full border border-gray-200/70 bg-white px-4 py-2 text-sm font-semibold text-brand-pink shadow-sm"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6H20M4 12H16M4 18H12" />
         </svg>
         Menu
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex bg-black/40"
-          onClick={() => setOpen(false)}
-        >
+      {open ? (
+        <div className="fixed inset-0 z-50 flex bg-black/35 backdrop-blur-[1px]" onClick={() => setOpen(false)}>
           <div
             id="admin-menu-drawer-panel"
-            className="h-full min-h-screen w-1/2 min-w-[16rem] max-w-full bg-white flex flex-col shadow-2xl"
+            className="flex h-full min-h-screen w-[min(100%,20rem)] flex-col bg-[#faf8f5] shadow-2xl"
             role="dialog"
             aria-modal="true"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-4">
-              <BrandLogoLink className="min-w-0" />
+            <div className="flex items-center justify-between gap-3 px-4 py-4">
+              <AdminBrandLogoLink className="shrink-0" />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
-                aria-label="Close admin menu"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200/70 bg-white text-gray-600"
+                aria-label={t('admin.common.close')}
               >
-                <svg className="mx-auto h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <div className="flex-1 divide-y divide-gray-100 overflow-y-auto">
-              {tabs.map((tab) => {
-                if (!isDrawerNestedProductTabVisible(tab, pathname, productsNestedExpanded)) {
-                  return null;
-                }
+            <div className={`mx-4 mb-4 overflow-hidden ${PROFILE_MOBILE_CARD_CLASS}`}>
+              <div className="divide-y divide-gray-100">
+                {tabs.map((tab) => {
+                  if (!isDrawerNestedProductTabVisible(tab, pathname, productsNestedExpanded)) {
+                    return null;
+                  }
 
-                const isActive = isDrawerTabPathActive(tab.path, pathname);
+                  const isActive = isAdminTabPathActive(tab.path, pathname);
+                  const iconTheme = ADMIN_MENU_ICON_THEME[tab.id] ?? 'pink';
 
-                if (tab.id === 'products') {
+                  if (tab.id === 'products') {
+                    return (
+                      <div key={tab.id}>
+                        <div className="flex w-full min-w-0 items-stretch">
+                          <AdminDrawerMenuRow
+                            label={tab.label}
+                            icon={tab.icon}
+                            iconTheme={iconTheme}
+                            isActive={isActive}
+                            onClick={() => handleNavigate(tab.path)}
+                          />
+                          <button
+                            type="button"
+                            aria-expanded={productsNestedExpanded}
+                            aria-label={t('admin.sidebar.toggleProductsNested')}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              toggleProductsNested();
+                            }}
+                            className="flex shrink-0 items-center border-l border-gray-100 px-3 text-gray-600"
+                          >
+                            <svg
+                              className={`h-5 w-5 transition-transform ${productsNestedExpanded ? '' : '-rotate-90'}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              aria-hidden
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
-                    <div
+                    <AdminDrawerMenuRow
                       key={tab.id}
-                      className={`flex w-full min-w-0 items-stretch ${isActive ? 'bg-gray-900 text-white' : ''}`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleNavigate(tab.path)}
-                        className={`flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium ${
-                          isActive ? 'text-white hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        <span className="flex min-w-0 items-center gap-3">
-                          <span className={isActive ? 'text-white' : 'text-gray-500'}>{tab.icon}</span>
-                          <span className="min-w-0 truncate">{tab.label}</span>
-                        </span>
-                        <svg
-                          className={`h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        aria-expanded={productsNestedExpanded}
-                        aria-label={t('admin.sidebar.toggleProductsNested')}
-                        title={t('admin.sidebar.toggleProductsNested')}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          toggleProductsNested();
-                        }}
-                        className={`shrink-0 border-l px-3 py-3 ${
-                          isActive
-                            ? 'border-white/25 text-white hover:bg-white/10'
-                            : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        <svg
-                          className={`h-5 w-5 transition-transform ${productsNestedExpanded ? '' : '-rotate-90'}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          aria-hidden
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                    </div>
+                      label={tab.label}
+                      icon={tab.icon}
+                      iconTheme={iconTheme}
+                      isActive={isActive}
+                      isSubCategory={tab.isSubCategory}
+                      onClick={() => handleNavigate(tab.path)}
+                    />
                   );
-                }
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => handleNavigate(tab.path)}
-                    className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium ${
-                      tab.isSubCategory ? 'pl-8' : ''
-                    } ${isActive ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50'}`}
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className={isActive ? 'text-white' : 'text-gray-500'}>{tab.icon}</span>
-                      {tab.label}
-                    </span>
-                    <svg
-                      className={`h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                );
-              })}
+                })}
+              </div>
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
-
-

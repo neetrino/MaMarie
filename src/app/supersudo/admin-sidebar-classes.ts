@@ -1,19 +1,40 @@
-/** Shared Tailwind classes: desktop admin sidebar flush to the viewport left edge. */
-export const ADMIN_SIDEBAR_MOBILE_DRAWER_WRAP =
-  'lg:hidden mb-6 shrink-0 px-4 pt-8 sm:px-6 lg:pt-0';
+/** Admin sidebar widths — expanded/collapsed (matches legacy `lg:w-64` / `lg:w-16`). */
+export const ADMIN_SIDEBAR_WIDTH_EXPANDED_PX = 256;
+export const ADMIN_SIDEBAR_WIDTH_COLLAPSED_PX = 64;
 
-/** Width is set in `AdminSidebar` (expanded vs collapsed). */
+/** Full viewport height for desktop admin sidebar. */
+export const ADMIN_SIDEBAR_HEIGHT = '100dvh';
+
+/** Header row — admin clay wordmark (666×375 source, transparent). */
+export const ADMIN_SIDEBAR_HEADER_LOGO_HEIGHT_PX = 56;
+export const ADMIN_SIDEBAR_HEADER_LOGO_WIDTH_PX = 100;
+
+/** Collapsed header — expand control only, centered in the rail. */
+export const ADMIN_SIDEBAR_HEADER_COLLAPSED =
+  'flex shrink-0 items-center justify-center border-b border-gray-100 px-2 py-2';
+
+export const ADMIN_SIDEBAR_HEADER =
+  'flex shrink-0 items-center border-b border-gray-100 px-3 py-0';
+
+/** Centers logo in the space between the left edge and the collapse button. */
+export const ADMIN_SIDEBAR_HEADER_LOGO_WRAP =
+  'flex min-w-0 flex-1 items-center justify-center';
+
+/** Shared Tailwind classes — left collapsible admin sidebar. */
+export const ADMIN_SIDEBAR_MOBILE_DRAWER_WRAP =
+  'lg:hidden shrink-0 px-4 pt-4 pb-3 sm:px-6';
+
+export const ADMIN_PAGE_SHELL =
+  'admin-page-shell flex min-h-screen flex-col bg-[#faf8f5] lg:flex-row lg:items-stretch';
+
 export const ADMIN_SIDEBAR_ASIDE =
-  'hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:shrink-0 lg:flex-col border-r border-gray-200 bg-white transition-[width] duration-200 ease-out';
+  'admin-desktop-sidebar hidden lg:sticky lg:top-0 lg:flex lg:min-h-0 lg:shrink-0 lg:flex-col lg:overflow-hidden border-r border-gray-200/80 bg-white transition-[width] duration-200 ease-out';
 
 export const ADMIN_SIDEBAR_NAV =
-  'flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain py-6 px-2 space-y-1';
+  'admin-sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain py-4';
 
-/** Desktop: sidebar sticky; page scrolls on `body` only (no nested main-column scroll). */
-export const ADMIN_PAGE_SHELL =
-  'flex min-h-screen flex-col bg-gray-50 lg:flex-row';
+export const ADMIN_SIDEBAR_FOOTER = 'shrink-0 border-t border-gray-100 py-3';
 
-export const ADMIN_MAIN_COLUMN =
-  'min-w-0 flex-1 pt-12 pb-8 px-4 sm:px-6 lg:px-8';
+export const ADMIN_MAIN_COLUMN = 'admin-main-column min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8';
 
-export const ADMIN_MAIN_INNER = 'max-w-7xl mx-auto w-full';
+export const ADMIN_MAIN_INNER = 'mx-auto w-full max-w-7xl';

@@ -51,8 +51,8 @@ export default function AdminPanel() {
     return (
       <div className="flex min-h-[50vh] items-center justify-center py-12">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900" />
-          <p className="text-gray-600">{t('admin.common.loading')}</p>
+          <div className="mx-auto mb-4 h-11 w-11 animate-spin rounded-full border-2 border-[#fdeef2] border-t-brand-pink" />
+          <p className="text-sm text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>
     );
@@ -64,11 +64,9 @@ export default function AdminPanel() {
 
   return (
     <>
-      <div className="mb-8">
-        <p className="text-gray-600">
-          {t('admin.dashboard.welcome').replace('{name}', user?.firstName || t('admin.dashboard.title'))}
-        </p>
-      </div>
+      <p className="mb-6 text-sm text-gray-600 lg:mb-8">
+        {t('admin.dashboard.welcome').replace('{name}', user?.firstName || t('admin.dashboard.title'))}
+      </p>
 
       <StatsGrid stats={stats} statsLoading={statsLoading} />
 
