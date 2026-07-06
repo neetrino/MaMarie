@@ -31,7 +31,7 @@ export const STOREFRONT_CACHE_KEYS = {
   productsList: (stableQuery: string) => `products:list:${stableQuery}`,
   productVisual: (lang: string, slug: string) => `product:visual:${lang}:${slug}`,
   productDetails: (lang: string, slug: string) => `product:details:${lang}:${slug}`,
-  productRelated: (lang: string, slug: string) => `product:related:${lang}:${slug}`,
+  productRelated: (lang: string, slug: string) => `product:related:v2:${lang}:${slug}`,
 } as const;
 
 /** Deterministic cache key fragment from URL search params (sorted keys). */

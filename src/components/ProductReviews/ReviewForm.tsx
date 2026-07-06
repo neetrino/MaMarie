@@ -1,7 +1,7 @@
 'use client';
 
 import type { FormEvent } from 'react';
-import { Button } from '@shop/ui';
+import { BrandPillButton } from '../BrandPillButton';
 import { useTranslation } from '../../lib/i18n-client';
 import { ReviewRating } from './ReviewRating';
 
@@ -65,17 +65,16 @@ export function ReviewForm({
           value={comment}
           onChange={(e) => onCommentChange(e.target.value)}
           rows={5}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full rounded-[15px] border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-pink"
           placeholder={t('common.reviews.commentPlaceholder')}
           required
         />
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-4">
-        <Button
+      <div className="flex flex-wrap gap-3">
+        <BrandPillButton
           type="submit"
-          variant="primary"
           disabled={submitting}
         >
           {submitting
@@ -83,14 +82,14 @@ export function ReviewForm({
             : editingReviewId
               ? 'Update Review'
               : t('common.reviews.submitReview')}
-        </Button>
-        <Button
+        </BrandPillButton>
+        <BrandPillButton
           type="button"
-          variant="outline"
+          variant="secondary"
           onClick={onCancel}
         >
           {t('common.buttons.cancel')}
-        </Button>
+        </BrandPillButton>
       </div>
     </form>
   );

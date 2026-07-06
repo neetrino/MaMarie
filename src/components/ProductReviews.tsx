@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@shop/ui';
+import { BrandPillButton } from './BrandPillButton';
 import { useAuth } from '../lib/auth/AuthContext';
 import { useTranslation } from '../lib/i18n-client';
 import { useReviews } from './ProductReviews/hooks/useReviews';
@@ -9,17 +9,19 @@ import { ReviewSummary } from './ProductReviews/ReviewSummary';
 import { ReviewForm } from './ProductReviews/ReviewForm';
 import { ReviewList } from './ProductReviews/ReviewList';
 import { ProductReviewsLoading } from './ProductReviews/ProductReviewsLoading';
+import type { Review } from './ProductReviews/utils';
 
 interface ProductReviewsProps {
-  productId?: string; // For backward compatibility
-  productSlug?: string; // Preferred: use slug for API calls
+  productId?: string;
+  productSlug?: string;
+  initialReviews?: Review[];
 }
 
-export function ProductReviews({ productId, productSlug }: ProductReviewsProps) {
+export function ProductReviews({ productId, productSlug, initialReviews }: ProductReviewsProps) {
   const { isLoggedIn, user } = useAuth();
   const { t } = useTranslation();
   
-  const { reviews, loading, setReviews } = useReviews(productId, productSlug);
+  const { reviews, loading, setReviews } = useReviews(productId, productSlug, initialReviews);
   
   const {
     showForm,
@@ -74,13 +76,13 @@ export function ProductReviews({ productId, productSlug }: ProductReviewsProps) 
 
         {/* Write Review Button */}
         {!showForm && (
-          <Button
-            variant="primary"
+          <BrandPillButton
+            type="button"
             onClick={handleShowForm}
             className="mb-8"
           >
             {t('common.reviews.writeReview')}
-          </Button>
+          </BrandPillButton>
         )}
 
         {/* Review Form */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HEADER_HOME_SCROLL_THRESHOLD_PX } from '../../constants/header';
 
 function resolveWindowScrollTop(): number {
@@ -20,6 +20,7 @@ function resolveWindowScrollTop(): number {
 export function useHeaderScrolled(): boolean {
   const pathname = usePathname() ?? '';
   const [isScrolled, setIsScrolled] = useState(false);
+  const scrollRafRef = useRef(0);
 
   useEffect(() => {
     const profileScrollArea = document.querySelector('.profile-scroll-area');
@@ -32,16 +33,30 @@ export function useHeaderScrolled(): boolean {
           scrolled || profileScrollArea.scrollTop > HEADER_HOME_SCROLL_THRESHOLD_PX;
       }
 
-      setIsScrolled(scrolled);
+      setIsScrolled((prev) => (prev === scrolled ? prev : scrolled));
+    };
+
+    const scheduleUpdate = () => {
+      if (scrollRafRef.current) {
+        return;
+      }
+
+      scrollRafRef.current = window.requestAnimationFrame(() => {
+        scrollRafRef.current = 0;
+        updateScrollState();
+      });
     };
 
     updateScrollState();
-    window.addEventListener('scroll', updateScrollState, { passive: true });
-    profileScrollArea?.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    profileScrollArea?.addEventListener('scroll', scheduleUpdate, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', updateScrollState);
-      profileScrollArea?.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('scroll', scheduleUpdate);
+      profileScrollArea?.removeEventListener('scroll', scheduleUpdate);
+      if (scrollRafRef.current) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+      }
     };
   }, [pathname]);
 

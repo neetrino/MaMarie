@@ -103,6 +103,8 @@ export const HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX =
 /** Desktop account menu — yellow pill dropdown (no outer white shell). */
 export const HEADER_PROFILE_MENU_DROPDOWN_ANIMATION_MS = HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS;
 export const HEADER_PROFILE_MENU_DROPDOWN_GAP_PX = HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX;
+/** Pointer leave → close delay so the cursor can cross the pill–dropdown gap. */
+export const HEADER_PROFILE_MENU_HOVER_CLOSE_DELAY_MS = 120;
 
 /** Main content top inset — keeps pages below the fixed navbar (not used on `/`). */
 export const HEADER_CONTENT_CLEARANCE_MOBILE_PX = HEADER_MOBILE_VISIBLE_BOTTOM_PX;

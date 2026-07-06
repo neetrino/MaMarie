@@ -205,7 +205,7 @@
     "supportTitle": "Support",
     "contactsTitle": "Contacts",
     "company": {
-      "shop": "Shop",
+      "shop": "Catalog",
       "about": "About us",
       "partners": "Partners",
       "categories": "Categories",
@@ -251,9 +251,9 @@
     "pageOf": "Page {page} of {totalPages}"
   },
   "notFound": {
-    "title": "Page Not Found",
-    "description": "The page you are looking for does not exist or has been moved.",
-    "goHome": "Go Home"
+    "title": "Page Not Found :(",
+    "goHome": "Homepage",
+    "continueShopping": "Continue Shopping"
   }
 }
 

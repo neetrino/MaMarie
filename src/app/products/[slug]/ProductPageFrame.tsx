@@ -20,7 +20,7 @@ interface ProductPageFrameProps {
 export function ProductPageFrame({ children, className = '' }: ProductPageFrameProps) {
   return (
     <div
-      className={`w-full max-w-full bg-white pb-12 pt-[var(--products-catalog-offset-mobile)] lg:pt-[var(--products-catalog-offset-desktop)] ${className}`.trim()}
+      className={`mobile-product-page w-full max-w-full max-lg:bg-[#f1f1f3] lg:bg-white pb-12 pt-[var(--products-catalog-offset-mobile)] lg:pt-[var(--products-catalog-offset-desktop)] ${className}`.trim()}
       style={productPageOffsetStyle}
     >
       <DesktopFluidFrame>

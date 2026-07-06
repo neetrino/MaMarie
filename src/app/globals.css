@@ -485,10 +485,53 @@
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-product-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
   .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
     background-color: #f1f1f3;
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .layout-shell-mobile-bottom-clearance:has(.mobile-auth-page) {
+    background-color: #f1f1f3;
+    /* LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_PX (92) */
+    padding-bottom: max(92px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .auth-page-scene {
+    min-height: 0;
+    margin-bottom: 0;
+    padding-top: var(--auth-section-padding-top-mobile, 8px);
+    padding-bottom: var(--auth-section-padding-bottom-mobile, 0);
+  }
+
+  .auth-page-card-offset {
+    margin-top: var(--auth-card-offset-top-mobile, 12px);
+  }
+
+  .auth-page-card {
+    padding-top: var(--auth-card-padding-y-mobile, 32px);
+    padding-bottom: var(--auth-card-padding-y-mobile, 32px);
+  }
+
+  /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — login/register clay pod; card keeps mobile offsets; no footer. */
+  @media (min-width: 744px) and (max-width: 1023px) {
+    main.home-main-surface:has(.mobile-auth-page) {
+      background-color: #ffffff;
+    }
+
+    .layout-shell-mobile-bottom-clearance:has(.mobile-auth-page) {
+      background-color: #ffffff;
+    }
+
+    .auth-page-scene {
+      min-height: max(
+        var(--auth-section-min-height-tablet, 864px),
+        calc(
+          100dvh - var(--header-clearance-mobile, 64px) - var(--auth-tablet-bottom-clearance, 92px)
+        )
+      );
+    }
   }
 
   /* Profile — less space under logout before bottom nav. */
@@ -500,6 +543,24 @@
   .mobile-contact-page {
     min-width: 0;
     overflow-x: clip;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-page-card-offset {
+    margin-top: var(--auth-card-offset-top, 50px);
+  }
+
+  main.auth-main-surface {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .auth-page-scene {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 }
 

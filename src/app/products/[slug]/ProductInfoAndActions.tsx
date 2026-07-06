@@ -10,6 +10,11 @@ import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import { ProductRatingSummary } from './ProductRatingSummary';
+import {
+  PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS,
+  PRODUCT_PDP_QUANTITY_STEPPER_CLASS,
+  PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS,
+} from './constants';
 import type { Product, ProductVariant } from './types';
 
 interface ProductInfoAndActionsProps {
@@ -51,6 +56,40 @@ interface ProductInfoAndActionsProps {
   onAttributeValueSelect: (attrKey: string, value: string) => void;
   getOptionValue: (options: any[] | undefined, key: string) => string | null;
   getRequiredAttributesMessage: () => string;
+}
+
+interface ProductQuantityStepperProps {
+  quantity: number;
+  maxQuantity: number;
+  onQuantityAdjust: (delta: number) => void;
+}
+
+function ProductQuantityStepper({
+  quantity,
+  maxQuantity,
+  onQuantityAdjust,
+}: ProductQuantityStepperProps) {
+  return (
+    <div className={PRODUCT_PDP_QUANTITY_STEPPER_CLASS}>
+      <button
+        type="button"
+        onClick={() => onQuantityAdjust(-1)}
+        disabled={quantity <= 1}
+        className={PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS}
+      >
+        -
+      </button>
+      <div className={PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS}>{quantity}</div>
+      <button
+        type="button"
+        onClick={() => onQuantityAdjust(1)}
+        disabled={quantity >= maxQuantity}
+        className={PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS}
+      >
+        +
+      </button>
+    </div>
+  );
 }
 
 export function ProductInfoAndActions({
@@ -131,18 +170,27 @@ export function ProductInfoAndActions({
           />
         </div>
         <div className="mb-6">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
-            {showRegularPrice && (
-              <p className="text-xl text-gray-500 line-through decoration-gray-400">
-                {formatPrice(regularPriceValue, currency as CurrencyCode)}
-              </p>
-            )}
-            {discountPercent && discountPercent > 0 && (
-              <span className="text-lg font-semibold text-blue-600">
-                -{discountPercent}%
-              </span>
-            )}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+              <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
+              {showRegularPrice && (
+                <p className="text-xl text-gray-500 line-through decoration-gray-400">
+                  {formatPrice(regularPriceValue, currency as CurrencyCode)}
+                </p>
+              )}
+              {discountPercent && discountPercent > 0 && (
+                <span className="text-lg font-semibold text-blue-600">
+                  -{discountPercent}%
+                </span>
+              )}
+            </div>
+            <div className="shrink-0 lg:hidden">
+              <ProductQuantityStepper
+                quantity={quantity}
+                maxQuantity={maxQuantity}
+                onQuantityAdjust={onQuantityAdjust}
+              />
+            </div>
           </div>
         </div>
         <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />
@@ -203,22 +251,12 @@ export function ProductInfoAndActions({
           </div>
         )}
         <div className="flex items-center gap-3">
-          <div className="flex items-center border rounded-full overflow-hidden bg-gray-50">
-            <button 
-              onClick={() => onQuantityAdjust(-1)} 
-              disabled={quantity <= 1}
-              className="w-12 h-12 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              -
-            </button>
-            <div className="w-12 text-center font-bold">{quantity}</div>
-            <button 
-              onClick={() => onQuantityAdjust(1)} 
-              disabled={quantity >= maxQuantity}
-              className="w-12 h-12 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              +
-            </button>
+          <div className="hidden shrink-0 lg:block">
+            <ProductQuantityStepper
+              quantity={quantity}
+              maxQuantity={maxQuantity}
+              onQuantityAdjust={onQuantityAdjust}
+            />
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 

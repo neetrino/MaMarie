@@ -11,7 +11,9 @@
     "submit": "Sign In",
     "submitting": "Signing in...",
     "noAccount": "Don't have an account?",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "errors": {
     "emailRequired": "Please enter your email",

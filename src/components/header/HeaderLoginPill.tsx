@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type FocusEvent } from 'react';
 import { BRAND_ASSETS } from '../../constants/brand';
 import {
   HEADER_LOGIN_ICON_SIZE_PX,
@@ -11,6 +11,7 @@ import {
   HEADER_LOGIN_PILL_WIDTH_PX,
   HEADER_PROFILE_MENU_DROPDOWN_ANIMATION_MS,
   HEADER_PROFILE_MENU_DROPDOWN_GAP_PX,
+  HEADER_PROFILE_MENU_HOVER_CLOSE_DELAY_MS,
 } from '../../constants/header';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
@@ -59,13 +60,11 @@ function AccountPillButton({
   menuId,
   menuOpen,
   disabled = false,
-  onClick,
 }: {
   label: string;
   menuId?: string;
   menuOpen?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
 }) {
   return (
     <button
@@ -80,7 +79,6 @@ function AccountPillButton({
       aria-expanded={menuOpen}
       aria-haspopup="menu"
       disabled={disabled}
-      onClick={onClick}
     >
       <AccountPillIcon />
     </button>
@@ -186,13 +184,34 @@ export function HeaderLoginPill() {
     });
   }, [clearCloseTimer]);
 
-  const toggleMenu = useCallback(() => {
-    if (menuOpen) {
+  const scheduleCloseMenu = useCallback(() => {
+    clearCloseTimer();
+    closeTimerRef.current = setTimeout(() => {
       closeMenu();
-      return;
-    }
+    }, HEADER_PROFILE_MENU_HOVER_CLOSE_DELAY_MS);
+  }, [clearCloseTimer, closeMenu]);
+
+  const handleContainerMouseEnter = useCallback(() => {
     openMenu();
-  }, [closeMenu, menuOpen, openMenu]);
+  }, [openMenu]);
+
+  const handleContainerMouseLeave = useCallback(() => {
+    scheduleCloseMenu();
+  }, [scheduleCloseMenu]);
+
+  const handleContainerFocus = useCallback(() => {
+    openMenu();
+  }, [openMenu]);
+
+  const handleContainerBlur = useCallback(
+    (event: FocusEvent<HTMLDivElement>) => {
+      if (containerRef.current?.contains(event.relatedTarget as Node)) {
+        return;
+      }
+      scheduleCloseMenu();
+    },
+    [scheduleCloseMenu],
+  );
 
   useEffect(() => {
     if (!menuOpen) {
@@ -205,18 +224,10 @@ export function HeaderLoginPill() {
       }
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        closeMenu();
-      }
-    };
-
     window.addEventListener('keydown', handleEscape);
-    document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
       window.removeEventListener('keydown', handleEscape);
-      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [closeMenu, menuOpen]);
 
@@ -240,23 +251,36 @@ export function HeaderLoginPill() {
   }
 
   return (
-    <div ref={containerRef} className="relative shrink-0">
+    <div
+      ref={containerRef}
+      className="relative shrink-0"
+      onMouseEnter={handleContainerMouseEnter}
+      onMouseLeave={handleContainerMouseLeave}
+      onFocusCapture={handleContainerFocus}
+      onBlurCapture={handleContainerBlur}
+    >
       <AccountPillButton
         label={label}
         menuId={menuId}
         menuOpen={menuOpen}
-        onClick={toggleMenu}
       />
 
       {isMenuVisible ? (
-        <HeaderProfileMenu
-          id={menuId}
-          isAdmin={isAdmin}
-          isExpanded={isMenuExpanded}
-          t={t}
-          onClose={closeMenu}
-          onLogout={handleLogout}
-        />
+        <>
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-full"
+            style={{ height: HEADER_PROFILE_MENU_DROPDOWN_GAP_PX }}
+          />
+          <HeaderProfileMenu
+            id={menuId}
+            isAdmin={isAdmin}
+            isExpanded={isMenuExpanded}
+            t={t}
+            onClose={closeMenu}
+            onLogout={handleLogout}
+          />
+        </>
       ) : null}
     </div>
   );

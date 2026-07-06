@@ -34,7 +34,6 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
       <button
         type="button"
         onClick={() => {
-          console.info('[ProfileMenuDrawer] Opening drawer');
           setOpen(true);
         }}
         className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold uppercase tracking-wide text-gray-800 shadow-sm"
@@ -49,7 +48,6 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
         <div
           className="fixed inset-0 z-50 flex bg-black/40 backdrop-blur-sm"
           onClick={() => {
-            console.info('[ProfileMenuDrawer] Closing drawer from backdrop');
             setOpen(false);
           }}
         >
@@ -64,7 +62,6 @@ export function ProfileMenuDrawer({ tabs, activeTab, onSelect }: ProfileMenuDraw
               <button
                 type="button"
                 onClick={() => {
-                  console.info('[ProfileMenuDrawer] Closing drawer from button');
                   setOpen(false);
                 }}
                 className="h-10 w-10 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"

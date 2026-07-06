@@ -15,7 +15,6 @@ import {
   homeSectionColumnWidthPx,
 } from './home-sections';
 import { resolveHomeProductCardHeightPx } from '../lib/home-product-card-layout';
-
 /** Figma shop page — catalog layout tokens. Horizontal insets use `HomeContentHorizontalFrame` (same as navbar pill). */
 
 /** Extra breathing room below fixed navbar — shop page only. */
@@ -42,6 +41,15 @@ export const PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX = 24;
 
 /** PDP related row — slightly tighter than shop grid. */
 export const RELATED_PRODUCTS_CARD_GAP_PX = 8;
+
+/** PDP related products — mobile title fits «Նմանատիպ ապրանքներ» on two lines. */
+export const RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX = 26;
+export const RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX = 30;
+export const RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES = 2;
+export const RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX = 68;
+
+/** Mobile related grid — title → shop-style card grid. */
+export const RELATED_PRODUCTS_MOBILE_GRID_OFFSET_TOP_PX = 20;
 export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;
 export const PRODUCTS_CATALOG_GRID4_COLUMNS = 4;
 

@@ -1,5 +1,13 @@
 import { db } from "@white-shop/db";
 import { processImageUrl } from "../../utils/image-utils";
+import {
+  collectProductColors,
+  collectProductSizes,
+  type ProductColorOption,
+  type ProductSizeOption,
+} from "../product-variant-attributes";
+import type { ProductWithRelations } from "../products-find-query/types";
+import { reviewsService } from "../reviews.service";
 
 /** Prisma `select` shape for related carousel (minimal joins). */
 export interface RelatedProductRow {
@@ -18,6 +26,30 @@ export interface RelatedProductRow {
     price: number;
     compareAtPrice: number | null;
     stock: number;
+    sku: string | null;
+    attributes: unknown;
+    options: Array<{
+      value: string | null;
+      attributeKey: string | null;
+      attributeValue: {
+        value: string;
+        imageUrl: string | null;
+        colors: string[] | null;
+        attribute: { key: string } | null;
+        translations: Array<{ locale: string; label: string | null }>;
+      } | null;
+    }>;
+  }>;
+  productAttributes?: Array<{
+    attribute: {
+      key: string;
+      values: Array<{
+        value: string;
+        imageUrl: string | null;
+        colors: string[] | null;
+        translations: Array<{ locale: string; label: string | null }>;
+      }>;
+    } | null;
   }>;
   categories: Array<{
     id: string;
@@ -37,6 +69,11 @@ export interface RelatedCardPayload {
   inStock: boolean;
   brand: { id: string; name: string } | null;
   categories: Array<{ id: string; slug: string; title: string }>;
+  defaultVariantId: string | null;
+  colors: ProductColorOption[];
+  sizes: ProductSizeOption[];
+  averageRating: number;
+  reviewsCount: number;
 }
 
 async function loadDiscountMaps(): Promise<{
@@ -98,7 +135,11 @@ export async function transformRelatedProductRows(
 ): Promise<RelatedCardPayload[]> {
   if (rows.length === 0) return [];
 
-  const { globalDiscount, categoryDiscounts, brandDiscounts } = await loadDiscountMaps();
+  const [{ globalDiscount, categoryDiscounts, brandDiscounts }, reviewStatsByProductId] =
+    await Promise.all([
+      loadDiscountMaps(),
+      reviewsService.getProductReviewStatsBatch(rows.map((row) => row.id)),
+    ]);
 
   return rows.map((product) => {
     const tr = pickTranslation(product.translations, lang);
@@ -136,6 +177,12 @@ export async function transformRelatedProductRows(
       image = processImageUrl(product.media[0] as string | { url?: string; src?: string; value?: string }) || null;
     }
 
+    const productForAttributes = product as unknown as ProductWithRelations;
+    const reviewStats = reviewStatsByProductId.get(product.id) ?? {
+      averageRating: 0,
+      reviewsCount: 0,
+    };
+
     return {
       id: product.id,
       slug: tr?.slug ?? "",
@@ -150,6 +197,11 @@ export async function transformRelatedProductRows(
         ? { id: product.brand.id, name: brandTr?.name ?? "" }
         : null,
       categories,
+      defaultVariantId: variant?.id ?? null,
+      colors: collectProductColors(productForAttributes, lang),
+      sizes: collectProductSizes(productForAttributes, lang),
+      averageRating: reviewStats.averageRating,
+      reviewsCount: reviewStats.reviewsCount,
     };
   });
 }

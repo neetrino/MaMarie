@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
-import { getStoredLanguage } from '../../../../lib/language';
+import { DEFAULT_LANGUAGE, getStoredLanguage, type LanguageCode } from '../../../../lib/language';
 import { logger } from '@/lib/utils/logger';
 import { RESERVED_ROUTES } from '../types';
 import type { Product } from '../types';
@@ -9,6 +9,8 @@ import type { Product } from '../types';
 interface UseProductFetchProps {
   slug: string;
   variantIdFromUrl: string | null;
+  initialProduct?: Product | null;
+  serverLang?: LanguageCode;
 }
 
 function isNotFoundError(error: unknown): boolean {
@@ -16,7 +18,7 @@ function isNotFoundError(error: unknown): boolean {
     error &&
       typeof error === 'object' &&
       'status' in error &&
-      Number((error as { status: number }).status) === 404
+      Number((error as { status: number }).status) === 404,
   );
 }
 
@@ -26,12 +28,27 @@ async function fetchProductForLang(slug: string, lang: string): Promise<Product>
   });
 }
 
-export function useProductFetch({ slug, variantIdFromUrl }: UseProductFetchProps) {
+export function useProductFetch({
+  slug,
+  variantIdFromUrl,
+  initialProduct = null,
+  serverLang = DEFAULT_LANGUAGE,
+}: UseProductFetchProps) {
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<Product | null>(initialProduct);
+  const [loading, setLoading] = useState(!initialProduct);
   const [notFound, setNotFound] = useState(false);
   const generationRef = useRef(0);
+  const skippedInitialFetchRef = useRef(Boolean(initialProduct));
+
+  useEffect(() => {
+    if (initialProduct) {
+      setProduct(initialProduct);
+      setNotFound(false);
+      setLoading(false);
+      skippedInitialFetchRef.current = true;
+    }
+  }, [initialProduct]);
 
   const runLoad = useCallback(async () => {
     if (!slug || RESERVED_ROUTES.includes(slug.toLowerCase())) {
@@ -58,7 +75,9 @@ export function useProductFetch({ slug, variantIdFromUrl }: UseProductFetchProps
 
     try {
       const data = await load(currentLang);
-      if (gen !== generationRef.current) return;
+      if (gen !== generationRef.current) {
+        return;
+      }
       setProduct(data);
     } catch (error: unknown) {
       logger.warn('Product fetch failed', {
@@ -69,10 +88,14 @@ export function useProductFetch({ slug, variantIdFromUrl }: UseProductFetchProps
         const fallback = await apiClient.get<Product>(`/api/v1/products/${slug}`, {
           params: { lang: currentLang },
         });
-        if (gen !== generationRef.current) return;
+        if (gen !== generationRef.current) {
+          return;
+        }
         setProduct(fallback);
       } catch (inner: unknown) {
-        if (gen !== generationRef.current) return;
+        if (gen !== generationRef.current) {
+          return;
+        }
         setProduct(null);
         setNotFound(isNotFoundError(inner));
       }
@@ -84,17 +107,34 @@ export function useProductFetch({ slug, variantIdFromUrl }: UseProductFetchProps
   }, [slug]);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!slug) {
+      return;
+    }
     if (RESERVED_ROUTES.includes(slug.toLowerCase())) {
       router.replace(`/${slug}`);
     }
   }, [slug, router]);
 
   useEffect(() => {
-    if (!slug || RESERVED_ROUTES.includes(slug.toLowerCase())) return;
-    void runLoad();
+    if (!slug || RESERVED_ROUTES.includes(slug.toLowerCase())) {
+      return;
+    }
+
+    const currentLang = getStoredLanguage();
+    const canUseInitialProduct =
+      skippedInitialFetchRef.current &&
+      initialProduct &&
+      currentLang === serverLang;
+
+    if (canUseInitialProduct) {
+      setLoading(false);
+    } else {
+      skippedInitialFetchRef.current = false;
+      void runLoad();
+    }
 
     const handleLanguageUpdate = () => {
+      skippedInitialFetchRef.current = false;
       void runLoad();
     };
 
@@ -102,7 +142,7 @@ export function useProductFetch({ slug, variantIdFromUrl }: UseProductFetchProps
     return () => {
       window.removeEventListener('language-updated', handleLanguageUpdate);
     };
-  }, [slug, variantIdFromUrl, router, runLoad]);
+  }, [slug, variantIdFromUrl, router, runLoad, initialProduct, serverLang]);
 
   return {
     product,

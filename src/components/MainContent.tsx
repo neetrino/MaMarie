@@ -110,9 +110,20 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
+  if (pathname === '/login' || pathname === '/register') {
+    return (
+      <main
+        className="auth-main-surface home-main-surface flex-1 max-lg:flex-none w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-visible pt-[var(--header-clearance-mobile)] lg:flex lg:flex-col lg:bg-white lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
   return (
     <main
-      className={`${mainBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
+      className={`${mainBase} flex min-h-0 flex-col pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
       style={headerClearanceVars}
     >
       {children}

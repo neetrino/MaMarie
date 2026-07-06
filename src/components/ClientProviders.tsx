@@ -4,8 +4,7 @@ import type { ReactNode } from 'react';
 import { AuthProvider } from '../lib/auth/AuthContext';
 import { LanguageHtmlUpdater } from './LanguageHtmlUpdater';
 import { LanguageScrollRestorer } from './LanguageScrollRestorer';
-import { CartDrawer } from './cart/CartDrawer';
-import { SearchModal } from './search/SearchModal';
+import { LazyCartDrawer, LazySearchModal } from './LazyClientOverlays';
 import { ToastContainer } from './Toast';
 
 /**
@@ -18,8 +17,8 @@ export function ClientProviders({ children }: { children: ReactNode }) {
       <LanguageHtmlUpdater />
       <LanguageScrollRestorer />
       {children}
-      <CartDrawer />
-      <SearchModal />
+      <LazyCartDrawer />
+      <LazySearchModal />
       <ToastContainer />
     </AuthProvider>
   );

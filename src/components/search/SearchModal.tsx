@@ -156,9 +156,13 @@ function SearchModalPanel({ onClose }: SearchModalPanelProps) {
   );
 }
 
+interface SearchModalProps {
+  initialOpen?: boolean;
+}
+
 /** Global search modal — opens when `openSearchModal()` is called. */
-export function SearchModal() {
-  const [open, setOpen] = useState(false);
+export function SearchModal({ initialOpen = false }: SearchModalProps) {
+  const [open, setOpen] = useState(initialOpen);
   const [mounted, setMounted] = useState(false);
 
   const handleClose = useCallback(() => {

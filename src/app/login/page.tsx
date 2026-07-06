@@ -1,17 +1,8 @@
 'use client';
 
 import { useState, FormEvent, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Input, Card } from '@shop/ui';
-import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
-import {
-  PROFILE_DESKTOP_ALERT_ERROR_CLASS,
-  PROFILE_DESKTOP_INPUT_CLASS,
-} from '../../constants/profile-desktop-page';
-import { AUTH_FORM_CARD_CLASS } from '../../constants/auth-form';
-import { ProfileClayButton } from '../profile/components/ProfileClayButton';
-import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../lib/i18n-client';
 import { resolveLoginApiError } from '../../lib/auth/client-api-error-messages';
 import {
@@ -19,11 +10,15 @@ import {
   clearAuthFieldError,
   validateLoginFields,
 } from '../../lib/auth/auth-form-field-errors';
-import { Eye, EyeOff } from 'lucide-react';
-import { logger } from "@/lib/utils/logger";
+import { logger } from '@/lib/utils/logger';
+import { useClientMounted } from '../../lib/use-client-mounted';
+import { AuthFormSkeleton } from '../../components/auth/AuthFormSkeleton';
+import { LoginPageScene } from '../../components/auth/LoginPageScene';
+import { LoginForm } from '../../components/auth/LoginForm';
 
 function LoginPageContent() {
   const { t } = useTranslation();
+  const isFormMounted = useClientMounted();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -52,7 +47,6 @@ function LoginPageContent() {
 
     try {
       logger.debug('🔐 [LOGIN PAGE] Form submitted');
-      logger.debug('📤 [LOGIN PAGE] Calling login function...');
       const loggedInUser = await login(email.trim(), password);
       const isUserAdmin =
         Array.isArray(loggedInUser.roles) && loggedInUser.roles.includes('admin');
@@ -60,145 +54,82 @@ function LoginPageContent() {
       logger.debug('✅ [LOGIN PAGE] Login successful, redirecting to:', destination);
       router.push(destination);
     } catch (err: unknown) {
-      console.error('❌ [LOGIN PAGE] Login error:', err);
+      logger.error('❌ [LOGIN PAGE] Login error', {
+        message: err instanceof Error ? err.message : String(err),
+      });
       setError(resolveLoginApiError(err instanceof Error ? err.message : String(err), t));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Redirect if already logged in (admins go to admin panel)
   useEffect(() => {
     if (isLoggedIn && !isLoading) {
       router.push(isAdmin ? '/supersudo' : redirectTo);
     }
   }, [isLoggedIn, isLoading, isAdmin, redirectTo, router]);
 
+  const formLabels = {
+    email: t('login.form.email'),
+    emailPlaceholder: t('login.form.emailPlaceholder'),
+    password: t('login.form.password'),
+    passwordPlaceholder: t('login.form.passwordPlaceholder'),
+    rememberMe: t('login.form.rememberMe'),
+    forgotPassword: t('login.form.forgotPassword'),
+    submit: t('login.form.submit'),
+    submitting: t('login.form.submitting'),
+    noAccount: t('login.form.noAccount'),
+    signUp: t('login.form.signUp'),
+    showPassword: t('login.form.showPassword'),
+    hidePassword: t('login.form.hidePassword'),
+  };
+
   return (
-    <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Card className={`p-8 ${AUTH_FORM_CARD_CLASS}`}>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('login.title')}</h1>
-        <p className="text-gray-600 mb-8">{t('login.subtitle')}</p>
+    <LoginPageScene title={t('login.title')} subtitle={t('login.subtitle')}>
+      {isFormMounted ? (
+        <LoginForm
+          email={email}
+          password={password}
+          showPassword={showPassword}
+          rememberMe={rememberMe}
+          error={error}
+          fieldErrors={fieldErrors}
+          isSubmitting={isSubmitting}
+          isLoading={isLoading}
+          labels={formLabels}
+          onSubmit={handleSubmit}
+          onEmailChange={(event) => {
+            setEmail(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
+          }}
+          onPasswordChange={(event) => {
+            setPassword(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
+          }}
+          onRememberMeChange={setRememberMe}
+          onTogglePassword={() => setShowPassword((current) => !current)}
+        />
+      ) : (
+        <AuthFormSkeleton />
+      )}
+    </LoginPageScene>
+  );
+}
 
-        {error && (
-          <div className={`mb-4 ${PROFILE_DESKTOP_ALERT_ERROR_CLASS}`}>
-            <p>{error}</p>
-          </div>
-        )}
+function LoginPageFallback() {
+  const { t } = useTranslation();
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('login.form.email')}
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t('login.form.emailPlaceholder')}
-              className={`w-full ${PROFILE_DESKTOP_INPUT_CLASS}`}
-              value={email}
-              error={fieldErrors.email}
-              showErrorMessage={false}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
-              }}
-              disabled={isSubmitting || isLoading}
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('login.form.password')}
-            </label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder={t('login.form.passwordPlaceholder')}
-                className={`w-full pr-10 ${PROFILE_DESKTOP_INPUT_CLASS}`}
-                value={password}
-                error={fieldErrors.password}
-                showErrorMessage={false}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
-                }}
-                disabled={isSubmitting || isLoading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                disabled={isSubmitting || isLoading}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                disabled={isSubmitting || isLoading}
-              />
-              <span className="ml-2 text-sm text-gray-600">{t('login.form.rememberMe')}</span>
-            </label>
-            <Link
-              href="/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              {t('login.form.forgotPassword')}
-            </Link>
-          </div>
-          <ProfileClayButton
-            variant="primary"
-            className="w-full"
-            type="submit"
-            disabled={isSubmitting || isLoading}
-          >
-            {isSubmitting || isLoading ? t('login.form.submitting') : t('login.form.submit')}
-          </ProfileClayButton>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            {t('login.form.noAccount')}{' '}
-            <Link href="/register" className="text-blue-600 hover:underline font-medium">
-              {t('login.form.signUp')}
-            </Link>
-          </p>
-        </div>
-      </Card>
-    </div>
+  return (
+    <LoginPageScene title={t('login.title')} subtitle={t('login.subtitle')}>
+      <AuthFormSkeleton />
+    </LoginPageScene>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card className={`p-8 ${AUTH_FORM_CARD_CLASS}`}>
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </Card>
-      </div>
-    }>
+    <Suspense fallback={<LoginPageFallback />}>
       <LoginPageContent />
     </Suspense>
   );
 }
-

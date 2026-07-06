@@ -203,7 +203,7 @@
     "supportTitle": "Աջակցություն",
     "contactsTitle": "Կոնտակտներ",
     "company": {
-      "shop": "Խանութ",
+      "shop": "Տեսականի",
       "about": "Մեր մասին",
       "partners": "Գործընկերներ",
       "categories": "Կատեգորիաներ",
@@ -249,9 +249,8 @@
     "pageOf": "Էջ {page} {totalPages}-ից"
   },
   "notFound": {
-    "title": "Էջը չի գտնվել",
-    "description": "Ձեր փնտրած էջը գոյություն չունի կամ տեղափոխվել է:",
-    "goHome": "Գնալ գլխավոր էջ"
+    "title": "Էջը չի գտնվել :(",
+    "goHome": "Գլխավոր էջ",
+    "continueShopping": "Շարունակել գնումները"
   }
 }
-
