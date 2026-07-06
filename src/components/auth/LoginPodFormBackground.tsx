@@ -11,7 +11,7 @@ export function LoginPodFormBackground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 bottom-0 hidden overflow-x-clip overflow-y-visible lg:block"
+      className="pointer-events-none absolute inset-x-0 bottom-0 overflow-x-clip overflow-y-visible max-[743px]:hidden"
       style={{ height: LOGIN_POD_FORM_BG_HEIGHT_PX }}
     >
       <div

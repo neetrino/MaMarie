@@ -1,9 +1,16 @@
 import { BRAND_COLORS } from './brand';
 import { HERO_GENDER_BUTTON_INSET_SHADOW } from './hero';
 import { PROFILE_DESKTOP_ASSETS } from './profile-desktop-page';
+import { MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX } from './mobile-bottom-nav';
+import {
+  MOBILE_HOME_TABLET_MIN_VIEWPORT_PX,
+  MOBILE_HOME_TABLET_PRO_MIN_VIEWPORT_PX,
+} from './mobile-home';
 
 /** Figma `222:491` — login page artboard. */
 export const LOGIN_PAGE_BG_HEIGHT_PX = 854;
+export const LOGIN_PAGE_TABLET_MIN_VIEWPORT_PX = MOBILE_HOME_TABLET_MIN_VIEWPORT_PX;
+export const LOGIN_PAGE_TABLET_PRO_MIN_VIEWPORT_PX = MOBILE_HOME_TABLET_PRO_MIN_VIEWPORT_PX;
 /** Exported PNG height — prevents top crop of clay letters. */
 export const LOGIN_POD_FORM_BG_HEIGHT_PX = 864;
 export const LOGIN_PAGE_BG_COLOR = '#ffffff';
@@ -27,6 +34,10 @@ export const REGISTER_CARD_OFFSET_TOP_MOBILE_PX = 12;
 export const LOGIN_POD_FORM_BG = '/assets/auth/login-pod-form-bg.png';
 export const LOGIN_POD_FORM_LEFT_PERCENT = -3.6;
 export const LOGIN_POD_FORM_WIDTH_PERCENT = 105.41;
+/** iPad Air / Mini — shell bottom padding above fixed bottom nav (`114 − 22`). */
+export const LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_OFFSET_PX = 22;
+export const LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_PX =
+  MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX - LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_OFFSET_PX;
 
 /** Figma `222:539` — gray login card (no white outer frame). */
 export const LOGIN_CARD_MAX_WIDTH_PX = 420;

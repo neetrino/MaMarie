@@ -113,7 +113,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname === '/login' || pathname === '/register') {
     return (
       <main
-        className="home-main-surface flex-1 max-lg:flex-none w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-visible pt-[var(--header-clearance-mobile)] lg:bg-white lg:pt-[var(--header-clearance-desktop)]"
+        className="auth-main-surface home-main-surface flex-1 max-lg:flex-none w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-visible pt-[var(--header-clearance-mobile)] lg:flex lg:flex-col lg:bg-white lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
         {children}
