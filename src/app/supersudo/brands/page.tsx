@@ -9,6 +9,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { ClaySelect } from '../../../components/ClaySelect';
 interface Brand {
   id: string;
   name: string;
@@ -376,25 +377,22 @@ function BrandsSection() {
                   required
                 />
               </div>
-              <div>
-                <label htmlFor="brand-status" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.brands.status')}
-                </label>
-                <select
-                  id="brand-status"
-                  value={formData.published}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      published: e.target.value as BrandFormData['published'],
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                >
-                  <option value="published">{t('admin.brands.published')}</option>
-                  <option value="draft">{t('admin.brands.draft')}</option>
-                </select>
-              </div>
+              <ClaySelect
+                id="brand-status"
+                label={t('admin.brands.status')}
+                value={formData.published}
+                onChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    published: value as BrandFormData['published'],
+                  })
+                }
+                placeholder={t('admin.brands.published')}
+                options={[
+                  { value: 'published', label: t('admin.brands.published') },
+                  { value: 'draft', label: t('admin.brands.draft') },
+                ]}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('admin.brands.logo')}

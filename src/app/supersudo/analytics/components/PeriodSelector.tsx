@@ -2,6 +2,7 @@
 
 import { Card } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { ClaySelect } from '../../../../components/ClaySelect';
 import { formatDate } from '../utils';
 import type { AnalyticsData } from '../types';
 
@@ -38,26 +39,25 @@ export function PeriodSelector({
       </div>
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('admin.analytics.period')}
-          </label>
-          <select
+          <ClaySelect
+            label={t('admin.analytics.period')}
             value={period}
-            onChange={(e) => {
-              onPeriodChange(e.target.value);
-              if (e.target.value !== 'custom') {
+            onChange={(value) => {
+              onPeriodChange(value);
+              if (value !== 'custom') {
                 onStartDateChange('');
                 onEndDateChange('');
               }
             }}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
-          >
-            <option value="day">{t('admin.analytics.today')}</option>
-            <option value="week">{t('admin.analytics.last7Days')}</option>
-            <option value="month">{t('admin.analytics.last30Days')}</option>
-            <option value="year">{t('admin.analytics.lastYear')}</option>
-            <option value="custom">{t('admin.analytics.customRange')}</option>
-          </select>
+            placeholder={t('admin.analytics.today')}
+            options={[
+              { value: 'day', label: t('admin.analytics.today') },
+              { value: 'week', label: t('admin.analytics.last7Days') },
+              { value: 'month', label: t('admin.analytics.last30Days') },
+              { value: 'year', label: t('admin.analytics.lastYear') },
+              { value: 'custom', label: t('admin.analytics.customRange') },
+            ]}
+          />
         </div>
         {period === 'custom' && (
           <>

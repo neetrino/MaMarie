@@ -2,6 +2,13 @@
 
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import { ClaySelectChevron } from '../../../../../components/ClaySelect';
+import {
+  CLAY_SELECT_DROPDOWN_ANIMATION_MS,
+  CLAY_SELECT_DROPDOWN_GAP_PX,
+  CLAY_SELECT_MULTI_PANEL_CLASS,
+  getClaySelectTriggerClass,
+} from '../../../../../constants/clay-select';
 import type { Category, Brand } from '../types';
 
 interface CategoriesBrandsProps {
@@ -171,28 +178,26 @@ export function CategoriesBrands({
                 <button
                   type="button"
                   onClick={() => onCategoriesExpandedChange(!categoriesExpanded)}
-                  className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
+                  className={getClaySelectTriggerClass(categoriesExpanded)}
+                  style={{ minHeight: 42 }}
                 >
-                  <span className="text-gray-700">
+                  <span className={`truncate text-sm ${categoryIds.length === 0 ? 'text-gray-400' : 'text-gray-900'}`}>
                     {categoryIds.length === 0
                       ? t('admin.products.add.selectCategories')
                       : categoryIds.length === 1
                         ? t('admin.products.add.categorySelected').replace('{count}', categoryIds.length.toString())
                         : t('admin.products.add.categoriesSelected').replace('{count}', categoryIds.length.toString())}
                   </span>
-                  <svg
-                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                      categoriesExpanded ? 'transform rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ClaySelectChevron isOpen={categoriesExpanded} />
                 </button>
                 {categoriesExpanded && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  <div
+                    className={`${CLAY_SELECT_MULTI_PANEL_CLASS} pointer-events-auto translate-y-0 opacity-100`}
+                    style={{
+                      top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
+                      transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
+                    }}
+                  >
                     <div className="p-2">
                       <div className="space-y-1">
                         {displayCategories.map((category) => (
@@ -278,28 +283,26 @@ export function CategoriesBrands({
                 <button
                   type="button"
                   onClick={() => onBrandsExpandedChange(!brandsExpanded)}
-                  className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
+                  className={getClaySelectTriggerClass(brandsExpanded)}
+                  style={{ minHeight: 42 }}
                 >
-                  <span className="text-gray-700">
+                  <span className={`truncate text-sm ${brandIds.length === 0 ? 'text-gray-400' : 'text-gray-900'}`}>
                     {brandIds.length === 0
                       ? t('admin.products.add.selectBrands')
                       : brandIds.length === 1
                         ? t('admin.products.add.brandSelected').replace('{count}', brandIds.length.toString())
                         : t('admin.products.add.brandsSelected').replace('{count}', brandIds.length.toString())}
                   </span>
-                  <svg
-                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                      brandsExpanded ? 'transform rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ClaySelectChevron isOpen={brandsExpanded} />
                 </button>
                 {brandsExpanded && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  <div
+                    className={`${CLAY_SELECT_MULTI_PANEL_CLASS} pointer-events-auto translate-y-0 opacity-100`}
+                    style={{
+                      top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
+                      transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
+                    }}
+                  >
                     <div className="p-2">
                       <div className="space-y-1">
                         {brands.map((brand) => (

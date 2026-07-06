@@ -2,6 +2,7 @@
 
 import type { Dispatch, SetStateAction } from 'react';
 import { Card, Button } from '@shop/ui';
+import { ClaySelect } from '../../../components/ClaySelect';
 import type { PromoFormFields } from './coupons-admin-types';
 
 export type PromoCodesAdminFormCardProps = {
@@ -58,23 +59,22 @@ export function PromoCodesAdminFormCard({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="pc-type">
-            {labels.formDiscountType}
-          </label>
-          <select
+          <ClaySelect
             id="pc-type"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            label={labels.formDiscountType}
             value={form.discountType}
-            onChange={(e) =>
+            onChange={(value) =>
               setForm((f) => ({
                 ...f,
-                discountType: e.target.value === 'fixed' ? 'fixed' : 'percent',
+                discountType: value === 'fixed' ? 'fixed' : 'percent',
               }))
             }
-          >
-            <option value="percent">{labels.typePercent}</option>
-            <option value="fixed">{labels.typeFixed}</option>
-          </select>
+            placeholder={labels.typePercent}
+            options={[
+              { value: 'percent', label: labels.typePercent },
+              { value: 'fixed', label: labels.typeFixed },
+            ]}
+          />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="pc-val">

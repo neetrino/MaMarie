@@ -4,6 +4,7 @@ import { ADMIN_TABLE_CHECKBOX, ADMIN_TABLE_TD_CHECK } from '../../constants/admi
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
 import { getStatusColor, getPaymentStatusColor } from '../utils/orderUtils';
+import { ClaySelect } from '../../../../components/ClaySelect';
 import type { Order } from '../useOrders';
 
 interface OrderRowProps {
@@ -18,8 +19,7 @@ interface OrderRowProps {
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
 }
 
-const selectClass =
-  'inline-block w-auto max-w-full min-w-0 cursor-pointer rounded-md border-0 px-2 py-1.5 text-left text-xs font-medium leading-snug focus:outline-none focus:ring-2 focus:ring-blue-500';
+const statusSelectTriggerClass = 'inline-block w-auto max-w-full min-w-0 border-0';
 
 export function OrderRow({
   order,
@@ -115,16 +115,19 @@ export function OrderRow({
           </div>
         ) : (
           <div className="inline-block min-w-0 max-w-full">
-            <select
+            <ClaySelect
+              compact
               value={order.status}
-              onChange={(e) => onStatusChange(e.target.value)}
-              className={`${selectClass} ${getStatusColor(order.status)}`}
-            >
-              <option value="pending">{t('admin.orders.pending')}</option>
-              <option value="processing">{t('admin.orders.processing')}</option>
-              <option value="completed">{t('admin.orders.completed')}</option>
-              <option value="cancelled">{t('admin.orders.cancelled')}</option>
-            </select>
+              onChange={onStatusChange}
+              placeholder={t('admin.orders.pending')}
+              triggerClassName={`${statusSelectTriggerClass} ${getStatusColor(order.status)}`}
+              options={[
+                { value: 'pending', label: t('admin.orders.pending') },
+                { value: 'processing', label: t('admin.orders.processing') },
+                { value: 'completed', label: t('admin.orders.completed') },
+                { value: 'cancelled', label: t('admin.orders.cancelled') },
+              ]}
+            />
           </div>
         )}
       </td>
@@ -144,15 +147,18 @@ export function OrderRow({
           </div>
         ) : (
           <div className="inline-block min-w-0 max-w-full">
-            <select
+            <ClaySelect
+              compact
               value={order.paymentStatus}
-              onChange={(e) => onPaymentStatusChange(e.target.value)}
-              className={`${selectClass} ${getPaymentStatusColor(order.paymentStatus)}`}
-            >
-              <option value="paid">{t('admin.orders.paid')}</option>
-              <option value="pending">{t('admin.orders.pendingPayment')}</option>
-              <option value="failed">{t('admin.orders.failed')}</option>
-            </select>
+              onChange={onPaymentStatusChange}
+              placeholder={t('admin.orders.paid')}
+              triggerClassName={`${statusSelectTriggerClass} ${getPaymentStatusColor(order.paymentStatus)}`}
+              options={[
+                { value: 'paid', label: t('admin.orders.paid') },
+                { value: 'pending', label: t('admin.orders.pendingPayment') },
+                { value: 'failed', label: t('admin.orders.failed') },
+              ]}
+            />
           </div>
         )}
       </td>
