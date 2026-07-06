@@ -10,8 +10,10 @@ export const LOGIN_PAGE_SECTION_PADDING_TOP_PX = 24;
 export const LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX = 0;
 /** Pull login section into footer — Figma `222:492` meets `222:654` with no white gap. */
 export const LOGIN_SECTION_FOOTER_OVERLAP_PX = 58;
-/** Nudge login card lower on the page. */
-export const LOGIN_CARD_OFFSET_TOP_PX = 50;
+/** Sign-in card vertical offset (lower = higher on page). */
+export const SIGN_IN_CARD_OFFSET_TOP_PX = 50;
+/** Register card vertical offset (lower = higher on page). */
+export const REGISTER_CARD_OFFSET_TOP_PX = 0;
 
 /** Figma `222:492` — clay pod-form background behind the login card. */
 export const LOGIN_POD_FORM_BG = '/assets/auth/login-pod-form-bg.png';
@@ -20,6 +22,9 @@ export const LOGIN_POD_FORM_WIDTH_PERCENT = 105.41;
 
 /** Figma `222:539` — gray login card (no white outer frame). */
 export const LOGIN_CARD_MAX_WIDTH_PX = 420;
+/** Wider card for register — two-column fields. */
+export const REGISTER_CARD_MAX_WIDTH_PX = 520;
+export const REGISTER_PAGE_MIN_HEIGHT_PX = 980;
 export const LOGIN_CARD_PADDING_X_PX = 28;
 export const LOGIN_CARD_PADDING_Y_PX = 45;
 

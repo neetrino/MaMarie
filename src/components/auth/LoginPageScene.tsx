@@ -5,7 +5,8 @@ import {
   LOGIN_CARD_INNER_GAP_PX,
   LOGIN_CARD_INNER_RADIUS_PX,
   LOGIN_CARD_MAX_WIDTH_PX,
-  LOGIN_CARD_OFFSET_TOP_PX,
+  REGISTER_CARD_OFFSET_TOP_PX,
+  SIGN_IN_CARD_OFFSET_TOP_PX,
   LOGIN_CARD_PADDING_X_PX,
   LOGIN_CARD_PADDING_Y_PX,
   LOGIN_DECO_BOW_LEFT_PX,
@@ -33,29 +34,39 @@ interface LoginPageSceneProps {
   title: string;
   subtitle: string;
   children: ReactNode;
+  cardMaxWidthPx?: number;
+  sectionMinHeightPx?: number;
+  cardOffsetTopPx?: number;
 }
 
-const sectionStyle = {
+const buildSectionStyle = (sectionMinHeightPx: number): CSSProperties => ({
   backgroundColor: LOGIN_PAGE_BG_COLOR,
-  minHeight: LOGIN_PAGE_BG_HEIGHT_PX,
+  minHeight: sectionMinHeightPx,
   paddingTop: LOGIN_PAGE_SECTION_PADDING_TOP_PX,
   paddingBottom: LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX,
   paddingLeft: LOGIN_PAGE_SECTION_PADDING_X_PX,
   paddingRight: LOGIN_PAGE_SECTION_PADDING_X_PX,
   marginBottom: -LOGIN_SECTION_FOOTER_OVERLAP_PX,
-} as CSSProperties;
+});
 
 /** Figma `222:491` — pod-form background, centered clay card, bow decoration. */
-export function LoginPageScene({ title, subtitle, children }: LoginPageSceneProps) {
+export function LoginPageScene({
+  title,
+  subtitle,
+  children,
+  cardMaxWidthPx = LOGIN_CARD_MAX_WIDTH_PX,
+  sectionMinHeightPx = LOGIN_PAGE_BG_HEIGHT_PX,
+  cardOffsetTopPx = SIGN_IN_CARD_OFFSET_TOP_PX,
+}: LoginPageSceneProps) {
   return (
-    <section className="relative w-full overflow-visible" style={sectionStyle}>
+    <section className="relative w-full overflow-visible" style={buildSectionStyle(sectionMinHeightPx)}>
       <LoginPodFormBackground />
 
       <div
         className="relative z-10 mx-auto flex w-full justify-center"
         style={{
-          maxWidth: LOGIN_CARD_MAX_WIDTH_PX,
-          marginTop: LOGIN_CARD_OFFSET_TOP_PX,
+          maxWidth: cardMaxWidthPx,
+          marginTop: cardOffsetTopPx,
         }}
       >
         <div
@@ -80,7 +91,7 @@ export function LoginPageScene({ title, subtitle, children }: LoginPageSceneProp
         <div
           className="relative flex w-full flex-col items-center"
           style={{
-            maxWidth: LOGIN_CARD_MAX_WIDTH_PX,
+            maxWidth: cardMaxWidthPx,
             paddingLeft: LOGIN_CARD_PADDING_X_PX,
             paddingRight: LOGIN_CARD_PADDING_X_PX,
             paddingTop: LOGIN_CARD_PADDING_Y_PX,

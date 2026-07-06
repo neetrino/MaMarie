@@ -24,7 +24,8 @@ interface LoginFormFieldProps {
   type?: string;
   value: string;
   placeholder: string;
-  iconSrc: string;
+  iconSrc?: string;
+  required?: boolean;
   disabled?: boolean;
   hasError?: boolean;
   trailing?: ReactNode;
@@ -39,6 +40,7 @@ export function LoginFormField({
   value,
   placeholder,
   iconSrc,
+  required = false,
   disabled = false,
   hasError = false,
   trailing,
@@ -57,11 +59,12 @@ export function LoginFormField({
         }}
       >
         {label}
+        {required ? <span className="ml-0.5 text-red-500">*</span> : null}
       </label>
       <div
         className="flex w-full items-center overflow-hidden"
         style={{
-          gap: LOGIN_INPUT_ICON_GAP_PX,
+          gap: iconSrc ? LOGIN_INPUT_ICON_GAP_PX : 0,
           minHeight: LOGIN_INPUT_HEIGHT_PX,
           paddingLeft: LOGIN_INPUT_PADDING_X_PX,
           paddingRight: LOGIN_INPUT_PADDING_X_PX,
@@ -74,14 +77,16 @@ export function LoginFormField({
           backgroundColor: LOGIN_INPUT_BG,
         }}
       >
-        <Image
-          src={iconSrc}
-          alt=""
-          width={LOGIN_INPUT_ICON_SIZE_PX}
-          height={LOGIN_INPUT_ICON_SIZE_PX}
-          className="shrink-0"
-          aria-hidden
-        />
+        {iconSrc ? (
+          <Image
+            src={iconSrc}
+            alt=""
+            width={LOGIN_INPUT_ICON_SIZE_PX}
+            height={LOGIN_INPUT_ICON_SIZE_PX}
+            className="shrink-0"
+            aria-hidden
+          />
+        ) : null}
         <input
           id={id}
           name={id}

@@ -13,13 +13,13 @@ export function ConditionalFooter() {
     return null;
   }
 
-  const isLoginPage = pathname === '/login';
+  const isAuthFormPage = pathname === '/login' || pathname === '/register';
 
   return (
     <DesktopFluidFrame className="mt-auto hidden lg:flex">
-      <div style={isLoginPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined}>
+      <div style={isAuthFormPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined}>
         <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
-          <Footer topGapPx={isLoginPage ? 0 : undefined} />
+          <Footer topGapPx={isAuthFormPage ? 0 : undefined} />
         </LazyWhenVisible>
       </div>
     </DesktopFluidFrame>
