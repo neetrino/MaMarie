@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@shop/ui';
+import { BrandPillButton } from '../BrandPillButton';
 import { formatDate, type Review } from './utils';
 
 interface ReviewItemProps {
@@ -45,15 +45,14 @@ export function ReviewItem({ review, currentUserId, onEdit }: ReviewItemProps) {
           </div>
         </div>
         {isOwnReview && (
-          <Button
+          <BrandPillButton
             type="button"
-            variant="outline"
-            size="sm"
+            variant="secondary"
             onClick={() => onEdit(review)}
-            className="ml-4"
+            className="ml-4 shrink-0"
           >
             Edit
-          </Button>
+          </BrandPillButton>
         )}
       </div>
       <p className="text-gray-700 whitespace-pre-wrap">{review.comment}</p>

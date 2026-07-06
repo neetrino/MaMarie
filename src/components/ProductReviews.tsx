@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@shop/ui';
+import { BrandPillButton } from './BrandPillButton';
 import { useAuth } from '../lib/auth/AuthContext';
 import { useTranslation } from '../lib/i18n-client';
 import { useReviews } from './ProductReviews/hooks/useReviews';
@@ -74,13 +74,13 @@ export function ProductReviews({ productId, productSlug }: ProductReviewsProps) 
 
         {/* Write Review Button */}
         {!showForm && (
-          <Button
-            variant="primary"
+          <BrandPillButton
+            type="button"
             onClick={handleShowForm}
             className="mb-8"
           >
             {t('common.reviews.writeReview')}
-          </Button>
+          </BrandPillButton>
         )}
 
         {/* Review Form */}

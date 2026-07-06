@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@shop/ui';
+import { BrandPillButton } from '../BrandPillButton';
 import { useTranslation } from '../../lib/i18n-client';
 import { ReviewItem } from './ReviewItem';
 import type { Review } from './utils';
@@ -34,12 +34,9 @@ export function ReviewList({
           {t('common.reviews.noReviews')}
         </p>
         {!showForm && (
-          <Button
-            variant="primary"
-            onClick={onShowForm}
-          >
+          <BrandPillButton type="button" onClick={onShowForm}>
             {t('common.reviews.writeReview')}
-          </Button>
+          </BrandPillButton>
         )}
       </div>
     );
