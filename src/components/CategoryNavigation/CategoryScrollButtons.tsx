@@ -28,7 +28,6 @@ export function CategoryScrollButtons({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          console.info('[CategoryNavigation] Left arrow clicked, canScrollLeft:', canScrollLeft);
           if (canScrollLeft) {
             onScrollLeft();
           }
@@ -50,7 +49,6 @@ export function CategoryScrollButtons({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          console.info('[CategoryNavigation] Right arrow clicked, canScrollRight:', canScrollRight);
           if (canScrollRight) {
             onScrollRight();
           }

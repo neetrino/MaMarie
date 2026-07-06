@@ -129,13 +129,17 @@ function CartDrawerPanel({
   );
 }
 
+interface CartDrawerProps {
+  initialOpen?: boolean;
+}
+
 /** Global cart drawer — slides in from the right when `openCartDrawer()` is called. */
-export function CartDrawer() {
-  const [open, setOpen] = useState(false);
+export function CartDrawer({ initialOpen = false }: CartDrawerProps) {
+  const [open, setOpen] = useState(initialOpen);
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const { rendered, visible } = useDrawerTransition(open, CART_DRAWER_PANEL_TRANSITION_MS);
-  const cartState = useCartState({ enabled: true });
+  const cartState = useCartState({ enabled: open || rendered });
   const { refreshCart, ...cartPanelProps } = cartState;
 
   const handleClose = useCallback(() => {

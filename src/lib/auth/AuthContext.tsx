@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
 import { logger } from "@/lib/utils/logger";
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /**
    * Login user
    */
-  const login = async (email: string, password: string): Promise<User> => {
+  const login = useCallback(async (email: string, password: string): Promise<User> => {
     logger.debug('🔐 [AUTH] Login attempt:', { email: email ? 'provided' : 'not provided', password: password ? 'provided' : 'not provided' });
     
     try {
@@ -176,12 +176,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   /**
    * Register new user
    */
-  const register = async (data: RegisterData) => {
+  const register = useCallback(async (data: RegisterData) => {
     logger.debug('🔐 [AUTH] Registration attempt:', { 
       email: data.email || 'not provided',
       phone: data.phone || 'not provided',
@@ -274,12 +274,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
 
   /**
    * Logout user
    */
-  const logout = () => {
+  const logout = useCallback(() => {
     logger.debug('🔐 [AUTH] Logging out...');
     
     // Clear auth data
@@ -294,47 +294,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Redirect to home page
     router.push('/');
-  };
+  }, [router]);
 
-  // Calculate roles and admin status
   const roles = user && Array.isArray(user.roles) ? user.roles : [];
   const isAdmin = roles.includes('admin');
-  
-  // Debug logging and ensure roles are loaded
-  useEffect(() => {
-    if (user && token) {
-      const userRoles = Array.isArray(user.roles) ? user.roles : [];
-      const userIsAdmin = userRoles.includes('admin');
-      
-      logger.debug('🔍 [AUTH] User state updated:', {
-        userId: user.id,
-        roles: user.roles,
-        rolesArray: userRoles,
-        isAdmin: userIsAdmin,
-        rolesType: typeof user.roles,
-        rolesIsArray: Array.isArray(user.roles)
-      });
-      
-      // If user doesn't have roles, fetch from API
-      if (!user.roles || !Array.isArray(user.roles) || user.roles.length === 0) {
-        logger.debug('⚠️ [AUTH] User missing roles, fetching from API...');
-        apiClient.get<{ roles: string[] }>('/api/v1/users/profile')
-          .then(profileData => {
-            if (profileData.roles && Array.isArray(profileData.roles)) {
-              const updatedUser = { ...user, roles: profileData.roles };
-              setUser(updatedUser);
-              localStorage.setItem(AUTH_USER_KEY, JSON.stringify(updatedUser));
-              logger.debug('✅ [AUTH] Roles updated from API:', profileData.roles);
-            }
-          })
-          .catch(error => {
-            console.error('❌ [AUTH] Failed to fetch user roles:', error);
-          });
-      }
-    }
-  }, [user, token]);
 
-  const value: AuthContextType = {
+  const value = useMemo<AuthContextType>(() => ({
     user,
     token,
     isLoggedIn: !!token && !!user,
@@ -344,7 +309,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
-  };
+  }), [user, token, isLoading, isAdmin, roles, login, register, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
