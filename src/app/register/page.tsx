@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
+import { useClientMounted } from '../../lib/use-client-mounted';
 import { resolveRegisterApiError } from '../../lib/auth/client-api-error-messages';
 import {
   AuthFieldErrors,
@@ -13,12 +14,15 @@ import { logger } from '@/lib/utils/logger';
 import {
   REGISTER_CARD_MAX_WIDTH_PX,
   REGISTER_CARD_OFFSET_TOP_PX,
+  REGISTER_CARD_OFFSET_TOP_MOBILE_PX,
 } from '../../constants/login-page';
 import { LoginPageScene } from '../../components/auth/LoginPageScene';
+import { AuthFormSkeleton } from '../../components/auth/AuthFormSkeleton';
 import { RegisterForm } from '../../components/auth/RegisterForm';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
+  const isFormMounted = useClientMounted();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -119,62 +123,67 @@ export default function RegisterPage() {
       subtitle={t('register.subtitle')}
       cardMaxWidthPx={REGISTER_CARD_MAX_WIDTH_PX}
       cardOffsetTopPx={REGISTER_CARD_OFFSET_TOP_PX}
+      cardOffsetTopMobilePx={REGISTER_CARD_OFFSET_TOP_MOBILE_PX}
     >
-      <RegisterForm
-        firstName={firstName}
-        lastName={lastName}
-        email={email}
-        phone={phone}
-        password={password}
-        confirmPassword={confirmPassword}
-        showPassword={showPassword}
-        showConfirmPassword={showConfirmPassword}
-        acceptTerms={acceptTerms}
-        error={error}
-        fieldErrors={fieldErrors}
-        isSubmitting={isSubmitting}
-        isLoading={isLoading}
-        labels={formLabels}
-        onSubmit={handleSubmit}
-        onFirstNameChange={(event) => {
-          setFirstName(event.target.value);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'firstName'));
-        }}
-        onLastNameChange={(event) => {
-          setLastName(event.target.value);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'lastName'));
-        }}
-        onEmailChange={(event) => {
-          setEmail(event.target.value);
-          setFieldErrors((prev) => {
-            let next = clearAuthFieldError(prev, 'email');
-            next = clearAuthFieldError(next, 'phone');
-            return next;
-          });
-        }}
-        onPhoneChange={(event) => {
-          setPhone(event.target.value);
-          setFieldErrors((prev) => {
-            let next = clearAuthFieldError(prev, 'phone');
-            next = clearAuthFieldError(next, 'email');
-            return next;
-          });
-        }}
-        onPasswordChange={(event) => {
-          setPassword(event.target.value);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
-        }}
-        onConfirmPasswordChange={(event) => {
-          setConfirmPassword(event.target.value);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'confirmPassword'));
-        }}
-        onAcceptTermsChange={(checked) => {
-          setAcceptTerms(checked);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'terms'));
-        }}
-        onTogglePassword={() => setShowPassword((current) => !current)}
-        onToggleConfirmPassword={() => setShowConfirmPassword((current) => !current)}
-      />
+      {isFormMounted ? (
+        <RegisterForm
+          firstName={firstName}
+          lastName={lastName}
+          email={email}
+          phone={phone}
+          password={password}
+          confirmPassword={confirmPassword}
+          showPassword={showPassword}
+          showConfirmPassword={showConfirmPassword}
+          acceptTerms={acceptTerms}
+          error={error}
+          fieldErrors={fieldErrors}
+          isSubmitting={isSubmitting}
+          isLoading={isLoading}
+          labels={formLabels}
+          onSubmit={handleSubmit}
+          onFirstNameChange={(event) => {
+            setFirstName(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'firstName'));
+          }}
+          onLastNameChange={(event) => {
+            setLastName(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'lastName'));
+          }}
+          onEmailChange={(event) => {
+            setEmail(event.target.value);
+            setFieldErrors((prev) => {
+              let next = clearAuthFieldError(prev, 'email');
+              next = clearAuthFieldError(next, 'phone');
+              return next;
+            });
+          }}
+          onPhoneChange={(event) => {
+            setPhone(event.target.value);
+            setFieldErrors((prev) => {
+              let next = clearAuthFieldError(prev, 'phone');
+              next = clearAuthFieldError(next, 'email');
+              return next;
+            });
+          }}
+          onPasswordChange={(event) => {
+            setPassword(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
+          }}
+          onConfirmPasswordChange={(event) => {
+            setConfirmPassword(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'confirmPassword'));
+          }}
+          onAcceptTermsChange={(checked) => {
+            setAcceptTerms(checked);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'terms'));
+          }}
+          onTogglePassword={() => setShowPassword((current) => !current)}
+          onToggleConfirmPassword={() => setShowConfirmPassword((current) => !current)}
+        />
+      ) : (
+        <AuthFormSkeleton />
+      )}
     </LoginPageScene>
   );
 }

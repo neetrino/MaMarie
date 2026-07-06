@@ -492,6 +492,27 @@
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
   }
 
+  .layout-shell-mobile-bottom-clearance:has(.mobile-auth-page) {
+    background-color: #f1f1f3;
+    padding-bottom: max(92px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .auth-page-scene {
+    min-height: 0;
+    margin-bottom: 0;
+    padding-top: var(--auth-section-padding-top-mobile, 8px);
+    padding-bottom: var(--auth-section-padding-bottom-mobile, 0);
+  }
+
+  .auth-page-card-offset {
+    margin-top: var(--auth-card-offset-top-mobile, 12px);
+  }
+
+  .auth-page-card {
+    padding-top: var(--auth-card-padding-y-mobile, 32px);
+    padding-bottom: var(--auth-card-padding-y-mobile, 32px);
+  }
+
   /* Profile — less space under logout before bottom nav. */
   .layout-shell-mobile-bottom-clearance:has(.profile-mobile-page) {
     background-color: #f1f1f3;
@@ -501,6 +522,12 @@
   .mobile-contact-page {
     min-width: 0;
     overflow-x: clip;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-page-card-offset {
+    margin-top: var(--auth-card-offset-top, 50px);
   }
 }
 

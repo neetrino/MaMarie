@@ -6,15 +6,13 @@ import {
   LOGIN_ACTIONS_GAP_PX,
   LOGIN_ACTIONS_TOP_GAP_PX,
   LOGIN_CHECKBOX_GAP_PX,
+  LOGIN_CHECKBOX_SIZE_PX,
   LOGIN_ERROR_CLASS,
   LOGIN_FIELD_ASSETS,
-  LOGIN_FIELDS_GAP_PX,
   LOGIN_FOOTER_TEXT_COLOR,
-  LOGIN_FORM_GAP_PX,
   LOGIN_INPUT_ICON_SIZE_PX,
   LOGIN_MUTED_TEXT_COLOR,
   LOGIN_SECONDARY_TEXT_FONT_SIZE_PX,
-  LOGIN_CHECKBOX_SIZE_PX,
   LOGIN_SIGNUP_LINK_COLOR,
   LOGIN_SUBMIT_BG,
   LOGIN_SUBMIT_FONT_SIZE_PX,
@@ -77,14 +75,18 @@ export function LoginForm({
   const iconSize = LOGIN_INPUT_ICON_SIZE_PX;
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full flex-col" style={{ gap: LOGIN_FORM_GAP_PX }}>
+    <form
+      onSubmit={onSubmit}
+      className="auth-page-form flex w-full flex-col gap-6 lg:gap-[22px]"
+      suppressHydrationWarning
+    >
       {error ? (
         <div className={LOGIN_ERROR_CLASS} role="alert">
           <p>{error}</p>
         </div>
       ) : null}
 
-      <div className="flex w-full flex-col" style={{ gap: LOGIN_FIELDS_GAP_PX }}>
+      <div className="auth-page-form-fields flex w-full flex-col gap-5 lg:gap-[18px]">
         <LoginFormField
           id="email"
           label={labels.email}
@@ -92,6 +94,7 @@ export function LoginForm({
           value={email}
           placeholder={labels.emailPlaceholder}
           iconSrc={LOGIN_FIELD_ASSETS.iconMail}
+          autoComplete="email"
           disabled={disabled}
           hasError={Boolean(fieldErrors.email)}
           onChange={onEmailChange}
@@ -103,6 +106,7 @@ export function LoginForm({
           value={password}
           placeholder={labels.passwordPlaceholder}
           iconSrc={LOGIN_FIELD_ASSETS.iconLock}
+          autoComplete="current-password"
           disabled={disabled}
           hasError={Boolean(fieldErrors.password)}
           onChange={onPasswordChange}
@@ -122,6 +126,7 @@ export function LoginForm({
                   alt=""
                   width={iconSize}
                   height={iconSize}
+                  unoptimized
                   aria-hidden
                 />
               )}
@@ -159,6 +164,8 @@ export function LoginForm({
               checked={rememberMe}
               onChange={(event) => onRememberMeChange(event.target.checked)}
               disabled={disabled}
+              autoComplete="off"
+              suppressHydrationWarning
               className="rounded border-[#ededed] text-brand-pink focus:ring-brand-pink/35"
               style={{ width: LOGIN_CHECKBOX_SIZE_PX, height: LOGIN_CHECKBOX_SIZE_PX }}
             />

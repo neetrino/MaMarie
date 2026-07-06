@@ -6,12 +6,12 @@ import {
   LOGIN_POD_FORM_WIDTH_PERCENT,
 } from '../../constants/login-page';
 
-/** Figma `222:492` — clay “marie” letters behind the auth card, anchored to footer seam. */
+/** Figma `222:492` — clay pod-form background behind the login card. */
 export function LoginPodFormBackground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 bottom-0 overflow-x-clip overflow-y-visible"
+      className="pointer-events-none absolute inset-x-0 bottom-0 hidden overflow-x-clip overflow-y-visible lg:block"
       style={{ height: LOGIN_POD_FORM_BG_HEIGHT_PX }}
     >
       <div

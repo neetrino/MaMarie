@@ -7,9 +7,7 @@ import {
   LOGIN_CHECKBOX_SIZE_PX,
   LOGIN_ERROR_CLASS,
   LOGIN_FIELD_ASSETS,
-  LOGIN_FIELDS_GAP_PX,
   LOGIN_FOOTER_TEXT_COLOR,
-  LOGIN_FORM_GAP_PX,
   LOGIN_INPUT_ICON_SIZE_PX,
   LOGIN_MUTED_TEXT_COLOR,
   LOGIN_SECONDARY_TEXT_FONT_SIZE_PX,
@@ -110,6 +108,7 @@ function PasswordToggleButton({
           alt=""
           width={iconSize}
           height={iconSize}
+          unoptimized
           aria-hidden
         />
       )}
@@ -145,22 +144,27 @@ export function RegisterForm({
   onToggleConfirmPassword,
 }: RegisterFormProps) {
   const disabled = isSubmitting || isLoading;
-  const gridGapStyle = { gap: LOGIN_FIELDS_GAP_PX };
+  const gridGapClassName = 'gap-5 lg:gap-[18px]';
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full flex-col" style={{ gap: LOGIN_FORM_GAP_PX }}>
+    <form
+      onSubmit={onSubmit}
+      className="auth-page-form flex w-full flex-col gap-6 lg:gap-[22px]"
+      suppressHydrationWarning
+    >
       {error ? (
         <div className={LOGIN_ERROR_CLASS} role="alert">
           <p>{error}</p>
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2" style={gridGapStyle}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridGapClassName}`}>
         <LoginFormField
           id="firstName"
           label={labels.firstName}
           value={firstName}
           placeholder={labels.placeholders.firstName}
+          autoComplete="given-name"
           required
           disabled={disabled}
           hasError={Boolean(fieldErrors.firstName)}
@@ -171,6 +175,7 @@ export function RegisterForm({
           label={labels.lastName}
           value={lastName}
           placeholder={labels.placeholders.lastName}
+          autoComplete="family-name"
           required
           disabled={disabled}
           hasError={Boolean(fieldErrors.lastName)}
@@ -178,7 +183,7 @@ export function RegisterForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2" style={gridGapStyle}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridGapClassName}`}>
         <LoginFormField
           id="email"
           label={labels.email}
@@ -186,6 +191,7 @@ export function RegisterForm({
           value={email}
           placeholder={labels.placeholders.email}
           iconSrc={LOGIN_FIELD_ASSETS.iconMail}
+          autoComplete="email"
           required
           disabled={disabled}
           hasError={Boolean(fieldErrors.email)}
@@ -197,14 +203,15 @@ export function RegisterForm({
           type="tel"
           value={phone}
           placeholder={labels.placeholders.phone}
+          autoComplete="tel"
           disabled={disabled}
           hasError={Boolean(fieldErrors.phone)}
           onChange={onPhoneChange}
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2" style={gridGapStyle}>
-        <div className="flex flex-col" style={gridGapStyle}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${gridGapClassName}`}>
+        <div className={`flex flex-col ${gridGapClassName}`}>
           <LoginFormField
             id="password"
             label={labels.password}
@@ -212,6 +219,7 @@ export function RegisterForm({
             value={password}
             placeholder={labels.placeholders.password}
             iconSrc={LOGIN_FIELD_ASSETS.iconLock}
+            autoComplete="new-password"
             required
             disabled={disabled}
             hasError={Boolean(fieldErrors.password)}
@@ -237,6 +245,7 @@ export function RegisterForm({
           value={confirmPassword}
           placeholder={labels.placeholders.confirmPassword}
           iconSrc={LOGIN_FIELD_ASSETS.iconLock}
+          autoComplete="new-password"
           required
           disabled={disabled}
           hasError={Boolean(fieldErrors.confirmPassword)}
@@ -263,6 +272,8 @@ export function RegisterForm({
           checked={acceptTerms}
           onChange={(event) => onAcceptTermsChange(event.target.checked)}
           disabled={disabled}
+          autoComplete="off"
+          suppressHydrationWarning
           className="mt-0.5 rounded border-[#ededed] text-brand-pink focus:ring-brand-pink/35"
           style={{ width: LOGIN_CHECKBOX_SIZE_PX, height: LOGIN_CHECKBOX_SIZE_PX }}
         />

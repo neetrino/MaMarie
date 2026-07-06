@@ -11,11 +11,14 @@ import {
   validateLoginFields,
 } from '../../lib/auth/auth-form-field-errors';
 import { logger } from '@/lib/utils/logger';
+import { useClientMounted } from '../../lib/use-client-mounted';
+import { AuthFormSkeleton } from '../../components/auth/AuthFormSkeleton';
 import { LoginPageScene } from '../../components/auth/LoginPageScene';
 import { LoginForm } from '../../components/auth/LoginForm';
 
 function LoginPageContent() {
   const { t } = useTranslation();
+  const isFormMounted = useClientMounted();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -83,28 +86,32 @@ function LoginPageContent() {
 
   return (
     <LoginPageScene title={t('login.title')} subtitle={t('login.subtitle')}>
-      <LoginForm
-        email={email}
-        password={password}
-        showPassword={showPassword}
-        rememberMe={rememberMe}
-        error={error}
-        fieldErrors={fieldErrors}
-        isSubmitting={isSubmitting}
-        isLoading={isLoading}
-        labels={formLabels}
-        onSubmit={handleSubmit}
-        onEmailChange={(event) => {
-          setEmail(event.target.value);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
-        }}
-        onPasswordChange={(event) => {
-          setPassword(event.target.value);
-          setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
-        }}
-        onRememberMeChange={setRememberMe}
-        onTogglePassword={() => setShowPassword((current) => !current)}
-      />
+      {isFormMounted ? (
+        <LoginForm
+          email={email}
+          password={password}
+          showPassword={showPassword}
+          rememberMe={rememberMe}
+          error={error}
+          fieldErrors={fieldErrors}
+          isSubmitting={isSubmitting}
+          isLoading={isLoading}
+          labels={formLabels}
+          onSubmit={handleSubmit}
+          onEmailChange={(event) => {
+            setEmail(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'email'));
+          }}
+          onPasswordChange={(event) => {
+            setPassword(event.target.value);
+            setFieldErrors((prev) => clearAuthFieldError(prev, 'password'));
+          }}
+          onRememberMeChange={setRememberMe}
+          onTogglePassword={() => setShowPassword((current) => !current)}
+        />
+      ) : (
+        <AuthFormSkeleton />
+      )}
     </LoginPageScene>
   );
 }
@@ -114,11 +121,7 @@ function LoginPageFallback() {
 
   return (
     <LoginPageScene title={t('login.title')} subtitle={t('login.subtitle')}>
-      <div className="flex w-full animate-pulse flex-col gap-5">
-        <div className="h-[52px] rounded-full bg-white/80" />
-        <div className="h-[52px] rounded-full bg-white/80" />
-        <div className="h-14 rounded-full bg-brand-pink/40" />
-      </div>
+      <AuthFormSkeleton />
     </LoginPageScene>
   );
 }
