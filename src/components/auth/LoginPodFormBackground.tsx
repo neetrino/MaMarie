@@ -1,16 +1,18 @@
 import Image from 'next/image';
 import {
   LOGIN_POD_FORM_BG,
+  LOGIN_POD_FORM_BG_HEIGHT_PX,
   LOGIN_POD_FORM_LEFT_PERCENT,
   LOGIN_POD_FORM_WIDTH_PERCENT,
 } from '../../constants/login-page';
 
-/** Figma `222:492` — clay “marie” letters behind the login card. */
+/** Figma `222:492` — clay “marie” letters behind the auth card, anchored to footer seam. */
 export function LoginPodFormBackground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-x-0 bottom-0 overflow-x-clip overflow-y-visible"
+      style={{ height: LOGIN_POD_FORM_BG_HEIGHT_PX }}
     >
       <div
         className="absolute top-0 h-full"
@@ -24,7 +26,7 @@ export function LoginPodFormBackground() {
           alt=""
           fill
           priority
-          className="max-w-none object-cover object-bottom"
+          className="max-w-none object-contain object-bottom"
           sizes="100vw"
         />
       </div>

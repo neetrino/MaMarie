@@ -4,6 +4,8 @@ import { PROFILE_DESKTOP_ASSETS } from './profile-desktop-page';
 
 /** Figma `222:491` — login page artboard. */
 export const LOGIN_PAGE_BG_HEIGHT_PX = 854;
+/** Exported PNG height — prevents top crop of clay letters. */
+export const LOGIN_POD_FORM_BG_HEIGHT_PX = 864;
 export const LOGIN_PAGE_BG_COLOR = '#ffffff';
 export const LOGIN_PAGE_SECTION_PADDING_X_PX = 16;
 export const LOGIN_PAGE_SECTION_PADDING_TOP_PX = 24;
@@ -24,7 +26,6 @@ export const LOGIN_POD_FORM_WIDTH_PERCENT = 105.41;
 export const LOGIN_CARD_MAX_WIDTH_PX = 420;
 /** Wider card for register — two-column fields. */
 export const REGISTER_CARD_MAX_WIDTH_PX = 520;
-export const REGISTER_PAGE_MIN_HEIGHT_PX = 980;
 export const LOGIN_CARD_PADDING_X_PX = 28;
 export const LOGIN_CARD_PADDING_Y_PX = 45;
 
@@ -98,5 +99,5 @@ export const LOGIN_PAGE_ASSETS = {
 } as const;
 
 export const LOGIN_DECO_BOW_SIZE_PX = 247;
-export const LOGIN_DECO_BOW_TOP_PX = -18;
+export const LOGIN_DECO_BOW_TOP_PX = -8;
 export const LOGIN_DECO_BOW_LEFT_PX = -40;

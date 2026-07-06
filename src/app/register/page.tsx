@@ -13,7 +13,6 @@ import { logger } from '@/lib/utils/logger';
 import {
   REGISTER_CARD_MAX_WIDTH_PX,
   REGISTER_CARD_OFFSET_TOP_PX,
-  REGISTER_PAGE_MIN_HEIGHT_PX,
 } from '../../constants/login-page';
 import { LoginPageScene } from '../../components/auth/LoginPageScene';
 import { RegisterForm } from '../../components/auth/RegisterForm';
@@ -119,7 +118,6 @@ export default function RegisterPage() {
       title={t('register.title')}
       subtitle={t('register.subtitle')}
       cardMaxWidthPx={REGISTER_CARD_MAX_WIDTH_PX}
-      sectionMinHeightPx={REGISTER_PAGE_MIN_HEIGHT_PX}
       cardOffsetTopPx={REGISTER_CARD_OFFSET_TOP_PX}
     >
       <RegisterForm

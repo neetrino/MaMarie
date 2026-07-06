@@ -110,6 +110,17 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
+  if (pathname === '/login' || pathname === '/register') {
+    return (
+      <main
+        className="flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-visible pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {children}
+      </main>
+    );
+  }
+
   return (
     <main
       className={`${mainBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}

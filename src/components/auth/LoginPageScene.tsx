@@ -63,7 +63,7 @@ export function LoginPageScene({
       <LoginPodFormBackground />
 
       <div
-        className="relative z-10 mx-auto flex w-full justify-center"
+        className="relative z-10 mx-auto flex w-full justify-center overflow-visible"
         style={{
           maxWidth: cardMaxWidthPx,
           marginTop: cardOffsetTopPx,
