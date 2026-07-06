@@ -49,3 +49,13 @@ export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS = 'left-4';
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS = 'right-4';
 
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS = 'h-5 w-5 shrink-0';
+
+/** Mobile PDP — compact quantity stepper (- 1 +). */
+export const PRODUCT_PDP_QUANTITY_STEPPER_CLASS =
+  'flex items-center overflow-hidden rounded-full border bg-gray-50';
+
+export const PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS =
+  'flex h-9 w-9 items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 lg:h-12 lg:w-12';
+
+export const PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS =
+  'w-8 text-center text-sm font-bold lg:w-12 lg:text-base';
