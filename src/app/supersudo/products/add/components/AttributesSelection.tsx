@@ -2,6 +2,13 @@
 
 import type { RefObject } from 'react';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import { ClaySelectChevron } from '../../../../../components/ClaySelect';
+import {
+  CLAY_SELECT_DROPDOWN_ANIMATION_MS,
+  CLAY_SELECT_DROPDOWN_GAP_PX,
+  CLAY_SELECT_MULTI_PANEL_CLASS,
+  getClaySelectTriggerClass,
+} from '../../../../../constants/clay-select';
 import { getColorHex } from '../../../../../lib/colorMap';
 import type { Attribute } from '../types';
 
@@ -39,12 +46,13 @@ export function AttributesSelection({
           <button
             type="button"
             onClick={onAttributesDropdownToggle}
-            className="w-full px-3 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm flex items-center justify-between"
+            className={getClaySelectTriggerClass(attributesDropdownOpen)}
+            style={{ minHeight: 42 }}
           >
             <span
-              className={
-                selectedAttributesForVariants.size === 0 ? 'text-gray-500' : 'text-gray-700'
-              }
+              className={`truncate text-sm ${
+                selectedAttributesForVariants.size === 0 ? 'text-gray-400' : 'text-gray-900'
+              }`}
             >
               {selectedAttributesForVariants.size === 0
                 ? t('admin.products.add.selectAttributes')
@@ -52,19 +60,16 @@ export function AttributesSelection({
                   ? t('admin.products.add.attributeSelected').replace('{count}', '1')
                   : t('admin.products.add.attributesSelected').replace('{count}', selectedAttributesForVariants.size.toString())}
             </span>
-            <svg
-              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                attributesDropdownOpen ? 'transform rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <ClaySelectChevron isOpen={attributesDropdownOpen} />
           </button>
           {attributesDropdownOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-96 overflow-y-auto">
+            <div
+              className={`${CLAY_SELECT_MULTI_PANEL_CLASS} max-h-96 pointer-events-auto translate-y-0 opacity-100`}
+              style={{
+                top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
+                transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
+              }}
+            >
               <div className="p-4">
                 <div className="mb-3 pb-3 border-b border-gray-200">
                   <h3 className="text-sm font-semibold text-gray-900">

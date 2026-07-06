@@ -8,6 +8,7 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { logger } from "@/lib/utils/logger";
+import { ClaySelect } from '../../../components/ClaySelect';
 
 interface Settings {
   defaultCurrency?: string;
@@ -175,20 +176,17 @@ export default function SettingsPage() {
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.settings.paymentSettings')}</h2>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('admin.settings.defaultCurrency')}
-              </label>
-              <select 
-                value={settings.defaultCurrency || 'AMD'}
-                onChange={(e) => setSettings({ ...settings, defaultCurrency: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="AMD">{t('admin.settings.amd')}</option>
-                <option value="USD">{t('admin.settings.usd')}</option>
-                <option value="EUR">{t('admin.settings.eur')}</option>
-              </select>
-            </div>
+            <ClaySelect
+              label={t('admin.settings.defaultCurrency')}
+              value={settings.defaultCurrency || 'AMD'}
+              onChange={(value) => setSettings({ ...settings, defaultCurrency: value })}
+              placeholder={t('admin.settings.amd')}
+              options={[
+                { value: 'AMD', label: t('admin.settings.amd') },
+                { value: 'USD', label: t('admin.settings.usd') },
+                { value: 'EUR', label: t('admin.settings.eur') },
+              ]}
+            />
             <div>
               <label className="flex items-center">
                 <input

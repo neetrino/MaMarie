@@ -23,6 +23,7 @@ import {
 } from '../constants/admin-table-classes';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
+import { AdminSegmentedControl } from '../components/AdminSegmentedControl';
 
 interface User {
   id: string;
@@ -228,56 +229,23 @@ export default function UsersPage() {
 
             {/* Admin / Customer filter */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 {t('admin.users.adminCustomer')}
               </span>
-              <div className="inline-flex rounded-full bg-gray-100 p-1 text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRoleFilter('all');
-                    setPage(1);
-                    logger.debug('👥 [ADMIN] Role filter changed to: all');
-                  }}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    roleFilter === 'all'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {t('admin.users.all')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRoleFilter('admin');
-                    setPage(1);
-                    logger.debug('👥 [ADMIN] Role filter changed to: admin');
-                  }}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    roleFilter === 'admin'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {t('admin.users.admins')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRoleFilter('customer');
-                    setPage(1);
-                    logger.debug('👥 [ADMIN] Role filter changed to: customer');
-                  }}
-                  className={`px-3 py-1 rounded-full transition-all ${
-                    roleFilter === 'customer'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {t('admin.users.customers')}
-                </button>
-              </div>
+              <AdminSegmentedControl
+                ariaLabel={t('admin.users.adminCustomer')}
+                value={roleFilter}
+                onChange={(nextRole) => {
+                  setRoleFilter(nextRole);
+                  setPage(1);
+                  logger.debug(`👥 [ADMIN] Role filter changed to: ${nextRole}`);
+                }}
+                options={[
+                  { value: 'all', label: t('admin.users.all') },
+                  { value: 'admin', label: t('admin.users.admins') },
+                  { value: 'customer', label: t('admin.users.customers') },
+                ]}
+              />
             </div>
             <div className="border-t border-gray-200 pt-3 text-sm text-gray-700">
               {t('admin.users.totalUsersCount').replace('{count}', totalUsersCount.toString())}

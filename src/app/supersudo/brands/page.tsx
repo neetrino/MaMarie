@@ -9,6 +9,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { ClaySelect } from '../../../components/ClaySelect';
 interface Brand {
   id: string;
   name: string;
@@ -237,14 +238,15 @@ function BrandsSection() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-gray-900">{t('admin.brands.title')}</h2>
         <Button
           onClick={handleOpenAddModal}
           variant="primary"
           size="sm"
+          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           {t('admin.brands.addNew')}
@@ -375,25 +377,22 @@ function BrandsSection() {
                   required
                 />
               </div>
-              <div>
-                <label htmlFor="brand-status" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.brands.status')}
-                </label>
-                <select
-                  id="brand-status"
-                  value={formData.published}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      published: e.target.value as BrandFormData['published'],
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                >
-                  <option value="published">{t('admin.brands.published')}</option>
-                  <option value="draft">{t('admin.brands.draft')}</option>
-                </select>
-              </div>
+              <ClaySelect
+                id="brand-status"
+                label={t('admin.brands.status')}
+                value={formData.published}
+                onChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    published: value as BrandFormData['published'],
+                  })
+                }
+                placeholder={t('admin.brands.published')}
+                options={[
+                  { value: 'published', label: t('admin.brands.published') },
+                  { value: 'draft', label: t('admin.brands.draft') },
+                ]}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('admin.brands.logo')}

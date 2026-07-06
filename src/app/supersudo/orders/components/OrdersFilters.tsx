@@ -2,6 +2,7 @@
 
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
+import { ClaySelect } from '../../../../components/ClaySelect';
 import type { useOrders } from '../useOrders';
 
 interface OrdersFiltersProps {
@@ -66,27 +67,31 @@ export function OrdersFilters({
   return (
     <Card className="mb-6 w-full min-w-0 p-4">
       <div className="flex w-full min-w-0 flex-wrap items-center gap-4">
-        <select
-          className="shrink-0 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <ClaySelect
+          className="w-full shrink-0 sm:w-auto sm:min-w-[12rem]"
           value={statusFilter}
-          onChange={(e) => handleStatusChange(e.target.value)}
-        >
-          <option value="">{t('admin.orders.allStatuses')}</option>
-          <option value="pending">{t('admin.orders.pending')}</option>
-          <option value="processing">{t('admin.orders.processing')}</option>
-          <option value="completed">{t('admin.orders.completed')}</option>
-          <option value="cancelled">{t('admin.orders.cancelled')}</option>
-        </select>
-        <select
-          className="shrink-0 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={handleStatusChange}
+          placeholder={t('admin.orders.allStatuses')}
+          options={[
+            { value: '', label: t('admin.orders.allStatuses') },
+            { value: 'pending', label: t('admin.orders.pending') },
+            { value: 'processing', label: t('admin.orders.processing') },
+            { value: 'completed', label: t('admin.orders.completed') },
+            { value: 'cancelled', label: t('admin.orders.cancelled') },
+          ]}
+        />
+        <ClaySelect
+          className="w-full shrink-0 sm:w-auto sm:min-w-[12rem]"
           value={paymentStatusFilter}
-          onChange={(e) => handlePaymentStatusChange(e.target.value)}
-        >
-          <option value="">{t('admin.orders.allPaymentStatuses')}</option>
-          <option value="paid">{t('admin.orders.paid')}</option>
-          <option value="pending">{t('admin.orders.pendingPayment')}</option>
-          <option value="failed">{t('admin.orders.failed')}</option>
-        </select>
+          onChange={handlePaymentStatusChange}
+          placeholder={t('admin.orders.allPaymentStatuses')}
+          options={[
+            { value: '', label: t('admin.orders.allPaymentStatuses') },
+            { value: 'paid', label: t('admin.orders.paid') },
+            { value: 'pending', label: t('admin.orders.pendingPayment') },
+            { value: 'failed', label: t('admin.orders.failed') },
+          ]}
+        />
         <input
           type="text"
           placeholder={t('admin.orders.searchPlaceholder')}

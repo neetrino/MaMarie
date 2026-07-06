@@ -2,6 +2,13 @@
 
 import type { FormEvent } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { ClaySelect, ClaySelectChevron } from '../../../../components/ClaySelect';
+import {
+  CLAY_SELECT_DROPDOWN_ANIMATION_MS,
+  CLAY_SELECT_DROPDOWN_GAP_PX,
+  CLAY_SELECT_MULTI_PANEL_CLASS,
+  getClaySelectTriggerClass,
+} from '../../../../constants/clay-select';
 import type { Category } from '../types';
 
 interface ProductFiltersProps {
@@ -98,28 +105,26 @@ export function ProductFilters({
             <button
               type="button"
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              className="w-full px-4 py-2.5 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm flex items-center justify-between"
+              className={getClaySelectTriggerClass(categoriesExpanded)}
+              style={{ minHeight: 42 }}
             >
-              <span className="text-gray-700">
+              <span className={`truncate text-sm ${selectedCategories.size === 0 ? 'text-gray-400' : 'text-gray-900'}`}>
                 {selectedCategories.size === 0
                   ? t('admin.products.allCategories')
                   : selectedCategories.size === 1
                   ? categories.find(c => selectedCategories.has(c.id))?.title || '1 category'
                   : `${selectedCategories.size} categories`}
               </span>
-              <svg
-                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                  categoriesExpanded ? 'transform rotate-180' : ''
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ClaySelectChevron isOpen={categoriesExpanded} />
             </button>
             {categoriesExpanded && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div
+                className={`${CLAY_SELECT_MULTI_PANEL_CLASS} pointer-events-auto translate-y-0 opacity-100`}
+                style={{
+                  top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
+                  transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
+                }}
+              >
                 {categoriesLoading ? (
                   <div className="p-3 text-sm text-gray-500 text-center">{t('admin.products.loadingCategories')}</div>
                 ) : categories.length === 0 ? (
@@ -163,18 +168,19 @@ export function ProductFilters({
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
             {t('admin.products.filterByStock')}
           </label>
-          <select
+          <ClaySelect
             value={stockFilter}
-            onChange={(e) => {
-              setStockFilter(e.target.value as 'all' | 'inStock' | 'outOfStock');
+            onChange={(value) => {
+              setStockFilter(value as 'all' | 'inStock' | 'outOfStock');
               setPage(1);
             }}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
-          >
-            <option value="all">{t('admin.products.allProducts')}</option>
-            <option value="inStock">{t('admin.products.inStock')}</option>
-            <option value="outOfStock">{t('admin.products.outOfStock')}</option>
-          </select>
+            placeholder={t('admin.products.allProducts')}
+            options={[
+              { value: 'all', label: t('admin.products.allProducts') },
+              { value: 'inStock', label: t('admin.products.inStock') },
+              { value: 'outOfStock', label: t('admin.products.outOfStock') },
+            ]}
+          />
         </div>
       </div>
     </div>

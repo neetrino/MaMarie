@@ -6,6 +6,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { ParentCategorySelector } from './ParentCategorySelector';
+import { ClaySelect } from '../../../../components/ClaySelect';
 
 interface AddCategoryModalProps {
   isOpen: boolean;
@@ -59,24 +60,21 @@ export function AddCategoryModal({
             selectedParentIds={formData.parentIds}
             onChange={(parentIds) => onFormDataChange({ ...formData, parentIds })}
           />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('admin.categories.status')}
-            </label>
-            <select
-              value={formData.published}
-              onChange={(e) =>
-                onFormDataChange({
-                  ...formData,
-                  published: e.target.value as CategoryFormData['published'],
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="published">{t('admin.categories.published')}</option>
-              <option value="draft">{t('admin.categories.draft')}</option>
-            </select>
-          </div>
+          <ClaySelect
+            label={t('admin.categories.status')}
+            value={formData.published}
+            onChange={(value) =>
+              onFormDataChange({
+                ...formData,
+                published: value as CategoryFormData['published'],
+              })
+            }
+            placeholder={t('admin.categories.published')}
+            options={[
+              { value: 'published', label: t('admin.categories.published') },
+              { value: 'draft', label: t('admin.categories.draft') },
+            ]}
+          />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {t('admin.categories.image')}

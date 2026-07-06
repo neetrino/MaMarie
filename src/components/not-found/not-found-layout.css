@@ -1,3 +1,33 @@
+.not-found-page--standalone {
+  min-height: 0;
+  flex: none;
+  width: 100%;
+}
+
+@media (max-width: 1023px) {
+  .not-found-page--standalone {
+    /* Standalone has no navbar — keep desktop spacing for true vertical centering. */
+    --nf-illustration-lift: 48px;
+    --nf-bunny-size: 156px;
+    --nf-bunny-left: 2%;
+    --nf-bunny-top: 28%;
+    --nf-bunny-offset-x: 0px;
+    --nf-copy-offset: 0px;
+    --nf-ill-to-title: -66px;
+    --nf-title-lift: 60px;
+    --nf-title-actions: 16px;
+  }
+}
+
+main.admin-page-main:has(.not-found-standalone-shell),
+main.home-main-surface:has(.not-found-standalone-shell) {
+  background-color: #fff;
+}
+
+.admin-page-shell:has(.not-found-standalone-shell) {
+  background-color: #fff;
+}
+
 .not-found-page {
   /* Desktop — see NOT_FOUND_* in constants/not-found-page.ts */
   --nf-illustration-lift: 48px;
