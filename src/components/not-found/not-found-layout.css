@@ -1,0 +1,42 @@
+.not-found-page {
+  /* Desktop — see NOT_FOUND_* in constants/not-found-page.ts */
+  --nf-illustration-lift: 48px;
+  --nf-bunny-size: 156px;
+  --nf-bunny-left: 2%;
+  --nf-bunny-top: 28%;
+  --nf-bunny-offset-x: 0px;
+  --nf-copy-offset: 0px;
+  --nf-ill-to-title: -66px;
+  --nf-title-lift: 60px;
+  --nf-title-actions: 16px;
+}
+
+@media (max-width: 1023px) {
+  .not-found-page {
+    /* NOT_FOUND_MOBILE_* — flow from top; no vertical centering under navbar */
+    --nf-illustration-lift: 0px;
+    --nf-bunny-size: 100px;
+    --nf-bunny-left: 0%;
+    --nf-bunny-top: 21%;
+    --nf-bunny-offset-x: -20px;
+    --nf-copy-offset: 16px;
+    --nf-ill-to-title: 20px;
+    --nf-title-lift: 0px;
+    --nf-title-actions: 32px;
+  }
+}
+
+.not-found-illustration {
+  transform: translateY(calc(-1 * var(--nf-illustration-lift)));
+}
+
+.not-found-deco-bunny {
+  width: var(--nf-bunny-size);
+  height: var(--nf-bunny-size);
+}
+
+.not-found-deco-bunny-slot {
+  top: var(--nf-bunny-top);
+  left: var(--nf-bunny-left);
+  transform: translateX(var(--nf-bunny-offset-x));
+}

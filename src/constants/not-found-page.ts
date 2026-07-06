@@ -10,8 +10,9 @@ import {
 export const NOT_FOUND_ILLUSTRATION_WIDTH_PX = 930;
 export const NOT_FOUND_ILLUSTRATION_HEIGHT_PX = 620;
 export const NOT_FOUND_ILLUSTRATION_MAX_WIDTH_PX = 930;
-/** Lift only the 404 art; title and buttons keep their own spacing. */
+/** Lift only the 404 art on desktop; mobile keeps art below the fixed navbar. */
 export const NOT_FOUND_ILLUSTRATION_LIFT_PX = 48;
+export const NOT_FOUND_MOBILE_ILLUSTRATION_LIFT_PX = 0;
 
 export const NOT_FOUND_SECTION_PADDING_TOP_PX = 24;
 export const NOT_FOUND_SECTION_PADDING_BOTTOM_PX = 48;
@@ -29,9 +30,14 @@ export const NOT_FOUND_ILLUSTRATION_TO_TITLE_GAP_PX = -66;
 export const NOT_FOUND_TITLE_LIFT_PX = 60;
 export const NOT_FOUND_TITLE_TO_ACTIONS_GAP_PX = 16;
 
+/** Mobile 404 — title + CTAs below illustration (no overlap with fixed navbar). */
+export const NOT_FOUND_MOBILE_COPY_BLOCK_OFFSET_PX = 16;
+export const NOT_FOUND_MOBILE_ILLUSTRATION_TO_TITLE_GAP_PX = 20;
+export const NOT_FOUND_MOBILE_TITLE_LIFT_PX = 0;
+export const NOT_FOUND_MOBILE_TITLE_TO_ACTIONS_GAP_PX = 32;
+
 export const NOT_FOUND_ACTIONS_GAP_PX = HERO_GENDER_BUTTONS_GAP_PX;
 
-export const NOT_FOUND_BUTTON_MIN_WIDTH_PX = 220;
 export const NOT_FOUND_BUTTON_ICON_SIZE_PX = 20;
 export const NOT_FOUND_BUTTON_ICON_GAP_PX = 10;
 
@@ -46,8 +52,12 @@ export const NOT_FOUND_DECO_RIGHT_ROTATE_DEG = -1.13;
 
 /** Homepage about-us bunny — reused on 404 green «4». */
 export const NOT_FOUND_DECO_BUNNY_SIZE_PX = 156;
+export const NOT_FOUND_MOBILE_DECO_BUNNY_SIZE_PX = 100;
+export const NOT_FOUND_MOBILE_DECO_BUNNY_OFFSET_X_PX = -20;
 export const NOT_FOUND_DECO_BUNNY_LEFT_PERCENT = 2;
+export const NOT_FOUND_MOBILE_DECO_BUNNY_LEFT_PERCENT = 0;
 export const NOT_FOUND_DECO_BUNNY_TOP_PERCENT = 28;
+export const NOT_FOUND_MOBILE_DECO_BUNNY_TOP_PERCENT = 21;
 export const NOT_FOUND_DECO_BUNNY_ROTATE_DEG = -168.97;
 export const NOT_FOUND_DECO_BUNNY_FLIP_X = false;
 export const NOT_FOUND_DECO_BUNNY_FLIP_Y = true;

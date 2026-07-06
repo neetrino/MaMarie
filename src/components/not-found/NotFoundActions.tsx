@@ -7,7 +7,6 @@ import {
   NOT_FOUND_ASSETS,
   NOT_FOUND_BUTTON_ICON_GAP_PX,
   NOT_FOUND_BUTTON_ICON_SIZE_PX,
-  NOT_FOUND_BUTTON_MIN_WIDTH_PX,
   NOT_FOUND_HOME_BUTTON_BG,
   NOT_FOUND_SHOP_BUTTON_BG,
 } from '../../constants/not-found-page';
@@ -33,10 +32,9 @@ function NotFoundActionButton({
   return (
     <Link
       href={href}
-      className={`${CLAY_PRIMARY_BUTTON_CLASS} inline-flex w-full sm:w-auto`}
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} inline-flex w-auto max-w-full whitespace-nowrap`}
       style={{
         ...getClayPrimaryButtonStyle(backgroundColor),
-        minWidth: NOT_FOUND_BUTTON_MIN_WIDTH_PX,
         gap: iconSrc ? NOT_FOUND_BUTTON_ICON_GAP_PX : undefined,
       }}
     >
@@ -61,7 +59,7 @@ export function NotFoundActions() {
 
   return (
     <div
-      className="flex w-full flex-col items-stretch justify-center sm:flex-row sm:items-center"
+      className="flex w-full flex-col-reverse items-center justify-center lg:flex-row"
       style={{ gap: NOT_FOUND_ACTIONS_GAP_PX }}
     >
       <NotFoundActionButton
