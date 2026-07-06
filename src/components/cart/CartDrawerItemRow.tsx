@@ -15,6 +15,7 @@ import {
 } from '../../constants/cart-drawer';
 import { HOME_PRODUCT_CARD_ASSETS, HOME_PRODUCT_CARD_BG } from '../../constants/home-sections';
 import type { CurrencyCode } from '../../lib/currency';
+import { closeCartDrawer } from '../../lib/cart-drawer';
 
 interface CartDrawerItemRowProps {
   item: CartItem;
@@ -64,11 +65,18 @@ export function CartDrawerItemRow({
     onUpdateQuantity(item.id, nextQuantity);
   };
 
+  const productHref = `/products/${item.variant.product.slug}`;
+
+  const handleProductNavigate = () => {
+    closeCartDrawer();
+  };
+
   return (
     <article className="border-b border-gray-100 py-4 first:pt-0 last:border-b-0">
       <div className="flex items-start gap-3">
         <Link
-          href={`/products/${item.variant.product.slug}`}
+          href={productHref}
+          onClick={handleProductNavigate}
           className="relative block shrink-0 overflow-hidden"
           style={{
             width: CART_DRAWER_ITEM_THUMB_SIZE_PX,
@@ -92,7 +100,8 @@ export function CartDrawerItemRow({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <Link
-                href={`/products/${item.variant.product.slug}`}
+                href={productHref}
+                onClick={handleProductNavigate}
                 className="line-clamp-2 text-sm font-medium text-gray-900 transition-colors hover:text-gray-600"
               >
                 {item.variant.product.title}
