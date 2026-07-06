@@ -14,17 +14,30 @@ import { NotFoundActions } from './NotFoundActions';
 import { NotFoundIllustrationScene } from './NotFoundIllustrationScene';
 import './not-found-layout.css';
 
+type NotFoundPageLayout = 'default' | 'standalone';
+
+interface NotFoundPageContentProps {
+  layout?: NotFoundPageLayout;
+}
+
 /** Figma `276:534` — clay 404 scene, title, and CTAs. */
-export function NotFoundPageContent() {
+export function NotFoundPageContent({ layout = 'default' }: NotFoundPageContentProps) {
   const { t } = useTranslation();
+  const isStandalone = layout === 'standalone';
 
   return (
     <section
-      className="not-found-page relative flex w-full flex-1 flex-col overflow-visible bg-white max-lg:justify-start lg:justify-center"
-      style={{
-        paddingTop: NOT_FOUND_SECTION_PADDING_TOP_PX,
-        paddingBottom: NOT_FOUND_SECTION_PADDING_BOTTOM_PX,
-      }}
+      className={`not-found-page relative flex w-full flex-1 flex-col overflow-visible bg-white ${
+        isStandalone ? 'not-found-page--standalone justify-center' : 'max-lg:justify-start lg:justify-center'
+      }`}
+      style={
+        isStandalone
+          ? undefined
+          : {
+              paddingTop: NOT_FOUND_SECTION_PADDING_TOP_PX,
+              paddingBottom: NOT_FOUND_SECTION_PADDING_BOTTOM_PX,
+            }
+      }
     >
       <div
         className="relative z-10 mx-auto flex w-full flex-col items-center px-4 sm:px-6"

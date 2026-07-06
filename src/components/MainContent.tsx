@@ -80,7 +80,7 @@ export function MainContent({ children }: MainContentProps) {
 
   if (pathname.startsWith('/supersudo')) {
     return (
-      <main className="admin-page-main home-main-surface w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden">
+      <main className="admin-page-main home-main-surface flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden">
         {children}
       </main>
     );
