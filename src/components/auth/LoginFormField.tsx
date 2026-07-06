@@ -8,7 +8,7 @@ import {
   LOGIN_INPUT_ICON_GAP_PX,
   LOGIN_INPUT_PADDING_X_PX,
   LOGIN_INPUT_PADDING_Y_PX,
-  LOGIN_INPUT_SHELL_RADIUS_CLASS,
+  LOGIN_INPUT_RADIUS_PX,
   LOGIN_INPUT_TEXT_COLOR,
   LOGIN_LABEL_COLOR,
   LOGIN_LABEL_FONT_SIZE_PX,
@@ -66,7 +66,7 @@ export function LoginFormField({
         {required ? <span className="ml-0.5 text-red-500">*</span> : null}
       </label>
       <div
-        className={`flex w-full items-center overflow-hidden ${LOGIN_INPUT_SHELL_RADIUS_CLASS}`}
+        className="flex w-full items-center overflow-hidden rounded-[36px] lg:rounded-[36px]"
         style={{
           gap: iconSrc ? LOGIN_INPUT_ICON_GAP_PX : 0,
           minHeight: LOGIN_INPUT_HEIGHT_PX,
@@ -74,6 +74,7 @@ export function LoginFormField({
           paddingRight: LOGIN_INPUT_PADDING_X_PX,
           paddingTop: LOGIN_INPUT_PADDING_Y_PX,
           paddingBottom: LOGIN_INPUT_PADDING_Y_PX,
+          borderRadius: LOGIN_INPUT_RADIUS_PX,
           borderWidth: LOGIN_INPUT_BORDER_WIDTH_PX,
           borderStyle: 'solid',
           borderColor: hasError ? '#ef4444' : LOGIN_INPUT_BORDER_COLOR,
@@ -101,7 +102,6 @@ export function LoginFormField({
             letterSpacing: '-0.24px',
           }}
         />
-        {trailing}
       </div>
     </div>
   );
