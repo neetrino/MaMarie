@@ -8,16 +8,26 @@ import { logger } from "@/lib/utils/logger";
 /**
  * Hook for fetching and managing reviews
  */
-export function useReviews(productId?: string, productSlug?: string) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+export function useReviews(
+  productId?: string,
+  productSlug?: string,
+  initialReviews?: Review[],
+) {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews ?? []);
+  const [loading, setLoading] = useState(initialReviews === undefined);
+  const hasInitialReviews = initialReviews !== undefined;
+
+  useEffect(() => {
+    if (initialReviews !== undefined) {
+      setReviews(initialReviews);
+      setLoading(false);
+    }
+  }, [initialReviews]);
 
   const loadReviews = async () => {
     try {
-      // Use slug if available, otherwise fall back to productId
       const identifier = productSlug || productId;
       if (!identifier) {
-        console.warn('⚠️ [PRODUCT REVIEWS] No product identifier provided');
         setReviews([]);
         setLoading(false);
         return;
@@ -29,11 +39,11 @@ export function useReviews(productId?: string, productSlug?: string) {
       logger.debug('✅ [PRODUCT REVIEWS] Reviews loaded:', data?.length || 0);
       setReviews(data || []);
     } catch (error: unknown) {
-      console.error('❌ [PRODUCT REVIEWS] Error loading reviews:', error);
-      // If 404, product might not have reviews yet - that's okay
       const err = error as { status?: number };
       if (err.status !== 404) {
-        console.error('Failed to load reviews:', error);
+        logger.warn('Failed to load reviews', {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
       setReviews([]);
     } finally {
@@ -42,8 +52,21 @@ export function useReviews(productId?: string, productSlug?: string) {
   };
 
   useEffect(() => {
-    loadReviews();
-  }, [productId, productSlug]);
+    if (!productId && !productSlug) {
+      return;
+    }
+
+    if (!hasInitialReviews) {
+      void loadReviews();
+    }
+
+    const handleReviewUpdate = () => {
+      void loadReviews();
+    };
+
+    window.addEventListener('review-updated', handleReviewUpdate);
+    return () => window.removeEventListener('review-updated', handleReviewUpdate);
+  }, [productId, productSlug, hasInitialReviews]);
 
   return {
     reviews,
@@ -52,7 +75,3 @@ export function useReviews(productId?: string, productSlug?: string) {
     loadReviews,
   };
 }
-
-
-
-

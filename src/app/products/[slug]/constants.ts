@@ -59,3 +59,9 @@ export const PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS =
 
 export const PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS =
   'w-8 text-center text-sm font-bold lg:w-12 lg:text-base';
+
+/** Below-the-fold related row — reserve space before lazy mount. */
+export const PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX = 420;
+
+/** Reviews block skeleton height before lazy mount. */
+export const PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX = 280;

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getStoredCurrency, DEFAULT_CURRENCY } from '../../../lib/currency';
 import { getStoredLanguage, DEFAULT_LANGUAGE, type LanguageCode } from '../../../lib/language';
 import { t } from '../../../lib/i18n';
+import type { Review } from '../../../components/ProductReviews/utils';
 import { useAttributeGroups } from './useAttributeGroups';
 import { useProductImages } from './hooks/useProductImages';
 import { useProductFetch } from './hooks/useProductFetch';
@@ -15,18 +16,34 @@ import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
 import type { Product } from './types';
 
-export function useProductPage(params: Promise<{ slug?: string }>) {
+interface UseProductPageOptions {
+  slugParam: string;
+  initialProduct: Product;
+  initialReviews: Review[];
+  serverLang: LanguageCode;
+}
+
+function parseSlugParam(rawSlug: string): { slug: string; variantIdFromUrl: string | null } {
+  const slugParts = rawSlug.includes(':') ? rawSlug.split(':') : [rawSlug];
+  return {
+    slug: slugParts[0] ?? '',
+    variantIdFromUrl: slugParts.length > 1 ? slugParts[1] : null,
+  };
+}
+
+export function useProductPage({
+  slugParam,
+  initialProduct,
+  initialReviews,
+  serverLang,
+}: UseProductPageOptions) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const [language, setLanguage] = useState<LanguageCode>(DEFAULT_LANGUAGE);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showMessage, setShowMessage] = useState<string | null>(null);
 
-  const resolvedParams = use(params);
-  const rawSlug = resolvedParams?.slug ?? '';
-  const slugParts = rawSlug.includes(':') ? rawSlug.split(':') : [rawSlug];
-  const slug = slugParts[0];
-  const variantIdFromUrl = slugParts.length > 1 ? slugParts[1] : null;
+  const { slug, variantIdFromUrl } = parseSlugParam(slugParam);
 
   const {
     product,
@@ -35,6 +52,8 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   } = useProductFetch({
     slug,
     variantIdFromUrl,
+    initialProduct,
+    serverLang,
   });
 
   const images = useProductImages(product);
@@ -96,6 +115,7 @@ export function useProductPage(params: Promise<{ slug?: string }>) {
   const { reviews, averageRating } = useProductReviews({
     slug,
     productId: product?.id ?? null,
+    initialReviews,
   });
 
   const { handleAddToWishlist, handleCompareToggle } = useProductActions({
