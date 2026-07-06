@@ -7,7 +7,9 @@ export const LOGIN_PAGE_BG_HEIGHT_PX = 854;
 export const LOGIN_PAGE_BG_COLOR = '#ffffff';
 export const LOGIN_PAGE_SECTION_PADDING_X_PX = 16;
 export const LOGIN_PAGE_SECTION_PADDING_TOP_PX = 24;
-export const LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX = 48;
+export const LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX = 0;
+/** Pull login section into footer — Figma `222:492` meets `222:654` with no white gap. */
+export const LOGIN_SECTION_FOOTER_OVERLAP_PX = 58;
 /** Nudge login card lower on the page. */
 export const LOGIN_CARD_OFFSET_TOP_PX = 50;
 

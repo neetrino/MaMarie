@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import {
-  LOGIN_PAGE_BG_HEIGHT_PX,
   LOGIN_POD_FORM_BG,
   LOGIN_POD_FORM_LEFT_PERCENT,
   LOGIN_POD_FORM_WIDTH_PERCENT,
@@ -11,8 +10,7 @@ export function LoginPodFormBackground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
-      style={{ height: LOGIN_PAGE_BG_HEIGHT_PX }}
+      className="pointer-events-none absolute inset-0 overflow-hidden"
     >
       <div
         className="absolute top-0 h-full"
@@ -26,7 +24,7 @@ export function LoginPodFormBackground() {
           alt=""
           fill
           priority
-          className="max-w-none object-cover object-center"
+          className="max-w-none object-cover object-bottom"
           sizes="100vw"
         />
       </div>

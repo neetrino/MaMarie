@@ -15,6 +15,7 @@ import {
   LOGIN_PAGE_ASSETS,
   LOGIN_PAGE_BG_COLOR,
   LOGIN_PAGE_BG_HEIGHT_PX,
+  LOGIN_SECTION_FOOTER_OVERLAP_PX,
   LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX,
   LOGIN_PAGE_SECTION_PADDING_TOP_PX,
   LOGIN_PAGE_SECTION_PADDING_X_PX,
@@ -41,12 +42,13 @@ const sectionStyle = {
   paddingBottom: LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX,
   paddingLeft: LOGIN_PAGE_SECTION_PADDING_X_PX,
   paddingRight: LOGIN_PAGE_SECTION_PADDING_X_PX,
+  marginBottom: -LOGIN_SECTION_FOOTER_OVERLAP_PX,
 } as CSSProperties;
 
 /** Figma `222:491` — pod-form background, centered clay card, bow decoration. */
 export function LoginPageScene({ title, subtitle, children }: LoginPageSceneProps) {
   return (
-    <section className="relative w-full overflow-hidden" style={sectionStyle}>
+    <section className="relative w-full overflow-visible" style={sectionStyle}>
       <LoginPodFormBackground />
 
       <div
