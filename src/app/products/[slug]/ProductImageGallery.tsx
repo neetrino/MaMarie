@@ -9,14 +9,19 @@ import { t } from "../../../lib/i18n";
 import type { LanguageCode } from "../../../lib/language";
 import type { Product } from "./types";
 import {
-  PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_LIST_CLASS,
+  PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS,
+  PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
 } from "./constants";
 
 interface ProductImageGalleryProps {
@@ -31,6 +36,57 @@ interface ProductImageGalleryProps {
 }
 
 const PDP_MAIN_IMAGE_SIZES = "(max-width: 1024px) 100vw, 55vw";
+
+interface ProductThumbnailRailProps {
+  images: string[];
+  currentImageIndex: number;
+  failedIndices: Set<number>;
+  onImageIndexChange: (index: number) => void;
+  onImageError: (index: number) => void;
+}
+
+function ProductThumbnailRail({
+  images,
+  currentImageIndex,
+  failedIndices,
+  onImageIndexChange,
+  onImageError,
+}: ProductThumbnailRailProps) {
+  return (
+    <div className={PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS}>
+      <div className={PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS}>
+        {images.map((image, index) => {
+          const isActive = index === currentImageIndex;
+          return (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onImageIndexChange(index)}
+              className={`${PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS} ${PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS} ${
+                isActive
+                  ? PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS
+                  : PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS
+              }`}
+            >
+              {failedIndices.has(index) ? (
+                <ProductImagePlaceholder className="h-full w-full" aria-label="" />
+              ) : (
+                <img
+                  src={image}
+                  alt=""
+                  className="h-full w-full object-contain transition-transform duration-300"
+                  loading="lazy"
+                  decoding="async"
+                  onError={() => onImageError(index)}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function ProductImageGallery({
   images,
@@ -62,45 +118,9 @@ export function ProductImageGallery({
 
   return (
     <>
-      <div className="flex gap-6 items-start">
-        <div className="flex w-28 flex-shrink-0 flex-col">
-          <div className={PRODUCT_PDP_THUMBNAIL_LIST_CLASS}>
-            {images.map((image, index) => {
-              const isActive = index === currentImageIndex;
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => onImageIndexChange(index)}
-                  className={`${PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS} ${
-                    isActive
-                      ? PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS
-                      : PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS
-                  }`}
-                >
-                  {failedIndices.has(index) ? (
-                    <ProductImagePlaceholder className="w-full h-full" aria-label="" />
-                  ) : (
-                    <img
-                      src={image}
-                      alt=""
-                      className="h-full w-full object-contain transition-transform duration-300"
-                      loading="lazy"
-                      decoding="async"
-                      onError={() => markFailed(index)}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex-1">
-          <div
-            data-product-fly-origin
-            className="relative aspect-square rounded-lg overflow-hidden group shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
-          >
+      <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
+        <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
+          <div data-product-fly-origin className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}>
             {images.length > 0 && !mainImageFailed ? (
               <Image
                 src={currentSrc}
@@ -114,13 +134,13 @@ export function ProductImageGallery({
               />
             ) : (
               <ProductImagePlaceholder
-                className="w-full h-full"
+                className="h-full w-full"
                 aria-label={t(language, "common.messages.noImage")}
               />
             )}
 
             {discountPercent ? (
-              <div className="absolute top-4 right-4 w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
+              <div className="absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
                 -{discountPercent}%
               </div>
             ) : null}
@@ -148,29 +168,39 @@ export function ProductImageGallery({
               </>
             ) : null}
 
-            <div className="absolute bottom-4 left-4 flex flex-col gap-3 z-10">
+            <div className="absolute bottom-4 left-4 z-10 flex flex-col gap-3">
               <button
                 type="button"
                 onClick={() => setShowZoom(true)}
-                className="w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50 shadow-[0_2px_8px_rgba(0,0,0,0.15)] hover:bg-white/90 transition-all duration-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-300 hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                 aria-label={t(language, 'common.ariaLabels.fullscreenImage')}
               >
-                <Maximize2 className="w-5 h-5 text-gray-800" />
+                <Maximize2 className="h-5 w-5 text-gray-800" />
               </button>
             </div>
           </div>
         </div>
+
+        {hasMultipleImages ? (
+          <ProductThumbnailRail
+            images={images}
+            currentImageIndex={currentImageIndex}
+            failedIndices={failedIndices}
+            onImageIndexChange={onImageIndexChange}
+            onImageError={markFailed}
+          />
+        ) : null}
       </div>
 
       {showZoom && images.length > 0 && !failedIndices.has(currentImageIndex) ? (
         <div
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
           onClick={() => setShowZoom(false)}
         >
-          <img src={currentSrc} alt="" className="max-w-full max-h-full object-contain" />
+          <img src={currentSrc} alt="" className="max-h-full max-w-full object-contain" />
           <button
             type="button"
-            className="absolute top-4 right-4 text-white text-2xl"
+            className="absolute top-4 right-4 text-2xl text-white"
             aria-label={t(language, 'common.buttons.close')}
             onClick={(e) => {
               e.stopPropagation();

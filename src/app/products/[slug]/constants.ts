@@ -16,16 +16,29 @@ export const THUMBNAILS_PER_VIEW = 3;
 export const PRODUCT_PDP_THUMBNAIL_BORDER_COLOR = PRODUCTS_CATALOG_FILTER_ACCENT;
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS =
-  'relative w-full aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all duration-300 flex-shrink-0';
+  'relative aspect-[3/4] shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS =
   'border-gray-200 hover:border-gray-300';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS = 'border-[#5281e1]';
 
-/** Scrollable thumbnail column — ~{THUMBNAILS_PER_VIEW} frames tall. */
-export const PRODUCT_PDP_THUMBNAIL_LIST_CLASS =
-  'flex flex-col gap-4 max-h-[29.5rem] overflow-y-auto overscroll-contain';
+/** Mobile PDP — main image centered, thumbnails in a row below. */
+export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
+  'flex flex-col items-center gap-4 lg:flex-row lg:items-start lg:gap-6';
+
+export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full lg:order-2 lg:flex-1';
+
+export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
+  'relative mx-auto aspect-square w-full max-w-[min(100%,28rem)] overflow-hidden rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-none';
+
+export const PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS =
+  'order-2 w-full lg:order-1 lg:w-28 lg:flex-shrink-0';
+
+export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
+  'flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:gap-4 lg:max-h-[29.5rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
+
+export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS = 'w-[4.5rem] lg:w-full';
 
 /** Main image prev/next — round pills (48px), visible on gallery hover. */
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS =
