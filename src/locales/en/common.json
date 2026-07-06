@@ -251,7 +251,7 @@
     "pageOf": "Page {page} of {totalPages}"
   },
   "notFound": {
-    "title": "Page Not Found",
+    "title": "Page Not Found :(",
     "goHome": "Homepage",
     "continueShopping": "Continue Shopping"
   }

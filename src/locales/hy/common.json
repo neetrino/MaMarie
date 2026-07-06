@@ -249,7 +249,7 @@
     "pageOf": "Էջ {page} {totalPages}-ից"
   },
   "notFound": {
-    "title": "Էջը չի գտնվել",
+    "title": "Էջը չի գտնվել :(",
     "goHome": "Գլխավոր էջ",
     "continueShopping": "Շարունակել գնումները"
   }
