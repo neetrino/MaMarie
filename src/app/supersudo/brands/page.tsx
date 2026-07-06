@@ -237,14 +237,15 @@ function BrandsSection() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-gray-900">{t('admin.brands.title')}</h2>
         <Button
           onClick={handleOpenAddModal}
           variant="primary"
           size="sm"
+          className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           {t('admin.brands.addNew')}

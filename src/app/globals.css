@@ -759,6 +759,101 @@ main.admin-page-main .profile-btn-outline:hover:not(:disabled) {
   background-color: #f9fafb !important;
 }
 
+main.admin-page-main .profile-btn-danger,
+main.admin-page-main .profile-btn-primary.profile-btn-danger {
+  background-color: #b91c1c !important;
+}
+
+main.admin-page-main .profile-btn-danger:hover:not(:disabled),
+main.admin-page-main .profile-btn-primary.profile-btn-danger:hover:not(:disabled) {
+  background-color: #991b1b !important;
+}
+
+main.admin-page-main .profile-btn-danger:focus-visible,
+main.admin-page-main .profile-btn-primary.profile-btn-danger:focus-visible {
+  outline-color: #b91c1c;
+}
+
+/* Admin — clay site style (15px radius, brand buttons, clay cards). */
+main.admin-page-main {
+  --admin-clay-radius: 15px;
+  --admin-clay-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --admin-brand-pink: #ef95aa;
+  --admin-brand-pink-hover: #e8879e;
+}
+
+main.admin-page-main input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+main.admin-page-main select,
+main.admin-page-main textarea {
+  border-radius: var(--admin-clay-radius) !important;
+}
+
+main.admin-page-main input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):focus,
+main.admin-page-main select:focus,
+main.admin-page-main textarea:focus {
+  --tw-ring-color: rgb(239 149 170 / 0.45) !important;
+  border-color: var(--admin-brand-pink) !important;
+}
+
+main.admin-page-main .rounded-sm,
+main.admin-page-main .rounded-md,
+main.admin-page-main .rounded-lg,
+main.admin-page-main .rounded-xl,
+main.admin-page-main .rounded-2xl {
+  border-radius: var(--admin-clay-radius) !important;
+}
+
+main.admin-page-main .bg-white.border.border-gray-200.shadow-sm,
+main.admin-page-main .bg-white.border.border-gray-200.shadow-xl,
+main.admin-page-main .bg-white.rounded-lg.border.border-gray-200 {
+  border-radius: var(--admin-clay-radius) !important;
+  box-shadow: var(--admin-clay-shadow) !important;
+}
+
+main.admin-page-main button.bg-gray-900,
+main.admin-page-main a.bg-gray-900,
+main.admin-page-main button.font-medium.rounded-xl.bg-gray-900 {
+  border-radius: var(--admin-clay-radius) !important;
+  background-color: var(--admin-brand-pink) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+main.admin-page-main button.bg-gray-900:hover:not(:disabled),
+main.admin-page-main a.bg-gray-900:hover,
+main.admin-page-main button.font-medium.rounded-xl.bg-gray-900:hover:not(:disabled) {
+  background-color: var(--admin-brand-pink-hover) !important;
+}
+
+main.admin-page-main button.bg-gray-900:focus-visible,
+main.admin-page-main button.font-medium.rounded-xl.bg-gray-900:focus-visible {
+  outline: 2px solid var(--admin-brand-pink);
+  outline-offset: 2px;
+  --tw-ring-color: rgb(239 149 170 / 0.45) !important;
+}
+
+main.admin-page-main button.bg-gray-200,
+main.admin-page-main button.border.border-gray-300,
+main.admin-page-main button.font-medium.rounded-xl {
+  border-radius: var(--admin-clay-radius) !important;
+}
+
+main.admin-page-main button.font-medium.rounded-xl.bg-transparent,
+main.admin-page-main button.font-medium.rounded-xl.bg-white {
+  border-radius: var(--admin-clay-radius) !important;
+}
+
+main.admin-page-main button.font-medium.rounded-xl.bg-transparent:hover:not(:disabled),
+main.admin-page-main button.font-medium.rounded-xl.bg-white:hover:not(:disabled) {
+  background-color: #f9fafb !important;
+}
+
+main.admin-page-main button.text-red-600,
+main.admin-page-main button.text-red-700,
+main.admin-page-main button.border-red-300 {
+  border-radius: var(--admin-clay-radius) !important;
+}
+
 main.profile-page-main .profile-btn-danger,
 .profile-side-sheet .profile-btn-danger {
   background-color: #b91c1c !important;

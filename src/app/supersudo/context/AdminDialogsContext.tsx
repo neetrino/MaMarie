@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@shop/ui';
+import { ADMIN_DANGER_BUTTON_CLASS, ADMIN_OUTLINE_BUTTON_CLASS, ADMIN_PRIMARY_BUTTON_CLASS } from '../../../constants/admin-ui-classes';
 import {
   createContext,
   useCallback,
@@ -118,7 +119,7 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
 
       {activeDialog ? (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
+          <div className="w-full max-w-md rounded-[15px] border border-gray-100 bg-white p-5 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
             <h3 className="mb-2 text-lg font-semibold text-gray-900">
               {activeDialog.options.title ?? t('admin.common.confirm')}
             </h3>
@@ -131,6 +132,7 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
                   onClick={() => {
                     finishDialog(false);
                   }}
+                  className={ADMIN_OUTLINE_BUTTON_CLASS}
                 >
                   {activeDialog.options.cancelText ?? t('admin.common.cancel')}
                 </Button>
@@ -142,8 +144,8 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
                 }}
                 className={
                   activeDialog.options.destructive
-                    ? '!bg-red-600 !text-white hover:!bg-red-700 focus:!ring-red-600'
-                    : ''
+                    ? ADMIN_DANGER_BUTTON_CLASS
+                    : ADMIN_PRIMARY_BUTTON_CLASS
                 }
               >
                 {activeDialog.options.confirmText ??

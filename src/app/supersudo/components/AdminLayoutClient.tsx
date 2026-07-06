@@ -10,6 +10,7 @@ import {
   ADMIN_MAIN_INNER,
   ADMIN_PAGE_SHELL,
 } from '../admin-sidebar-classes';
+import { ADMIN_THEMED_CONTENT_CLASS } from '../../../constants/admin-ui-classes';
 import { AdminDialogsProvider } from '../context/AdminDialogsContext';
 import { AdminSidebarCollapseProvider } from '../context/AdminSidebarCollapseContext';
 import { AdminDesktopSidebar } from './AdminDesktopSidebar';
@@ -31,7 +32,7 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
           <AdminSidebar />
           <AdminDesktopSidebar tabs={adminTabs} pathname={pathname} />
           <div className={ADMIN_MAIN_COLUMN}>
-            <div className={ADMIN_MAIN_INNER}>{children}</div>
+            <div className={`${ADMIN_MAIN_INNER} ${ADMIN_THEMED_CONTENT_CLASS}`}>{children}</div>
           </div>
         </div>
       </AdminDialogsProvider>
