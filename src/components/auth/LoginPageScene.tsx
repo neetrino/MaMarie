@@ -5,17 +5,16 @@ import {
   LOGIN_CARD_MAX_WIDTH_PX,
   LOGIN_CARD_PADDING_X_PX,
   LOGIN_CARD_PADDING_Y_MOBILE_PX,
-  LOGIN_CARD_PADDING_Y_PX,
   LOGIN_DECO_BOW_LEFT_PX,
   LOGIN_DECO_BOW_SIZE_PX,
   LOGIN_DECO_BOW_TOP_PX,
   LOGIN_HEADING_GAP_PX,
   LOGIN_PAGE_ASSETS,
+  LOGIN_PAGE_BG_HEIGHT_PX,
   LOGIN_PAGE_SECTION_PADDING_BOTTOM_MOBILE_PX,
-  LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX,
   LOGIN_PAGE_SECTION_PADDING_TOP_MOBILE_PX,
-  LOGIN_PAGE_SECTION_PADDING_TOP_PX,
   LOGIN_PAGE_SECTION_PADDING_X_PX,
+  LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_OFFSET_PX,
   LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_PX,
   LOGIN_POD_FORM_BG_HEIGHT_PX,
   LOGIN_SECTION_FOOTER_OVERLAP_PX,
@@ -36,6 +35,7 @@ interface LoginPageSceneProps {
   subtitle: string;
   children: ReactNode;
   cardMaxWidthPx?: number;
+  sectionMinHeightPx?: number;
   cardOffsetTopPx?: number;
   cardOffsetTopMobilePx?: number;
 }
@@ -43,12 +43,10 @@ interface LoginPageSceneProps {
 const buildSceneStyle = (
   cardOffsetTopPx: number,
   cardOffsetTopMobilePx: number,
+  sectionMinHeightPx: number,
 ): CSSProperties => ({
-  paddingTop: LOGIN_PAGE_SECTION_PADDING_TOP_PX,
-  paddingBottom: LOGIN_PAGE_SECTION_PADDING_BOTTOM_PX,
   paddingLeft: LOGIN_PAGE_SECTION_PADDING_X_PX,
   paddingRight: LOGIN_PAGE_SECTION_PADDING_X_PX,
-  marginBottom: -LOGIN_SECTION_FOOTER_OVERLAP_PX,
   ['--auth-card-offset-top' as string]: `${cardOffsetTopPx}px`,
   ['--auth-card-offset-top-mobile' as string]: `${cardOffsetTopMobilePx}px`,
   ['--auth-section-padding-top-mobile' as string]: `${LOGIN_PAGE_SECTION_PADDING_TOP_MOBILE_PX}px`,
@@ -57,6 +55,8 @@ const buildSceneStyle = (
   ['--auth-footer-overlap' as string]: `${LOGIN_SECTION_FOOTER_OVERLAP_PX}px`,
   ['--auth-section-min-height-tablet' as string]: `${LOGIN_POD_FORM_BG_HEIGHT_PX}px`,
   ['--auth-tablet-bottom-clearance' as string]: `${LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_PX}px`,
+  ['--auth-tablet-nav-overlap' as string]: `${LOGIN_AUTH_BOTTOM_NAV_CLEARANCE_OFFSET_PX}px`,
+  ['--auth-section-min-height-desktop' as string]: `${sectionMinHeightPx}px`,
 });
 
 /** Figma `222:491` — pod-form background, centered clay card, bow decoration. */
@@ -65,19 +65,22 @@ export function LoginPageScene({
   subtitle,
   children,
   cardMaxWidthPx = LOGIN_CARD_MAX_WIDTH_PX,
+  sectionMinHeightPx = LOGIN_PAGE_BG_HEIGHT_PX,
   cardOffsetTopPx = SIGN_IN_CARD_OFFSET_TOP_PX,
   cardOffsetTopMobilePx = SIGN_IN_CARD_OFFSET_TOP_MOBILE_PX,
 }: LoginPageSceneProps) {
   return (
     <section
-      className="mobile-auth-page auth-page-scene relative w-full overflow-visible max-[743px]:!mb-0 max-[743px]:!min-h-0 max-[743px]:!pb-0 max-[743px]:!pt-4 max-lg:!mb-0 min-[744px]:bg-white lg:bg-white"
-      style={buildSceneStyle(cardOffsetTopPx, cardOffsetTopMobilePx)}
+      className="mobile-auth-page auth-page-scene relative w-full overflow-visible max-[743px]:!mb-0 max-[743px]:!min-h-0 max-[743px]:!pb-0 max-[743px]:!pt-4 min-[744px]:bg-white lg:bg-white"
+      style={buildSceneStyle(cardOffsetTopPx, cardOffsetTopMobilePx, sectionMinHeightPx)}
     >
       <LoginPodFormBackground />
 
       <div
         className="auth-page-card-offset relative z-10 mx-auto flex w-full justify-center overflow-visible"
-        style={{ maxWidth: cardMaxWidthPx }}
+        style={{
+          maxWidth: cardMaxWidthPx,
+        }}
       >
         <div
           className="pointer-events-none absolute hidden sm:block"
@@ -104,8 +107,6 @@ export function LoginPageScene({
             maxWidth: cardMaxWidthPx,
             paddingLeft: LOGIN_CARD_PADDING_X_PX,
             paddingRight: LOGIN_CARD_PADDING_X_PX,
-            paddingTop: LOGIN_CARD_PADDING_Y_PX,
-            paddingBottom: LOGIN_CARD_PADDING_Y_PX,
             borderRadius: LOGIN_CARD_INNER_RADIUS_PX,
           }}
         >

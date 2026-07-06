@@ -517,6 +517,12 @@
   /* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — login/register clay pod; card keeps mobile offsets; no footer. */
   @media (min-width: 744px) and (max-width: 1023px) {
     main.home-main-surface:has(.mobile-auth-page) {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: calc(
+        100dvh - var(--header-clearance-mobile, 64px) - var(--auth-tablet-bottom-clearance, 92px)
+      );
       background-color: #ffffff;
     }
 
@@ -525,12 +531,17 @@
     }
 
     .auth-page-scene {
+      flex: 1 1 auto;
       min-height: max(
         var(--auth-section-min-height-tablet, 864px),
         calc(
           100dvh - var(--header-clearance-mobile, 64px) - var(--auth-tablet-bottom-clearance, 92px)
         )
       );
+    }
+
+    .auth-page-pod-bg {
+      bottom: calc(-1 * var(--auth-tablet-nav-overlap, 22px));
     }
   }
 
@@ -547,10 +558,6 @@
 }
 
 @media (min-width: 1024px) {
-  .auth-page-card-offset {
-    margin-top: var(--auth-card-offset-top, 50px);
-  }
-
   main.auth-main-surface {
     display: flex;
     flex-direction: column;
@@ -559,8 +566,25 @@
   }
 
   .auth-page-scene {
+    position: relative;
     flex: 1 1 auto;
-    min-height: 0;
+    min-height: var(--auth-section-min-height-desktop, 854px);
+    margin-bottom: calc(-1 * var(--auth-footer-overlap, 58px));
+    padding-top: 24px;
+    padding-bottom: 0;
+    background-color: #ffffff;
+  }
+
+  .auth-page-card-offset {
+    margin-top: var(--auth-card-offset-top, 50px);
+  }
+
+  .auth-page-card {
+    padding-top: 45px;
+    padding-bottom: 45px;
+    background-color: #f4f4f4;
+    gap: 22px;
+    box-shadow: none;
   }
 }
 
