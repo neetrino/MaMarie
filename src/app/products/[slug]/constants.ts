@@ -36,7 +36,7 @@ export const PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS =
   'order-2 w-full lg:order-1 lg:w-28 lg:flex-shrink-0';
 
 export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
-  'flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:gap-4 lg:max-h-[29.5rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
+  'flex w-full flex-row justify-start gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:justify-start lg:gap-4 lg:max-h-[29.5rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS = 'w-[4.5rem] lg:w-full';
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { ProductLabels } from "../../../components/ProductLabels";
 import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
@@ -52,6 +52,20 @@ function ProductThumbnailRail({
   onImageIndexChange,
   onImageError,
 }: ProductThumbnailRailProps) {
+  const activeThumbRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      return;
+    }
+
+    activeThumbRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    });
+  }, [currentImageIndex]);
+
   return (
     <div className={PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS}>
       <div className={PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS}>
@@ -60,6 +74,7 @@ function ProductThumbnailRail({
           return (
             <button
               key={index}
+              ref={isActive ? activeThumbRef : undefined}
               type="button"
               onClick={() => onImageIndexChange(index)}
               className={`${PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS} ${PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS} ${
