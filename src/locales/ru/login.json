@@ -11,7 +11,9 @@
     "submit": "Войти",
     "submitting": "Вход...",
     "noAccount": "Нет аккаунта?",
-    "signUp": "Зарегистрироваться"
+    "signUp": "Зарегистрироваться",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль"
   },
   "errors": {
     "emailRequired": "Пожалуйста, введите ваш email",

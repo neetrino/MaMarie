@@ -1,0 +1,105 @@
+import type { ChangeEvent, ReactNode } from 'react';
+import Image from 'next/image';
+import {
+  LOGIN_INPUT_BG,
+  LOGIN_INPUT_BORDER_COLOR,
+  LOGIN_INPUT_BORDER_WIDTH_PX,
+  LOGIN_INPUT_CLASS,
+  LOGIN_INPUT_FONT_SIZE_PX,
+  LOGIN_INPUT_HEIGHT_PX,
+  LOGIN_INPUT_ICON_GAP_PX,
+  LOGIN_INPUT_ICON_SIZE_PX,
+  LOGIN_INPUT_PADDING_X_PX,
+  LOGIN_INPUT_PADDING_Y_PX,
+  LOGIN_INPUT_RADIUS_PX,
+  LOGIN_INPUT_TEXT_COLOR,
+  LOGIN_LABEL_COLOR,
+  LOGIN_LABEL_FONT_SIZE_PX,
+  LOGIN_LABEL_TO_INPUT_GAP_PX,
+} from '../../constants/login-page';
+
+interface LoginFormFieldProps {
+  id: string;
+  label: string;
+  type?: string;
+  value: string;
+  placeholder: string;
+  iconSrc: string;
+  disabled?: boolean;
+  hasError?: boolean;
+  trailing?: ReactNode;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}
+
+/** Figma `222:548` / `222:553` — labeled pill input with leading icon. */
+export function LoginFormField({
+  id,
+  label,
+  type = 'text',
+  value,
+  placeholder,
+  iconSrc,
+  disabled = false,
+  hasError = false,
+  trailing,
+  onChange,
+}: LoginFormFieldProps) {
+  return (
+    <div className="flex w-full flex-col" style={{ gap: LOGIN_LABEL_TO_INPUT_GAP_PX }}>
+      <label
+        htmlFor={id}
+        className="font-medium"
+        style={{
+          fontSize: LOGIN_LABEL_FONT_SIZE_PX,
+          lineHeight: 1.5,
+          color: LOGIN_LABEL_COLOR,
+          letterSpacing: '-0.24px',
+        }}
+      >
+        {label}
+      </label>
+      <div
+        className="flex w-full items-center overflow-hidden"
+        style={{
+          gap: LOGIN_INPUT_ICON_GAP_PX,
+          minHeight: LOGIN_INPUT_HEIGHT_PX,
+          paddingLeft: LOGIN_INPUT_PADDING_X_PX,
+          paddingRight: LOGIN_INPUT_PADDING_X_PX,
+          paddingTop: LOGIN_INPUT_PADDING_Y_PX,
+          paddingBottom: LOGIN_INPUT_PADDING_Y_PX,
+          borderRadius: LOGIN_INPUT_RADIUS_PX,
+          borderWidth: LOGIN_INPUT_BORDER_WIDTH_PX,
+          borderStyle: 'solid',
+          borderColor: hasError ? '#ef4444' : LOGIN_INPUT_BORDER_COLOR,
+          backgroundColor: LOGIN_INPUT_BG,
+        }}
+      >
+        <Image
+          src={iconSrc}
+          alt=""
+          width={LOGIN_INPUT_ICON_SIZE_PX}
+          height={LOGIN_INPUT_ICON_SIZE_PX}
+          className="shrink-0"
+          aria-hidden
+        />
+        <input
+          id={id}
+          name={id}
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          disabled={disabled}
+          onChange={onChange}
+          className={LOGIN_INPUT_CLASS}
+          style={{
+            fontSize: LOGIN_INPUT_FONT_SIZE_PX,
+            lineHeight: 1.5,
+            color: LOGIN_INPUT_TEXT_COLOR,
+            letterSpacing: '-0.24px',
+          }}
+        />
+        {trailing}
+      </div>
+    </div>
+  );
+}
