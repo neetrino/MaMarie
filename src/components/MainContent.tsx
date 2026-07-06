@@ -123,7 +123,7 @@ export function MainContent({ children }: MainContentProps) {
 
   return (
     <main
-      className={`${mainBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
+      className={`${mainBase} flex min-h-0 flex-col pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
       style={headerClearanceVars}
     >
       {children}
