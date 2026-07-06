@@ -1,14 +1,11 @@
 import type { ChangeEvent, FormEvent, ReactNode } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Eye } from 'lucide-react';
 import {
   LOGIN_CHECKBOX_GAP_PX,
   LOGIN_CHECKBOX_SIZE_PX,
   LOGIN_ERROR_CLASS,
   LOGIN_FIELD_ASSETS,
   LOGIN_FOOTER_TEXT_COLOR,
-  LOGIN_INPUT_ICON_SIZE_PX,
   LOGIN_MUTED_TEXT_COLOR,
   LOGIN_SECONDARY_TEXT_FONT_SIZE_PX,
   LOGIN_SIGNUP_LINK_COLOR,
@@ -20,6 +17,7 @@ import {
 } from '../../constants/login-page';
 import { CLAY_PRIMARY_BUTTON_CLASS } from '../../constants/clay-primary-button';
 import type { AuthFieldErrors } from '../../lib/auth/auth-form-field-errors';
+import { AuthPasswordVisibilityIcon } from './AuthFieldIcon';
 import { LoginFormField } from './LoginFormField';
 
 interface RegisterFormLabels {
@@ -90,8 +88,6 @@ function PasswordToggleButton({
   hideLabel: string;
   onToggle: () => void;
 }): ReactNode {
-  const iconSize = LOGIN_INPUT_ICON_SIZE_PX;
-
   return (
     <button
       type="button"
@@ -100,18 +96,7 @@ function PasswordToggleButton({
       className="shrink-0 hover:opacity-70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       aria-label={visible ? hideLabel : showLabel}
     >
-      {visible ? (
-        <Eye size={iconSize} strokeWidth={1.75} className="text-[#232323]" />
-      ) : (
-        <Image
-          src={LOGIN_FIELD_ASSETS.iconEyeOff}
-          alt=""
-          width={iconSize}
-          height={iconSize}
-          unoptimized
-          aria-hidden
-        />
-      )}
+      <AuthPasswordVisibilityIcon visible={visible} />
     </button>
   );
 }

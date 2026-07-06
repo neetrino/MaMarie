@@ -1,7 +1,5 @@
 import type { ChangeEvent, FormEvent } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Eye } from 'lucide-react';
 import {
   LOGIN_ACTIONS_ROW_CLASS,
   LOGIN_ACTIONS_TOP_GAP_PX,
@@ -11,7 +9,6 @@ import {
   LOGIN_FIELD_ASSETS,
   LOGIN_FOOTER_TEXT_COLOR,
   LOGIN_FORGOT_PASSWORD_LINK_CLASS,
-  LOGIN_INPUT_ICON_SIZE_PX,
   LOGIN_MUTED_TEXT_COLOR,
   LOGIN_SECONDARY_TEXT_CLASS,
   LOGIN_SECONDARY_TEXT_FONT_SIZE_PX,
@@ -23,6 +20,7 @@ import {
   LOGIN_SUBMIT_LINE_HEIGHT_PX,
 } from '../../constants/login-page';
 import { CLAY_PRIMARY_BUTTON_CLASS } from '../../constants/clay-primary-button';
+import { AuthPasswordVisibilityIcon } from './AuthFieldIcon';
 import type { AuthFieldErrors } from '../../lib/auth/auth-form-field-errors';
 import { LoginFormField } from './LoginFormField';
 
@@ -74,7 +72,6 @@ export function LoginForm({
   onTogglePassword,
 }: LoginFormProps) {
   const disabled = isSubmitting || isLoading;
-  const iconSize = LOGIN_INPUT_ICON_SIZE_PX;
 
   return (
     <form
@@ -120,18 +117,7 @@ export function LoginForm({
               className="shrink-0 hover:opacity-70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               aria-label={showPassword ? labels.hidePassword : labels.showPassword}
             >
-              {showPassword ? (
-                <Eye size={iconSize} strokeWidth={1.75} className="text-[#232323]" />
-              ) : (
-                <Image
-                  src={LOGIN_FIELD_ASSETS.iconEyeOff}
-                  alt=""
-                  width={iconSize}
-                  height={iconSize}
-                  unoptimized
-                  aria-hidden
-                />
-              )}
+              <AuthPasswordVisibilityIcon visible={showPassword} />
             </button>
           }
         />

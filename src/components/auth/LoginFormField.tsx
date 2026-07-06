@@ -1,14 +1,11 @@
 import type { ChangeEvent, ReactNode } from 'react';
-import Image from 'next/image';
 import {
   LOGIN_INPUT_BG,
   LOGIN_INPUT_BORDER_COLOR,
   LOGIN_INPUT_BORDER_WIDTH_PX,
-  LOGIN_INPUT_CLASS,
   LOGIN_INPUT_FIELD_CLASS,
   LOGIN_INPUT_HEIGHT_PX,
   LOGIN_INPUT_ICON_GAP_PX,
-  LOGIN_INPUT_ICON_SIZE_PX,
   LOGIN_INPUT_PADDING_X_PX,
   LOGIN_INPUT_PADDING_Y_PX,
   LOGIN_INPUT_SHELL_RADIUS_CLASS,
@@ -17,6 +14,7 @@ import {
   LOGIN_LABEL_FONT_SIZE_PX,
   LOGIN_LABEL_TO_INPUT_GAP_PX,
 } from '../../constants/login-page';
+import { AuthFieldIcon } from './AuthFieldIcon';
 
 interface LoginFormFieldProps {
   id: string;
@@ -34,17 +32,7 @@ interface LoginFormFieldProps {
 }
 
 function LoginFormFieldIcon({ src }: { src: string }) {
-  return (
-    <Image
-      src={src}
-      alt=""
-      width={LOGIN_INPUT_ICON_SIZE_PX}
-      height={LOGIN_INPUT_ICON_SIZE_PX}
-      unoptimized
-      className="shrink-0"
-      aria-hidden
-    />
-  );
+  return <AuthFieldIcon src={src} />;
 }
 
 /** Figma `222:548` / `222:553` — labeled pill input with leading icon. */

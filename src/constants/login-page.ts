@@ -72,6 +72,10 @@ export const LOGIN_INPUT_PADDING_X_PX = 14;
 export const LOGIN_INPUT_PADDING_Y_PX = 14;
 export const LOGIN_INPUT_ICON_SIZE_PX = 20;
 export const LOGIN_INPUT_ICON_GAP_PX = 10;
+/** Mobile field icons — slightly darker than Figma `#ededed` for legibility on white inputs. */
+export const LOGIN_INPUT_ICON_COLOR = '#d4d4d4';
+export const LOGIN_INPUT_ICON_STROKE_WIDTH_MOBILE = 1.25;
+export const LOGIN_INPUT_ICON_STROKE_WIDTH_DESKTOP = 1.75;
 export const LOGIN_INPUT_FONT_SIZE_PX = 14;
 /** iOS Safari auto-zooms focused inputs below 16px. */
 export const LOGIN_INPUT_FONT_SIZE_MOBILE_PX = 16;
@@ -122,6 +126,11 @@ export const LOGIN_FIELD_ASSETS = {
   iconLock: '/assets/auth/icon-lock.svg',
   iconEyeOff: '/assets/auth/icon-eye-off.svg',
 } as const;
+
+/** Mobile auth icons — `-mobile` suffix, thinner stroke, no inner-shadow filter. */
+export function getLoginFieldAssetMobileSrc(desktopSrc: string): string {
+  return desktopSrc.replace(/\.svg$/u, '-mobile.svg');
+}
 
 /** Figma decoration — bow above card. */
 export const LOGIN_PAGE_ASSETS = {
