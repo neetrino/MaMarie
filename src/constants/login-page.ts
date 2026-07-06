@@ -85,8 +85,20 @@ export const LOGIN_SUBMIT_LINE_HEIGHT_PX = 24;
 export const LOGIN_SUBMIT_BG = BRAND_COLORS.pink;
 export const LOGIN_SUBMIT_INSET_SHADOW = HERO_GENDER_BUTTON_INSET_SHADOW;
 export const LOGIN_ACTIONS_GAP_PX = 24;
+/** Mobile remember-me row — keep «Հիշել ինձ» + forgot password on one line. */
+export const LOGIN_ACTIONS_ROW_MOBILE_GAP_PX = 8;
+export const LOGIN_SECONDARY_TEXT_FONT_SIZE_MOBILE_PX = 12;
 export const LOGIN_CHECKBOX_GAP_PX = 8;
 export const LOGIN_ACTIONS_TOP_GAP_PX = 18;
+
+/** Remember me + forgot password — single row on mobile, wraps on desktop if needed. */
+export const LOGIN_ACTIONS_ROW_CLASS =
+  'flex w-full items-center justify-between max-lg:flex-nowrap max-lg:gap-2 lg:flex-wrap lg:gap-x-6 lg:gap-y-2';
+
+export const LOGIN_SECONDARY_TEXT_CLASS =
+  'font-medium max-lg:text-xs max-lg:leading-4 lg:text-sm lg:leading-normal';
+
+export const LOGIN_FORGOT_PASSWORD_LINK_CLASS = `${LOGIN_SECONDARY_TEXT_CLASS} shrink-0 underline decoration-solid underline-offset-2 max-lg:text-right`;
 
 export const LOGIN_MUTED_TEXT_COLOR = '#9c9c9c';
 export const LOGIN_SIGNUP_LINK_COLOR = '#256dff';

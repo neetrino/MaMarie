@@ -3,15 +3,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Eye } from 'lucide-react';
 import {
-  LOGIN_ACTIONS_GAP_PX,
+  LOGIN_ACTIONS_ROW_CLASS,
   LOGIN_ACTIONS_TOP_GAP_PX,
   LOGIN_CHECKBOX_GAP_PX,
   LOGIN_CHECKBOX_SIZE_PX,
   LOGIN_ERROR_CLASS,
   LOGIN_FIELD_ASSETS,
   LOGIN_FOOTER_TEXT_COLOR,
+  LOGIN_FORGOT_PASSWORD_LINK_CLASS,
   LOGIN_INPUT_ICON_SIZE_PX,
   LOGIN_MUTED_TEXT_COLOR,
+  LOGIN_SECONDARY_TEXT_CLASS,
   LOGIN_SECONDARY_TEXT_FONT_SIZE_PX,
   LOGIN_SIGNUP_LINK_COLOR,
   LOGIN_SUBMIT_BG,
@@ -151,12 +153,9 @@ export function LoginForm({
           {disabled ? labels.submitting : labels.submit}
         </button>
 
-        <div
-          className="flex w-full flex-wrap items-center justify-between gap-y-2"
-          style={{ gap: LOGIN_ACTIONS_GAP_PX }}
-        >
+        <div className={LOGIN_ACTIONS_ROW_CLASS}>
           <label
-            className="flex items-center"
+            className="flex shrink-0 items-center"
             style={{ gap: LOGIN_CHECKBOX_GAP_PX, color: LOGIN_MUTED_TEXT_COLOR }}
           >
             <input
@@ -169,14 +168,12 @@ export function LoginForm({
               className="rounded border-[#ededed] text-brand-pink focus:ring-brand-pink/35"
               style={{ width: LOGIN_CHECKBOX_SIZE_PX, height: LOGIN_CHECKBOX_SIZE_PX }}
             />
-            <span className="font-medium" style={{ fontSize: LOGIN_SECONDARY_TEXT_FONT_SIZE_PX }}>
-              {labels.rememberMe}
-            </span>
+            <span className={LOGIN_SECONDARY_TEXT_CLASS}>{labels.rememberMe}</span>
           </label>
           <Link
             href="/forgot-password"
-            className="font-medium underline decoration-solid underline-offset-2"
-            style={{ fontSize: LOGIN_SECONDARY_TEXT_FONT_SIZE_PX, color: LOGIN_MUTED_TEXT_COLOR }}
+            className={LOGIN_FORGOT_PASSWORD_LINK_CLASS}
+            style={{ color: LOGIN_MUTED_TEXT_COLOR }}
           >
             {labels.forgotPassword}
           </Link>
