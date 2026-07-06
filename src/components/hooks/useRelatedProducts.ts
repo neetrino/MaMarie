@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../lib/api-client';
 import { getStoredLanguage, type LanguageCode } from '../../lib/language';
+import type {
+  ProductColorOption,
+  ProductSizeOption,
+} from '../../lib/services/product-variant-attributes';
 import { logger } from "@/lib/utils/logger";
 
 interface RelatedProduct {
@@ -24,12 +28,11 @@ interface RelatedProduct {
     slug: string;
     title: string;
   }>;
-  variants?: Array<{
-    options?: Array<{
-      key: string;
-      value: string;
-    }>;
-  }>;
+  defaultVariantId?: string | null;
+  colors?: ProductColorOption[];
+  sizes?: ProductSizeOption[];
+  averageRating?: number;
+  reviewsCount?: number;
 }
 
 interface UseRelatedProductsProps {
@@ -38,6 +41,17 @@ interface UseRelatedProductsProps {
   language: LanguageCode;
   /** When set (PDP), uses cached `/api/v1/products/[slug]/related` instead of list API. */
   productSlug?: string;
+}
+
+function normalizeRelatedProduct(product: RelatedProduct): RelatedProduct {
+  return {
+    ...product,
+    defaultVariantId: product.defaultVariantId ?? null,
+    colors: Array.isArray(product.colors) ? product.colors : [],
+    sizes: Array.isArray(product.sizes) ? product.sizes : [],
+    averageRating: typeof product.averageRating === 'number' ? product.averageRating : 0,
+    reviewsCount: typeof product.reviewsCount === 'number' ? product.reviewsCount : 0,
+  };
 }
 
 /**
@@ -65,7 +79,9 @@ export function useRelatedProducts({
           }>(`/api/v1/products/${encoded}/related`, {
             params: { lang: language },
           });
-          const filtered = response.data.filter((p) => p.id !== currentProductId);
+          const filtered = response.data
+            .filter((p) => p.id !== currentProductId)
+            .map(normalizeRelatedProduct);
           setProducts(filtered.slice(0, 10));
           return;
         }
@@ -94,7 +110,9 @@ export function useRelatedProducts({
         logger.debug('[RelatedProducts] Received products:', response.data.length);
         const filtered = response.data.filter((p) => p.id !== currentProductId);
         logger.debug('[RelatedProducts] After filtering current product:', filtered.length);
-        const finalProducts = filtered.slice(0, 10);
+        const finalProducts = filtered
+          .slice(0, 10)
+          .map(normalizeRelatedProduct);
         logger.debug('[RelatedProducts] Final products to display:', finalProducts.length);
         setProducts(finalProducts);
       } catch (error: unknown) {

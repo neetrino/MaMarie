@@ -485,6 +485,7 @@
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-product-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
   .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
     background-color: #f1f1f3;

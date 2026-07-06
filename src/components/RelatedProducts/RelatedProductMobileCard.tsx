@@ -1,14 +1,13 @@
 'use client';
 
 import {
-  RELATED_PRODUCTS_MOBILE_CARD_WIDTH_PX,
-} from '../../constants/products-catalog';
+  MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX,
+} from '../../constants/mobile-products-catalog';
+import { MobileProductsCatalogProductCard } from '../products/MobileProductsCatalogProductCard';
 import {
-  MOBILE_WISHLIST_CARD_WIDTH_PX,
-} from '../../constants/mobile-wishlist';
-import { mapToHomeProductCard } from '../home/best-products-data';
-import { MobileWishlistProductCard } from '../wishlist/MobileWishlistProductCard';
-import type { RelatedProductCardData } from './RelatedProductCard';
+  mapRelatedProductToHomeProductCard,
+  type RelatedProductCardData,
+} from './RelatedProductCard';
 
 interface RelatedProductMobileCardProps {
   product: RelatedProductCardData;
@@ -16,29 +15,20 @@ interface RelatedProductMobileCardProps {
   addToCartLabel: string;
 }
 
-/** PDP related row on mobile — same card as wishlist. */
+/** PDP related row on mobile — same card component and width as mobile shop catalog. */
 export function RelatedProductMobileCard({
   product,
   imagePriority = false,
   addToCartLabel,
 }: RelatedProductMobileCardProps) {
-  const cardProduct = mapToHomeProductCard({
-    id: product.id,
-    slug: product.slug,
-    title: product.title,
-    price: product.price,
-    compareAtPrice: product.compareAtPrice,
-    originalPrice: product.originalPrice,
-    image: product.image,
-    inStock: product.inStock,
-    brand: product.brand ? { name: product.brand.name } : null,
-  });
+  const layoutWidthPx = MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX;
+  const cardProduct = mapRelatedProductToHomeProductCard(product);
 
   return (
-    <div className="shrink-0 snap-start" style={{ width: RELATED_PRODUCTS_MOBILE_CARD_WIDTH_PX }}>
-      <MobileWishlistProductCard
+    <div className="shrink-0 snap-start" style={{ width: layoutWidthPx }}>
+      <MobileProductsCatalogProductCard
         product={cardProduct}
-        layoutWidthPx={MOBILE_WISHLIST_CARD_WIDTH_PX}
+        layoutWidthPx={layoutWidthPx}
         imagePriority={imagePriority}
         addToCartLabel={addToCartLabel}
       />

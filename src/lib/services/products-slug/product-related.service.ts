@@ -33,12 +33,51 @@ const relatedProductSelect = {
   variants: {
     where: { published: true },
     orderBy: { price: "asc" as const },
-    take: 1,
     select: {
       id: true,
       price: true,
       compareAtPrice: true,
       stock: true,
+      sku: true,
+      attributes: true,
+      options: {
+        select: {
+          value: true,
+          attributeKey: true,
+          attributeValue: {
+            select: {
+              value: true,
+              imageUrl: true,
+              colors: true,
+              attribute: { select: { key: true } },
+              translations: {
+                select: { locale: true, label: true },
+                take: 10,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  productAttributes: {
+    select: {
+      attribute: {
+        select: {
+          key: true,
+          values: {
+            select: {
+              value: true,
+              imageUrl: true,
+              colors: true,
+              translations: {
+                select: { locale: true, label: true },
+                take: 10,
+              },
+            },
+          },
+        },
+      },
     },
   },
   categories: {

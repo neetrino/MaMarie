@@ -15,12 +15,6 @@ import {
   homeSectionColumnWidthPx,
 } from './home-sections';
 import { resolveHomeProductCardHeightPx } from '../lib/home-product-card-layout';
-import {
-  MOBILE_WISHLIST_CARD_COLUMN_GAP_PX,
-  MOBILE_WISHLIST_CARD_HEIGHT_PX,
-  MOBILE_WISHLIST_CARD_WIDTH_PX,
-} from './mobile-wishlist';
-
 /** Figma shop page — catalog layout tokens. Horizontal insets use `HomeContentHorizontalFrame` (same as navbar pill). */
 
 /** Extra breathing room below fixed navbar — shop page only. */
@@ -54,10 +48,7 @@ export const RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX = 30;
 export const RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES = 2;
 export const RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX = 68;
 
-/** Mobile related row — wishlist card sizing and spacing. */
-export const RELATED_PRODUCTS_MOBILE_CARD_WIDTH_PX = MOBILE_WISHLIST_CARD_WIDTH_PX;
-export const RELATED_PRODUCTS_MOBILE_CARD_HEIGHT_PX = MOBILE_WISHLIST_CARD_HEIGHT_PX;
-export const RELATED_PRODUCTS_MOBILE_CARD_GAP_PX = MOBILE_WISHLIST_CARD_COLUMN_GAP_PX;
+/** Mobile related grid — title → shop-style card grid. */
 export const RELATED_PRODUCTS_MOBILE_GRID_OFFSET_TOP_PX = 20;
 export const PRODUCTS_CATALOG_CARD_COLUMNS = 3;
 export const PRODUCTS_CATALOG_GRID4_COLUMNS = 4;

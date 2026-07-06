@@ -30,7 +30,7 @@ export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
 export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full lg:order-2 lg:flex-1';
 
 export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
-  'relative mx-auto aspect-square w-full max-w-[min(100%,28rem)] overflow-hidden rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-none';
+  'relative mx-auto aspect-square w-full max-w-[min(100%,28rem)] overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-none';
 
 export const PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS =
   'order-2 w-full lg:order-1 lg:w-28 lg:flex-shrink-0';

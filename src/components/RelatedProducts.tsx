@@ -6,15 +6,17 @@ import {
   PRODUCTS_CATALOG_CARD_WIDTH_PX,
   RELATED_PRODUCTS_CARD_GAP_PX,
   RELATED_PRODUCTS_GRID_OFFSET_TOP_PX,
-  RELATED_PRODUCTS_MOBILE_CARD_GAP_PX,
-  RELATED_PRODUCTS_MOBILE_CARD_HEIGHT_PX,
-  RELATED_PRODUCTS_MOBILE_CARD_WIDTH_PX,
   RELATED_PRODUCTS_MOBILE_GRID_OFFSET_TOP_PX,
   RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX,
   RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX,
   RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX,
   RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES,
 } from '../constants/products-catalog';
+import {
+  MOBILE_PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
+  MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX,
+  MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX,
+} from '../constants/mobile-products-catalog';
 import {
   BEST_PRODUCTS_ASSETS,
   BEST_PRODUCTS_HEADING_COLOR,
@@ -47,7 +49,7 @@ const MOBILE_RELATED_ROW_CLASS =
   'scrollbar-hide flex snap-x snap-mandatory overflow-x-auto overflow-y-visible pb-6 lg:hidden';
 
 /**
- * Related products row — desktop shop cards; mobile wishlist-style cards.
+ * Related products — desktop horizontal shop cards; mobile horizontal row with shop catalog cards.
  */
 export function RelatedProducts({ categorySlug, currentProductId, productSlug }: RelatedProductsProps) {
   const [language, setLanguage] = useState<LanguageCode>('en');
@@ -78,11 +80,11 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
   } as const;
 
   const mobileRowStyle = {
-    gap: RELATED_PRODUCTS_MOBILE_CARD_GAP_PX,
+    gap: MOBILE_PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
     paddingTop: RELATED_PRODUCTS_MOBILE_GRID_OFFSET_TOP_PX,
   } as const;
 
-  const addToCartLabel = t(language, 'product.relatedAddToCart');
+  const addToCartLabel = t(language, 'common.wishlist.addToCart');
 
   return (
     <section className="mt-12 border-t border-gray-200 py-8 lg:mt-20 lg:py-12">
@@ -105,14 +107,14 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
 
       {loading ? (
         <>
-          <div className={MOBILE_RELATED_ROW_CLASS} style={mobileRowStyle}>
+          <div className={`${MOBILE_RELATED_ROW_CLASS} w-full min-w-0`} style={mobileRowStyle}>
             {[1, 2, 3].map((index) => (
               <div
                 key={`mobile-related-skeleton-${index}`}
                 className="shrink-0 animate-pulse rounded-[30px] bg-gray-100"
                 style={{
-                  width: RELATED_PRODUCTS_MOBILE_CARD_WIDTH_PX,
-                  height: RELATED_PRODUCTS_MOBILE_CARD_HEIGHT_PX,
+                  width: MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX,
+                  height: MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX,
                 }}
               />
             ))}
@@ -136,26 +138,25 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
         </div>
       ) : (
         <>
-          <div className={MOBILE_RELATED_ROW_CLASS} style={mobileRowStyle}>
+          <div className={`${MOBILE_RELATED_ROW_CLASS} w-full min-w-0`} style={mobileRowStyle}>
             {products.map((product, index) => (
               <LazyWhenVisible
                 key={product.id}
-                eager={resolveProductCardEagerMount(index, 'wishlist-grid-4')}
-                minHeightPx={RELATED_PRODUCTS_MOBILE_CARD_HEIGHT_PX}
+                eager={resolveProductCardEagerMount(index, 'grid-4')}
+                minHeightPx={MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX}
                 prefetchHorizontalPx={LAZY_LOAD_ROOT_MARGIN_PX}
                 className="shrink-0 snap-start"
                 fallback={
                   <ProductCardMountPlaceholder
                     variant="grid"
-                    widthPx={RELATED_PRODUCTS_MOBILE_CARD_WIDTH_PX}
-                    heightPx={RELATED_PRODUCTS_MOBILE_CARD_HEIGHT_PX}
-                    className="mobile-wishlist-card-placeholder w-full max-w-none"
+                    widthPx={MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX}
+                    heightPx={MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX}
                   />
                 }
               >
                 <RelatedProductMobileCard
                   product={product}
-                  imagePriority={resolveProductCardImagePriority(index, 'wishlist-grid-4')}
+                  imagePriority={resolveProductCardImagePriority(index, 'grid-4')}
                   addToCartLabel={addToCartLabel}
                 />
               </LazyWhenVisible>
