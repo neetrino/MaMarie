@@ -25,7 +25,9 @@ export const NOT_FOUND_TITLE_LINE_HEIGHT = 1.1;
 export const NOT_FOUND_TITLE_COLOR = BRAND_COLORS.pink;
 export const NOT_FOUND_TITLE_TRACKING_PX = -0.45;
 export const NOT_FOUND_ILLUSTRATION_TO_TITLE_GAP_PX = -66;
-export const NOT_FOUND_TITLE_TO_ACTIONS_GAP_PX = 24;
+/** Lift only «Էջը չի գտնվել»; illustration and buttons stay put. */
+export const NOT_FOUND_TITLE_LIFT_PX = 60;
+export const NOT_FOUND_TITLE_TO_ACTIONS_GAP_PX = 16;
 
 export const NOT_FOUND_ACTIONS_GAP_PX = HERO_GENDER_BUTTONS_GAP_PX;
 

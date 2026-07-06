@@ -7,6 +7,7 @@ import {
   NOT_FOUND_SECTION_PADDING_TOP_PX,
   NOT_FOUND_TITLE_COLOR,
   NOT_FOUND_TITLE_FONT_SIZE_PX,
+  NOT_FOUND_TITLE_LIFT_PX,
   NOT_FOUND_TITLE_LINE_HEIGHT,
   NOT_FOUND_TITLE_TO_ACTIONS_GAP_PX,
   NOT_FOUND_TITLE_TRACKING_PX,
@@ -41,6 +42,7 @@ export function NotFoundPageContent() {
             lineHeight: NOT_FOUND_TITLE_LINE_HEIGHT,
             letterSpacing: `${NOT_FOUND_TITLE_TRACKING_PX}px`,
             marginTop: NOT_FOUND_ILLUSTRATION_TO_TITLE_GAP_PX,
+            transform: `translateY(-${NOT_FOUND_TITLE_LIFT_PX}px)`,
           }}
         >
           {t('common.notFound.title')}
