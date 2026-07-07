@@ -231,10 +231,13 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
   const { user } = useAuth();
   const { collapsed } = useAdminSidebarCollapse();
   const [productsNestedExpanded, toggleProductsNested] = useAdminProductsSubnavExpanded(pathname);
+  const adminTitle = t('admin.dashboard.title');
   const displayName =
     user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
-      : user?.firstName || user?.lastName || t('admin.dashboard.title');
+      : user?.firstName || user?.lastName || adminTitle;
+  const showAdminTitle =
+    displayName.trim().localeCompare(adminTitle.trim(), undefined, { sensitivity: 'accent' }) !== 0;
 
   const sidebarWidth = collapsed ? ADMIN_SIDEBAR_WIDTH_COLLAPSED_PX : ADMIN_SIDEBAR_WIDTH_EXPANDED_PX;
 
@@ -260,7 +263,9 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
       {!collapsed ? (
         <div className="shrink-0 border-b border-gray-100 px-4 py-4 text-center">
           <p className="text-base font-bold text-gray-900">{displayName}</p>
-          <p className="mt-0.5 text-sm font-medium text-brand-pink">{t('admin.dashboard.title')}</p>
+          {showAdminTitle ? (
+            <p className="mt-0.5 text-sm font-medium text-brand-pink">{adminTitle}</p>
+          ) : null}
           {user?.email ? <p className="mt-2 truncate text-xs text-gray-500">{user.email}</p> : null}
         </div>
       ) : null}
