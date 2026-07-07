@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
 import { ensureProductReviewsTable } from "../utils/db-ensure";
+import { resolvePublishedProductIdBySlug } from "./products-slug/product-query-builder";
 import { logger } from "@/lib/utils/logger";
 
 type ProductReviewWithUser = Prisma.ProductReviewGetPayload<{
@@ -25,19 +26,12 @@ class ReviewsService {
    * @param options - Query options (published only, sorting, etc.)
    */
   async getProductReviews(productId: string, options?: { publishedOnly?: boolean }) {
-    // Ensure table exists before querying
-    await ensureProductReviewsTable();
-    
     logger.debug('📝 [REVIEWS SERVICE] Getting reviews for product:', productId);
-    
-    const where: any = {
-      productId,
-    };
 
-    // Filter by published status if needed
-    if (options?.publishedOnly !== false) {
-      where.published = true;
-    }
+    const where: Prisma.ProductReviewWhereInput = {
+      productId,
+      ...(options?.publishedOnly !== false ? { published: true } : {}),
+    };
 
     const reviews = await db.productReview.findMany({
       where,
@@ -73,15 +67,26 @@ class ReviewsService {
   }
 
   /**
+   * Published reviews by storefront slug (light id lookup, safe for parallel SSR with full PDP fetch).
+   */
+  async getProductReviewsBySlug(
+    slug: string,
+    options?: { publishedOnly?: boolean },
+  ) {
+    const productId = await resolvePublishedProductIdBySlug(slug);
+    if (!productId) {
+      return [];
+    }
+    return this.getProductReviews(productId, options);
+  }
+
+  /**
    * Get user's review for a specific product
    * @param productId - Product ID
    * @param userId - User ID
    * @param includeUnpublished - Whether to include unpublished reviews (default: true)
    */
   async getUserReview(productId: string, userId: string, includeUnpublished: boolean = true) {
-    // Ensure table exists before querying
-    await ensureProductReviewsTable();
-    
     logger.debug('📝 [REVIEWS SERVICE] Getting user review:', { productId, userId });
 
     const review = await db.productReview.findUnique({
@@ -135,9 +140,6 @@ class ReviewsService {
    * @param productId - Product ID
    */
   async getProductReviewStats(productId: string) {
-    // Ensure table exists before querying
-    await ensureProductReviewsTable();
-    
     const reviews = await db.productReview.findMany({
       where: {
         productId,
@@ -174,8 +176,6 @@ class ReviewsService {
   async getProductReviewStatsBatch(
     productIds: string[]
   ): Promise<Map<string, { averageRating: number; reviewsCount: number }>> {
-    await ensureProductReviewsTable();
-
     if (productIds.length === 0) {
       return new Map();
     }

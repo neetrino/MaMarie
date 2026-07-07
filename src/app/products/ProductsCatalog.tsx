@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
-import { unstable_cache } from 'next/cache';
 import { cookies } from 'next/headers';
-import { getStoredLanguage } from '../../lib/language';
+import { getServerLanguage } from '../../lib/language-server';
 import { t } from '../../lib/i18n';
 import { BrandFilter } from '../../components/BrandFilter';
 import { ColorFilter } from '../../components/ColorFilter';
@@ -22,8 +21,9 @@ import {
 } from '../../components/home/HomeSectionShell';
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
-import { productsService } from '../../lib/services/products.service';
-import { getCatalogFiltersCached } from '../../lib/services/products-catalog-filters-cache';
+import { getStorefrontProductsListForCatalog } from '../../lib/services/storefront-products-list-loader';
+import { getStorefrontProductsFiltersForCatalog } from '../../lib/services/storefront-products-filters-loader';
+import type { ProductsFiltersData } from '../../components/ProductsFiltersProvider';
 import {
   PRODUCTS_CATALOG_VIEW_MODE_COOKIE,
   resolveCatalogLimitFromViewMode,
@@ -42,40 +42,14 @@ import type {
   ProductsCatalogResponse,
 } from './products-catalog-types';
 
-const PRODUCTS_LIST_REVALIDATE_SECONDS = 60;
+function hasExplicitLimitParam(
+  rawParams: Record<string, string | string[] | undefined>
+): boolean {
+  const limit = rawParams.limit;
+  return typeof limit === 'string' && limit.trim().length > 0;
+}
 
-const getProductsCached = unstable_cache(
-  async (
-    page: number,
-    limit: number,
-    lang: string,
-    search?: string,
-    category?: string,
-    minPrice?: number,
-    maxPrice?: number,
-    colors?: string,
-    sizes?: string,
-    brand?: string,
-    clothingTypes?: string
-  ): Promise<ProductsCatalogResponse> =>
-    productsService.findAll({
-      page,
-      limit,
-      lang,
-      search,
-      category,
-      minPrice,
-      maxPrice,
-      colors,
-      sizes,
-      brand,
-      clothingTypes,
-    }) as Promise<ProductsCatalogResponse>,
-  ['products-catalog-db-v2'],
-  { revalidate: PRODUCTS_LIST_REVALIDATE_SECONDS }
-);
-
-function parseOptionalPriceFromString(value?: string): number | undefined {
+function parseOptionalPrice(value?: string): number | undefined {
   if (!value?.trim()) {
     return undefined;
   }
@@ -83,11 +57,23 @@ function parseOptionalPriceFromString(value?: string): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-function hasExplicitLimitParam(
-  rawParams: Record<string, string | string[] | undefined>
-): boolean {
-  const limit = rawParams.limit;
-  return typeof limit === 'string' && limit.trim().length > 0;
+function toInitialFilters(
+  result: Awaited<ReturnType<typeof getStorefrontProductsFiltersForCatalog>> | null
+): ProductsFiltersData | null {
+  if (!result) {
+    return null;
+  }
+  return {
+    colors: result.colors ?? [],
+    sizes: result.sizes ?? [],
+    brands: result.brands ?? [],
+    priceRange: result.priceRange ?? {
+      min: 0,
+      max: 100000,
+      stepSize: null,
+      stepSizePerCurrency: null,
+    },
+  };
 }
 
 function buildCatalogParams(
@@ -104,22 +90,12 @@ function buildCatalogParams(
   };
 }
 
-async function getProducts(params: ReturnType<typeof parseProductsCatalogParams>): Promise<ProductsCatalogResponse> {
+async function getProducts(
+  params: ReturnType<typeof parseProductsCatalogParams>,
+  language: string
+): Promise<ProductsCatalogResponse> {
   try {
-    const language = getStoredLanguage();
-    const response = await getProductsCached(
-      params.page,
-      params.limit,
-      language,
-      params.search,
-      params.category,
-      parseOptionalPriceFromString(params.minPrice),
-      parseOptionalPriceFromString(params.maxPrice),
-      params.colors,
-      params.sizes,
-      params.brand,
-      params.clothingTypes
-    );
+    const response = await getStorefrontProductsListForCatalog(params, language);
     if (!Array.isArray(response.data)) {
       return {
         data: [],
@@ -127,7 +103,7 @@ async function getProducts(params: ReturnType<typeof parseProductsCatalogParams>
       };
     }
 
-    return response;
+    return response as ProductsCatalogResponse;
   } catch (e) {
     logger.error('Product catalog fetch failed', e);
     return {
@@ -170,20 +146,23 @@ export async function ProductsCatalog({
     cookieStore.get(PRODUCTS_CATALOG_VIEW_MODE_COOKIE)?.value
   );
   const catalogParams = buildCatalogParams(rawParams, initialViewMode);
-  const language = getStoredLanguage();
+  const language = await getServerLanguage();
 
-  const [productsData, initialFilters] = await Promise.all([
-    getProducts(catalogParams),
-    getCatalogFiltersCached({
-      lang: language,
-      category: catalogParams.category,
-      search: catalogParams.search,
-      minPrice: parseOptionalPriceFromString(catalogParams.minPrice),
-      maxPrice: parseOptionalPriceFromString(catalogParams.maxPrice),
-    }),
+  const filtersInput = {
+    lang: language,
+    category: catalogParams.category,
+    search: catalogParams.search,
+    minPrice: parseOptionalPrice(catalogParams.minPrice),
+    maxPrice: parseOptionalPrice(catalogParams.maxPrice),
+  };
+
+  const [productsData, filtersData] = await Promise.all([
+    getProducts(catalogParams, language),
+    getStorefrontProductsFiltersForCatalog(filtersInput).catch(() => null),
   ]);
 
   const normalizedProducts = productsData.data.map(normalizeProduct);
+  const initialFilters = toInitialFilters(filtersData);
 
   return (
     <HomeContentHorizontalFrame>

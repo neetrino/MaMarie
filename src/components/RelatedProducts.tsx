@@ -31,7 +31,7 @@ import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '.
 import { HomeSectionHeadingRow } from './home/HomeSectionHeading';
 import { ProductCardMountPlaceholder } from './home/ProductCardMountPlaceholder';
 import { LazyWhenVisible } from './LazyWhenVisible';
-import { useRelatedProducts } from './hooks/useRelatedProducts';
+import { useRelatedProducts, type RelatedProduct } from './hooks/useRelatedProducts';
 import { RelatedProductCard } from './RelatedProducts/RelatedProductCard';
 import { RelatedProductMobileCard } from './RelatedProducts/RelatedProductMobileCard';
 
@@ -40,6 +40,8 @@ interface RelatedProductsProps {
   currentProductId: string;
   /** PDP: use dedicated related endpoint + cache (server resolves category). */
   productSlug?: string;
+  /** SSR-hydrated related row — skips client fetch on first paint. */
+  initialProducts?: RelatedProduct[];
 }
 
 const DESKTOP_RELATED_ROW_CLASS =
@@ -51,7 +53,12 @@ const MOBILE_RELATED_ROW_CLASS =
 /**
  * Related products — desktop horizontal shop cards; mobile horizontal row with shop catalog cards.
  */
-export function RelatedProducts({ categorySlug, currentProductId, productSlug }: RelatedProductsProps) {
+export function RelatedProducts({
+  categorySlug,
+  currentProductId,
+  productSlug,
+  initialProducts = [],
+}: RelatedProductsProps) {
   const [language, setLanguage] = useState<LanguageCode>('en');
 
   const { products, loading } = useRelatedProducts({
@@ -59,6 +66,7 @@ export function RelatedProducts({ categorySlug, currentProductId, productSlug }:
     currentProductId,
     language,
     productSlug,
+    initialProducts,
   });
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import { adminService } from './admin.service';
 import { aggregateCatalogFilters } from './products-filters-aggregate';
 import { buildStorefrontFiltersCacheKey } from './products-filters-cache-key';
 import { buildWhereClause } from './products-find-query/query-builder';
-import { fetchStorefrontCatalogProducts } from './products-find-query/storefront-catalog-list-batcher';
+import { fetchStorefrontCatalogFilterProducts } from './products-find-query/storefront-catalog-filters-batcher';
 import { logger } from '../utils/logger';
 
 const FILTERS_PRODUCTS_LIMIT = 500;
@@ -56,9 +56,11 @@ class ProductsFiltersService {
         return EMPTY_FILTERS;
       }
 
-      const products = await fetchStorefrontCatalogProducts(where, FILTERS_PRODUCTS_LIMIT, 0);
+      const [products, priceSettings] = await Promise.all([
+        fetchStorefrontCatalogFilterProducts(where, FILTERS_PRODUCTS_LIMIT),
+        this.loadPriceFilterSettings(),
+      ]);
       const aggregated = aggregateCatalogFilters(products, lang);
-      const priceSettings = await this.loadPriceFilterSettings();
 
       return {
         colors: aggregated.colors,

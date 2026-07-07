@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
+import { isRecoverableConnectionError } from "./connection-errors";
 import { createQuerySemaphore, type QuerySemaphore } from "./query-semaphore";
 
 declare global {
@@ -9,6 +10,10 @@ const globalForPrisma = globalThis as typeof globalThis & { prisma?: PrismaClien
 
 const DEFAULT_DEV_CONNECTION_LIMIT = "8";
 const DEFAULT_MAX_CONCURRENT_QUERIES = 8;
+
+// Neon suspends idle compute after ~5 min ("scale to zero"); the next query then
+// pays a multi-second cold-start. Ping just under that window to keep it awake.
+const DB_KEEP_WARM_INTERVAL_MS = 4 * 60 * 1000;
 
 function appendQueryParam(url: string, key: string, value: string): string {
   const lower = url.toLowerCase();
@@ -66,12 +71,24 @@ function resolveMaxConcurrentQueries(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_MAX_CONCURRENT_QUERIES;
 }
 
+async function runWithConnectionRetry<T>(operation: () => Promise<T>): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    if (!isRecoverableConnectionError(error)) {
+      throw error;
+    }
+    await resetDbConnection();
+    return operation();
+  }
+}
+
 function extendClientWithSemaphore(base: PrismaClient, semaphore: QuerySemaphore): PrismaClient {
   return base.$extends({
     query: {
       $allModels: {
         async $allOperations({ args, query }) {
-          return semaphore.run(() => query(args));
+          return semaphore.run(() => runWithConnectionRetry(() => query(args)));
         },
       },
     },
@@ -80,19 +97,27 @@ function extendClientWithSemaphore(base: PrismaClient, semaphore: QuerySemaphore
         query: TemplateStringsArray | Prisma.Sql,
         ...values: unknown[]
       ): Promise<T> {
-        return semaphore.run(() => base.$queryRaw<T>(query, ...values));
+        return semaphore.run(() =>
+          runWithConnectionRetry(() => base.$queryRaw<T>(query, ...values))
+        );
       },
       async $queryRawUnsafe<T = unknown>(query: string, ...values: unknown[]): Promise<T> {
-        return semaphore.run(() => base.$queryRawUnsafe<T>(query, ...values));
+        return semaphore.run(() =>
+          runWithConnectionRetry(() => base.$queryRawUnsafe<T>(query, ...values))
+        );
       },
       async $executeRaw(
         query: TemplateStringsArray | Prisma.Sql,
         ...values: unknown[]
       ): Promise<number> {
-        return semaphore.run(() => base.$executeRaw(query, ...values));
+        return semaphore.run(() =>
+          runWithConnectionRetry(() => base.$executeRaw(query, ...values))
+        );
       },
       async $executeRawUnsafe(query: string, ...values: unknown[]): Promise<number> {
-        return semaphore.run(() => base.$executeRawUnsafe(query, ...values));
+        return semaphore.run(() =>
+          runWithConnectionRetry(() => base.$executeRawUnsafe(query, ...values))
+        );
       },
     },
   }) as unknown as PrismaClient;
@@ -114,6 +139,7 @@ export const db = globalForPrisma.prisma ?? createPrismaClient();
 globalForPrisma.prisma = db;
 
 let dbReadyPromise: Promise<void> | null = null;
+let dbResetPromise: Promise<void> | null = null;
 
 /** Opens the first pool connection — reduces Neon cold-start latency on first request. */
 export function ensureDbReady(): Promise<void> {
@@ -124,4 +150,60 @@ export function ensureDbReady(): Promise<void> {
     });
   }
   return dbReadyPromise;
+}
+
+/**
+ * Drops stale pool connections and reconnects.
+ * Coalesces concurrent resets (e.g. many queries failing with P1017 at once).
+ */
+export function resetDbConnection(): Promise<void> {
+  if (dbResetPromise) {
+    return dbResetPromise;
+  }
+
+  dbResetPromise = (async () => {
+    dbReadyPromise = null;
+    try {
+      await db.$disconnect();
+    } catch {
+      // Ignore disconnect errors on already-closed connections.
+    }
+    await ensureDbReady();
+  })().finally(() => {
+    dbResetPromise = null;
+  });
+
+  return dbResetPromise;
+}
+
+let keepWarmTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Keeps the Neon compute awake by pinging it just under the auto-suspend window,
+ * eliminating multi-second cold-start latency on the first request of a session.
+ *
+ * Enabled in development by default; in production opt in with `DB_KEEP_WARM=1`
+ * (only for always-on Node hosts — on serverless prefer raising Neon's suspend
+ * timeout, since intervals do not survive across function invocations).
+ */
+export function startDbKeepWarm(): void {
+  if (keepWarmTimer) {
+    return;
+  }
+
+  const flag = process.env.DB_KEEP_WARM;
+  const enabled =
+    flag === "1" || (flag !== "0" && process.env.NODE_ENV === "development");
+  if (!enabled) {
+    return;
+  }
+
+  keepWarmTimer = setInterval(() => {
+    void db.$queryRaw`SELECT 1`.catch(() => {
+      // Best-effort: a missed ping only means the next real query pays wake cost.
+    });
+  }, DB_KEEP_WARM_INTERVAL_MS);
+
+  // Never hold the process open solely for the heartbeat.
+  keepWarmTimer.unref?.();
 }

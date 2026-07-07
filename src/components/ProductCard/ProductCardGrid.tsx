@@ -6,6 +6,7 @@ import { ProductCardInfo } from './ProductCardInfo';
 import { ProductCardActions } from './ProductCardActions';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { useTranslation } from '../../lib/i18n-client';
+import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
 
@@ -53,6 +54,20 @@ export function ProductCardGrid({
   onAddToCart,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
+  const saveSnapshot = () => writeProductPageSnapshotFromCard({
+    slug: product.slug,
+    title: product.title,
+    image: product.image,
+    brandName: product.brand?.name ?? null,
+    brandLogoUrl: product.brand?.logoUrl ?? null,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    compareAtPrice: product.compareAtPrice,
+    discountPercent: product.discountPercent,
+    colors: product.colors,
+    labels: product.labels,
+    inStock: product.inStock,
+  });
 
   return (
     <div
@@ -69,6 +84,7 @@ export function ProductCardGrid({
           imageError={imageError}
           onImageError={onImageError}
           isCompact={isCompact}
+          onBeforeNavigate={saveSnapshot}
         />
         
         {/* Action Icons - appear on hover */}
@@ -89,6 +105,7 @@ export function ProductCardGrid({
       <ProductCardInfo
         slug={product.slug}
         title={product.title}
+        image={product.image}
         brandName={product.brand?.name}
         brandLogoUrl={product.brand?.logoUrl}
         price={product.price}
@@ -98,6 +115,7 @@ export function ProductCardGrid({
         currency={currency}
         colors={product.colors}
         isCompact={isCompact}
+        onBeforeNavigate={saveSnapshot}
       />
 
       {/* Cart Button in Price Row */}

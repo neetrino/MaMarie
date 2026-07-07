@@ -37,6 +37,7 @@ import {
   resolveHomeProductCardTypography,
 } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
+import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
@@ -137,6 +138,20 @@ function HomeProductCardComponent({
     product.averageRating ?? 0,
     product.reviewsCount ?? 0
   );
+  const saveSnapshot = () => writeProductPageSnapshotFromCard({
+    slug: product.slug,
+    title: product.title,
+    image: product.image,
+    subtitle: product.subtitle,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    compareAtPrice: product.compareAtPrice,
+    colors: product.colors,
+    sizes: product.sizes,
+    averageRating: product.averageRating,
+    reviewsCount: product.reviewsCount,
+    inStock: product.inStock,
+  });
 
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -264,6 +279,8 @@ function HomeProductCardComponent({
     <Link
       href={`/products/${product.slug}`}
       className="truncate font-bold"
+      onFocus={saveSnapshot}
+      onPointerDown={saveSnapshot}
       style={{
         color: HOME_PRODUCT_CARD_TEXT_DARK,
         fontSize: typography.titleSizePx,
@@ -342,6 +359,8 @@ function HomeProductCardComponent({
         <Link
           href={`/products/${product.slug}`}
           className="home-product-card-image-wrap absolute overflow-hidden"
+          onFocus={saveSnapshot}
+          onPointerDown={saveSnapshot}
         >
           <div
             className="pointer-events-none absolute relative max-w-none"

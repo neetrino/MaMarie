@@ -9,6 +9,7 @@ import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { ProductColors } from './ProductColors';
+import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
 import type { CurrencyCode } from '../../lib/currency';
 import type { ProductLabel } from '../ProductLabels';
 
@@ -54,6 +55,20 @@ export function ProductCardList({
   onAddToCart,
 }: ProductCardListProps) {
   const { t } = useTranslation();
+  const saveSnapshot = () => writeProductPageSnapshotFromCard({
+    slug: product.slug,
+    title: product.title,
+    image: product.image,
+    brandName: product.brand?.name ?? null,
+    brandLogoUrl: product.brand?.logoUrl ?? null,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    compareAtPrice: product.compareAtPrice,
+    discountPercent: product.discountPercent,
+    colors: product.colors,
+    labels: product.labels,
+    inStock: product.inStock,
+  });
 
   return (
     <div data-product-card className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:bg-gray-50 transition-colors">
@@ -63,6 +78,8 @@ export function ProductCardList({
           href={`/products/${product.slug}`}
           data-product-fly-origin
           className="w-20 h-20 rounded-lg flex-shrink-0 relative overflow-hidden self-start sm:self-center"
+          onFocus={saveSnapshot}
+          onPointerDown={saveSnapshot}
         >
           {product.image && !imageError ? (
             <Image
@@ -85,7 +102,12 @@ export function ProductCardList({
 
         {/* Product Info */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
-          <Link href={`/products/${product.slug}`} className="block">
+          <Link
+            href={`/products/${product.slug}`}
+            className="block"
+            onFocus={saveSnapshot}
+            onPointerDown={saveSnapshot}
+          >
             <h3 className="text-lg sm:text-xl font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
               {product.title}
             </h3>

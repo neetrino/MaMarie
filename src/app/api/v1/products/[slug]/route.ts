@@ -24,17 +24,7 @@ export async function GET(
       return NextResponse.json(cached, { headers: { "X-Cache": "HIT" } });
     }
 
-    let result: unknown;
-    try {
-      result = await productsService.findBySlug(slug, lang);
-    } catch (first: unknown) {
-      const err = first as { status?: number };
-      if (err?.status === 404 && lang !== "en") {
-        result = await productsService.findBySlug(slug, "en");
-      } else {
-        throw first;
-      }
-    }
+    const result = await productsService.findBySlug(slug, lang);
 
     await writeJsonCache(cacheKey, STOREFRONT_CACHE_TTL.productDetails, result);
     return NextResponse.json(result, { headers: { "X-Cache": "MISS" } });

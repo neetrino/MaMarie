@@ -20,6 +20,7 @@ import { VariantBuilder } from './VariantBuilder';
 import { ProductLabels } from './ProductLabels';
 import { Publishing } from './Publishing';
 import { FormActions } from './FormActions';
+import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
 
 interface AddProductFormContentProps {
   formData: {
@@ -35,6 +36,7 @@ interface AddProductFormContentProps {
     featured: boolean;
     variants: Variant[];
   };
+  fieldErrors: ProductFormFieldErrors;
   productType: 'simple' | 'variable';
   simpleProductData: {
     price: string;
@@ -105,6 +107,7 @@ interface AddProductFormContentProps {
 
 export function AddProductFormContent({
   formData,
+  fieldErrors,
   productType,
   simpleProductData,
   categories,
@@ -172,12 +175,22 @@ export function AddProductFormContent({
   return (
     <Card className="p-6 pb-24 sm:pb-24">
       <form onSubmit={handleSubmit} className="space-y-14">
+        {fieldErrors.formSummary ? (
+          <div
+            className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            data-field-error="true"
+          >
+            {fieldErrors.formSummary}
+          </div>
+        ) : null}
+
         <BasicInformation
           productType={productType}
           setProductType={onProductTypeChange}
           title={formData.title}
           slug={formData.slug}
           descriptionHtml={formData.descriptionHtml}
+          fieldErrors={fieldErrors}
           onTitleChange={onTitleChange}
           onSlugChange={onSlugChange}
           onDescriptionChange={onDescriptionChange}
@@ -227,6 +240,7 @@ export function AddProductFormContent({
             sku={simpleProductData.sku}
             quantity={simpleProductData.quantity}
             defaultCurrency={defaultCurrency}
+            fieldErrors={fieldErrors}
             onPriceChange={onPriceChange}
             onCompareAtPriceChange={onCompareAtPriceChange}
             onSkuChange={onSkuChange}
@@ -241,6 +255,7 @@ export function AddProductFormContent({
             selectedAttributeValueIds={selectedAttributeValueIds}
             attributesDropdownOpen={attributesDropdownOpen}
             attributesDropdownRef={attributesDropdownRef}
+            fieldErrors={fieldErrors}
             onAttributesDropdownToggle={onAttributesDropdownToggle}
             onAttributeToggle={onAttributeToggle}
             onAttributeRemove={onAttributeRemove}
@@ -261,6 +276,7 @@ export function AddProductFormContent({
               slug={formData.slug}
               title={formData.title}
               variantImageInputRefs={variantImageInputRefs}
+              fieldErrors={fieldErrors}
               onVariantUpdate={onVariantUpdate}
               onVariantDelete={onVariantDelete}
               onVariantAdd={onVariantAdd}
@@ -273,6 +289,7 @@ export function AddProductFormContent({
 
         <ProductLabels
           labels={formData.labels}
+          fieldErrors={fieldErrors}
           onAddLabel={onAddLabel}
           onRemoveLabel={onRemoveLabel}
           onUpdateLabel={onUpdateLabel}

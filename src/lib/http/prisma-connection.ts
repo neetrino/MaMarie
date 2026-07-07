@@ -1,15 +1,10 @@
-import { Prisma } from "@white-shop/db";
-
-const PRISMA_CONNECTION_CODES = new Set(["P1001", "P1002", "P1017"]);
+import { Prisma, isRecoverableConnectionError } from "@white-shop/db";
 
 /**
  * True when Prisma cannot reach PostgreSQL (Neon paused, wrong URL, network, etc.).
  */
 export function isPrismaConnectionError(error: unknown): boolean {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    return PRISMA_CONNECTION_CODES.has(error.code);
-  }
-  return error instanceof Prisma.PrismaClientInitializationError;
+  return isRecoverableConnectionError(error);
 }
 
 export function prismaConnectionFailureCode(error: unknown): string {

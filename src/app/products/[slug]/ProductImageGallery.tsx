@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
+import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { ProductLabels } from "../../../components/ProductLabels";
 import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
 import { t } from "../../../lib/i18n";
 import type { LanguageCode } from "../../../lib/language";
+import { readProductPageSnapshot } from "../../../lib/product-page-snapshot";
 import type { Product } from "./types";
 import {
   PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
@@ -40,15 +41,15 @@ const PDP_MAIN_IMAGE_SIZES = "(max-width: 1024px) 100vw, 55vw";
 interface ProductThumbnailRailProps {
   images: string[];
   currentImageIndex: number;
-  failedIndices: Set<number>;
+  failedSources: Set<string>;
   onImageIndexChange: (index: number) => void;
-  onImageError: (index: number) => void;
+  onImageError: (src: string) => void;
 }
 
 function ProductThumbnailRail({
   images,
   currentImageIndex,
-  failedIndices,
+  failedSources,
   onImageIndexChange,
   onImageError,
 }: ProductThumbnailRailProps) {
@@ -83,7 +84,7 @@ function ProductThumbnailRail({
                   : PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS
               }`}
             >
-              {failedIndices.has(index) ? (
+              {failedSources.has(image) ? (
                 <ProductImagePlaceholder className="h-full w-full" aria-label="" />
               ) : (
                 <img
@@ -92,7 +93,7 @@ function ProductThumbnailRail({
                   className="h-full w-full object-contain transition-transform duration-300"
                   loading="lazy"
                   decoding="async"
-                  onError={() => onImageError(index)}
+                  onError={() => onImageError(image)}
                 />
               )}
             </button>
@@ -113,15 +114,30 @@ export function ProductImageGallery({
   mainImagePriority = false,
 }: ProductImageGalleryProps) {
   const [showZoom, setShowZoom] = useState(false);
-  const [failedIndices, setFailedIndices] = useState<Set<number>>(new Set());
+  const [failedSources, setFailedSources] = useState<Set<string>>(new Set());
+  const [snapshotSrc, setSnapshotSrc] = useState<string | undefined>(() => images[currentImageIndex]);
 
-  const markFailed = (index: number) => {
-    setFailedIndices((prev) => new Set(prev).add(index));
+  const markFailed = (src: string | undefined) => {
+    if (!src) {
+      return;
+    }
+    setFailedSources((prev) => new Set(prev).add(src));
   };
 
-  const mainImageFailed = failedIndices.has(currentImageIndex);
   const currentSrc = images[currentImageIndex];
+  const renderedSrc = currentSrc ?? snapshotSrc;
+  const mainImageFailed = currentSrc ? failedSources.has(currentSrc) : false;
+  const snapshotFailed = snapshotSrc ? failedSources.has(snapshotSrc) : false;
+  const canShowSnapshot = Boolean(snapshotSrc && !snapshotFailed);
+  const canShowMainImage = Boolean(currentSrc && !mainImageFailed);
   const hasMultipleImages = images.length > 1;
+
+  useEffect(() => {
+    const entrySnapshot = readProductPageSnapshot(product.slug);
+    if (entrySnapshot?.imageUrl) {
+      setSnapshotSrc(entrySnapshot.imageUrl);
+    }
+  }, [product.slug]);
 
   const showPreviousImage = () => {
     onImageIndexChange((currentImageIndex - 1 + images.length) % images.length);
@@ -136,17 +152,31 @@ export function ProductImageGallery({
       <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
         <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
           <div data-product-fly-origin className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}>
-            {images.length > 0 && !mainImageFailed ? (
-              <Image
-                src={currentSrc}
-                alt={product.title}
-                fill
-                className="object-contain transition-transform duration-500 group-hover:scale-105"
-                sizes={PDP_MAIN_IMAGE_SIZES}
-                priority={mainImagePriority}
-                unoptimized
-                onError={() => markFailed(currentImageIndex)}
-              />
+            {canShowMainImage || canShowSnapshot ? (
+              <>
+                {snapshotSrc && snapshotSrc !== currentSrc && !snapshotFailed ? (
+                  <img
+                    src={snapshotSrc}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-contain"
+                    aria-hidden
+                    decoding="async"
+                  />
+                ) : null}
+                {currentSrc && !mainImageFailed ? (
+                  <NextImage
+                    src={currentSrc}
+                    alt={product.title}
+                    fill
+                    className="object-contain transition-transform duration-500 group-hover:scale-105"
+                    sizes={PDP_MAIN_IMAGE_SIZES}
+                    loading={mainImagePriority && currentSrc === images[0] ? "eager" : "lazy"}
+                    unoptimized
+                    onLoad={() => setSnapshotSrc(currentSrc)}
+                    onError={() => markFailed(currentSrc)}
+                  />
+                ) : null}
+              </>
             ) : (
               <ProductImagePlaceholder
                 className="h-full w-full"
@@ -200,19 +230,19 @@ export function ProductImageGallery({
           <ProductThumbnailRail
             images={images}
             currentImageIndex={currentImageIndex}
-            failedIndices={failedIndices}
+            failedSources={failedSources}
             onImageIndexChange={onImageIndexChange}
             onImageError={markFailed}
           />
         ) : null}
       </div>
 
-      {showZoom && images.length > 0 && !failedIndices.has(currentImageIndex) ? (
+      {showZoom && renderedSrc && !failedSources.has(renderedSrc) ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
           onClick={() => setShowZoom(false)}
         >
-          <img src={currentSrc} alt="" className="max-h-full max-w-full object-contain" />
+          <img src={renderedSrc} alt="" className="max-h-full max-w-full object-contain" />
           <button
             type="button"
             className="absolute top-4 right-4 text-2xl text-white"

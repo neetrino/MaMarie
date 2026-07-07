@@ -1,6 +1,8 @@
+import { COLOR_MAP } from '@/lib/colorMap';
 import {
   collectProductColors,
   collectProductSizes,
+  isLikelySizeToken,
 } from './product-variant-attributes';
 import type { ProductWithRelations } from './products-find-query/types';
 
@@ -53,10 +55,11 @@ function upsertColor(
 }
 
 function upsertSize(sizeMap: Map<string, number>, value: string): void {
-  const normalized = value.trim().toUpperCase();
-  if (!normalized) {
+  const trimmed = value.trim();
+  if (!trimmed || !isLikelySizeToken(trimmed)) {
     return;
   }
+  const normalized = trimmed.toUpperCase();
   sizeMap.set(normalized, (sizeMap.get(normalized) ?? 0) + 1);
 }
 
@@ -102,7 +105,9 @@ export function aggregateCatalogFilters(
   }
 
   const colors = Array.from(colorMap.values()).sort((a, b) => a.label.localeCompare(b.label));
+  const colorKeys = new Set(colorMap.keys());
   const sizes = Array.from(sizeMap.entries())
+    .filter(([value]) => !colorKeys.has(value.toLowerCase()) && !(value.toLowerCase() in COLOR_MAP))
     .map(([value, count]) => ({ value, count }))
     .sort((a, b) => {
       const aIndex = SIZE_ORDER.indexOf(a.value as (typeof SIZE_ORDER)[number]);

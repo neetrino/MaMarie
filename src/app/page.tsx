@@ -1,6 +1,7 @@
 import { AboutUsSection } from '../components/home/AboutUsSection';
 import { BestProductsSection } from '../components/home/BestProductsSection';
 import { HeroSection } from '../components/home/HeroSection';
+import { HomeGenderCatalogPrefetch } from '../components/home/HomeGenderCatalogPrefetch';
 import { MobileHomeSection } from '../components/home/MobileHomeSection';
 import { SaleSection } from '../components/home/SaleSection';
 import { WhyUsSection } from '../components/home/WhyUsSection';
@@ -19,6 +20,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <HomeGenderCatalogPrefetch />
       <MobileHomeSection products={featuredProducts} />
 
       <DesktopFluidFrame className="hidden min-h-screen bg-white lg:flex">

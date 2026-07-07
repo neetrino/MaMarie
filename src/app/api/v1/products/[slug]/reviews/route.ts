@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reviewsService } from "@/lib/services/reviews.service";
 import { authenticateToken } from "@/lib/middleware/auth";
-import { productsService } from "@/lib/services/products.service";
+import { resolvePublishedProductIdBySlug } from "@/lib/services/products-slug/product-query-builder";
 import { logger } from "@/lib/utils/logger";
 
 export const dynamic = "force-dynamic";
@@ -19,14 +19,12 @@ export async function GET(
   try {
     const { slug } = await params;
     const { searchParams } = new URL(req.url);
-    const lang = searchParams.get("lang") || "en";
     const myReview = searchParams.get("my") === "true";
     
     logger.debug('📝 [REVIEWS API] GET request for product slug:', slug, { myReview });
 
-    // First, get the product by slug to get the productId
-    const product = await productsService.findBySlug(slug, lang);
-    if (!product || !product.id) {
+    const productId = await resolvePublishedProductIdBySlug(slug);
+    if (!productId) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/not-found",
@@ -55,12 +53,12 @@ export async function GET(
         );
       }
 
-      const review = await reviewsService.getUserReview(product.id, user.id, true);
+      const review = await reviewsService.getUserReview(productId, user.id, true);
       return NextResponse.json(review);
     }
 
     // Otherwise, return all published reviews
-    const reviews = await reviewsService.getProductReviews(product.id, {
+    const reviews = await reviewsService.getProductReviews(productId, {
       publishedOnly: true,
     });
 
@@ -105,15 +103,12 @@ export async function POST(
     }
 
     const { slug } = await params;
-    const { searchParams } = new URL(req.url);
-    const lang = searchParams.get("lang") || "en";
     const body = await req.json();
 
     logger.debug('📝 [REVIEWS API] POST request:', { slug, userId: user.id, rating: body.rating });
 
-    // First, get the product by slug to get the productId
-    const product = await productsService.findBySlug(slug, lang);
-    if (!product || !product.id) {
+    const productId = await resolvePublishedProductIdBySlug(slug);
+    if (!productId) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/not-found",
@@ -154,7 +149,7 @@ export async function POST(
     }
 
     // Create review
-    const review = await reviewsService.createReview(product.id, user.id, {
+    const review = await reviewsService.createReview(productId, user.id, {
       rating: body.rating,
       comment: body.comment,
     });

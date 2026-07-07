@@ -9,6 +9,7 @@ import type { CurrencyCode } from '../../lib/currency';
 interface ProductCardInfoProps {
   slug: string;
   title: string;
+  image: string | null;
   brandName?: string | null;
   brandLogoUrl?: string | null;
   price: number;
@@ -18,6 +19,7 @@ interface ProductCardInfoProps {
   currency: CurrencyCode;
   colors?: Array<{ value: string; imageUrl?: string | null; colors?: string[] | null }>;
   isCompact?: boolean;
+  onBeforeNavigate?: () => void;
 }
 
 /**
@@ -26,6 +28,7 @@ interface ProductCardInfoProps {
 export function ProductCardInfo({
   slug,
   title,
+  image,
   brandName,
   brandLogoUrl,
   price,
@@ -35,10 +38,16 @@ export function ProductCardInfo({
   currency,
   colors,
   isCompact = false,
+  onBeforeNavigate,
 }: ProductCardInfoProps) {
   return (
     <div className={isCompact ? 'p-2.5' : 'p-4'}>
-      <Link href={`/products/${slug}`} className="block">
+      <Link
+        href={`/products/${slug}`}
+        className="block"
+        onFocus={onBeforeNavigate}
+        onPointerDown={onBeforeNavigate}
+      >
         {/* Product Title */}
         <h3 className={`${isCompact ? 'text-base' : 'text-xl'} font-medium text-gray-900 ${isCompact ? 'mb-0.5' : 'mb-1'} line-clamp-2`}>
           {title}

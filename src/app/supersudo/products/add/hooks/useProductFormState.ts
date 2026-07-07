@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import type { Brand, Category, Attribute, Variant, ProductLabel, GeneratedVariant } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
+import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
 
 export function useProductFormState() {
   const [loading, setLoading] = useState(false);
@@ -55,6 +56,7 @@ export function useProductFormState() {
   const [openValueModal, setOpenValueModal] = useState<{ variantId: string; attributeId: string } | null>(null);
   const [generatedVariants, setGeneratedVariants] = useState<GeneratedVariant[]>([]);
   const [hasVariantsToLoad, setHasVariantsToLoad] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<ProductFormFieldErrors>({});
 
   return {
     // Loading states
@@ -130,6 +132,8 @@ export function useProductFormState() {
     setGeneratedVariants,
     hasVariantsToLoad,
     setHasVariantsToLoad,
+    fieldErrors,
+    setFieldErrors,
   };
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, type ReactNode } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import { t } from '../../../lib/i18n';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -29,6 +29,8 @@ interface ProductPageClientProps {
   initialProduct: Product;
   initialReviews: Review[];
   serverLang: LanguageCode;
+  /** Streamed related row from the server (Suspense). */
+  relatedSection?: ReactNode;
 }
 
 export function ProductPageClient({
@@ -36,6 +38,7 @@ export function ProductPageClient({
   initialProduct,
   initialReviews,
   serverLang,
+  relatedSection,
 }: ProductPageClientProps) {
   const { isLoggedIn } = useAuth();
   const {
@@ -227,13 +230,15 @@ export function ProductPageClient({
       </div>
 
       <div className="mt-24">
-        <LazyWhenVisible minHeightPx={PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX}>
-          <RelatedProducts
-            productSlug={slug}
-            categorySlug={product.categories?.[0]?.slug}
-            currentProductId={product.id}
-          />
-        </LazyWhenVisible>
+        {relatedSection ?? (
+          <LazyWhenVisible minHeightPx={PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX}>
+            <RelatedProducts
+              productSlug={slug}
+              categorySlug={product.categories?.[0]?.slug}
+              currentProductId={product.id}
+            />
+          </LazyWhenVisible>
+        )}
       </div>
       <div id="product-reviews" className="mt-16 scroll-mt-24">
         <LazyWhenVisible minHeightPx={PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX}>

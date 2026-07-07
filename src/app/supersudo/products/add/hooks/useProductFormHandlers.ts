@@ -8,6 +8,12 @@ import { useVariantValidation } from './useVariantValidation';
 import { processImagesForSubmit } from './useImageProcessingForSubmit';
 import { createAndSubmitPayload } from './useProductPayloadCreation';
 import { logger } from "@/lib/utils/logger";
+import {
+  type ProductFormFieldErrors,
+  scrollToFirstProductFormError,
+  validateProductForm,
+} from '../utils/product-form-field-errors';
+import { useTranslation } from '@/lib/i18n-client';
 
 interface UseProductFormHandlersProps {
   formData: {
@@ -46,6 +52,8 @@ interface UseProductFormHandlersProps {
   newCategoryName: string;
   isEditMode: boolean;
   productId: string | null;
+  hasVariantsToLoad: boolean;
+  setFieldErrors: (errors: ProductFormFieldErrors) => void;
   getColorAttribute: () => Attribute | undefined;
   getSizeAttribute: () => Attribute | undefined;
   isClothingCategory: () => boolean;
@@ -69,11 +77,14 @@ export function useProductFormHandlers({
   newCategoryName,
   isEditMode,
   productId,
+  hasVariantsToLoad,
+  setFieldErrors,
   getColorAttribute,
   getSizeAttribute,
   isClothingCategory,
 }: UseProductFormHandlersProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const generateAutoSku = (baseSlug: string, index: number): string => {
     const normalizedBase = (baseSlug || 'PROD').toUpperCase();
@@ -113,6 +124,29 @@ export function useProductFormHandlers({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    const validationErrors = validateProductForm(
+      {
+        productType,
+        title: formData.title,
+        slug: formData.slug,
+        labels: formData.labels,
+        simpleProductData,
+        selectedAttributesForVariants,
+        generatedVariants,
+        isEditMode,
+        hasVariantsToLoad,
+      },
+      t,
+    );
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      scrollToFirstProductFormError();
+      return;
+    }
+
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -131,8 +165,12 @@ export function useProductFormHandlers({
       // Get current formData after potential update
       const currentFormData = formData.variants.length > 0 ? formData : { ...formData, variants: [] };
 
-      // Validate variants
-      if (productType === 'variable' && currentFormData.variants.length === 0) {
+      // Validate variants (legacy formData.variants path only)
+      if (
+        productType === 'variable' &&
+        currentFormData.variants.length === 0 &&
+        generatedVariants.length === 0
+      ) {
         setLoading(false);
         return;
       }

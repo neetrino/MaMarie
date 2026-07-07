@@ -3,6 +3,7 @@
 import type { ChangeEvent } from 'react';
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
+import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
 
 interface BasicInformationProps {
   productType: 'simple' | 'variable';
@@ -10,6 +11,7 @@ interface BasicInformationProps {
   title: string;
   slug: string;
   descriptionHtml: string;
+  fieldErrors: ProductFormFieldErrors;
   onTitleChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSlugChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
@@ -21,6 +23,7 @@ export function BasicInformation({
   title,
   slug,
   descriptionHtml,
+  fieldErrors,
   onTitleChange,
   onSlugChange,
   onDescriptionChange,
@@ -65,7 +68,7 @@ export function BasicInformation({
           </div>
         </div>
 
-        <div>
+        <div data-field-error={fieldErrors.title ? 'true' : undefined}>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t('admin.products.add.title')} *
           </label>
@@ -73,12 +76,12 @@ export function BasicInformation({
             type="text"
             value={title}
             onChange={onTitleChange}
-            required
             placeholder={t('admin.products.add.productTitlePlaceholder')}
+            error={fieldErrors.title}
           />
         </div>
 
-        <div>
+        <div data-field-error={fieldErrors.slug ? 'true' : undefined}>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t('admin.products.add.slug')} *
           </label>
@@ -86,8 +89,8 @@ export function BasicInformation({
             type="text"
             value={slug}
             onChange={onSlugChange}
-            required
             placeholder={t('admin.products.add.productSlugPlaceholder')}
+            error={fieldErrors.slug}
           />
         </div>
 

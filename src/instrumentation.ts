@@ -6,8 +6,9 @@ export async function register(): Promise<void> {
     return;
   }
 
-  const { ensureDbReady } = await import('@white-shop/db');
+  const { ensureDbReady, startDbKeepWarm } = await import('@white-shop/db');
   await ensureDbReady().catch(() => {
     // Non-fatal at boot; the first request will establish the connection.
   });
+  startDbKeepWarm();
 }

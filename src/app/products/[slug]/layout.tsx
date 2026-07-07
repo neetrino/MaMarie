@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { DEFAULT_LANGUAGE } from '@/lib/language';
-import { getProductBySlug } from './get-product-by-slug';
+import { getProductPageCore } from './get-product-by-slug';
 
 const DEFAULT_TITLE = 'Product';
 const SITE_NAME = 'MAMARIE';
@@ -14,7 +14,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = rawSlug.includes(':') ? rawSlug.split(':')[0] : rawSlug;
 
   try {
-    const product = await getProductBySlug(slug, DEFAULT_LANGUAGE);
+    const core = await getProductPageCore(slug, DEFAULT_LANGUAGE);
+    const product = core?.product;
     if (!product) {
       return { title: `${DEFAULT_TITLE} | ${SITE_NAME}` };
     }

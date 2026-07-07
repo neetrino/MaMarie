@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  STOREFRONT_CACHE_KEYS,
-  STOREFRONT_CACHE_TTL,
-  readJsonCache,
-  writeJsonCache,
-} from "@/lib/cache/storefront-cache";
+import { STOREFRONT_CACHE_KEYS, readJsonCache } from "@/lib/cache/storefront-cache";
 import { findRelatedByProductSlug } from "@/lib/services/products-slug/product-related.service";
 import { logger } from "@/lib/utils/logger";
 
@@ -25,7 +20,6 @@ export async function GET(
     }
 
     const body = await findRelatedByProductSlug(slug, lang);
-    await writeJsonCache(cacheKey, STOREFRONT_CACHE_TTL.productRelated, body);
     return NextResponse.json(body, { headers: { "X-Cache": "MISS" } });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);

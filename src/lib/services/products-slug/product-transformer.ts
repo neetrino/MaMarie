@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { db } from "@white-shop/db";
+import { withServerReadCache } from "@/lib/cache/server-read-cache";
 import {
   processImageUrl,
   smartSplitUrls,
@@ -14,10 +16,16 @@ import { logger } from "../../utils/logger";
 import { getOutOfStockLabel } from "./utils";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
 
-/**
- * Get discount settings from database
- */
-async function getDiscountSettings() {
+const DISCOUNT_SETTINGS_CACHE_TTL_MS = 30_000;
+const DISCOUNT_SETTINGS_REVALIDATE_SECONDS = 60;
+
+type DiscountSettings = {
+  globalDiscount: number;
+  categoryDiscounts: Record<string, number>;
+  brandDiscounts: Record<string, number>;
+};
+
+async function loadDiscountSettingsFromDb(): Promise<DiscountSettings> {
   const discountSettings = await db.settings.findMany({
     where: {
       key: {
@@ -28,14 +36,31 @@ async function getDiscountSettings() {
 
   const globalDiscountSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "globalDiscount");
   const globalDiscount = Number(globalDiscountSetting?.value) || 0;
-  
+
   const categoryDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "categoryDiscounts");
   const categoryDiscounts = categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) || {} : {};
-  
+
   const brandDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "brandDiscounts");
   const brandDiscounts = brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) || {} : {};
 
   return { globalDiscount, categoryDiscounts, brandDiscounts };
+}
+
+const fetchDiscountSettingsCached = unstable_cache(
+  loadDiscountSettingsFromDb,
+  ["storefront-discount-settings-v1"],
+  { revalidate: DISCOUNT_SETTINGS_REVALIDATE_SECONDS },
+);
+
+/**
+ * Discount settings — cross-request (unstable_cache) + in-process dedupe.
+ */
+async function getDiscountSettings(): Promise<DiscountSettings> {
+  return withServerReadCache(
+    "storefront:discount-settings",
+    DISCOUNT_SETTINGS_CACHE_TTL_MS,
+    () => fetchDiscountSettingsCached(),
+  );
 }
 
 /**
@@ -105,13 +130,7 @@ function transformMedia(
   
   // Clean and validate final main images (never inline base64 in storefront JSON)
   const cleanedMain = stripInlineDataImages(cleanImageUrls(main));
-  
-  logger.debug('Main media images count (after cleanup)', { count: cleanedMain.length });
-  logger.debug('Variant images excluded', { count: variantImages.length });
-  if (cleanedMain.length > 0) {
-    logger.debug('Main media (first 3)', { images: cleanedMain.slice(0, 3).map((img: string) => img.substring(0, 50)) });
-  }
-  
+
   return cleanedMain;
 }
 
@@ -201,14 +220,6 @@ function transformVariants(
       }
 
       const variantImageUrl = transformVariantImageUrl(variant);
-      
-      if (variantImageUrl) {
-        logger.debug('Variant has imageUrl', {
-          variantId: variant.id,
-          sku: variant.sku,
-          imageUrl: variantImageUrl.substring(0, 50) + (variantImageUrl.length > 50 ? '...' : ''),
-        });
-      }
 
       return {
         id: variant.id,
@@ -256,11 +267,7 @@ function transformProductAttributes(
   lang: string
 ) {
   const productAttrs = (product as { productAttributes?: unknown[] }).productAttributes;
-  logger.debug('Raw productAttributes from DB', {
-    isArray: Array.isArray(productAttrs),
-    length: productAttrs?.length || 0,
-  });
-  
+
   if (Array.isArray(productAttrs) && productAttrs.length > 0) {
     type ProductAttribute = {
       id: string;
@@ -307,10 +314,8 @@ function transformProductAttributes(
         },
       };
     });
-    logger.debug('Mapped productAttributes', { count: mapped.length });
     return mapped;
   }
-  logger.debug('No productAttributes, returning empty array');
   return [];
 }
 

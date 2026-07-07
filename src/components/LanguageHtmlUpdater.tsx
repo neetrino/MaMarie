@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { getStoredLanguage } from '../lib/language';
+import { getStoredLanguage, syncShopLanguageCookieFromStorage } from '../lib/language';
 
 /**
  * Component that updates the html lang attribute based on stored language
@@ -15,6 +15,9 @@ export function LanguageHtmlUpdater() {
         document.documentElement.lang = lang;
       }
     };
+
+    // Sync SSR cookie so catalog pages use the same locale as localStorage.
+    syncShopLanguageCookieFromStorage();
 
     // Update on mount
     updateHtmlLang();

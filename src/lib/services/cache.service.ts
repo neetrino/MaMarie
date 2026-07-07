@@ -36,6 +36,17 @@ function memoryGet(key: string): string | null {
   return entry.value;
 }
 
+/** Upstash REST auto-deserializes JSON strings into objects on GET. */
+function normalizeRedisGetValue(value: unknown): string | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  return JSON.stringify(value);
+}
+
 function memorySetex(key: string, seconds: number, value: string): void {
   while (memoryCache.size >= MEMORY_CACHE_MAX_KEYS) {
     const firstKey = memoryCache.keys().next().value;
@@ -146,7 +157,7 @@ export async function get(key: string): Promise<string | null> {
   try {
     if (upstashClient) {
       const v = await upstashClient.get(key);
-      return v ?? null;
+      return normalizeRedisGetValue(v);
     }
     return await redisClient.get(key);
   } catch (error) {
