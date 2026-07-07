@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { ALERT_EXIT_ANIMATION_MS } from '../constants/profile-desktop-page';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -9,21 +10,35 @@ export interface Toast {
   message: string;
   type: ToastType;
   duration?: number;
+  phase: 'entering' | 'exiting';
 }
 
 interface ToastProps {
   toast: Toast;
   onClose: (id: string) => void;
+  onStartExit: (id: string) => void;
 }
 
-function ToastItem({ toast, onClose }: ToastProps) {
+function ToastItem({ toast, onClose, onStartExit }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose(toast.id);
+      onStartExit(toast.id);
     }, toast.duration || 3000);
 
     return () => clearTimeout(timer);
-  }, [toast.id, toast.duration, onClose]);
+  }, [toast.id, toast.duration, onStartExit]);
+
+  useEffect(() => {
+    if (toast.phase !== 'exiting') {
+      return;
+    }
+
+    const exitTimer = setTimeout(() => {
+      onClose(toast.id);
+    }, ALERT_EXIT_ANIMATION_MS);
+
+    return () => clearTimeout(exitTimer);
+  }, [toast.phase, toast.id, onClose]);
 
   const bgColors = {
     success: 'bg-green-50 border-green-200 text-green-800',
@@ -62,13 +77,15 @@ function ToastItem({ toast, onClose }: ToastProps) {
     ),
   };
 
+  const animationClass = toast.phase === 'exiting' ? 'animate-alert-out' : 'animate-alert-in';
+
   return (
     <div
       className={`
         ${bgColors[toast.type]}
         border rounded-lg shadow-lg p-4 mb-3 flex items-start gap-3
         max-w-md w-full
-        animate-fade-in
+        ${animationClass}
       `}
       role="alert"
     >
@@ -77,7 +94,7 @@ function ToastItem({ toast, onClose }: ToastProps) {
       </div>
       <div className="flex-1 text-sm font-medium">{toast.message}</div>
       <button
-        onClick={() => onClose(toast.id)}
+        onClick={() => onStartExit(toast.id)}
         className={`flex-shrink-0 ${iconColors[toast.type]} hover:opacity-70 transition-opacity`}
         aria-label="Close"
       >
@@ -93,14 +110,14 @@ export function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
-    // Listen for toast events
     const handleShowToast = (event: Event) => {
-      const customEvent = event as CustomEvent<Omit<Toast, 'id'>>;
+      const customEvent = event as CustomEvent<Omit<Toast, 'id' | 'phase'>>;
       if (!customEvent.detail) return;
-      
+
       const newToast: Toast = {
         ...customEvent.detail,
         id: Date.now().toString() + Math.random().toString(36).substring(2, 11),
+        phase: 'entering',
       };
       setToasts((prev) => [...prev, newToast]);
     };
@@ -112,16 +129,31 @@ export function ToastContainer() {
     };
   }, []);
 
-  const handleClose = (id: string) => {
+  const handleClose = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
+  }, []);
+
+  const handleStartExit = useCallback((id: string) => {
+    setToasts((prev) =>
+      prev.map((toast) =>
+        toast.id === id && toast.phase !== 'exiting'
+          ? { ...toast, phase: 'exiting' }
+          : toast,
+      ),
+    );
+  }, []);
 
   if (toasts.length === 0) return null;
 
   return (
     <div className="fixed top-4 right-4 z-50 flex flex-col items-end">
       {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onClose={handleClose} />
+        <ToastItem
+          key={toast.id}
+          toast={toast}
+          onClose={handleClose}
+          onStartExit={handleStartExit}
+        />
       ))}
     </div>
   );
@@ -141,4 +173,3 @@ export function showToast(message: string, type: ToastType = 'info', duration?: 
   });
   window.dispatchEvent(event);
 }
-

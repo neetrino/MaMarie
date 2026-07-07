@@ -3,19 +3,33 @@
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PartnerStoreList } from '@/components/stores/PartnerStoreList';
+import { HomeSectionHeadingRow } from '@/components/home/HomeSectionHeading';
 import type { PartnerStoreItem } from '@/lib/partner-stores/types';
 import { apiClient } from '@/lib/api-client';
 import { useTranslation } from '@/lib/i18n-client';
 import { getStoredLanguage } from '@/lib/language';
 import {
-  STORES_LIST_MAX_HEIGHT_PX,
+  BEST_PRODUCTS_ASSETS,
+  BEST_PRODUCTS_HEADING_COLOR,
+  BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX,
+} from '@/constants/home-sections';
+import {
+  RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX,
+  RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX,
+} from '@/constants/products-catalog';
+import {
+  STORES_LIST_PANEL_WIDTH_PX,
   STORES_MAP_MIN_HEIGHT_MOBILE_PX,
-  STORES_MAP_MIN_HEIGHT_PX,
   STORES_PAGE_BG,
   STORES_PAGE_CARD_RADIUS_PX,
   STORES_PAGE_CARD_SHADOW,
   STORES_PAGE_COLUMN_GAP_PX,
+  STORES_PAGE_HEADING_BOTTOM_GAP_LG_PX,
+  STORES_PAGE_HEADING_BOTTOM_GAP_PX,
+  STORES_PAGE_HEADING_MIN_HEIGHT_PX,
+  STORES_PAGE_HEADING_PADDING_Y_PX,
   STORES_PAGE_MAX_WIDTH_PX,
+  STORES_PANEL_HEIGHT_PX,
 } from '@/constants/stores-page';
 
 const PartnerStoresMap = dynamic(
@@ -38,6 +52,12 @@ export function StoresPageClient() {
   const [stores, setStores] = useState<PartnerStoreItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [focusStoreId, setFocusStoreId] = useState<string | null>(null);
+
+  const handleSelectStoreFromList = useCallback((storeId: string) => {
+    setSelectedStoreId(storeId);
+    setFocusStoreId(storeId);
+  }, []);
 
   const fetchStores = useCallback(async () => {
     try {
@@ -70,10 +90,11 @@ export function StoresPageClient() {
     return () => window.removeEventListener('language-updated', handleLanguageUpdated);
   }, [fetchStores]);
 
-  const cardStyle = useMemo(
+  const panelStyle = useMemo(
     () => ({
       borderRadius: STORES_PAGE_CARD_RADIUS_PX,
       boxShadow: STORES_PAGE_CARD_SHADOW,
+      ['--stores-panel-height' as string]: `${STORES_PANEL_HEIGHT_PX}px`,
     }),
     [],
   );
@@ -111,47 +132,62 @@ export function StoresPageClient() {
       className="mx-auto w-full max-w-full px-5 pb-8 pt-7 lg:px-8 lg:pb-12 lg:pt-12"
       style={{ backgroundColor: STORES_PAGE_BG, maxWidth: STORES_PAGE_MAX_WIDTH_PX }}
     >
-      <div className="mb-6 text-center lg:mb-8">
-        <h1 className="text-2xl font-bold uppercase tracking-[0.08em] text-brand-pink lg:text-3xl">
-          {t('stores.title')}
-        </h1>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-brand-muted lg:mt-3 lg:text-base">
-          {t('stores.description')}
-        </p>
-      </div>
+      <header
+        className="mb-[var(--stores-heading-gap)] lg:mb-[var(--stores-heading-gap-lg)]"
+        style={{
+          ['--stores-heading-gap' as string]: `${STORES_PAGE_HEADING_BOTTOM_GAP_PX}px`,
+          ['--stores-heading-gap-lg' as string]: `${STORES_PAGE_HEADING_BOTTOM_GAP_LG_PX}px`,
+        }}
+      >
+        <HomeSectionHeadingRow
+          id="stores-page-heading"
+          title={t('stores.title')}
+          seeAllHref="/stores"
+          seeAllLabel=""
+          color={BEST_PRODUCTS_HEADING_COLOR}
+          chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
+          titleLineHeightPx={BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX}
+          minHeightPx={STORES_PAGE_HEADING_MIN_HEIGHT_PX}
+          headingPaddingYPx={STORES_PAGE_HEADING_PADDING_Y_PX}
+          mobileTitleFontSizePx={RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX}
+          mobileTitleLineHeightPx={RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX}
+          showSeeAllLink={false}
+        />
+      </header>
 
       <div
-        className="grid grid-cols-1 items-stretch lg:[grid-template-columns:380px_minmax(0,1fr)]"
-        style={{ gap: STORES_PAGE_COLUMN_GAP_PX }}
+        className="grid grid-cols-1 items-stretch lg:[grid-template-columns:var(--stores-list-width)_minmax(0,1fr)]"
+        style={{
+          gap: STORES_PAGE_COLUMN_GAP_PX,
+          ['--stores-list-width' as string]: `${STORES_LIST_PANEL_WIDTH_PX}px`,
+        }}
       >
         <section
-          className="bg-white p-4 lg:p-6"
-          style={{ ...cardStyle, maxHeight: STORES_LIST_MAX_HEIGHT_PX }}
+          className="flex min-h-0 flex-col bg-white p-4 lg:h-[var(--stores-panel-height)] lg:p-6"
+          style={panelStyle}
         >
           <PartnerStoreList
             stores={stores}
             selectedStoreId={selectedStoreId}
-            onSelectStore={setSelectedStoreId}
+            onSelectStore={handleSelectStoreFromList}
             title={t('stores.partnerStoresTitle')}
             hint={t('stores.selectStoreHint')}
           />
         </section>
 
         <section
-          className="bg-white p-4 lg:p-6"
-          style={{
-            ...cardStyle,
-            minHeight: STORES_MAP_MIN_HEIGHT_MOBILE_PX,
-          }}
+          className="relative z-0 flex min-h-0 flex-col bg-white p-4 lg:h-[var(--stores-panel-height)] lg:p-6"
+          style={{ ...panelStyle, minHeight: STORES_MAP_MIN_HEIGHT_MOBILE_PX }}
         >
-          <div className="h-full lg:min-h-[var(--stores-map-min-height)]" style={{ ['--stores-map-min-height' as string]: `${STORES_MAP_MIN_HEIGHT_PX}px` }}>
+          <div className="min-h-[320px] flex-1">
             <PartnerStoresMap
               stores={stores}
-              selectedStoreId={selectedStoreId}
+              focusStoreId={focusStoreId}
+              onFocusStoreHandled={() => setFocusStoreId(null)}
               onSelectStore={setSelectedStoreId}
               mapTitle={t('stores.storeMapTitle')}
               getDirectionsLabel={t('stores.getDirections')}
-              className="h-full min-h-[320px] lg:min-h-[560px]"
+              className="h-full min-h-[320px]"
             />
           </div>
         </section>

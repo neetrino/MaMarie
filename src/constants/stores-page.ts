@@ -12,9 +12,15 @@ export const STORES_PAGE_COLUMN_GAP_PX = 24;
 export const STORES_PAGE_CARD_RADIUS_PX = 24;
 export const STORES_PAGE_CARD_SHADOW = '0 8px 32px rgba(87, 66, 59, 0.08)';
 
-export const STORES_LIST_PANEL_WIDTH_PX = 380;
-export const STORES_LIST_MAX_HEIGHT_PX = 560;
-export const STORES_MAP_MIN_HEIGHT_PX = 560;
+export const STORES_PAGE_HEADING_PADDING_Y_PX = 0;
+export const STORES_PAGE_HEADING_MIN_HEIGHT_PX = 0;
+export const STORES_PAGE_HEADING_BOTTOM_GAP_PX = 32;
+export const STORES_PAGE_HEADING_BOTTOM_GAP_LG_PX = 48;
+
+export const STORES_PANEL_HEIGHT_PX = 560;
+export const STORES_LIST_PANEL_WIDTH_PX = 320;
+export const STORES_LIST_MAX_HEIGHT_PX = STORES_PANEL_HEIGHT_PX;
+export const STORES_MAP_MIN_HEIGHT_PX = STORES_PANEL_HEIGHT_PX;
 export const STORES_MAP_MIN_HEIGHT_MOBILE_PX = 320;
 
 /** Yerevan center — default map viewport before stores load. */
@@ -25,6 +31,8 @@ export const STORES_MAP_DEFAULT_CENTER = {
 
 export const STORES_MAP_DEFAULT_ZOOM = 13;
 export const STORES_MAP_SELECTED_ZOOM = 15;
+/** Keep viewport fixed when marker popups open (no auto-pan). */
+export const STORES_MAP_POPUP_AUTO_PAN = false;
 
 export const STORES_PAGE_ASSETS = {
   iconLocation: '/assets/contact/icon-location.png',

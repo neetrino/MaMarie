@@ -1,0 +1,19 @@
+/**
+ * Leaflet panes default to z-index 400+ and paint above app drawers (z-index 90).
+ * Isolate the map shell and cap internal layers so overlays stay on top.
+ */
+.mapShell {
+  isolation: isolate;
+  z-index: 0;
+}
+
+.mapShell :global(.leaflet-pane),
+.mapShell :global(.leaflet-top),
+.mapShell :global(.leaflet-bottom),
+.mapShell :global(.leaflet-control-container) {
+  z-index: 1 !important;
+}
+
+.mapShell :global(.leaflet-popup-pane) {
+  z-index: 2 !important;
+}

@@ -51,6 +51,99 @@ function getAttributesToShow(
   return [];
 }
 
+interface VariantBulkActionsProps {
+  slug: string;
+  title: string;
+  selectedAttributesForVariants: Set<string>;
+  attributes: Attribute[];
+  onApplyToAll: (field: 'price' | 'compareAtPrice' | 'stock' | 'sku', value: string) => void;
+  onVariantUpdate: (updater: (prev: GeneratedVariant[]) => GeneratedVariant[]) => void;
+  generateSlug: (title: string) => string;
+  t: (key: string) => string;
+}
+
+function VariantBulkActions({
+  slug,
+  title,
+  selectedAttributesForVariants,
+  attributes,
+  onApplyToAll,
+  onVariantUpdate,
+  generateSlug,
+  t,
+}: VariantBulkActionsProps) {
+  return (
+    <div className="flex gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          const price = prompt(t('admin.products.add.enterDefaultPrice'));
+          if (price !== null) {
+            onApplyToAll('price', price);
+          }
+        }}
+      >
+        {t('admin.products.add.applyPriceToAll')}
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          const stock = prompt(t('admin.products.add.enterDefaultStock'));
+          if (stock !== null) {
+            onApplyToAll('stock', stock);
+          }
+        }}
+      >
+        {t('admin.products.add.applyStockToAll')}
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          const skuPrefix = prompt(t('admin.products.add.enterSkuPrefix'));
+          if (skuPrefix !== null) {
+            const baseSlug = skuPrefix || slug || generateSlug(title) || 'PROD';
+            onVariantUpdate((prev) =>
+              prev.map((variant) => {
+                const valueParts: string[] = [];
+                Array.from(selectedAttributesForVariants).forEach((attributeId) => {
+                  const attribute = attributes.find((a) => a.id === attributeId);
+                  if (!attribute) return;
+
+                  const selectedIds = variant.selectedValueIds.filter((id) =>
+                    attribute.values.some((v) => v.id === id)
+                  );
+
+                  selectedIds.forEach((valueId) => {
+                    const value = attribute.values.find((v) => v.id === valueId);
+                    if (value) {
+                      valueParts.push(value.value.toUpperCase().replace(/\s+/g, '-'));
+                    }
+                  });
+                });
+
+                const sku =
+                  valueParts.length > 0
+                    ? `${baseSlug.toUpperCase()}-${valueParts.join('-')}`
+                    : `${baseSlug.toUpperCase()}`;
+
+                return { ...variant, sku };
+              })
+            );
+          }
+        }}
+      >
+        {t('admin.products.add.applySkuToAll')}
+      </Button>
+    </div>
+  );
+}
+
 export function VariantBuilder({
   generatedVariants,
   attributes,
@@ -96,74 +189,16 @@ export function VariantBuilder({
                 {t('admin.products.add.generatedVariants')} ({generatedVariants.length.toString()})
               </h3>
               {generatedVariants.length > 0 && (
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const price = prompt(t('admin.products.add.enterDefaultPrice'));
-                    if (price !== null) {
-                      onApplyToAll('price', price);
-                    }
-                  }}
-                >
-                  {t('admin.products.add.applyPriceToAll')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const stock = prompt(t('admin.products.add.enterDefaultStock'));
-                    if (stock !== null) {
-                      onApplyToAll('stock', stock);
-                    }
-                  }}
-                >
-                  {t('admin.products.add.applyStockToAll')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const skuPrefix = prompt(t('admin.products.add.enterSkuPrefix'));
-                    if (skuPrefix !== null) {
-                      const baseSlug = skuPrefix || slug || generateSlug(title) || 'PROD';
-                      onVariantUpdate((prev) =>
-                        prev.map((variant) => {
-                          const valueParts: string[] = [];
-                          Array.from(selectedAttributesForVariants).forEach((attributeId) => {
-                            const attribute = attributes.find((a) => a.id === attributeId);
-                            if (!attribute) return;
-
-                            const selectedIds = variant.selectedValueIds.filter((id) =>
-                              attribute.values.some((v) => v.id === id)
-                            );
-
-                            selectedIds.forEach((valueId) => {
-                              const value = attribute.values.find((v) => v.id === valueId);
-                              if (value) {
-                                valueParts.push(value.value.toUpperCase().replace(/\s+/g, '-'));
-                              }
-                            });
-                          });
-
-                          const sku =
-                            valueParts.length > 0
-                              ? `${baseSlug.toUpperCase()}-${valueParts.join('-')}`
-                              : `${baseSlug.toUpperCase()}`;
-
-                          return { ...variant, sku };
-                        })
-                      );
-                    }
-                  }}
-                >
-                  {t('admin.products.add.applySkuToAll')}
-                </Button>
-              </div>
+                <VariantBulkActions
+                  slug={slug}
+                  title={title}
+                  selectedAttributesForVariants={selectedAttributesForVariants}
+                  attributes={attributes}
+                  onApplyToAll={onApplyToAll}
+                  onVariantUpdate={onVariantUpdate}
+                  generateSlug={generateSlug}
+                  t={t}
+                />
               )}
             </div>
 

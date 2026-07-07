@@ -157,6 +157,18 @@ export const PROFILE_DESKTOP_ALERT_ERROR_CLASS =
 export const PROFILE_DESKTOP_ALERT_SUCCESS_CLASS =
   'rounded-[15px] border border-green-200 bg-green-50 p-4 text-sm text-green-600';
 
+export const TOP_ALERT_SUCCESS_CLASS =
+  'inline-flex w-fit max-w-[calc(100vw-2rem)] items-center justify-center rounded-full border border-green-200 bg-green-50 px-5 py-2.5 text-sm font-medium text-green-600 shadow-md';
+
+export const TOP_ALERT_ERROR_CLASS =
+  'inline-flex w-fit max-w-[calc(100vw-2rem)] items-center justify-center rounded-full border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-medium text-red-600 shadow-md';
+
+export const TOP_ALERT_CONTAINER_TOP_PADDING_PX = 16;
+
+export const ALERT_AUTO_DISMISS_MS = 3500;
+export const ALERT_EXIT_ANIMATION_MS = 300;
+export const TOP_ALERT_Z_INDEX = 100;
+
 export const PROFILE_DESKTOP_DEFAULT_BADGE_CLASS =
   'inline-flex rounded-full bg-[#e8f4fd] px-3 py-1 text-xs font-medium text-[#5281e1]';
 
@@ -164,6 +176,8 @@ export const PROFILE_DESKTOP_DEFAULT_BADGE_CLASS =
 export const PROFILE_SIDE_SHEET_WIDTH_PERCENT = 50;
 export const PROFILE_SIDE_SHEET_Z_INDEX = 95;
 export const PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS = 300;
+export const REORDER_SUCCESS_ALERT_DELAY_MS = PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS;
+export const REORDER_CART_DRAWER_DELAY_MS = 1500;
 export const PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS = 200;
 export const PROFILE_SIDE_SHEET_PANEL_Z_INDEX = 2;
 export const PROFILE_SIDE_SHEET_RADIUS_PX = 24;

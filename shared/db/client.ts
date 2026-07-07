@@ -153,7 +153,18 @@ function resolvePrismaClient(): PrismaClient {
   return client;
 }
 
-export const db = resolvePrismaClient();
+function invalidateDbClient(): void {
+  dbReadyPromise = null;
+  globalForPrisma.prisma = undefined;
+}
+
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = resolvePrismaClient();
+    const value = Reflect.get(client as object, prop, client);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
 
 let dbReadyPromise: Promise<void> | null = null;
 let dbResetPromise: Promise<void> | null = null;
@@ -179,12 +190,12 @@ export function resetDbConnection(): Promise<void> {
   }
 
   dbResetPromise = (async () => {
-    dbReadyPromise = null;
     try {
       await db.$disconnect();
     } catch {
       // Ignore disconnect errors on already-closed connections.
     }
+    invalidateDbClient();
     await ensureDbReady();
   })().finally(() => {
     dbResetPromise = null;
