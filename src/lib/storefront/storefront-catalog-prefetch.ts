@@ -1,5 +1,7 @@
 'use client';
 
+import type { LinkProps } from 'next/link';
+import type { FocusEvent, MouseEvent, TouchEvent } from 'react';
 import type { ProductsCatalogResponse } from '../../app/products/products-catalog-types';
 import type { ProductsFiltersData } from '../../components/ProductsFiltersProvider';
 import { apiClient } from '../api-client';
@@ -117,10 +119,50 @@ export function warmStorefrontCatalogRoute(href: string): void {
   }
 
   warmProductsList(params);
+  warmProductsFilters(params);
+}
 
-  if (params.category || params.search || params.minPrice || params.maxPrice) {
-    warmProductsFilters(params);
+/** Whether `href` targets the storefront products catalog. */
+export function isStorefrontCatalogHref(href: LinkProps['href']): href is string {
+  if (typeof href !== 'string') {
+    return false;
   }
+  return href === '/products' || href.startsWith('/products?') || href.startsWith('/products#');
+}
+
+interface StorefrontCatalogPrefetchHandlers {
+  onMouseEnter?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  onFocus?: (event: FocusEvent<HTMLAnchorElement>) => void;
+  onTouchStart?: (event: TouchEvent<HTMLAnchorElement>) => void;
+  prefetch?: LinkProps['prefetch'];
+}
+
+/** Merges catalog API warm-up handlers into Next.js `Link` props. */
+export function mergeStorefrontCatalogPrefetchProps(
+  href: LinkProps['href'],
+  existing: StorefrontCatalogPrefetchHandlers = {}
+): StorefrontCatalogPrefetchHandlers {
+  if (!isStorefrontCatalogHref(href)) {
+    return existing;
+  }
+
+  const warm = () => warmStorefrontCatalogRoute(href);
+
+  return {
+    prefetch: existing.prefetch ?? true,
+    onMouseEnter: (event) => {
+      warm();
+      existing.onMouseEnter?.(event);
+    },
+    onFocus: (event) => {
+      warm();
+      existing.onFocus?.(event);
+    },
+    onTouchStart: (event) => {
+      warm();
+      existing.onTouchStart?.(event);
+    },
+  };
 }
 
 /** Reads warmed client cache for SSR-hydration alignment when available. */

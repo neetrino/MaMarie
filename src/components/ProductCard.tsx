@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { useWishlist } from './hooks/useWishlist';
+import { buildWishlistProductSnapshot } from '../lib/wishlist-product-cache';
 import { useCompare } from './hooks/useCompare';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
@@ -62,7 +63,20 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
   const handleWishlistToggle = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleWishlist();
+    toggleWishlist(buildWishlistProductSnapshot({
+      id: product.id,
+      slug: product.slug,
+      title: product.title,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      compareAtPrice: product.compareAtPrice,
+      discountPercent: product.discountPercent,
+      image: product.image,
+      inStock: product.inStock,
+      brand: product.brand ? { id: product.brand.id, name: product.brand.name } : null,
+      defaultVariantId: product.defaultVariantId,
+      colors: product.colors,
+    }));
   };
 
   // Handle compare toggle

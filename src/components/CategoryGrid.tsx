@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
+import { StorefrontCatalogLink } from './storefront/StorefrontCatalogLink';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 import { logger } from "@/lib/utils/logger";
@@ -306,7 +306,7 @@ export function CategoryGrid() {
             const product = categoryProducts[category.slug];
             
             return (
-              <Link
+              <StorefrontCatalogLink
                 key={category.id}
                 href={`/products?category=${category.slug}`}
                 onClick={(e) => {
@@ -342,7 +342,7 @@ export function CategoryGrid() {
                 <span className="text-xs text-gray-500 font-medium">
                   {productCount} products
                 </span>
-              </Link>
+              </StorefrontCatalogLink>
             );
           })}
         </div>

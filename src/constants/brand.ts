@@ -5,6 +5,7 @@ export const BRAND_COLORS = {
   brown: '#57423b',
   muted: '#4b5563',
   onPink: '#f5f5f5',
+  sky: '#c2ddf9',
 } as const;
 
 /** Static brand assets exported from Figma. */

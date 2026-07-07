@@ -8,13 +8,9 @@ import {
   MOBILE_WISHLIST_CARD_WIDTH_PX,
   MOBILE_WISHLIST_TITLE_TO_GRID_GAP_PX,
 } from '../../constants/mobile-wishlist';
-import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../../lib/product-card-lazy';
 import type { HomeProductCardData } from '../home/HomeProductCard';
 import { ProductCardMountPlaceholder } from '../home/ProductCardMountPlaceholder';
-import { LazyWhenVisible } from '../LazyWhenVisible';
 import { MobileWishlistProductCard } from './MobileWishlistProductCard';
-
-const MOBILE_WISHLIST_VIEW_MODE = 'wishlist-grid-4' as const;
 
 interface MobileWishlistProductGridProps {
   products: HomeProductCardData[];
@@ -40,26 +36,13 @@ export function MobileWishlistProductGrid({
       } as CSSProperties}
       aria-busy={loading}
     >
-      {products.map((product, index) => (
-        <LazyWhenVisible
+      {products.map((product) => (
+        <MobileWishlistProductCard
           key={product.id}
-          eager={resolveProductCardEagerMount(index, MOBILE_WISHLIST_VIEW_MODE)}
-          minHeightPx={MOBILE_WISHLIST_CARD_HEIGHT_PX}
-          fallback={
-            <ProductCardMountPlaceholder
-              variant="grid"
-              widthPx={MOBILE_WISHLIST_CARD_WIDTH_PX}
-              heightPx={MOBILE_WISHLIST_CARD_HEIGHT_PX}
-              className="mobile-wishlist-card-placeholder w-full max-w-none"
-            />
-          }
-        >
-          <MobileWishlistProductCard
-            product={product}
-            imagePriority={resolveProductCardImagePriority(index, MOBILE_WISHLIST_VIEW_MODE)}
-            addToCartLabel={addToCartLabel}
-          />
-        </LazyWhenVisible>
+          product={product}
+          imagePriority
+          addToCartLabel={addToCartLabel}
+        />
       ))}
 
       {loading && products.length === 0

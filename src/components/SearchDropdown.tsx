@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { StorefrontCatalogLink } from './storefront/StorefrontCatalogLink';
 import { useTranslation } from '../lib/i18n-client';
 import { formatPrice, getStoredCurrency } from '../lib/currency';
 import type { InstantSearchResultItem } from './hooks/useInstantSearch';
@@ -124,7 +124,7 @@ export function SearchDropdown({
 
       {!loading && !error && query.trim().length >= 1 ? (
         <div className="border-t border-gray-100 bg-gray-50 px-4 py-2">
-          <Link
+          <StorefrontCatalogLink
             href={`/products?search=${encodeURIComponent(query.trim())}`}
             onClick={() => {
               onClose();
@@ -133,7 +133,7 @@ export function SearchDropdown({
             className="block text-center text-sm font-medium text-gray-700 hover:text-gray-900"
           >
             {t('common.search.seeAll')}
-          </Link>
+          </StorefrontCatalogLink>
         </div>
       ) : null}
     </div>

@@ -548,6 +548,41 @@ model Settings {
 }
 
 // ============================================
+// PARTNER STORE MODEL
+// ============================================
+model PartnerStore {
+  id           String                    @id @default(cuid())
+  slug         String                    @unique
+  logoUrl      String?
+  latitude     Float
+  longitude    Float
+  published    Boolean                   @default(false)
+  position     Int                       @default(0)
+  translations PartnerStoreTranslation[]
+  deletedAt    DateTime?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@index([published])
+  @@index([deletedAt])
+  @@index([position])
+  @@map("partner_stores")
+}
+
+model PartnerStoreTranslation {
+  id      String @id @default(cuid())
+  storeId String
+  locale  String
+  name    String
+  address String
+
+  store PartnerStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, locale])
+  @@map("partner_store_translations")
+}
+
+// ============================================
 // CONTACT MESSAGE MODEL
 // ============================================
 model ContactMessage {
