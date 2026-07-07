@@ -413,6 +413,7 @@ export default function ProductsPage() {
               duplicatingProductId={handlers.duplicatingProductId}
               handleTogglePublished={handlers.handleTogglePublished}
               handleToggleFeatured={handlers.handleToggleFeatured}
+              togglingFeaturedIds={handlers.togglingFeaturedIds}
               meta={meta}
               page={page}
               setPage={setPage}
