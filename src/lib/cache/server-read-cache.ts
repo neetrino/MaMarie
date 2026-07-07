@@ -9,7 +9,6 @@ interface ServerReadCacheState {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var __serverReadCache: ServerReadCacheState | undefined;
 }
 

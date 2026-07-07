@@ -489,7 +489,6 @@ export function ProductsCatalogProvider({
         });
     };
 
-    let timeoutId: number | undefined;
     if (typeof window.requestIdleCallback === 'function') {
       const idleId = window.requestIdleCallback(prefetchPool, {
         timeout: CATALOG_POOL_PREFETCH_DELAY_MS,
@@ -500,12 +499,10 @@ export function ProductsCatalogProvider({
       };
     }
 
-    timeoutId = window.setTimeout(prefetchPool, CATALOG_POOL_PREFETCH_DELAY_MS);
+    const timeoutId = window.setTimeout(prefetchPool, CATALOG_POOL_PREFETCH_DELAY_MS);
     return () => {
       controller.abort();
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
-      }
+      window.clearTimeout(timeoutId);
     };
   }, [normalizedInitialParams, initialMeta, initialProducts]);
 

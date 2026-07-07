@@ -95,9 +95,11 @@ export function PartnerStoresMap({
   const directionsLabelRef = useRef(getDirectionsLabel);
   const onFocusStoreHandledRef = useRef(onFocusStoreHandled);
 
-  onSelectStoreRef.current = onSelectStore;
-  directionsLabelRef.current = getDirectionsLabel;
-  onFocusStoreHandledRef.current = onFocusStoreHandled;
+  useEffect(() => {
+    onSelectStoreRef.current = onSelectStore;
+    directionsLabelRef.current = getDirectionsLabel;
+    onFocusStoreHandledRef.current = onFocusStoreHandled;
+  }, [onSelectStore, getDirectionsLabel, onFocusStoreHandled]);
 
   useEffect(() => {
     const container = mapContainerRef.current;
