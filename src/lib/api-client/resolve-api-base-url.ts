@@ -33,16 +33,54 @@ function isSameDevServer(apiOrigin: string, pageOrigin: string): boolean {
   }
 }
 
+function isLoopbackConfiguredUrl(url: string): boolean {
+  if (!url) {
+    return false;
+  }
+  try {
+    return isLocalDevHost(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isProductionRuntime(): boolean {
+  return process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+}
+
+/** Ignore localhost API URL copied from .env when deployed (browser cannot reach it; CSP blocks it). */
+function effectiveConfiguredApiUrl(raw: string): string {
+  if (!raw) {
+    return '';
+  }
+  if (isLoopbackConfiguredUrl(raw) && isProductionRuntime()) {
+    return '';
+  }
+  return raw;
+}
+
+function resolveServerApiBaseUrl(): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() ?? '';
+  if (appUrl && !isLoopbackConfiguredUrl(appUrl)) {
+    return appUrl;
+  }
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  if (vercelUrl) {
+    return `https://${vercelUrl}`;
+  }
+  return appUrl || 'http://localhost:3000';
+}
+
 /**
  * Resolves the API base URL for the current runtime.
  * Browser: relative paths when the configured API is this Next.js app (avoids CSP / origin mismatch).
  * Server: absolute URL required for self-fetch.
  */
 export function resolveApiBaseUrl(): string {
-  const configured = process.env.NEXT_PUBLIC_API_URL?.trim() ?? '';
+  const configured = effectiveConfiguredApiUrl(process.env.NEXT_PUBLIC_API_URL?.trim() ?? '');
 
   if (typeof window === 'undefined') {
-    return configured || process.env.NEXT_PUBLIC_APP_URL?.trim() || 'http://localhost:3000';
+    return configured || resolveServerApiBaseUrl();
   }
 
   if (!configured) {
