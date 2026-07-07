@@ -3,7 +3,7 @@
 import { ADMIN_TABLE_CHECKBOX, ADMIN_TABLE_TD_CHECK } from '../../constants/admin-table-classes';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
-import { getStatusColor, getPaymentStatusColor } from '../utils/orderUtils';
+import { getStatusColor, getPaymentStatusColor, getAdminPaymentStatusSelectOptions } from '../utils/orderUtils';
 import { ClaySelect } from '../../../../components/ClaySelect';
 import type { Order } from '../useOrders';
 
@@ -157,11 +157,7 @@ export function OrderRow({
               onChange={onPaymentStatusChange}
               placeholder={t('admin.orders.paid')}
               triggerClassName={`${statusSelectTriggerClass} ${getPaymentStatusColor(order.paymentStatus)}`}
-              options={[
-                { value: 'paid', label: t('admin.orders.paid') },
-                { value: 'pending', label: t('admin.orders.pendingPayment') },
-                { value: 'failed', label: t('admin.orders.failed') },
-              ]}
+              options={getAdminPaymentStatusSelectOptions(t)}
             />
           </div>
         )}

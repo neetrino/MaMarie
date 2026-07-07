@@ -7,6 +7,7 @@ import {
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
 } from '../../../constants/admin-desktop-page';
 import { formatCurrency, formatDate } from '../utils/dashboardUtils';
+import { getPaymentStatusColor, translateAdminPaymentStatus } from '../orders/utils/orderUtils';
 import { AdminClaySectionCard } from './AdminClaySectionCard';
 
 interface RecentOrder {
@@ -77,7 +78,7 @@ export function RecentOrdersCard({ recentOrders, recentOrdersLoading }: RecentOr
                             : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {order.paymentStatus}
+                      {translateAdminPaymentStatus(order.paymentStatus, t)}
                     </span>
                   </div>
                   <p className="text-xs text-gray-600">

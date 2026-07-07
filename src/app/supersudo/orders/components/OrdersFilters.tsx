@@ -3,6 +3,7 @@
 import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { ClaySelect } from '../../../../components/ClaySelect';
+import { getAdminPaymentStatusFilterOptions } from '../utils/orderUtils';
 import type { useOrders } from '../useOrders';
 
 interface OrdersFiltersProps {
@@ -85,12 +86,7 @@ export function OrdersFilters({
           value={paymentStatusFilter}
           onChange={handlePaymentStatusChange}
           placeholder={t('admin.orders.allPaymentStatuses')}
-          options={[
-            { value: '', label: t('admin.orders.allPaymentStatuses') },
-            { value: 'paid', label: t('admin.orders.paid') },
-            { value: 'pending', label: t('admin.orders.pendingPayment') },
-            { value: 'failed', label: t('admin.orders.failed') },
-          ]}
+          options={getAdminPaymentStatusFilterOptions(t)}
         />
         <input
           type="text"

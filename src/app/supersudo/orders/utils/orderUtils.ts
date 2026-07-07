@@ -49,6 +49,50 @@ export function getPaymentStatusColor(paymentStatus: string): string {
   }
 }
 
+const ADMIN_PAYMENT_STATUS_I18N_KEYS: Record<string, string> = {
+  paid: 'admin.orders.paid',
+  pending: 'admin.orders.pendingPayment',
+  failed: 'admin.orders.failed',
+};
+
+/** Admin UI label for order payment status (paid / pending / failed). */
+export function translateAdminPaymentStatus(
+  paymentStatus: string,
+  t: (key: string) => string
+): string {
+  const normalized = paymentStatus.trim().toLowerCase();
+  const key = ADMIN_PAYMENT_STATUS_I18N_KEYS[normalized];
+  if (key) {
+    return t(key);
+  }
+
+  const fallback = paymentStatus.trim();
+  if (!fallback) {
+    return fallback;
+  }
+
+  return fallback.charAt(0).toUpperCase() + fallback.slice(1);
+}
+
+export function getAdminPaymentStatusSelectOptions(
+  t: (key: string) => string
+): Array<{ value: string; label: string }> {
+  return [
+    { value: 'paid', label: t('admin.orders.paid') },
+    { value: 'pending', label: t('admin.orders.pendingPayment') },
+    { value: 'failed', label: t('admin.orders.failed') },
+  ];
+}
+
+export function getAdminPaymentStatusFilterOptions(
+  t: (key: string) => string
+): Array<{ value: string; label: string }> {
+  return [
+    { value: '', label: t('admin.orders.allPaymentStatuses') },
+    ...getAdminPaymentStatusSelectOptions(t),
+  ];
+}
+
 /**
  * Helper function to get color hex/rgb from color name
  */

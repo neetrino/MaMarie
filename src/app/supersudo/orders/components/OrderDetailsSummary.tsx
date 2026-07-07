@@ -4,7 +4,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { convertPrice, formatPriceInCurrency, type CurrencyCode } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
-import { getStatusColor, getPaymentStatusColor } from '../utils/orderUtils';
+import { getStatusColor, getPaymentStatusColor, translateAdminPaymentStatus } from '../utils/orderUtils';
 
 function translateAdminPhrase(status: string, t: (key: string) => string): string {
   const key = `admin.orders.${status}`;
@@ -77,7 +77,7 @@ export function OrderDetailsSummary({
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getPaymentStatusColor(orderDetails.paymentStatus)}`}
               >
-                {translateAdminPhrase(orderDetails.paymentStatus, t)}
+                {translateAdminPaymentStatus(orderDetails.paymentStatus, t)}
               </span>
             </dd>
           </dl>
