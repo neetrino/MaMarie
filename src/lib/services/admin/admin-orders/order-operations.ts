@@ -90,7 +90,10 @@ export async function getOrderById(orderId: string) {
                   attributeValue: {
                     include: {
                       attribute: true,
-                      translations: true,
+                      translations: {
+                        where: { locale: 'en' },
+                        take: 1,
+                      },
                     },
                   },
                 },

@@ -12,6 +12,12 @@ export const CLAY_SELECT_CHEVRON_SIZE_PX = 16;
 export const CLAY_SELECT_DROPDOWN_PANEL_CLASS =
   'absolute left-0 z-50 w-full origin-top overflow-hidden border border-[#f0f0f0] bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-all ease-out';
 
+/** Fixed portal menu — above admin table overflow clips and side sheets. */
+export const CLAY_SELECT_PORTAL_Z_INDEX = 110;
+
+export const CLAY_SELECT_PORTAL_DROPDOWN_PANEL_CLASS =
+  'fixed origin-top overflow-hidden border border-[#f0f0f0] bg-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-all ease-out';
+
 export const CLAY_SELECT_OPTION_CLASS =
   'w-full px-5 py-3 text-left text-sm transition-colors text-gray-800 hover:bg-gray-50';
 

@@ -4,7 +4,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { CurrencyCode } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
-import { getCheckoutPaymentMethodKey, getPaymentStatusColor } from '../utils/orderUtils';
+import { getCheckoutPaymentMethodKey, getPaymentStatusColor, translateAdminPaymentStatus } from '../utils/orderUtils';
 
 interface OrderDetailsAddressesProps {
   orderDetails: OrderDetails;
@@ -108,11 +108,7 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${getPaymentStatusColor(orderDetails.payment.status)}`}
               >
-                {(() => {
-                  const key = `admin.orders.${orderDetails.payment.status}`;
-                  const translated = t(key);
-                  return translated === key ? orderDetails.payment.status : translated;
-                })()}
+                {translateAdminPaymentStatus(orderDetails.payment.status, t)}
               </span>
             </dd>
             {orderDetails.payment.cardBrand && orderDetails.payment.cardLast4 && (

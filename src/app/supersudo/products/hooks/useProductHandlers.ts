@@ -1,20 +1,30 @@
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { FormEvent } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { useTranslation } from '../../../../lib/i18n-client';
-import type { Product, ProductsResponse } from '../types';
+import type { Product } from '../types';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../../context/AdminDialogsContext';
 
 interface UseProductHandlersProps {
   products: Product[];
-  setProducts: (products: Product[]) => void;
+  setProducts: Dispatch<SetStateAction<Product[]>>;
   fetchProducts: () => Promise<void>;
   selectedIds: Set<string>;
   setSelectedIds: (ids: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setPage: (page: number | ((prev: number) => number)) => void;
   setBulkDeleting: (deleting: boolean) => void;
   setTogglingAllFeatured: (toggling: boolean) => void;
+}
+
+function patchProductFeatured(
+  setProducts: Dispatch<SetStateAction<Product[]>>,
+  productId: string,
+  featured: boolean
+): void {
+  setProducts((prev) =>
+    prev.map((product) => (product.id === productId ? { ...product, featured } : product))
+  );
 }
 
 export function useProductHandlers({
@@ -30,6 +40,7 @@ export function useProductHandlers({
   const { t } = useTranslation();
   const { confirm: confirmDialog } = useAdminDialogs();
   const [duplicatingProductId, setDuplicatingProductId] = useState<string | null>(null);
+  const [togglingFeaturedIds, setTogglingFeaturedIds] = useState<Set<string>>(new Set());
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -117,97 +128,99 @@ export function useProductHandlers({
     try {
       await apiClient.delete(`/api/v1/admin/products/${productId}`);
       logger.debug('✅ [ADMIN] Product deleted successfully');
-      
-      // Refresh products list
       fetchProducts();
-      
       alert(t('admin.products.deletedSuccess'));
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error deleting product:', err);
-      alert(t('admin.products.errorDeleting').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      alert(t('admin.products.errorDeleting').replace('{message}', message));
     }
   };
 
   const handleTogglePublished = async (productId: string, currentStatus: boolean, productTitle: string) => {
     try {
       const newStatus = !currentStatus;
-      
-      // При изменении только статуса published, отправляем только статус
-      // Это позволяет избежать проблем с валидацией вариантов (например, требование размеров)
-      // Варианты и другие данные останутся без изменений на сервере
       const updateData = {
         published: newStatus,
       };
-      
+
       logger.debug(`🔄 [ADMIN] Updating product status to ${newStatus ? 'published' : 'draft'}`);
-      
+
       await apiClient.put(`/api/v1/admin/products/${productId}`, updateData);
-      
+
       logger.debug(`✅ [ADMIN] Product ${newStatus ? 'published' : 'unpublished'} successfully`);
-      
-      // Refresh products list
+
       fetchProducts();
-      
+
       if (newStatus) {
         alert(t('admin.products.productPublished').replace('{title}', productTitle));
       } else {
         alert(t('admin.products.productDraft').replace('{title}', productTitle));
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product status:', err);
-      alert(t('admin.products.errorUpdatingStatus').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      alert(t('admin.products.errorUpdatingStatus').replace('{message}', message));
     }
   };
 
-  const handleToggleFeatured = async (productId: string, currentStatus: boolean, productTitle: string) => {
+  const handleToggleFeatured = async (productId: string, currentStatus: boolean) => {
+    if (togglingFeaturedIds.has(productId)) {
+      return;
+    }
+
+    const newStatus = !currentStatus;
+    const previousProducts = products;
+
+    patchProductFeatured(setProducts, productId, newStatus);
+    setTogglingFeaturedIds((prev) => new Set(prev).add(productId));
+
     try {
-      const newStatus = !currentStatus;
-      
-      const updateData = {
-        featured: newStatus,
-      };
-      
       logger.debug(`⭐ [ADMIN] Updating product featured status to ${newStatus ? 'featured' : 'not featured'}`);
-      
-      await apiClient.put(`/api/v1/admin/products/${productId}`, updateData);
-      
+      await apiClient.put(`/api/v1/admin/products/${productId}`, { featured: newStatus });
       logger.debug(`✅ [ADMIN] Product ${newStatus ? 'marked as featured' : 'removed from featured'} successfully`);
-      
-      // Refresh products list
-      fetchProducts();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      setProducts(previousProducts);
+      const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product featured status:', err);
-      alert(t('admin.products.errorUpdatingFeatured').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      alert(t('admin.products.errorUpdatingFeatured').replace('{message}', message));
+    } finally {
+      setTogglingFeaturedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(productId);
+        return next;
+      });
     }
   };
 
   const handleToggleAllFeatured = async () => {
     if (products.length === 0) return;
 
-    // Check if all products are featured
     const allFeatured = products.every(p => p.featured);
     const newStatus = !allFeatured;
+    const previousProducts = products;
 
+    setProducts((prev) => prev.map((product) => ({ ...product, featured: newStatus })));
     setTogglingAllFeatured(true);
+
     try {
       const results = await Promise.allSettled(
-        products.map(product => 
+        products.map(product =>
           apiClient.put(`/api/v1/admin/products/${product.id}`, { featured: newStatus })
         )
       );
-      
+
       const failed = results.filter(r => r.status === 'rejected');
       const successCount = products.length - failed.length;
-      
+
       logger.debug(`✅ [ADMIN] Toggle all featured completed: ${successCount}/${products.length} successful`);
-      
-      // Refresh products list
-      await fetchProducts();
-      
+
       if (failed.length > 0) {
+        setProducts(previousProducts);
         alert(t('admin.products.featuredToggleFinished').replace('{success}', successCount.toString()).replace('{total}', products.length.toString()));
       }
     } catch (err) {
+      setProducts(previousProducts);
       console.error('❌ [ADMIN] Toggle all featured error:', err);
       alert(t('admin.products.failedToUpdateFeatured'));
     } finally {
@@ -222,15 +235,10 @@ export function useProductHandlers({
     handleBulkDelete,
     handleDuplicateProduct,
     duplicatingProductId,
+    togglingFeaturedIds,
     handleDeleteProduct,
     handleTogglePublished,
     handleToggleFeatured,
     handleToggleAllFeatured,
   };
 }
-
-
-
-
-
-

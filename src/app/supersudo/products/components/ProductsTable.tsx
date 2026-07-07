@@ -38,7 +38,8 @@ interface ProductsTableProps {
   handleDuplicateProduct: (productId: string) => void;
   duplicatingProductId: string | null;
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
-  handleToggleFeatured: (productId: string, currentStatus: boolean, productTitle: string) => void;
+  handleToggleFeatured: (productId: string, currentStatus: boolean) => void;
+  togglingFeaturedIds: Set<string>;
   meta: ProductsResponse['meta'] | null;
   page: number;
   setPage: (page: number | ((prev: number) => number)) => void;
@@ -108,7 +109,8 @@ interface ProductsTableLoadedViewProps {
   handleDuplicateProduct: (productId: string) => void;
   duplicatingProductId: string | null;
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
-  handleToggleFeatured: (productId: string, currentStatus: boolean, productTitle: string) => void;
+  handleToggleFeatured: (productId: string, currentStatus: boolean) => void;
+  togglingFeaturedIds: Set<string>;
   meta: ProductsResponse['meta'] | null;
   page: number;
   t: (key: string) => string;
@@ -160,6 +162,7 @@ function ProductsTableLoadedView({
   duplicatingProductId,
   handleTogglePublished,
   handleToggleFeatured,
+  togglingFeaturedIds,
   meta,
   page,
   t,
@@ -310,15 +313,24 @@ function ProductsTableLoadedView({
                 <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center`}>
                   <button
                     type="button"
+                    disabled={togglingFeaturedIds.has(product.id)}
                     onClick={(event) => {
                       event.stopPropagation();
-                      handleToggleFeatured(product.id, product.featured || false, product.title);
+                      handleToggleFeatured(product.id, Boolean(product.featured));
+                      event.currentTarget.blur();
                     }}
-                    className="inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
-                    title={product.featured ? t('admin.products.clickToRemoveFeatured') : t('admin.products.clickToMarkFeatured')}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded transition-all duration-200 hover:scale-110 focus:outline-none ${
+                      togglingFeaturedIds.has(product.id) ? 'cursor-wait opacity-75' : ''
+                    }`}
+                    title={
+                      product.featured
+                        ? t('admin.products.clickToRemoveFeatured')
+                        : t('admin.products.clickToMarkFeatured')
+                    }
+                    aria-busy={togglingFeaturedIds.has(product.id)}
                   >
                     <svg
-                      className={`w-6 h-6 transition-all duration-200 ${
+                      className={`h-6 w-6 transition-all duration-200 ${
                         product.featured
                           ? 'fill-blue-500 text-blue-500 drop-shadow-sm'
                           : 'fill-none stroke-blue-400 text-blue-400 opacity-50 hover:opacity-75'
@@ -326,6 +338,7 @@ function ProductsTableLoadedView({
                       viewBox="0 0 24 24"
                       strokeWidth="1.5"
                       stroke="currentColor"
+                      aria-hidden
                     >
                       <path
                         strokeLinecap="round"
@@ -485,6 +498,7 @@ export function ProductsTable({
   duplicatingProductId,
   handleTogglePublished,
   handleToggleFeatured,
+  togglingFeaturedIds,
   meta,
   page,
   setPage,
@@ -530,6 +544,7 @@ export function ProductsTable({
           duplicatingProductId={duplicatingProductId}
           handleTogglePublished={handleTogglePublished}
           handleToggleFeatured={handleToggleFeatured}
+          togglingFeaturedIds={togglingFeaturedIds}
           meta={meta}
           page={page}
           t={t}

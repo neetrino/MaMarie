@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { AdminBrandLogoLink } from '../../../components/AdminBrandLogoLink';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -92,11 +92,10 @@ function AdminNavIcon({ icon, themeKey }: { icon: ReactNode; themeKey: keyof typ
   );
 }
 
-function adminNavIntentHandlers(path: string, navigate: (path: string) => void) {
+function adminNavIntentHandlers(path: string) {
   return {
     onMouseEnter: () => prefetchAdminRoute(path),
     onFocus: () => prefetchAdminRoute(path),
-    onClick: () => navigate(path),
   };
 }
 
@@ -113,7 +112,6 @@ function AdminDesktopNav({
   productsNestedExpanded: boolean;
   onToggleProductsNested: () => void;
 }) {
-  const router = useRouter();
   const { t } = useTranslation();
 
   return (
@@ -140,10 +138,11 @@ function AdminDesktopNav({
                 isActive ? '' : 'border-transparent'
               }`}
             >
-              <button
-                type="button"
+              <Link
+                href={tab.path}
+                prefetch
                 title={tab.label}
-                {...adminNavIntentHandlers(tab.path, router.push)}
+                {...adminNavIntentHandlers(tab.path)}
                 className={`flex min-w-0 flex-1 items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left text-sm font-medium transition-colors ${
                   isActive ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-[#faf8f5]'
                 }`}
@@ -159,7 +158,7 @@ function AdminDesktopNav({
               >
                 <AdminNavIcon icon={tab.icon} themeKey={themeKey} />
                 <span className="min-w-0 flex-1 truncate font-semibold">{tab.label}</span>
-              </button>
+              </Link>
               <button
                 type="button"
                 aria-expanded={productsNestedExpanded}
@@ -191,11 +190,12 @@ function AdminDesktopNav({
         } ${isSubCategory && isActive && !collapsed ? 'pl-[calc(2rem-4px)]' : ''}`;
 
         return (
-          <button
+          <Link
             key={tab.id}
-            type="button"
+            href={tab.path}
+            prefetch
             title={tab.label}
-            {...adminNavIntentHandlers(tab.path, router.push)}
+            {...adminNavIntentHandlers(tab.path)}
             className={rowClasses}
             style={
               isActive && !collapsed
@@ -219,7 +219,7 @@ function AdminDesktopNav({
                 {tab.label}
               </span>
             ) : null}
-          </button>
+          </Link>
         );
       })}
     </nav>
@@ -231,10 +231,17 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
   const { user } = useAuth();
   const { collapsed } = useAdminSidebarCollapse();
   const [productsNestedExpanded, toggleProductsNested] = useAdminProductsSubnavExpanded(pathname);
+
+  useEffect(() => {
+    prefetchAdminRoute(pathname);
+  }, [pathname]);
+  const adminTitle = t('admin.dashboard.title');
   const displayName =
     user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
-      : user?.firstName || user?.lastName || t('admin.dashboard.title');
+      : user?.firstName || user?.lastName || adminTitle;
+  const showAdminTitle =
+    displayName.trim().localeCompare(adminTitle.trim(), undefined, { sensitivity: 'accent' }) !== 0;
 
   const sidebarWidth = collapsed ? ADMIN_SIDEBAR_WIDTH_COLLAPSED_PX : ADMIN_SIDEBAR_WIDTH_EXPANDED_PX;
 
@@ -260,7 +267,9 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
       {!collapsed ? (
         <div className="shrink-0 border-b border-gray-100 px-4 py-4 text-center">
           <p className="text-base font-bold text-gray-900">{displayName}</p>
-          <p className="mt-0.5 text-sm font-medium text-brand-pink">{t('admin.dashboard.title')}</p>
+          {showAdminTitle ? (
+            <p className="mt-0.5 text-sm font-medium text-brand-pink">{adminTitle}</p>
+          ) : null}
           {user?.email ? <p className="mt-2 truncate text-xs text-gray-500">{user.email}</p> : null}
         </div>
       ) : null}

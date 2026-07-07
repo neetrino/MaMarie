@@ -29,6 +29,7 @@ export function OrdersPageContent() {
     setPage,
     formatCurrency,
     handleViewOrderDetails,
+    handlePrefetchOrderDetails,
     handleCloseModal,
     toggleSelect,
     toggleSelectAll,
@@ -73,21 +74,24 @@ export function OrdersPageContent() {
         onToggleSelectAll={toggleSelectAll}
         onSort={handleSort}
         onViewDetails={handleViewOrderDetails}
+        onPrefetchDetails={handlePrefetchOrderDetails}
         onStatusChange={handleStatusChange}
         onPaymentStatusChange={handlePaymentStatusChange}
         onPageChange={(newPage) => setPage(newPage)}
         formatCurrency={formatCurrency}
       />
 
-      {selectedOrderId && (
+      {selectedOrderId ? (
         <OrderDetailsModal
+          isOpen
           orderDetails={orderDetails}
+          previewNumber={orders.find((order) => order.id === selectedOrderId)?.number}
           loading={loadingOrderDetails}
           currency={currency}
           onClose={handleCloseModal}
           formatCurrency={formatCurrency}
         />
-      )}
+      ) : null}
     </>
   );
 }

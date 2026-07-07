@@ -85,21 +85,21 @@ function readCachedDashboard(): DashboardSummaryResponse | null {
  * Hook for admin dashboard data fetching (single aggregated request).
  */
 export function useAdminDashboard({ isLoggedIn, isAdmin, isLoading }: UseAdminDashboardProps) {
-  const cached = readCachedDashboard();
-  const [stats, setStats] = useState<Stats | null>(() => cached?.stats ?? null);
-  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>(
-    () => (Array.isArray(cached?.recentOrders) ? cached.recentOrders : [])
+  const [initialDashboard] = useState(() => readCachedDashboard());
+  const [stats, setStats] = useState<Stats | null>(() => initialDashboard?.stats ?? null);
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>(() =>
+    Array.isArray(initialDashboard?.recentOrders) ? initialDashboard.recentOrders : []
   );
-  const [topProducts, setTopProducts] = useState<TopProduct[]>(
-    () => (Array.isArray(cached?.topProducts) ? cached.topProducts : [])
+  const [topProducts, setTopProducts] = useState<TopProduct[]>(() =>
+    Array.isArray(initialDashboard?.topProducts) ? initialDashboard.topProducts : []
   );
   const [userActivity, setUserActivity] = useState<UserActivity | null>(
-    () => cached?.userActivity ?? null
+    () => initialDashboard?.userActivity ?? null
   );
-  const [statsLoading, setStatsLoading] = useState(() => !cached);
-  const [recentOrdersLoading, setRecentOrdersLoading] = useState(() => !cached);
-  const [topProductsLoading, setTopProductsLoading] = useState(() => !cached);
-  const [userActivityLoading, setUserActivityLoading] = useState(() => !cached);
+  const [statsLoading, setStatsLoading] = useState(() => initialDashboard === null);
+  const [recentOrdersLoading, setRecentOrdersLoading] = useState(() => initialDashboard === null);
+  const [topProductsLoading, setTopProductsLoading] = useState(() => initialDashboard === null);
+  const [userActivityLoading, setUserActivityLoading] = useState(() => initialDashboard === null);
   const fetchedRef = useRef(false);
 
   const applySummary = useCallback((summary: DashboardSummaryResponse) => {

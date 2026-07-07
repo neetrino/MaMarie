@@ -690,7 +690,7 @@
     "completed": "Completed",
     "cancelled": "Cancelled",
     "paid": "Paid",
-    "pendingPayment": "pending",
+    "pendingPayment": "Pending",
     "failed": "Failed",
     "statusUpdated": "Status successfully updated",
     "paymentStatusUpdated": "Payment status successfully updated",

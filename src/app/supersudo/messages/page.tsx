@@ -34,6 +34,11 @@ import {
 } from '../constants/admin-table-classes';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
+import { AdminSideSheet } from '../components/AdminSideSheet';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+} from '../components/AdminSideSheetActions';
 
 interface Message {
   id: string;
@@ -61,27 +66,23 @@ interface MessageDetailsModalProps {
 }
 
 function MessageDetailsModal({ message, onClose, t }: MessageDetailsModalProps) {
-  if (!message) return null;
+  const footer = (
+    <AdminSideSheetFooter>
+      <AdminSideSheetCancelButton type="button" onClick={onClose}>
+        {t('admin.common.cancel')}
+      </AdminSideSheetCancelButton>
+    </AdminSideSheetFooter>
+  );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">{t('admin.messages.message')}</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-            aria-label={t('admin.common.cancel')}
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <AdminSideSheet
+      isOpen={Boolean(message)}
+      title={t('admin.messages.message')}
+      closeLabel={t('admin.common.close')}
+      onClose={onClose}
+      footer={footer}
+    >
+      {message ? (
         <div className="space-y-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('admin.messages.name')}</p>
@@ -89,30 +90,23 @@ function MessageDetailsModal({ message, onClose, t }: MessageDetailsModalProps) 
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('admin.messages.email')}</p>
-            <p className="mt-1 text-sm text-gray-900 break-all">{message.email}</p>
+            <p className="mt-1 break-all text-sm text-gray-900">{message.email}</p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('admin.messages.subject')}</p>
-            <p className="mt-1 text-sm text-gray-900 break-words">{message.subject}</p>
+            <p className="mt-1 break-words text-sm text-gray-900">{message.subject}</p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('admin.messages.message')}</p>
-            <p className="mt-1 max-h-72 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed text-gray-900">
-              {message.message}
-            </p>
+            <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-gray-900">{message.message}</p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('admin.messages.date')}</p>
             <p className="mt-1 text-sm text-gray-900">{new Date(message.createdAt).toLocaleString()}</p>
           </div>
         </div>
-        <div className="mt-6 flex justify-end">
-          <Button type="button" variant="ghost" onClick={onClose}>
-            {t('admin.common.cancel')}
-          </Button>
-        </div>
-      </div>
-    </div>
+      ) : null}
+    </AdminSideSheet>
   );
 }
 

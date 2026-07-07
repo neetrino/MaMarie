@@ -3,7 +3,7 @@
 import { ADMIN_TABLE_CHECKBOX, ADMIN_TABLE_TD_CHECK } from '../../constants/admin-table-classes';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { convertPrice, CurrencyCode } from '../../../../lib/currency';
-import { getStatusColor, getPaymentStatusColor } from '../utils/orderUtils';
+import { getStatusColor, getPaymentStatusColor, getAdminPaymentStatusSelectOptions } from '../utils/orderUtils';
 import { ClaySelect } from '../../../../components/ClaySelect';
 import type { Order } from '../useOrders';
 
@@ -14,6 +14,7 @@ interface OrderRowProps {
   updatingPaymentStatus: boolean;
   onToggleSelect: () => void;
   onViewDetails: () => void;
+  onPrefetchDetails?: () => void;
   onStatusChange: (newStatus: string) => void;
   onPaymentStatusChange: (newPaymentStatus: string) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
@@ -28,6 +29,7 @@ export function OrderRow({
   updatingPaymentStatus,
   onToggleSelect,
   onViewDetails,
+  onPrefetchDetails,
   onStatusChange,
   onPaymentStatusChange,
   formatCurrency,
@@ -57,6 +59,8 @@ export function OrderRow({
     <tr
       className="cursor-pointer hover:bg-gray-50"
       onClick={onViewDetails}
+      onMouseEnter={onPrefetchDetails}
+      onFocus={onPrefetchDetails}
       aria-label={rowDetailsLabel}
     >
       <td
@@ -153,11 +157,7 @@ export function OrderRow({
               onChange={onPaymentStatusChange}
               placeholder={t('admin.orders.paid')}
               triggerClassName={`${statusSelectTriggerClass} ${getPaymentStatusColor(order.paymentStatus)}`}
-              options={[
-                { value: 'paid', label: t('admin.orders.paid') },
-                { value: 'pending', label: t('admin.orders.pendingPayment') },
-                { value: 'failed', label: t('admin.orders.failed') },
-              ]}
+              options={getAdminPaymentStatusSelectOptions(t)}
             />
           </div>
         )}
