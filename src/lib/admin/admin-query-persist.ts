@@ -1,6 +1,7 @@
 import { buildPersistableAdminListKeys } from '@/lib/admin/admin-list-default-params';
 
 const STORAGE_KEY = 'mamarie:admin-query-cache:v1';
+const PERSIST_FLUSH_DEBOUNCE_MS = 300;
 
 const PERSIST_EXACT_KEYS = new Set([
   'admin:categories',
@@ -20,6 +21,9 @@ interface PersistedEntry {
   data: unknown;
   fetchedAt: number;
 }
+
+let pendingStore: Record<string, PersistedEntry> | null = null;
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Whether a cache key should survive tab refresh via sessionStorage. */
 export function shouldPersistAdminQueryKey(key: string): boolean {
@@ -61,8 +65,46 @@ function writeStorage(store: Record<string, PersistedEntry>): void {
   }
 }
 
+function getMutableStore(): Record<string, PersistedEntry> {
+  if (!pendingStore) {
+    pendingStore = readStorage();
+  }
+  return pendingStore;
+}
+
+/** Flush debounced sessionStorage writes immediately (e.g. before tab close). */
+export function flushPersistedAdminQueryCache(): void {
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+  if (!pendingStore) {
+    return;
+  }
+  writeStorage(pendingStore);
+  pendingStore = null;
+}
+
+function schedulePersistFlush(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  if (flushTimer) {
+    return;
+  }
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    flushPersistedAdminQueryCache();
+  }, PERSIST_FLUSH_DEBOUNCE_MS);
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', flushPersistedAdminQueryCache);
+}
+
 /** Load persisted entries into the in-memory admin query cache. */
 export function readPersistedAdminQueryEntries(): Record<string, PersistedEntry> {
+  flushPersistedAdminQueryCache();
   return readStorage();
 }
 
@@ -71,24 +113,24 @@ export function persistAdminQueryEntry(key: string, data: unknown, fetchedAt: nu
   if (!shouldPersistAdminQueryKey(key)) {
     return;
   }
-  const store = readStorage();
+  const store = getMutableStore();
   store[key] = { data, fetchedAt };
-  writeStorage(store);
+  schedulePersistFlush();
 }
 
 /** Remove a key from sessionStorage when invalidated. */
 export function removePersistedAdminQueryEntry(key: string): void {
-  const store = readStorage();
+  const store = getMutableStore();
   if (!(key in store)) {
     return;
   }
   delete store[key];
-  writeStorage(store);
+  schedulePersistFlush();
 }
 
 /** Clear persisted entries whose keys match a prefix. */
 export function removePersistedAdminQueryPrefix(prefix: string): void {
-  const store = readStorage();
+  const store = getMutableStore();
   let changed = false;
   for (const key of Object.keys(store)) {
     if (key.startsWith(prefix)) {
@@ -97,6 +139,6 @@ export function removePersistedAdminQueryPrefix(prefix: string): void {
     }
   }
   if (changed) {
-    writeStorage(store);
+    schedulePersistFlush();
   }
 }

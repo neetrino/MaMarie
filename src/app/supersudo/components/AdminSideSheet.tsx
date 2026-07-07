@@ -41,15 +41,16 @@ function AdminSideSheetPanel({
 }: AdminSideSheetPanelProps) {
   return (
     <div
-      className="fixed inset-0 flex justify-end overscroll-none"
+      className={`fixed inset-0 flex justify-end overscroll-none ${visible ? '' : 'pointer-events-none'}`}
       style={{ zIndex: ADMIN_SIDE_SHEET_Z_INDEX }}
+      aria-hidden={!visible}
     >
       <button
         type="button"
-        tabIndex={-1}
-        aria-hidden
-        className={`fixed inset-0 rounded-none bg-black/40 backdrop-blur-sm transition-opacity ease-in-out motion-reduce:transition-none ${
-          visible ? 'opacity-100' : 'opacity-0'
+        tabIndex={visible ? 0 : -1}
+        aria-hidden={!visible}
+        className={`fixed inset-0 rounded-none bg-black/40 transition-opacity ease-in-out motion-reduce:transition-none ${
+          visible ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         }`}
         style={{ transitionDuration: `${ADMIN_SIDE_SHEET_BACKDROP_TRANSITION_MS}ms` }}
         onClick={onClose}
@@ -58,7 +59,7 @@ function AdminSideSheetPanel({
       <div
         ref={panelRef}
         className={`relative h-dvh max-h-dvh w-[var(--admin-side-sheet-width)] transition-transform ease-in-out motion-reduce:transition-none motion-reduce:duration-0 ${
-          visible ? 'translate-x-0' : 'translate-x-full motion-reduce:translate-x-0'
+          visible ? 'pointer-events-auto translate-x-0' : 'pointer-events-none translate-x-full motion-reduce:translate-x-0'
         }`}
         style={{
           ['--admin-side-sheet-width' as string]: `${ADMIN_SIDE_SHEET_WIDTH_PERCENT}%`,

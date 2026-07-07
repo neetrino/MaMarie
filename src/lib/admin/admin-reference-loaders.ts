@@ -83,12 +83,12 @@ export async function loadAdminStats(force = false): Promise<unknown> {
   );
 }
 
-/** Background warm-up for commonly reused reference data (sequential to spare DB pool). */
+/** Background warm-up for commonly reused reference data. */
 export function warmAdminReferenceData(): void {
-  void (async () => {
-    await loadAdminCategories(false);
-    await loadAdminBrands(false);
-    await loadAdminSettings(false);
-    await loadAdminAttributes(false);
-  })();
+  void Promise.all([
+    loadAdminCategories(false),
+    loadAdminBrands(false),
+    loadAdminSettings(false),
+    loadAdminAttributes(false),
+  ]);
 }

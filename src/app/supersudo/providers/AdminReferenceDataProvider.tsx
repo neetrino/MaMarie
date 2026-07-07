@@ -45,7 +45,7 @@ interface AdminReferenceDataContextValue {
 
 const AdminReferenceDataContext = createContext<AdminReferenceDataContextValue | null>(null);
 
-const IDLE_WARMUP_DELAY_MS = 5_000;
+const IDLE_WARMUP_DELAY_MS = 1_500;
 
 function readCachedReferenceState(): Pick<
   AdminReferenceDataContextValue,
@@ -115,12 +115,12 @@ function useLazyReferenceFetch<T>(
 
 export function AdminReferenceDataProvider({ children }: { children: ReactNode }) {
   const { isLoggedIn, isAdmin, isLoading: authLoading } = useAuth();
-  const cached = readCachedReferenceState();
+  const [initialReference] = useState(() => readCachedReferenceState());
 
-  const [categories, setCategories] = useState<AdminReferenceCategory[]>(cached.categories);
-  const [brands, setBrands] = useState<AdminReferenceBrand[]>(cached.brands);
-  const [attributes, setAttributes] = useState<AdminReferenceAttribute[]>(cached.attributes);
-  const [settings, setSettings] = useState<AdminReferenceSettings | null>(cached.settings);
+  const [categories, setCategories] = useState<AdminReferenceCategory[]>(initialReference.categories);
+  const [brands, setBrands] = useState<AdminReferenceBrand[]>(initialReference.brands);
+  const [attributes, setAttributes] = useState<AdminReferenceAttribute[]>(initialReference.attributes);
+  const [settings, setSettings] = useState<AdminReferenceSettings | null>(initialReference.settings);
 
   const refetchCategories = useCallback(async (force = false) => {
     if (force) {

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { AdminBrandLogoLink } from '../../../components/AdminBrandLogoLink';
 import { useAuth } from '../../../lib/auth/AuthContext';
@@ -92,11 +92,10 @@ function AdminNavIcon({ icon, themeKey }: { icon: ReactNode; themeKey: keyof typ
   );
 }
 
-function adminNavIntentHandlers(path: string, navigate: (path: string) => void) {
+function adminNavIntentHandlers(path: string) {
   return {
     onMouseEnter: () => prefetchAdminRoute(path),
     onFocus: () => prefetchAdminRoute(path),
-    onClick: () => navigate(path),
   };
 }
 
@@ -113,7 +112,6 @@ function AdminDesktopNav({
   productsNestedExpanded: boolean;
   onToggleProductsNested: () => void;
 }) {
-  const router = useRouter();
   const { t } = useTranslation();
 
   return (
@@ -140,10 +138,11 @@ function AdminDesktopNav({
                 isActive ? '' : 'border-transparent'
               }`}
             >
-              <button
-                type="button"
+              <Link
+                href={tab.path}
+                prefetch
                 title={tab.label}
-                {...adminNavIntentHandlers(tab.path, router.push)}
+                {...adminNavIntentHandlers(tab.path)}
                 className={`flex min-w-0 flex-1 items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left text-sm font-medium transition-colors ${
                   isActive ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-[#faf8f5]'
                 }`}
@@ -159,7 +158,7 @@ function AdminDesktopNav({
               >
                 <AdminNavIcon icon={tab.icon} themeKey={themeKey} />
                 <span className="min-w-0 flex-1 truncate font-semibold">{tab.label}</span>
-              </button>
+              </Link>
               <button
                 type="button"
                 aria-expanded={productsNestedExpanded}
@@ -191,11 +190,12 @@ function AdminDesktopNav({
         } ${isSubCategory && isActive && !collapsed ? 'pl-[calc(2rem-4px)]' : ''}`;
 
         return (
-          <button
+          <Link
             key={tab.id}
-            type="button"
+            href={tab.path}
+            prefetch
             title={tab.label}
-            {...adminNavIntentHandlers(tab.path, router.push)}
+            {...adminNavIntentHandlers(tab.path)}
             className={rowClasses}
             style={
               isActive && !collapsed
@@ -219,7 +219,7 @@ function AdminDesktopNav({
                 {tab.label}
               </span>
             ) : null}
-          </button>
+          </Link>
         );
       })}
     </nav>
@@ -231,6 +231,10 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
   const { user } = useAuth();
   const { collapsed } = useAdminSidebarCollapse();
   const [productsNestedExpanded, toggleProductsNested] = useAdminProductsSubnavExpanded(pathname);
+
+  useEffect(() => {
+    prefetchAdminRoute(pathname);
+  }, [pathname]);
   const adminTitle = t('admin.dashboard.title');
   const displayName =
     user?.firstName && user?.lastName

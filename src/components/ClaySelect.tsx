@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
+import { useClaySelectPortalPosition } from '../lib/use-clay-select-portal-position';
 import {
   CLAY_SELECT_BORDER_CLASS,
   CLAY_SELECT_BORDER_OPEN_CLASS,
@@ -11,6 +13,7 @@ import {
   CLAY_SELECT_FORM_INPUT_CLASS,
   CLAY_SELECT_OPTION_CLASS,
   CLAY_SELECT_OPTION_SELECTED_CLASS,
+  CLAY_SELECT_PORTAL_DROPDOWN_PANEL_CLASS,
   CLAY_SELECT_TRIGGER_BASE_CLASS,
   CLAY_SELECT_TRIGGER_MIN_HEIGHT_PX,
 } from '../constants/clay-select';
@@ -31,6 +34,8 @@ interface ClaySelectProps {
   className?: string;
   triggerClassName?: string;
   compact?: boolean;
+  /** Render dropdown in a body portal (default: same as compact — for overflow-hidden tables). */
+  portal?: boolean;
   id?: string;
 }
 
@@ -70,14 +75,19 @@ export function ClaySelect({
   className = '',
   triggerClassName = '',
   compact = false,
+  portal: portalProp,
   id,
 }: ClaySelectProps) {
+  const portal = portalProp ?? compact;
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isDropdownExpanded, setIsDropdownExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLUListElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listboxId = useId();
+  const portalPosition = useClaySelectPortalPosition(portal, isOpen, triggerRef);
 
   const selectedOption = options.find((option) => option.value === value);
   const displayLabel = selectedOption?.label ?? placeholder;
@@ -138,9 +148,14 @@ export function ClaySelect({
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        closeDropdown();
+      const target = event.target as Node;
+      if (containerRef.current?.contains(target)) {
+        return;
       }
+      if (dropdownRef.current?.contains(target)) {
+        return;
+      }
+      closeDropdown();
     };
 
     const handleEscape = (event: KeyboardEvent) => {
@@ -169,6 +184,51 @@ export function ClaySelect({
       ? 'border-error'
       : CLAY_SELECT_BORDER_CLASS;
 
+  const dropdownPanelClass = portal
+    ? `${CLAY_SELECT_PORTAL_DROPDOWN_PANEL_CLASS} ${CLAY_SELECT_FORM_INPUT_CLASS}`
+    : `${CLAY_SELECT_DROPDOWN_PANEL_CLASS} ${CLAY_SELECT_FORM_INPUT_CLASS}`;
+
+  const dropdownStyle: CSSProperties = portal
+    ? { ...portalPosition, transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms` }
+    : {
+        top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
+        transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
+      };
+
+  const dropdown = isDropdownVisible ? (
+    <ul
+      ref={dropdownRef}
+      id={listboxId}
+      role="listbox"
+      className={`${dropdownPanelClass} ${
+        isDropdownExpanded
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-1 opacity-0'
+      }`}
+      style={dropdownStyle}
+    >
+      {options.map((option) => {
+        const isSelected = option.value === value;
+
+        return (
+          <li key={option.value || '__empty__'} role="presentation">
+            <button
+              type="button"
+              role="option"
+              aria-selected={isSelected}
+              onClick={() => handleSelect(option.value)}
+              className={`${CLAY_SELECT_OPTION_CLASS} ${
+                isSelected ? CLAY_SELECT_OPTION_SELECTED_CLASS : ''
+              }`}
+            >
+              {option.label}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  ) : null;
+
   return (
     <div ref={containerRef} className={`relative w-full ${className}`.trim()}>
       {label ? (
@@ -178,6 +238,7 @@ export function ClaySelect({
       ) : null}
 
       <button
+        ref={triggerRef}
         id={id}
         type="button"
         role="combobox"
@@ -201,41 +262,9 @@ export function ClaySelect({
         <ClaySelectChevron isOpen={isOpen} />
       </button>
 
-      {isDropdownVisible ? (
-        <ul
-          id={listboxId}
-          role="listbox"
-          className={`${CLAY_SELECT_DROPDOWN_PANEL_CLASS} ${CLAY_SELECT_FORM_INPUT_CLASS} ${
-            isDropdownExpanded
-              ? 'pointer-events-auto translate-y-0 opacity-100'
-              : 'pointer-events-none -translate-y-1 opacity-0'
-          }`}
-          style={{
-            top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
-            transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
-          }}
-        >
-          {options.map((option) => {
-            const isSelected = option.value === value;
-
-            return (
-              <li key={option.value || '__empty__'} role="presentation">
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected}
-                  onClick={() => handleSelect(option.value)}
-                  className={`${CLAY_SELECT_OPTION_CLASS} ${
-                    isSelected ? CLAY_SELECT_OPTION_SELECTED_CLASS : ''
-                  }`}
-                >
-                  {option.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
+      {portal && typeof document !== 'undefined'
+        ? createPortal(dropdown, document.body)
+        : dropdown}
 
       {error ? <p className="mt-1 text-sm text-error">{error}</p> : null}
     </div>

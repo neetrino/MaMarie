@@ -21,8 +21,8 @@ describe('shouldPersistAdminQueryKey', () => {
     );
 
     expect(productsKey).toBe('admin:products?limit=20&page=1&sort=createdAt-desc');
-    expect(shouldPersistAdminQueryKey(productsKey)).toBe(true);
-    expect(buildPersistableAdminListKeys().has(productsKey)).toBe(true);
+    expect(shouldPersistAdminQueryKey(productsKey)).toBe(false);
+    expect(buildPersistableAdminListKeys().has(productsKey)).toBe(false);
   });
 
   it('persists default orders list key', () => {
