@@ -2,7 +2,7 @@ import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import { logger } from "../../utils/logger";
 import type { ProductFilters } from "./types";
-import { getAllChildCategoryIds, findCategoryBySlug } from "./category-utils";
+import { resolveCategoryFilterIds } from "./category-filter-cache";
 import { buildCatalogAttributeWhere } from "./attribute-filters";
 
 /**
@@ -50,23 +50,17 @@ function buildSearchFilter(search: string): Prisma.ProductWhereInput {
  */
 async function buildCategoryFilter(
   category: string,
-  lang: string,
   existingWhere: Prisma.ProductWhereInput
 ): Promise<Prisma.ProductWhereInput | null> {
-  const categoryDoc = await findCategoryBySlug(category, lang);
+  const allCategoryIds = await resolveCategoryFilterIds(category);
 
-  if (!categoryDoc) {
-    return null; // Category not found - return null to indicate empty result
+  if (!allCategoryIds) {
+    return null;
   }
 
-  // Get all child categories (subcategories) recursively
-  const childCategoryIds = await getAllChildCategoryIds(categoryDoc.id);
-  const allCategoryIds = [categoryDoc.id, ...childCategoryIds];
-  
   logger.debug('Category IDs to include', {
-    parent: categoryDoc.id,
-    children: childCategoryIds,
-    total: allCategoryIds.length
+    slug: category,
+    total: allCategoryIds.length,
   });
   
   // Build OR conditions for all categories (parent + children)
@@ -240,7 +234,7 @@ export async function buildWhereClause(
 
   // Add category filter
   if (category) {
-    const categoryWhere = await buildCategoryFilter(category, lang, where);
+    const categoryWhere = await buildCategoryFilter(category, where);
     if (categoryWhere === null) {
       // Category not found - return empty result
       return {

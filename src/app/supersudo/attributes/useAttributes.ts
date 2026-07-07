@@ -6,6 +6,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { showToast } from '../../../components/Toast';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
+import { useAdminAttributesReference } from '../providers/AdminReferenceDataProvider';
 
 export interface AttributeValue {
   id: string;
@@ -27,6 +28,11 @@ export interface Attribute {
 export function useAttributes() {
   const { t } = useTranslation();
   const { confirm: confirmDialog } = useAdminDialogs();
+  const {
+    attributes: sharedAttributes,
+    loading: sharedAttributesLoading,
+    refetchAttributes,
+  } = useAdminAttributesReference();
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -58,41 +64,24 @@ export function useAttributes() {
   const fetchAttributes = useCallback(async () => {
     try {
       setLoading(true);
-      logger.debug('📋 [ADMIN] Fetching attributes...');
-      const response = await apiClient.get<{ data: Attribute[] }>('/api/v1/admin/attributes');
-      logger.debug('📋 [ADMIN] Attributes response:', response.data);
-      // Log colors for each value to debug
-      if (response.data && Array.isArray(response.data)) {
-        response.data.forEach((attr) => {
-          if (attr.values && Array.isArray(attr.values)) {
-            attr.values.forEach((val) => {
-              logger.debug('🎨 [ADMIN] Attribute value colors:', {
-                attributeId: attr.id,
-                attributeName: attr.name,
-                valueId: val.id,
-                valueLabel: val.label,
-                colors: val.colors,
-                colorsType: typeof val.colors,
-                colorsIsArray: Array.isArray(val.colors),
-                colorsLength: val.colors?.length
-              });
-            });
-          }
-        });
-      }
-      setAttributes(response.data || []);
-      logger.debug('✅ [ADMIN] Attributes loaded:', response.data?.length || 0);
+      logger.debug('📋 [ADMIN] Refreshing attributes...');
+      const data = await refetchAttributes();
+      setAttributes((data as Attribute[]) || []);
+      logger.debug('✅ [ADMIN] Attributes loaded:', data.length);
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching attributes:', err);
       setAttributes([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refetchAttributes]);
 
   useEffect(() => {
-    fetchAttributes();
-  }, [fetchAttributes]);
+    if (!sharedAttributesLoading) {
+      setAttributes(sharedAttributes as Attribute[]);
+      setLoading(false);
+    }
+  }, [sharedAttributes, sharedAttributesLoading]);
 
   const handleCreateAttribute = async (e: React.FormEvent) => {
     e.preventDefault();

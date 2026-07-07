@@ -15,6 +15,7 @@ import {
 } from '../constants/profile-mobile-page';
 import { useTranslation } from '../lib/i18n-client';
 import { useBodyScrollLock } from '../lib/useBodyScrollLock';
+import { prefetchAdminRoute } from '@/lib/admin/admin-route-prefetch';
 import { AdminBrandLogoLink } from './AdminBrandLogoLink';
 
 export interface AdminMenuItem {
@@ -53,6 +54,7 @@ function AdminDrawerMenuRow({
   isActive,
   isSubCategory = false,
   onClick,
+  onNavigateIntent,
 }: {
   label: string;
   icon: ReactNode;
@@ -60,6 +62,7 @@ function AdminDrawerMenuRow({
   isActive: boolean;
   isSubCategory?: boolean;
   onClick: () => void;
+  onNavigateIntent?: () => void;
 }) {
   const theme = PROFILE_MOBILE_ICON_THEMES[iconTheme];
 
@@ -67,6 +70,9 @@ function AdminDrawerMenuRow({
     <button
       type="button"
       onClick={onClick}
+      onMouseEnter={onNavigateIntent}
+      onFocus={onNavigateIntent}
+      onTouchStart={onNavigateIntent}
       className={`flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-gray-50/80 ${
         isSubCategory ? 'pl-8 pr-4' : 'px-4'
       } ${isActive ? 'bg-[#faf8f5]' : ''}`}
@@ -110,6 +116,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
   useBodyScrollLock(open);
 
   const handleNavigate = (path: string) => {
+    prefetchAdminRoute(path);
     router.push(path);
     setOpen(false);
   };
@@ -172,6 +179,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
                             iconTheme={iconTheme}
                             isActive={isActive}
                             onClick={() => handleNavigate(tab.path)}
+                            onNavigateIntent={() => prefetchAdminRoute(tab.path)}
                           />
                           <button
                             type="button"
@@ -207,6 +215,7 @@ export function AdminMenuDrawer({ tabs, currentPath }: AdminMenuDrawerProps) {
                       isActive={isActive}
                       isSubCategory={tab.isSubCategory}
                       onClick={() => handleNavigate(tab.path)}
+                      onNavigateIntent={() => prefetchAdminRoute(tab.path)}
                     />
                   );
                 })}

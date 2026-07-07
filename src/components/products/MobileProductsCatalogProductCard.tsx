@@ -48,6 +48,7 @@ import {
   resolveMobileProductsCatalogCardHeightPx,
 } from '../../lib/mobile-products-catalog-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
+import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
 import { resolveComparePrice } from '../home/home-product-card-shared';
 import type { HomeProductCardData } from '../home/HomeProductCard';
 import { MobileProductsCatalogColorSwatches } from './MobileProductsCatalogColorSwatches';
@@ -109,6 +110,20 @@ function MobileProductsCatalogProductCardComponent({
     product.averageRating ?? 0,
     product.reviewsCount ?? 0,
   );
+  const saveSnapshot = () => writeProductPageSnapshotFromCard({
+    slug: product.slug,
+    title: product.title,
+    image: product.image,
+    subtitle: product.subtitle,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    compareAtPrice: product.compareAtPrice,
+    colors: product.colors,
+    sizes: product.sizes,
+    averageRating: product.averageRating,
+    reviewsCount: product.reviewsCount,
+    inStock: product.inStock,
+  });
 
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -142,6 +157,7 @@ function MobileProductsCatalogProductCardComponent({
         layoutWidthPx={cardWidthPx}
         isInWishlist={isInWishlist}
         onWishlistToggle={handleWishlist}
+        onBeforeNavigate={saveSnapshot}
       />
 
       <div
@@ -157,6 +173,8 @@ function MobileProductsCatalogProductCardComponent({
             <Link
               href={`/products/${product.slug}`}
               className="block truncate font-medium"
+              onFocus={saveSnapshot}
+              onPointerDown={saveSnapshot}
               style={{
                 color: MOBILE_PRODUCTS_CATALOG_CARD_TEXT_DARK,
                 fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_TITLE_SIZE_PX),

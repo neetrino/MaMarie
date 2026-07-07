@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminResource, invalidateAdminQuery } from '@/lib/admin/admin-fetch';
+import { ADMIN_QUERY_KEYS, ADMIN_RESOURCE_STALE_MS } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
 
@@ -25,11 +27,11 @@ export default function PriceFilterSettingsPage() {
   const prevStepSizeRef = useRef<string>('');
   const isUpdatingRef = useRef<boolean>(false);
 
-  const fetchSettings = useCallback(async () => {
+  const fetchSettings = useCallback(async (force = false) => {
     try {
       logger.debug('⚙️ [PRICE FILTER SETTINGS] Fetching settings...');
       setLoading(true);
-      const response = await apiClient.get<{
+      const response = await fetchAdminResource<{
         minPrice?: number;
         maxPrice?: number;
         stepSize?: number;
@@ -39,7 +41,23 @@ export default function PriceFilterSettingsPage() {
           RUB?: number;
           GEL?: number;
         };
-      }>('/api/v1/admin/settings/price-filter');
+      }>(
+        ADMIN_QUERY_KEYS.priceFilter,
+        () =>
+          apiClient.get<{
+            minPrice?: number;
+            maxPrice?: number;
+            stepSize?: number;
+            stepSizePerCurrency?: {
+              USD?: number;
+              AMD?: number;
+              RUB?: number;
+              GEL?: number;
+            };
+          }>('/api/v1/admin/settings/price-filter'),
+        ADMIN_RESOURCE_STALE_MS,
+        force
+      );
       const minPriceStr = response.minPrice?.toString() || '';
       const maxPriceStr = response.maxPrice?.toString() || '';
       const per = response.stepSizePerCurrency || {};
@@ -198,9 +216,11 @@ export default function PriceFilterSettingsPage() {
       await apiClient.put('/api/v1/admin/settings/price-filter', {
         minPrice: minValue,
         maxPrice: maxValue,
-        stepSize: stepValueUSD, // keep legacy field for backwards compatibility (USD as base)
+        stepSize: stepValueUSD,
         stepSizePerCurrency: Object.keys(stepSizePerCurrency).length ? stepSizePerCurrency : null,
       });
+
+      invalidateAdminQuery(ADMIN_QUERY_KEYS.priceFilter);
       
       alert(t('admin.priceFilter.savedSuccess'));
       logger.debug('✅ [PRICE FILTER SETTINGS] Settings saved');

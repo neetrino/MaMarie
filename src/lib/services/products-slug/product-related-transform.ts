@@ -28,7 +28,7 @@ export interface RelatedProductRow {
     stock: number;
     sku: string | null;
     attributes: unknown;
-    options: Array<{
+    options?: Array<{
       value: string | null;
       attributeKey: string | null;
       attributeValue: {

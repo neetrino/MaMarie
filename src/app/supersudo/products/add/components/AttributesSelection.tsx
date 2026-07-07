@@ -11,6 +11,7 @@ import {
 } from '../../../../../constants/clay-select';
 import { getColorHex } from '../../../../../lib/colorMap';
 import type { Attribute } from '../types';
+import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
 
 interface AttributesSelectionProps {
   attributes: Attribute[];
@@ -18,6 +19,7 @@ interface AttributesSelectionProps {
   selectedAttributeValueIds: Record<string, string[]>;
   attributesDropdownOpen: boolean;
   attributesDropdownRef: RefObject<HTMLDivElement>;
+  fieldErrors: ProductFormFieldErrors;
   onAttributesDropdownToggle: () => void;
   onAttributeToggle: (attributeId: string, checked: boolean) => void;
   onAttributeRemove: (attributeId: string) => void;
@@ -29,6 +31,7 @@ export function AttributesSelection({
   selectedAttributeValueIds,
   attributesDropdownOpen,
   attributesDropdownRef,
+  fieldErrors,
   onAttributesDropdownToggle,
   onAttributeToggle,
   onAttributeRemove,
@@ -42,11 +45,13 @@ export function AttributesSelection({
         <label className="block text-sm font-medium text-gray-700 mb-3">
           {t('admin.products.add.attributes')} <span className="text-gray-500 font-normal">{t('admin.products.add.selectMultiple')}</span>
         </label>
-        <div className="relative" ref={attributesDropdownRef}>
+        <div className="relative" ref={attributesDropdownRef} data-field-error={fieldErrors.attributes ? 'true' : undefined}>
           <button
             type="button"
             onClick={onAttributesDropdownToggle}
-            className={getClaySelectTriggerClass(attributesDropdownOpen)}
+            className={`${getClaySelectTriggerClass(attributesDropdownOpen)} ${
+              fieldErrors.attributes ? 'border-red-300 bg-red-50' : ''
+            }`}
             style={{ minHeight: 42 }}
           >
             <span
@@ -62,6 +67,9 @@ export function AttributesSelection({
             </span>
             <ClaySelectChevron isOpen={attributesDropdownOpen} />
           </button>
+          {fieldErrors.attributes ? (
+            <p className="mt-1 text-sm text-error">{fieldErrors.attributes}</p>
+          ) : null}
           {attributesDropdownOpen && (
             <div
               className={`${CLAY_SELECT_MULTI_PANEL_CLASS} max-h-96 pointer-events-auto translate-y-0 opacity-100`}

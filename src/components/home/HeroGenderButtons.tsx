@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from '../../lib/i18n-client';
+import { warmStorefrontCatalogRoute } from '../../lib/storefront/storefront-catalog-prefetch';
 import {
   HOME_GENDER_CATEGORY_SLUG,
   homeGenderCategoryProductsHref,
@@ -24,9 +25,17 @@ interface GenderButtonProps {
 }
 
 function GenderButton({ href, label, backgroundColor, widthPx }: GenderButtonProps) {
+  const handlePrefetch = () => {
+    warmStorefrontCatalogRoute(href);
+  };
+
   return (
     <Link
       href={href}
+      prefetch
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
+      onTouchStart={handlePrefetch}
       className={genderButtonClassName}
       style={{
         ...getClayPrimaryButtonStyle(backgroundColor),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../../lib/api-client';
 import { getStoredLanguage, type LanguageCode } from '../../lib/language';
 import type {
@@ -35,12 +35,16 @@ interface RelatedProduct {
   reviewsCount?: number;
 }
 
+export type { RelatedProduct };
+
 interface UseRelatedProductsProps {
   categorySlug?: string;
   currentProductId: string;
   language: LanguageCode;
   /** When set (PDP), uses cached `/api/v1/products/[slug]/related` instead of list API. */
   productSlug?: string;
+  /** SSR payload — skip network on mount when language matches server render. */
+  initialProducts?: RelatedProduct[];
 }
 
 function normalizeRelatedProduct(product: RelatedProduct): RelatedProduct {
@@ -62,12 +66,21 @@ export function useRelatedProducts({
   currentProductId,
   language,
   productSlug,
+  initialProducts = [],
 }: UseRelatedProductsProps) {
-  const [products, setProducts] = useState<RelatedProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<RelatedProduct[]>(() =>
+    initialProducts.map(normalizeRelatedProduct),
+  );
+  const [loading, setLoading] = useState(initialProducts.length === 0);
+  const skipInitialFetchRef = useRef(initialProducts.length > 0);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
+      if (skipInitialFetchRef.current) {
+        skipInitialFetchRef.current = false;
+        return;
+      }
+
       try {
         setLoading(true);
 

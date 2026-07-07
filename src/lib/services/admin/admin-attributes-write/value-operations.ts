@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { invalidateAdminAttributesCache } from "@/lib/cache/admin-reference-cache";
 import { logger } from "../../../utils/logger";
 import { ensureColorsColumnsExist } from "./migration";
 import { formatAttribute, parseColors } from "./utils";
@@ -87,6 +88,7 @@ export async function addAttributeValue(
     };
   }
 
+  invalidateAdminAttributesCache();
   return formatAttribute(updatedAttribute, locale);
 }
 
@@ -231,6 +233,7 @@ export async function updateAttributeValue(
     };
   }
 
+  invalidateAdminAttributesCache();
   return formatAttribute(updatedAttribute, locale);
 }
 

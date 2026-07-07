@@ -1,3 +1,4 @@
+import { COLOR_MAP } from '@/lib/colorMap';
 import type { ProductWithRelations } from './products-find-query/types';
 
 export interface ProductColorOption {
@@ -30,6 +31,20 @@ interface ProductAttributeWithColor {
 }
 
 const SIZE_LETTER_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'] as const;
+const SIZE_TOKEN_PATTERN = /^(xs|s|m|l|xl|xxl|xxxl|\d+(?:\.\d+)?)$/i;
+
+function isKnownColorName(value: string): boolean {
+  return value.toLowerCase().trim() in COLOR_MAP;
+}
+
+/** Returns true when a SKU segment looks like a size, not a color name. */
+export function isLikelySizeToken(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed || isKnownColorName(trimmed)) {
+    return false;
+  }
+  return SIZE_TOKEN_PATTERN.test(trimmed);
+}
 
 function isAttributeOption(opt: VariantOption, attributeKey: 'color' | 'size'): boolean {
   const legacyOption = opt as VariantOption & { key?: string; attribute?: string };
@@ -86,17 +101,35 @@ function readVariantDirectAttribute(
   return typeof directValue === 'string' ? directValue.trim() : '';
 }
 
-function readSizeFromSku(sku: string | null | undefined): string {
+/**
+ * Parses size from SKU segments (`prefix-...-size`), scanning from the end and
+ * skipping known color tokens (e.g. `prod-PINK-PINK-96` → `96`).
+ */
+export function parseSizeFromSku(sku: string | null | undefined): string {
   if (!sku) {
     return '';
   }
 
-  const skuParts = sku.split('-');
-  if (skuParts.length < 3) {
+  const skuParts = sku
+    .split('-')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (skuParts.length < 2) {
     return '';
   }
 
-  return skuParts[2]?.trim() ?? '';
+  for (let index = skuParts.length - 1; index >= 1; index -= 1) {
+    const candidate = skuParts[index];
+    if (isLikelySizeToken(candidate)) {
+      return candidate;
+    }
+  }
+
+  return '';
+}
+
+function readSizeFromSku(sku: string | null | undefined): string {
+  return parseSizeFromSku(sku);
 }
 
 function readJsonAttributeValues(
@@ -224,7 +257,7 @@ function upsertSize(
 ): void {
   const trimmedValue = value.trim();
   const trimmedLabel = label.trim() || trimmedValue;
-  if (!trimmedValue) {
+  if (!trimmedValue || !isLikelySizeToken(trimmedValue)) {
     return;
   }
 
@@ -298,7 +331,7 @@ export function collectProductSizes(
       }
 
       const skuSize = readSizeFromSku(variant.sku);
-      if (skuSize) {
+      if (skuSize && isLikelySizeToken(skuSize)) {
         upsertSize(sizeMap, skuSize, skuSize, stock);
       }
 

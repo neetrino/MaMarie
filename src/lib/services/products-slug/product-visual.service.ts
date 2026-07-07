@@ -2,6 +2,7 @@ import { db } from "@white-shop/db";
 import { logger } from "../../utils/logger";
 import { computeProductGalleryUrls } from "./product-gallery-urls";
 import { getBaseWhere } from "./product-query-builder";
+import { pickTranslationByLocale } from "./utils";
 
 export interface ProductVisualPayload {
   id: string;
@@ -18,6 +19,14 @@ export interface ProductVisualPayload {
   imageHeight: number | null;
 }
 
+type VisualTranslationRow = {
+  locale: string;
+  slug: string;
+  title: string;
+  seoTitle: string | null;
+  seoDescription: string | null;
+};
+
 async function fetchVisualRow(slug: string, lang: string) {
   return db.product.findFirst({
     where: getBaseWhere(slug, lang),
@@ -25,14 +34,13 @@ async function fetchVisualRow(slug: string, lang: string) {
       id: true,
       media: true,
       translations: {
-        where: { locale: lang },
         select: {
+          locale: true,
           slug: true,
           title: true,
           seoTitle: true,
           seoDescription: true,
         },
-        take: 1,
       },
       variants: {
         where: { published: true },
@@ -47,8 +55,11 @@ async function fetchVisualRow(slug: string, lang: string) {
   });
 }
 
-function mapRowToPayload(row: NonNullable<Awaited<ReturnType<typeof fetchVisualRow>>>): ProductVisualPayload | null {
-  const tr = row.translations[0];
+function mapRowToPayload(
+  row: NonNullable<Awaited<ReturnType<typeof fetchVisualRow>>>,
+  lang: string,
+): ProductVisualPayload | null {
+  const tr = pickTranslationByLocale(row.translations as VisualTranslationRow[], lang);
   if (!tr) {
     return null;
   }
@@ -78,15 +89,11 @@ export async function findVisualBySlug(
   lang: string
 ): Promise<ProductVisualPayload | null> {
   try {
-    let row = await fetchVisualRow(slug, lang);
-    if (!row && lang !== "en") {
-      row = await fetchVisualRow(slug, "en");
-    }
+    const row = await fetchVisualRow(slug, lang);
     if (!row) {
       return null;
     }
-    const mapped = mapRowToPayload(row);
-    return mapped;
+    return mapRowToPayload(row, lang);
   } catch (error: unknown) {
     logger.warn("findVisualBySlug failed", {
       slug,

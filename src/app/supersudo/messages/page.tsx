@@ -1,10 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
+import {
+  buildAdminListQueryKey,
+  fetchAdminList,
+  invalidateAdminQueryPrefix,
+} from '@/lib/admin/admin-fetch';
+import {
+  hydrateAdminListFromCache,
+  useAdminQuerySubscription,
+} from '@/lib/admin/admin-list-cache-ui';
+import { ADMIN_LIST_STALE_MS, ADMIN_QUERY_PREFIX } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import {
   ADMIN_TABLE,
@@ -128,34 +138,67 @@ export default function MessagesPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  const fetchMessages = useCallback(async () => {
+  const messagesListParams = useMemo(
+    () => ({
+      page: page.toString(),
+      limit: '20',
+    }),
+    [page]
+  );
+
+  const messagesListCacheKey = useMemo(
+    () => buildAdminListQueryKey(ADMIN_QUERY_PREFIX.messages, messagesListParams),
+    [messagesListParams]
+  );
+
+  const applyMessagesResponse = useCallback((response: MessagesResponse) => {
+    setMessages(response.data || []);
+    setMeta(response.meta || null);
+  }, []);
+
+  useAdminQuerySubscription(
+    messagesListCacheKey,
+    isLoggedIn && isAdmin,
+    applyMessagesResponse
+  );
+
+  const fetchMessages = useCallback(async (force = false) => {
     try {
-      setLoading(true);
+      hydrateAdminListFromCache<MessagesResponse>(
+        messagesListCacheKey,
+        force,
+        setLoading,
+        applyMessagesResponse
+      );
       logger.debug('📧 [ADMIN] Fetching messages...', { page });
-      
-      const response = await apiClient.get<MessagesResponse>('/api/v1/admin/messages', {
-        params: {
-          page: page.toString(),
-          limit: '20',
-        },
-      });
+
+      const response = await fetchAdminList<MessagesResponse>(
+        ADMIN_QUERY_PREFIX.messages,
+        '/api/v1/admin/messages',
+        messagesListParams,
+        ADMIN_LIST_STALE_MS,
+        force
+      );
 
       logger.debug('✅ [ADMIN] Messages fetched:', response);
-      setMessages(response.data || []);
-      setMeta(response.meta || null);
+      applyMessagesResponse(response);
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching messages:', err);
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [messagesListCacheKey, messagesListParams, applyMessagesResponse, page]);
 
   useEffect(() => {
     if (isLoggedIn && isAdmin) {
-      fetchMessages();
+      void fetchMessages();
     }
-     
-  }, [isLoggedIn, isAdmin, page]);
+  }, [isLoggedIn, isAdmin, fetchMessages]);
+
+  const refetchMessages = useCallback(async () => {
+    invalidateAdminQueryPrefix(ADMIN_QUERY_PREFIX.messages);
+    await fetchMessages(true);
+  }, [fetchMessages]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -202,7 +245,7 @@ export default function MessagesPage() {
       }
       
       setSelectedIds(new Set());
-      await fetchMessages();
+      await refetchMessages();
       alert(t('admin.messages.deletedSuccess'));
     } catch (err: any) {
       console.error('❌ [ADMIN] Bulk delete messages error:', err);

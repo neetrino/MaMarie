@@ -29,6 +29,7 @@ interface MobileProductsCatalogProductCardMediaProps {
   layoutWidthPx: number;
   isInWishlist: boolean;
   onWishlistToggle: (event: MouseEvent<HTMLButtonElement>) => void;
+  onBeforeNavigate?: () => void;
 }
 
 /** Figma `167:619` — product photo frame and wishlist control. */
@@ -40,6 +41,7 @@ export function MobileProductsCatalogProductCardMedia({
   layoutWidthPx,
   isInWishlist,
   onWishlistToggle,
+  onBeforeNavigate,
 }: MobileProductsCatalogProductCardMediaProps) {
   const [imageError, setImageError] = useState(false);
   const lp = (value: number) => mobileProductsCatalogCardLayoutPx(value, layoutWidthPx);
@@ -60,6 +62,8 @@ export function MobileProductsCatalogProductCardMedia({
       <Link
         href={`/products/${slug}`}
         className="absolute overflow-hidden"
+        onFocus={onBeforeNavigate}
+        onPointerDown={onBeforeNavigate}
         style={{
           left: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_LEFT_PX),
           top: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_TOP_PX),

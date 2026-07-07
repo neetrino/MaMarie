@@ -24,6 +24,7 @@ class AdminService {
   getTopProducts = adminStatsService.getTopProducts.bind(adminStatsService);
   getActivity = adminStatsService.getActivity.bind(adminStatsService);
   getAnalytics = adminStatsService.getAnalytics.bind(adminStatsService);
+  getDashboardSummary = adminStatsService.getDashboardSummary.bind(adminStatsService);
 
   // Users methods
   getUsers = adminUsersService.getUsers.bind(adminUsersService);
@@ -38,6 +39,7 @@ class AdminService {
 
   // Settings methods
   getSettings = adminSettingsService.getSettings.bind(adminSettingsService);
+  getCurrencyRates = adminSettingsService.getCurrencyRates.bind(adminSettingsService);
   updateSettings = adminSettingsService.updateSettings.bind(adminSettingsService);
   getPriceFilterSettings = adminSettingsService.getPriceFilterSettings.bind(adminSettingsService);
   updatePriceFilterSettings = adminSettingsService.updatePriceFilterSettings.bind(adminSettingsService);

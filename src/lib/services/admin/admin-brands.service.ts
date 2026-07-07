@@ -1,40 +1,46 @@
 import { db } from "@white-shop/db";
 import { toSlug } from "@/lib/utils/slug";
 import { logger } from "@/lib/utils/logger";
+import {
+  invalidateAdminBrandsCache,
+  withAdminBrandsCache,
+} from "@/lib/cache/admin-reference-cache";
 
 class AdminBrandsService {
   /**
    * Get brands for admin
    */
   async getBrands() {
-    const brands = await db.brand.findMany({
-      where: {
-        deletedAt: null,
-      },
-      include: {
-        translations: {
-          where: { locale: "en" },
-          take: 1,
+    return withAdminBrandsCache(async () => {
+      const brands = await db.brand.findMany({
+        where: {
+          deletedAt: null,
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+        include: {
+          translations: {
+            where: { locale: "en" },
+            take: 1,
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
 
-    return {
-      data: brands.map((brand: { id: string; slug: string; logoUrl: string | null; published: boolean | null; translations?: Array<{ name: string }> }) => {
-        const translations = Array.isArray(brand.translations) ? brand.translations : [];
-        const translation = translations[0] || null;
-        return {
-          id: brand.id,
-          name: translation?.name || "",
-          slug: brand.slug,
-          logoUrl: brand.logoUrl,
-          published: Boolean(brand.published),
-        };
-      }),
-    };
+      return {
+        data: brands.map((brand: { id: string; slug: string; logoUrl: string | null; published: boolean | null; translations?: Array<{ name: string }> }) => {
+          const translations = Array.isArray(brand.translations) ? brand.translations : [];
+          const translation = translations[0] || null;
+          return {
+            id: brand.id,
+            name: translation?.name || "",
+            slug: brand.slug,
+            logoUrl: brand.logoUrl,
+            published: Boolean(brand.published),
+          };
+        }),
+      };
+    });
   }
 
   /**
@@ -96,6 +102,8 @@ class AdminBrandsService {
     // Безопасное получение translation с проверкой на существование массива
     const brandTranslations = Array.isArray(brand.translations) ? brand.translations : [];
     const translation = brandTranslations.find((t: { locale: string }) => t.locale === locale) || brandTranslations[0] || null;
+
+    invalidateAdminBrandsCache();
 
     return {
       data: {
@@ -199,6 +207,8 @@ class AdminBrandsService {
       : [];
     const translation = brandTranslations[0] || null;
 
+    invalidateAdminBrandsCache();
+
     return {
       data: {
         id: updatedBrand!.id,
@@ -256,6 +266,7 @@ class AdminBrandsService {
     });
 
     logger.debug('✅ [ADMIN SERVICE] Brand deleted:', brandId);
+    invalidateAdminBrandsCache();
     return { success: true };
   }
 }

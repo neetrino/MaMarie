@@ -1,25 +1,31 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
+import {
+  invalidateServerReadCache,
+  withServerReadCache,
+} from "@/lib/cache/server-read-cache";
+
+const DELIVERY_CACHE_TTL_MS = 60_000;
 
 class AdminDeliveryService {
   /**
    * Get delivery settings
    */
   async getDeliverySettings() {
-    const setting = await db.settings.findUnique({
-      where: { key: 'delivery-locations' },
-    });
+    return withServerReadCache('admin:delivery', DELIVERY_CACHE_TTL_MS, async () => {
+      const setting = await db.settings.findUnique({
+        where: { key: 'delivery-locations' },
+      });
 
-    if (!setting) {
-      return {
-        locations: [],
+      if (!setting) {
+        return { locations: [] };
+      }
+
+      const value = setting.value as {
+        locations?: Array<{ id?: string; country: string; city: string; price: number }>;
       };
-    }
-
-    const value = setting.value as { locations?: Array<{ id?: string; country: string; city: string; price: number }> };
-    return {
-      locations: value.locations || [],
-    };
+      return { locations: value.locations || [] };
+    });
   }
 
   /**
@@ -111,6 +117,8 @@ class AdminDeliveryService {
         description: 'Delivery prices by country and city',
       },
     });
+
+    invalidateServerReadCache('admin:delivery');
 
     return {
       locations: locationsWithIds,

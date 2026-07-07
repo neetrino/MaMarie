@@ -7,6 +7,9 @@ import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient, ApiError } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from '@/lib/utils/logger';
+import { fetchAdminQuery } from '@/lib/admin/admin-query-cache';
+import { invalidateAdminQuery } from '@/lib/admin/admin-fetch';
+import { ADMIN_QUERY_KEYS, ADMIN_LIST_STALE_MS } from '@/lib/admin/admin-query-keys';
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import type { PromoCodeAdminRow } from '@/lib/promo-codes/types';
 import {
@@ -113,10 +116,17 @@ export function CouponsAdminClient() {
     [t]
   );
 
-  const loadList = useCallback(async () => {
+  const loadList = useCallback(async (force = false) => {
     try {
       setLoading(true);
-      const res = await apiClient.get<PromoListResponse>('/api/v1/admin/coupons');
+      if (force) {
+        invalidateAdminQuery(ADMIN_QUERY_KEYS.coupons);
+      }
+      const res = await fetchAdminQuery(
+        ADMIN_QUERY_KEYS.coupons,
+        () => apiClient.get<PromoListResponse>('/api/v1/admin/coupons'),
+        { staleTimeMs: ADMIN_LIST_STALE_MS, force }
+      );
       setRows(res.data);
     } catch (e) {
       logger.error('[ADMIN COUPONS] load failed', { err: e });
@@ -213,7 +223,7 @@ export function CouponsAdminClient() {
         await apiClient.post('/api/v1/admin/coupons', payload);
       }
       closeForm();
-      await loadList();
+      await loadList(true);
     } catch (e) {
       const msg =
         e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Error';
@@ -236,7 +246,7 @@ export function CouponsAdminClient() {
     }
     try {
       await apiClient.delete(`/api/v1/admin/coupons/${row.id}`);
-      await loadList();
+      await loadList(true);
     } catch (e) {
       const msg =
         e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Error';

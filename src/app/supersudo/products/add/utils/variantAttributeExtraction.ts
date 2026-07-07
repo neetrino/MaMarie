@@ -1,3 +1,5 @@
+import { parseSizeFromSku } from '@/lib/services/product-variant-attributes';
+
 /**
  * Utilities for extracting color and size attributes from variants
  */
@@ -120,19 +122,7 @@ export function extractColorFromSku(variant: Variant): string {
  * Extracts size from SKU (format: prefix-color-size)
  */
 export function extractSizeFromSku(variant: Variant): string {
-  if (!variant.sku) {
-    return '';
-  }
-
-  const skuParts = variant.sku.split('-');
-  if (skuParts.length >= 3) {
-    const possibleSize = skuParts[2];
-    if (possibleSize) {
-      return possibleSize;
-    }
-  }
-
-  return '';
+  return parseSizeFromSku(variant.sku);
 }
 
 /**

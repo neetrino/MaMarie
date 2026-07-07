@@ -1,13 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   STOREFRONT_CACHE_KEYS,
-  STOREFRONT_CACHE_TTL,
   readJsonCache,
   stableSearchParamsKey,
-  writeJsonCache,
 } from "@/lib/cache/storefront-cache";
-import { productsService } from "@/lib/services/products.service";
+import {
+  getStorefrontProductsFilters,
+  type StorefrontProductsFiltersInput,
+} from "@/lib/services/storefront-products-filters-loader";
 import { logger } from "@/lib/utils/logger";
+
+function parseFiltersInput(searchParams: URLSearchParams): StorefrontProductsFiltersInput {
+  return {
+    category: searchParams.get("category") || undefined,
+    search: searchParams.get("search") || undefined,
+    minPrice: searchParams.get("minPrice")
+      ? parseFloat(searchParams.get("minPrice")!)
+      : undefined,
+    maxPrice: searchParams.get("maxPrice")
+      ? parseFloat(searchParams.get("maxPrice")!)
+      : undefined,
+    lang: searchParams.get("lang") || "en",
+  };
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -29,26 +44,13 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const filters = {
-      category: searchParams.get("category") || undefined,
-      search: searchParams.get("search") || undefined,
-      minPrice: searchParams.get("minPrice")
-        ? parseFloat(searchParams.get("minPrice")!)
-        : undefined,
-      maxPrice: searchParams.get("maxPrice")
-        ? parseFloat(searchParams.get("maxPrice")!)
-        : undefined,
-      lang: searchParams.get("lang") || "en",
-    };
-
     const cacheKey = STOREFRONT_CACHE_KEYS.productsFilters(stableSearchParamsKey(searchParams));
     const cached = await readJsonCache<unknown>(cacheKey);
     if (cached !== null) {
       return NextResponse.json(cached, { headers: { "X-Cache": "HIT" } });
     }
 
-    const result = await productsService.getFilters(filters);
-    await writeJsonCache(cacheKey, STOREFRONT_CACHE_TTL.productsFilters, result);
+    const result = await getStorefrontProductsFilters(parseFiltersInput(searchParams));
 
     return NextResponse.json(result, { headers: { "X-Cache": "MISS" } });
   } catch (error: unknown) {

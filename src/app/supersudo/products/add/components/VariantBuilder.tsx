@@ -6,6 +6,7 @@ import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
 import { CURRENCIES, type CurrencyCode } from '../../../../../lib/currency';
 import type { Attribute, GeneratedVariant } from '../types';
+import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
 import { setMainVariant } from '../utils/variantMainHelpers';
 import { logger } from "@/lib/utils/logger";
 
@@ -20,6 +21,7 @@ interface VariantBuilderProps {
   slug: string;
   title: string;
   variantImageInputRefs: RefObject<Record<string, HTMLInputElement | null>>;
+  fieldErrors: ProductFormFieldErrors;
   onVariantUpdate: (updater: (prev: GeneratedVariant[]) => GeneratedVariant[]) => void;
   onVariantDelete: (variantId: string) => void;
   onVariantAdd: () => void;
@@ -60,6 +62,7 @@ export function VariantBuilder({
   slug,
   title,
   variantImageInputRefs,
+  fieldErrors,
   onVariantUpdate,
   onVariantDelete,
   onVariantAdd,
@@ -80,8 +83,11 @@ export function VariantBuilder({
   const hasVariantsTable = attributesToShow.length > 0 || generatedVariants.length > 0;
 
   return (
-    <div>
+    <div data-field-error={fieldErrors.variants ? 'true' : undefined}>
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.products.add.variantBuilder')}</h2>
+      {fieldErrors.variants ? (
+        <p className="mb-4 text-sm text-error">{fieldErrors.variants}</p>
+      ) : null}
       <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
         {hasVariantsTable ? (
           <div>
@@ -217,9 +223,17 @@ export function VariantBuilder({
                       variant,
                       attributes,
                     );
+                    const variantPriceError = fieldErrors[`variant.${variant.id}.price`];
+                    const variantStockError = fieldErrors[`variant.${variant.id}.stock`];
+                    const variantValuesError = fieldErrors[`variant.${variant.id}.values`];
+                    const hasVariantFieldError = Boolean(variantPriceError || variantStockError || variantValuesError);
 
                     return (
-                      <tr key={variant.id} className="hover:bg-gray-50">
+                      <tr
+                        key={variant.id}
+                        className="hover:bg-gray-50"
+                        data-field-error={hasVariantFieldError ? 'true' : undefined}
+                      >
                         {variantAttributesToShow.map((attributeId) => {
                           const attribute = attributes.find((a) => a.id === attributeId);
                           if (!attribute) return null;
@@ -252,7 +266,11 @@ export function VariantBuilder({
                                   onClick={() => {
                                     onOpenValueModal({ variantId: variant.id, attributeId });
                                   }}
-                                  className="w-full text-left flex items-center gap-1 p-1.5 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className={`w-full text-left flex items-center gap-1 p-1.5 border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 ${
+                                    variantValuesError
+                                      ? 'border-red-300 bg-red-50 focus:ring-red-500'
+                                      : 'border-gray-300 focus:ring-blue-500'
+                                  }`}
                                 >
                                   <div className="flex-1 flex flex-wrap items-center gap-1 min-w-0">
                                     {selectedValues.length > 0 ? (
@@ -307,9 +325,12 @@ export function VariantBuilder({
                               className="w-20 text-xs"
                               min="0"
                               step="0.01"
+                              error={variantPriceError}
+                              showErrorMessage={false}
                             />
                             <span className="text-xs text-gray-500">{CURRENCIES[defaultCurrency].symbol}</span>
                           </div>
+                          {variantPriceError ? <p className="mt-1 text-xs text-error">{variantPriceError}</p> : null}
                         </td>
                         <td className="px-2 py-2 align-middle whitespace-nowrap text-left">
                           <div className="flex items-center gap-1">
@@ -341,7 +362,11 @@ export function VariantBuilder({
                             placeholder={t('admin.products.add.quantityPlaceholder')}
                             className="w-16 text-xs"
                             min="0"
+                            error={variantStockError}
+                            showErrorMessage={false}
                           />
+                          {variantStockError ? <p className="mt-1 text-xs text-error">{variantStockError}</p> : null}
+                          {variantValuesError ? <p className="mt-1 text-xs text-error">{variantValuesError}</p> : null}
                         </td>
                         <td className="px-2 py-2 align-middle whitespace-nowrap text-left">
                           <Input

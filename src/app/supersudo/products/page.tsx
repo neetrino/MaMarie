@@ -1,15 +1,27 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
-import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { getStoredCurrency, initializeCurrencyRates, type CurrencyCode } from '../../../lib/currency';
+import {
+  buildAdminListQueryKey,
+  fetchAdminList,
+  invalidateAdminQueryPrefix,
+} from '@/lib/admin/admin-fetch';
+import { buildAdminProductListParams } from '@/lib/admin/admin-product-list-params';
+import {
+  hydrateAdminListFromCache,
+  useAdminQuerySubscription,
+} from '@/lib/admin/admin-list-cache-ui';
+import { isAdminQueryFresh, peekAdminQuery } from '@/lib/admin/admin-query-cache';
+import { ADMIN_LIST_STALE_MS, ADMIN_QUERY_PREFIX } from '@/lib/admin/admin-query-keys';
 import { ProductBulkSelectionBar } from './components/ProductBulkSelectionBar';
 import { ProductFilters } from './components/ProductFilters';
 import { ProductsTable } from './components/ProductsTable';
 import { useProductHandlers } from './hooks/useProductHandlers';
+import { useAdminCategories } from '../providers/AdminReferenceDataProvider';
 import type { Product, ProductsResponse, Category } from './types';
 import { logger } from "@/lib/utils/logger";
 
@@ -21,8 +33,8 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const { categories: sharedCategories, loading: categoriesLoading } = useAdminCategories();
+  const categories = sharedCategories as Category[];
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [skuSearch, setSkuSearch] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'inStock' | 'outOfStock'>('all');
@@ -75,13 +87,6 @@ export default function ProductsPage() {
     }
   }, []);
 
-  // Fetch categories on mount
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchCategories();
-    }
-  }, [isLoggedIn, isAdmin]);
-
   // Close category dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -99,83 +104,35 @@ export default function ProductsPage() {
     }
   }, [categoriesExpanded]);
 
-  const fetchCategories = async () => {
-    try {
-      setCategoriesLoading(true);
-      logger.debug('📂 [ADMIN] Fetching categories...');
-      const response = await apiClient.get<{ data: Category[] }>('/api/v1/admin/categories');
-      setCategories(response.data || []);
-      logger.debug('✅ [ADMIN] Categories loaded:', response.data?.length || 0);
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error fetching categories:', err);
-      setCategories([]);
-    } finally {
-      setCategoriesLoading(false);
-    }
-  };
-
   /** Only `createdAt-*` is applied on the server; other sorts are client-only (avoids refetch on every header click). */
   const sortParamForApi = sortBy.startsWith('createdAt') ? sortBy : '';
   const categoryFilterKey = [...selectedCategories].sort().join(',');
 
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      void fetchProducts();
-    }
-  }, [
-    isLoggedIn,
-    isAdmin,
-    page,
-    search,
-    categoryFilterKey,
-    skuSearch,
-    stockFilter,
-    sortParamForApi,
-    minPrice,
-    maxPrice,
-  ]);
+  const productListParams = useMemo(
+    () =>
+      buildAdminProductListParams({
+        page,
+        search,
+        category: selectedCategories.size > 0 ? Array.from(selectedCategories).join(',') : undefined,
+        sku: skuSearch,
+        minPrice,
+        maxPrice,
+        sort: sortBy.startsWith('createdAt') ? sortBy : undefined,
+      }),
+    [page, search, categoryFilterKey, skuSearch, minPrice, maxPrice, sortBy]
+  );
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const params: Record<string, string> = {
-        page: page.toString(),
-        limit: '20',
-      };
-      
-      if (search.trim()) {
-        params.search = search.trim();
-      }
+  const productListCacheKey = useMemo(
+    () => buildAdminListQueryKey(ADMIN_QUERY_PREFIX.products, productListParams),
+    [productListParams]
+  );
 
-      if (selectedCategories.size > 0) {
-        params.category = Array.from(selectedCategories).join(',');
-      }
-
-      if (skuSearch.trim()) {
-        params.sku = skuSearch.trim();
-      }
-
-      if (minPrice.trim()) {
-        params.minPrice = minPrice.trim();
-      }
-
-      if (maxPrice.trim()) {
-        params.maxPrice = maxPrice.trim();
-      }
-
-      if (sortBy && sortBy.startsWith('createdAt')) {
-        params.sort = sortBy;
-      }
-
-      const response = await apiClient.get<ProductsResponse>('/api/v1/admin/products', {
-        params,
-      });
-      
+  const applyProductsResponse = useCallback(
+    (response: ProductsResponse) => {
       let filteredProducts = response.data || [];
 
-      // Stock filter (client-side)
       if (stockFilter !== 'all') {
-        filteredProducts = filteredProducts.filter(product => {
+        filteredProducts = filteredProducts.filter((product) => {
           const getTotalStock = (p: Product) => {
             if (p.colorStocks && p.colorStocks.length > 0) {
               return p.colorStocks.reduce((sum, cs) => sum + (cs.stock || 0), 0);
@@ -185,7 +142,8 @@ export default function ProductsPage() {
           const totalStock = getTotalStock(product);
           if (stockFilter === 'inStock') {
             return totalStock > 0;
-          } else if (stockFilter === 'outOfStock') {
+          }
+          if (stockFilter === 'outOfStock') {
             return totalStock === 0;
           }
           return true;
@@ -194,13 +152,67 @@ export default function ProductsPage() {
 
       setProducts(filteredProducts);
       setMeta(response.meta || null);
-    } catch (err: any) {
+    },
+    [stockFilter]
+  );
+
+  useAdminQuerySubscription(
+    productListCacheKey,
+    isLoggedIn && isAdmin,
+    applyProductsResponse
+  );
+
+  const fetchProducts = useCallback(async (force = false) => {
+    try {
+      hydrateAdminListFromCache<ProductsResponse>(
+        productListCacheKey,
+        force,
+        setLoading,
+        applyProductsResponse
+      );
+
+      const response = await fetchAdminList<ProductsResponse>(
+        ADMIN_QUERY_PREFIX.products,
+        '/api/v1/admin/products',
+        productListParams,
+        ADMIN_LIST_STALE_MS,
+        force
+      );
+
+      applyProductsResponse(response);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error fetching products:', err);
-      alert(t('admin.products.errorLoading').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      alert(t('admin.products.errorLoading').replace('{message}', message));
     } finally {
       setLoading(false);
     }
-  };
+  }, [productListCacheKey, productListParams, applyProductsResponse, t]);
+
+  const fetchProductsRef = useRef(fetchProducts);
+  fetchProductsRef.current = fetchProducts;
+
+  useEffect(() => {
+    if (!isLoggedIn || !isAdmin) {
+      return;
+    }
+
+    if (isAdminQueryFresh(productListCacheKey, ADMIN_LIST_STALE_MS)) {
+      const cached = peekAdminQuery<ProductsResponse>(productListCacheKey);
+      if (cached) {
+        applyProductsResponse(cached);
+        setLoading(false);
+      }
+      return;
+    }
+
+    void fetchProductsRef.current();
+  }, [isLoggedIn, isAdmin, productListCacheKey, applyProductsResponse]);
+
+  const refetchProducts = useCallback(async () => {
+    invalidateAdminQueryPrefix(ADMIN_QUERY_PREFIX.products);
+    await fetchProducts(true);
+  }, [fetchProducts]);
 
   // Client-side sorting for Product / Price / Stock columns
   const sortedProducts = useMemo(() => {
@@ -295,7 +307,7 @@ export default function ProductsPage() {
   const handlers = useProductHandlers({
     products,
     setProducts,
-    fetchProducts,
+    fetchProducts: refetchProducts,
     selectedIds,
     setSelectedIds,
     setPage,

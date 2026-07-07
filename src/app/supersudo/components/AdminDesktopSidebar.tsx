@@ -7,6 +7,7 @@ import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
 import { AdminBrandLogoLink } from '../../../components/AdminBrandLogoLink';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
+import { prefetchAdminRoute } from '@/lib/admin/admin-route-prefetch';
 import {
   ADMIN_MENU_ICON_THEME,
   PROFILE_MOBILE_ICON_THEMES,
@@ -91,6 +92,14 @@ function AdminNavIcon({ icon, themeKey }: { icon: ReactNode; themeKey: keyof typ
   );
 }
 
+function adminNavIntentHandlers(path: string, navigate: (path: string) => void) {
+  return {
+    onMouseEnter: () => prefetchAdminRoute(path),
+    onFocus: () => prefetchAdminRoute(path),
+    onClick: () => navigate(path),
+  };
+}
+
 function AdminDesktopNav({
   tabs,
   pathname,
@@ -134,7 +143,7 @@ function AdminDesktopNav({
               <button
                 type="button"
                 title={tab.label}
-                onClick={() => router.push(tab.path)}
+                {...adminNavIntentHandlers(tab.path, router.push)}
                 className={`flex min-w-0 flex-1 items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left text-sm font-medium transition-colors ${
                   isActive ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-[#faf8f5]'
                 }`}
@@ -186,7 +195,7 @@ function AdminDesktopNav({
             key={tab.id}
             type="button"
             title={tab.label}
-            onClick={() => router.push(tab.path)}
+            {...adminNavIntentHandlers(tab.path, router.push)}
             className={rowClasses}
             style={
               isActive && !collapsed

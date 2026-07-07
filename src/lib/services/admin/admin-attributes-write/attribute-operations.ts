@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { invalidateAdminAttributesCache } from "@/lib/cache/admin-reference-cache";
 import { logger } from "../../../utils/logger";
 import { formatAttribute } from "./utils";
 
@@ -56,6 +57,7 @@ export async function createAttribute(data: {
     },
   });
 
+  invalidateAdminAttributesCache();
   return formatAttribute(attribute, locale);
 }
 
@@ -136,6 +138,7 @@ export async function updateAttributeTranslation(
     };
   }
 
+  invalidateAdminAttributesCache();
   return formatAttribute(updatedAttribute, locale);
 }
 

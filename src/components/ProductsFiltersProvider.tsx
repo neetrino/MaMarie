@@ -74,6 +74,7 @@ interface ProductsFiltersProviderProps {
   search?: string;
   minPrice?: string;
   maxPrice?: string;
+  initialData?: ProductsFiltersData | null;
   children: ReactNode;
 }
 
@@ -97,14 +98,22 @@ export function ProductsFiltersProvider({
   search,
   minPrice,
   maxPrice,
+  initialData = null,
   children,
 }: ProductsFiltersProviderProps) {
   const cacheKey = buildFiltersCacheKey({ category, search, minPrice, maxPrice });
-  const cachedFilters = readCatalogClientCache<ProductsFiltersData>(cacheKey);
+  const cachedFilters = initialData ?? readCatalogClientCache<ProductsFiltersData>(cacheKey);
   const [data, setData] = useState<ProductsFiltersData | null>(cachedFilters);
   const [loading, setLoading] = useState(!cachedFilters);
   const [error, setError] = useState(false);
   const requestSeqRef = useRef(0);
+  const skipInitialFetchRef = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (initialData) {
+      writeCatalogClientCache(cacheKey, initialData);
+    }
+  }, [cacheKey, initialData]);
 
   const fetchFilters = useCallback(async () => {
     const requestId = ++requestSeqRef.current;
@@ -156,6 +165,10 @@ export function ProductsFiltersProvider({
   }, [category, search, minPrice, maxPrice]);
 
   useEffect(() => {
+    if (skipInitialFetchRef.current) {
+      skipInitialFetchRef.current = false;
+      return;
+    }
     void fetchFilters();
   }, [fetchFilters]);
 

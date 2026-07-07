@@ -1,6 +1,6 @@
 import { db } from "@white-shop/db";
-import { processImageUrl } from "../utils/image-utils";
 import { translations } from "../translations";
+import { resolveCatalogProductCardImage } from "./catalog-product-card-image";
 import { collectProductColors, collectProductSizes } from "./product-variant-attributes";
 import { reviewsService } from "./reviews.service";
 import { ProductWithRelations } from "./products-find-query.service";
@@ -165,16 +165,11 @@ class ProductsFindTransformService {
         originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
         compareAtPrice: variant?.compareAtPrice || null,
         discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
-        image: (() => {
-          // Use unified image utilities to get first valid main image
-          if (!Array.isArray(product.media) || product.media.length === 0) {
-            return null;
-          }
-          
-          // Process first image - cast JsonValue to ImageUrlInput
-          const firstImage = processImageUrl(product.media[0] as string | null | undefined | { url?: string; src?: string; value?: string });
-          return firstImage || null;
-        })(),
+        image: resolveCatalogProductCardImage(
+          Array.isArray(product.media) ? product.media : [],
+          variants,
+          variant?.id ?? null
+        ),
         inStock: (variant?.stock || 0) > 0,
         labels: (() => {
           // Map existing labels

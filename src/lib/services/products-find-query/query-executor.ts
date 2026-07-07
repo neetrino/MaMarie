@@ -2,7 +2,43 @@ import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import { ensureProductVariantAttributesColumn } from "../../utils/db-ensure";
 import { logger } from "../../utils/logger";
+import { fetchStorefrontCatalogProducts } from "./storefront-catalog-list-batcher";
 import type { ProductWithRelations } from "./types";
+
+/**
+ * Lightweight catalog include — variant options only (no full attribute catalog tree).
+ */
+const getCatalogListInclude = () => ({
+  translations: true,
+  brand: {
+    include: {
+      translations: true,
+    },
+  },
+  variants: {
+    where: {
+      published: true,
+    },
+    include: {
+      options: {
+        include: {
+          attributeValue: {
+            include: {
+              attribute: true,
+              translations: true,
+            },
+          },
+        },
+      },
+    },
+  },
+  labels: true,
+  categories: {
+    include: {
+      translations: true,
+    },
+  },
+});
 
 /**
  * Base include configuration for product queries
@@ -106,30 +142,37 @@ function isAttributeValuesColorsError(error: unknown): boolean {
 }
 
 /**
- * Execute product query with comprehensive error handling
+ * Execute product query with comprehensive error handling.
+ * Catalog lists use a lightweight include (no productAttributes value tree).
  */
 export async function executeProductQuery(
   where: Prisma.ProductWhereInput,
   limit: number,
   skip: number = 0
 ): Promise<ProductWithRelations[]> {
-  const baseInclude = getBaseInclude();
+  try {
+    const products = await fetchStorefrontCatalogProducts(where, limit, skip);
+    logger.debug(`Found ${products.length} products from database (catalog list)`);
+    return products;
+  } catch (batchError: unknown) {
+    logger.warn('Batched catalog fetch failed, falling back to nested include', {
+      error: batchError instanceof Error ? batchError.message : String(batchError),
+    });
+  }
+
+  const catalogInclude = getCatalogListInclude();
 
   try {
     const products = await db.product.findMany({
       where,
-      include: {
-        ...baseInclude,
-        ...getProductAttributesInclude(),
-      },
+      include: catalogInclude,
       skip,
       take: limit,
       orderBy: { createdAt: "desc" },
     });
-    logger.debug(`Found ${products.length} products from database (with productAttributes)`);
+    logger.debug(`Found ${products.length} products from database (catalog list fallback)`);
     return products as unknown as ProductWithRelations[];
   } catch (error: unknown) {
-    // If productAttributes table doesn't exist, retry without it
     if (isProductAttributesError(error)) {
       logger.warn('product_attributes table not found, fetching without it', { 
         error: error instanceof Error ? error.message : String(error) 
@@ -143,9 +186,10 @@ export async function executeProductQuery(
         await ensureProductVariantAttributesColumn();
         const products = await db.product.findMany({
           where,
-          include: baseInclude,
+          include: catalogInclude,
           skip,
           take: limit,
+          orderBy: { createdAt: "desc" },
         });
         logger.debug(`Found ${products.length} products from database (after creating attributes column)`);
         return products as unknown as ProductWithRelations[];

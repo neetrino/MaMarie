@@ -15,13 +15,13 @@
     }
   },
   "scripts": {
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio",
-    "db:seed": "prisma db seed",
-    "postinstall": "prisma generate"
+    "db:generate": "node scripts/run-with-root-env.cjs generate",
+    "db:push": "node scripts/run-with-root-env.cjs db push",
+    "db:migrate": "node scripts/run-with-root-env.cjs migrate dev",
+    "db:migrate:deploy": "node scripts/run-with-root-env.cjs migrate deploy",
+    "db:studio": "node scripts/run-with-root-env.cjs studio",
+    "db:seed": "node scripts/run-with-root-env.cjs db seed",
+    "postinstall": "node scripts/run-with-root-env.cjs generate"
   },
   "prisma": {
     "seed": "node prisma/seed.cjs"

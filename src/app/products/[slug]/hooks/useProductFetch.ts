@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
-import { DEFAULT_LANGUAGE, getStoredLanguage, type LanguageCode } from '../../../../lib/language';
+import { getStoredLanguage, type LanguageCode } from '../../../../lib/language';
 import { logger } from '@/lib/utils/logger';
 import { RESERVED_ROUTES } from '../types';
 import type { Product } from '../types';
@@ -10,6 +10,7 @@ interface UseProductFetchProps {
   slug: string;
   variantIdFromUrl: string | null;
   initialProduct?: Product | null;
+  /** @deprecated Kept for call-site compat; SSR payload is trusted on mount. */
   serverLang?: LanguageCode;
 }
 
@@ -32,21 +33,24 @@ export function useProductFetch({
   slug,
   variantIdFromUrl,
   initialProduct = null,
-  serverLang = DEFAULT_LANGUAGE,
 }: UseProductFetchProps) {
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(initialProduct);
   const [loading, setLoading] = useState(!initialProduct);
   const [notFound, setNotFound] = useState(false);
   const generationRef = useRef(0);
-  const skippedInitialFetchRef = useRef(Boolean(initialProduct));
+  const productRef = useRef<Product | null>(initialProduct);
+
+  useEffect(() => {
+    productRef.current = product;
+  }, [product]);
 
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
       setNotFound(false);
       setLoading(false);
-      skippedInitialFetchRef.current = true;
+      productRef.current = initialProduct;
     }
   }, [initialProduct]);
 
@@ -56,9 +60,9 @@ export function useProductFetch({
       return;
     }
     const gen = ++generationRef.current;
-    setLoading(true);
+    const hadProduct = productRef.current !== null;
+    setLoading(!hadProduct);
     setNotFound(false);
-    setProduct(null);
 
     const currentLang = getStoredLanguage();
 
@@ -79,6 +83,7 @@ export function useProductFetch({
         return;
       }
       setProduct(data);
+      productRef.current = data;
     } catch (error: unknown) {
       logger.warn('Product fetch failed', {
         slug,
@@ -92,12 +97,16 @@ export function useProductFetch({
           return;
         }
         setProduct(fallback);
+        productRef.current = fallback;
       } catch (inner: unknown) {
         if (gen !== generationRef.current) {
           return;
         }
-        setProduct(null);
-        setNotFound(isNotFoundError(inner));
+        if (!hadProduct) {
+          setProduct(null);
+          productRef.current = null;
+          setNotFound(isNotFoundError(inner));
+        }
       }
     } finally {
       if (gen === generationRef.current) {
@@ -120,21 +129,13 @@ export function useProductFetch({
       return;
     }
 
-    const currentLang = getStoredLanguage();
-    const canUseInitialProduct =
-      skippedInitialFetchRef.current &&
-      initialProduct &&
-      currentLang === serverLang;
-
-    if (canUseInitialProduct) {
-      setLoading(false);
-    } else {
-      skippedInitialFetchRef.current = false;
+    if (!initialProduct) {
       void runLoad();
+    } else {
+      setLoading(false);
     }
 
     const handleLanguageUpdate = () => {
-      skippedInitialFetchRef.current = false;
       void runLoad();
     };
 
@@ -142,7 +143,7 @@ export function useProductFetch({
     return () => {
       window.removeEventListener('language-updated', handleLanguageUpdate);
     };
-  }, [slug, variantIdFromUrl, router, runLoad, initialProduct, serverLang]);
+  }, [slug, variantIdFromUrl, initialProduct, runLoad]);
 
   return {
     product,

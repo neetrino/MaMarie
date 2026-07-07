@@ -18,6 +18,7 @@ import { useProductAttributeHandlers } from './hooks/useProductAttributeHandlers
 import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
+import { clearProductFieldError } from './utils/product-form-field-errors';
 
 function AddProductPageContent() {
   const { t } = useTranslation();
@@ -163,6 +164,8 @@ function AddProductPageContent() {
     newCategoryName: formState.newCategoryName,
     isEditMode,
     productId,
+    hasVariantsToLoad: formState.hasVariantsToLoad,
+    setFieldErrors: formState.setFieldErrors,
     getColorAttribute,
     getSizeAttribute,
     isClothingCategory,
@@ -189,6 +192,7 @@ function AddProductPageContent() {
     <>
           <AddProductFormContent
             formData={formState.formData}
+            fieldErrors={formState.fieldErrors}
             productType={formState.productType}
             simpleProductData={formState.simpleProductData}
             categories={formState.categories}
@@ -213,10 +217,19 @@ function AddProductPageContent() {
             fileInputRef={formState.fileInputRef}
             attributesDropdownRef={formState.attributesDropdownRef}
             variantImageInputRefs={formState.variantImageInputRefs}
-            onTitleChange={handleTitleChange}
-            onSlugChange={(e) => formState.setFormData((prev) => ({ ...prev, slug: e.target.value }))}
+            onTitleChange={(e) => {
+              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'title'));
+              handleTitleChange(e);
+            }}
+            onSlugChange={(e) => {
+              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'slug'));
+              formState.setFormData((prev) => ({ ...prev, slug: e.target.value }));
+            }}
             onDescriptionChange={(e) => formState.setFormData((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
-            onProductTypeChange={formState.setProductType}
+            onProductTypeChange={(type) => {
+              formState.setFieldErrors({});
+              formState.setProductType(type);
+            }}
             onUploadImages={handleUploadImages}
             onRemoveImage={removeImageUrl}
             onSetFeaturedImage={setFeaturedImage}
@@ -229,21 +242,50 @@ function AddProductPageContent() {
             onCategoryIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, categoryIds: ids }))}
             onBrandIdsChange={(ids) => formState.setFormData((prev) => ({ ...prev, brandIds: ids }))}
             onPrimaryCategoryIdChange={(id) => formState.setFormData((prev) => ({ ...prev, primaryCategoryId: id }))}
-            onPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, price: value }))}
+            onPriceChange={(value) => {
+              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'price'));
+              formState.setSimpleProductData((prev) => ({ ...prev, price: value }));
+            }}
             onCompareAtPriceChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, compareAtPrice: value }))}
             onSkuChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, sku: value }))}
-            onQuantityChange={(value) => formState.setSimpleProductData((prev) => ({ ...prev, quantity: value }))}
+            onQuantityChange={(value) => {
+              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'quantity'));
+              formState.setSimpleProductData((prev) => ({ ...prev, quantity: value }));
+            }}
             onAttributesDropdownToggle={() => formState.setAttributesDropdownOpen(!formState.attributesDropdownOpen)}
-            onAttributeToggle={handleAttributeToggle}
-            onAttributeRemove={handleAttributeRemove}
-            onVariantUpdate={formState.setGeneratedVariants}
+            onAttributeToggle={(attributeId, checked) => {
+              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'attributes'));
+              handleAttributeToggle(attributeId, checked);
+            }}
+            onAttributeRemove={(attributeId) => {
+              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'attributes'));
+              handleAttributeRemove(attributeId);
+            }}
+            onVariantUpdate={(updater) => {
+              formState.setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next.variants;
+                Object.keys(next).forEach((key) => {
+                  if (key.startsWith('variant.')) {
+                    delete next[key];
+                  }
+                });
+                return next;
+              });
+              formState.setGeneratedVariants(updater);
+            }}
             onVariantDelete={handleVariantDelete}
             onVariantAdd={handleVariantAdd}
             onVariantImageUpload={(variantId, event) => handleUploadVariantImage(variantId, event)}
             onOpenValueModal={formState.setOpenValueModal}
             onAddLabel={addLabel}
             onRemoveLabel={removeLabel}
-            onUpdateLabel={(index, field, value) => updateLabel(index, field, value)}
+            onUpdateLabel={(index, field, value) => {
+              if (field === 'value') {
+                formState.setFieldErrors((prev) => clearProductFieldError(prev, `label.${index}.value`));
+              }
+              updateLabel(index, field, value);
+            }}
             onFeaturedChange={(featured) => formState.setFormData((prev) => ({ ...prev, featured }))}
             onVariantsUpdate={(updater) => formState.setFormData((prev) => ({ ...prev, variants: updater(prev.variants) }))}
             onApplyToAllVariants={(field, value) => applyToAllVariants(field, value)}

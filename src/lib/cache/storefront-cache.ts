@@ -1,4 +1,5 @@
 import { cacheService } from "@/lib/services/cache.service";
+import { logger } from "@/lib/utils/logger";
 
 /**
  * Central TTLs (seconds) for public storefront HTTP responses stored in Redis / in-memory fallback.
@@ -45,6 +46,9 @@ export async function readJsonCache<T>(key: string): Promise<T | null> {
   if (raw === null || raw === undefined) {
     return null;
   }
+  if (typeof raw !== "string") {
+    return raw as T;
+  }
   try {
     return JSON.parse(raw) as T;
   } catch {
@@ -57,6 +61,11 @@ export async function writeJsonCache(key: string, ttlSeconds: number, body: unkn
   const MAX_CACHE_BYTES = 512_000;
 
   if (payload.length > MAX_CACHE_BYTES) {
+    logger.warn("[storefront-cache] skip write: payload too large", {
+      key,
+      payloadSize: payload.length,
+      maxBytes: MAX_CACHE_BYTES,
+    });
     return;
   }
 

@@ -4,15 +4,17 @@ import { Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { ClaySelect } from '../../../../../components/ClaySelect';
 import type { ProductLabel } from '../types';
+import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
 
 interface ProductLabelsProps {
   labels: ProductLabel[];
+  fieldErrors: ProductFormFieldErrors;
   onAddLabel: () => void;
   onRemoveLabel: (index: number) => void;
   onUpdateLabel: (index: number, field: keyof ProductLabel, value: any) => void;
 }
 
-export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel }: ProductLabelsProps) {
+export function ProductLabels({ labels, fieldErrors, onAddLabel, onRemoveLabel, onUpdateLabel }: ProductLabelsProps) {
   const { t } = useTranslation();
 
   return (
@@ -58,7 +60,7 @@ export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel
                 </div>
 
                 {/* Label Value */}
-                <div>
+                <div data-field-error={fieldErrors[`label.${index}.value`] ? 'true' : undefined}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.products.add.value')} *
                   </label>
@@ -69,8 +71,8 @@ export function ProductLabels({ labels, onAddLabel, onRemoveLabel, onUpdateLabel
                     placeholder={
                       label.type === 'percentage' ? t('admin.products.add.percentagePlaceholder') : t('admin.products.add.newProductLabel')
                     }
-                    required
                     className="w-full"
+                    error={fieldErrors[`label.${index}.value`]}
                   />
                   {label.type === 'percentage' && (
                     <p className="mt-1 text-xs text-blue-600 font-medium">{t('admin.products.add.percentageAutoUpdateHint')}</p>

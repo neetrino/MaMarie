@@ -1,5 +1,9 @@
 import { db } from "@white-shop/db";
 import {
+  invalidateAdminCategoriesCache,
+  withAdminCategoriesCache,
+} from "@/lib/cache/admin-reference-cache";
+import {
   getEffectiveParentIds,
   isRootCategory,
   normalizeParentIds,
@@ -124,37 +128,39 @@ class AdminCategoriesService {
    * Get categories for admin
    */
   async getCategories() {
-    const categories = await db.category.findMany({
-      where: {
-        deletedAt: null,
-      },
-      include: {
-        translations: {
-          where: { locale: "en" },
-          take: 1,
+    return withAdminCategoriesCache(async () => {
+      const categories = await db.category.findMany({
+        where: {
+          deletedAt: null,
         },
-      },
-      orderBy: {
-        position: "asc",
-      },
-    });
+        include: {
+          translations: {
+            where: { locale: "en" },
+            take: 1,
+          },
+        },
+        orderBy: {
+          position: "asc",
+        },
+      });
 
-    return {
-      data: categories.map((category: { id: string; parentId: string | null; parentIds: string[]; requiresSizes: boolean | null; published: boolean | null; media: unknown[]; translations?: Array<{ title: string; slug: string }> }) => {
-        const translations = Array.isArray(category.translations) ? category.translations : [];
-        const translation = translations[0] || null;
-        return {
-          id: category.id,
-          title: translation?.title || "",
-          slug: translation?.slug || "",
-          parentId: category.parentId,
-          parentIds: getEffectiveParentIds(category),
-          requiresSizes: category.requiresSizes || false,
-          published: Boolean(category.published),
-          imageUrl: this.extractImageUrl(category.media),
-        };
-      }),
-    };
+      return {
+        data: categories.map((category: { id: string; parentId: string | null; parentIds: string[]; requiresSizes: boolean | null; published: boolean | null; media: unknown[]; translations?: Array<{ title: string; slug: string }> }) => {
+          const translations = Array.isArray(category.translations) ? category.translations : [];
+          const translation = translations[0] || null;
+          return {
+            id: category.id,
+            title: translation?.title || "",
+            slug: translation?.slug || "",
+            parentId: category.parentId,
+            parentIds: getEffectiveParentIds(category),
+            requiresSizes: category.requiresSizes || false,
+            published: Boolean(category.published),
+            imageUrl: this.extractImageUrl(category.media),
+          };
+        }),
+      };
+    });
   }
 
   /**
@@ -222,6 +228,8 @@ class AdminCategoriesService {
 
     const categoryTranslations = Array.isArray(category.translations) ? category.translations : [];
     const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
+
+    invalidateAdminCategoriesCache();
 
     return {
       data: {
@@ -450,6 +458,8 @@ class AdminCategoriesService {
     const categoryTranslations = Array.isArray(updatedCategory.translations) ? updatedCategory.translations : [];
     const translation = categoryTranslations.find((t: { locale: string }) => t.locale === locale) || categoryTranslations[0] || null;
 
+    invalidateAdminCategoriesCache();
+
     return {
       data: {
         id: updatedCategory.id,
@@ -541,6 +551,7 @@ class AdminCategoriesService {
     });
 
     logger.debug('✅ [ADMIN SERVICE] Category deleted:', categoryId);
+    invalidateAdminCategoriesCache();
     return { success: true };
   }
 }

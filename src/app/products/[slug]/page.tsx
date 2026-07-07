@@ -1,10 +1,10 @@
+import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { DEFAULT_LANGUAGE } from '@/lib/language';
-import { reviewsService } from '@/lib/services/reviews.service';
-import { calculateAverageRating } from '@/components/ProductReviews/utils';
-import type { Review } from '@/components/ProductReviews/utils';
 import { ProductPageClient } from './ProductPageClient';
-import { getProductBySlug } from './get-product-by-slug';
+import { ProductRelatedFallback } from './ProductRelatedFallback';
+import { ProductRelatedSection } from './ProductRelatedSection';
+import { getProductPageCore } from './get-product-by-slug';
 import { RESERVED_ROUTES } from './types';
 
 /** Aligned with STOREFRONT_CACHE_TTL.productDetails (300s). */
@@ -27,14 +27,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
     redirect(`/${slug}`);
   }
 
-  const product = await getProductBySlug(slug, DEFAULT_LANGUAGE);
-  if (!product) {
+  const core = await getProductPageCore(slug, DEFAULT_LANGUAGE);
+  if (!core) {
     notFound();
   }
 
-  const reviews = (await reviewsService.getProductReviews(product.id, {
-    publishedOnly: true,
-  })) as Review[];
+  const { product, reviews } = core;
+
+  const primaryCategory = product.categories?.[0];
 
   return (
     <ProductPageClient
@@ -42,6 +42,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
       initialProduct={product}
       initialReviews={reviews}
       serverLang={DEFAULT_LANGUAGE}
+      relatedSection={
+        <Suspense fallback={<ProductRelatedFallback />}>
+          <ProductRelatedSection
+            slug={slug}
+            lang={DEFAULT_LANGUAGE}
+            productId={product.id}
+            categoryId={primaryCategory?.id ?? null}
+            categorySlug={primaryCategory?.slug}
+          />
+        </Suspense>
+      }
     />
   );
 }

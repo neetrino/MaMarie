@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import {
   FOOTER_ASSETS,
   FOOTER_BUNNY_DECORATION,
@@ -35,13 +34,12 @@ function FooterDecoration({
           transform: `scale(${scaleX}, ${scaleY}) rotate(${layout.rotateDeg}deg)`,
         }}
       >
-        <Image
+        <img
           src={imageSrc}
           alt=""
-          fill
           loading="lazy"
-          sizes={`${Math.round(layout.imageSizePx)}px`}
-          className="object-cover"
+          decoding="async"
+          className="h-full w-full object-cover"
         />
       </div>
     </div>

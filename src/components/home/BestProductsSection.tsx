@@ -1,37 +1,13 @@
-import { unstable_cache } from 'next/cache';
-import { DEFAULT_LANGUAGE } from '../../lib/language';
-import { logger } from '../../lib/utils/logger';
-import { productsService } from '../../lib/services/products.service';
-import { BEST_PRODUCTS_CARD_COUNT, BEST_PRODUCTS_SECTION_OFFSET_TOP_PX } from '../../constants/home-sections';
+import type { HomeProductCardData } from './HomeProductCard';
+import { BEST_PRODUCTS_SECTION_OFFSET_TOP_PX } from '../../constants/home-sections';
 import { BestProductsBlock } from './BestProductsBlock';
-import { mapToHomeProductCard } from './best-products-data';
 import { HomePageSection } from './HomeSectionShell';
 
-const BEST_PRODUCTS_REVALIDATE_SECONDS = 600;
+interface BestProductsSectionProps {
+  products: HomeProductCardData[];
+}
 
-const getBestProductsCached = unstable_cache(
-  async (lang: string) => {
-    try {
-      const result = await productsService.findAll({
-        filter: 'featured',
-        limit: BEST_PRODUCTS_CARD_COUNT,
-        page: 1,
-        lang,
-      });
-
-      return result.data.map(mapToHomeProductCard);
-    } catch (error) {
-      logger.error('Failed to load home best products', { error, lang });
-      return [];
-    }
-  },
-  ['home-featured-products-v3'],
-  { revalidate: BEST_PRODUCTS_REVALIDATE_SECONDS }
-);
-
-export async function BestProductsSection() {
-  const products = await getBestProductsCached(DEFAULT_LANGUAGE);
-
+export function BestProductsSection({ products }: BestProductsSectionProps) {
   return (
     <HomePageSection offsetTopPx={BEST_PRODUCTS_SECTION_OFFSET_TOP_PX}>
       <BestProductsBlock products={products} />

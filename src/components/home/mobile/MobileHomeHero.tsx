@@ -19,6 +19,7 @@ import {
   MOBILE_HOME_HORIZONTAL_PADDING_PX,
 } from '../../../constants/mobile-home';
 import { useTranslation } from '../../../lib/i18n-client';
+import { warmStorefrontCatalogRoute } from '../../../lib/storefront/storefront-catalog-prefetch';
 import { MobileHomeSaleBanner } from './MobileHomeSaleBanner';
 import { MobileHomeSearchField } from './MobileHomeSearchField';
 
@@ -30,9 +31,17 @@ interface GenderCtaProps {
 }
 
 function GenderCta({ href, label, backgroundColor, chevronSrc }: GenderCtaProps) {
+  const handlePrefetch = () => {
+    warmStorefrontCatalogRoute(href);
+  };
+
   return (
     <Link
       href={href}
+      prefetch
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
+      onTouchStart={handlePrefetch}
       className="flex min-w-0 flex-1 items-center justify-between rounded-full pl-5 pr-2.5 text-sm font-semibold leading-7 text-white"
       style={{
         height: MOBILE_HOME_GENDER_BUTTON_HEIGHT_PX,

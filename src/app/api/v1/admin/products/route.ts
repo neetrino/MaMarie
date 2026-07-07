@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
+import { buildAdminProductsListCacheKey } from "@/lib/services/admin/admin-products-read/list-cache";
 import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { adminService } from "@/lib/services/admin.service";
 import { toApiError } from "@/lib/types/errors";
@@ -167,7 +169,10 @@ export async function GET(req: NextRequest) {
     logger.debug("🌐 [ADMIN PRODUCTS API] Calling adminService.getProducts with filters:", filters);
     
     const serviceStartTime = Date.now();
-    const result = await adminService.getProducts(filters);
+    const result = await dedupeInflight(
+      buildAdminProductsListCacheKey(filters),
+      () => adminService.getProducts(filters)
+    );
     const serviceTime = Date.now() - serviceStartTime;
     
     const totalTime = Date.now() - requestStartTime;

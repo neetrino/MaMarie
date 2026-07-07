@@ -41,6 +41,17 @@ export function LazyWhenVisible({
       return;
     }
 
+    const rect = node.getBoundingClientRect();
+    const alreadyVisible =
+      rect.top < window.innerHeight + rootMarginPx &&
+      rect.bottom > -rootMarginPx &&
+      rect.left < window.innerWidth + prefetchHorizontalPx &&
+      rect.right > -prefetchHorizontalPx;
+    if (alreadyVisible) {
+      setIsVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
