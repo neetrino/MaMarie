@@ -12,9 +12,10 @@ export const STORES_PAGE_COLUMN_GAP_PX = 24;
 export const STORES_PAGE_CARD_RADIUS_PX = 24;
 export const STORES_PAGE_CARD_SHADOW = '0 8px 32px rgba(87, 66, 59, 0.08)';
 
-export const STORES_LIST_PANEL_WIDTH_PX = 380;
-export const STORES_LIST_MAX_HEIGHT_PX = 560;
-export const STORES_MAP_MIN_HEIGHT_PX = 560;
+export const STORES_PANEL_HEIGHT_PX = 560;
+export const STORES_LIST_PANEL_WIDTH_PX = 320;
+export const STORES_LIST_MAX_HEIGHT_PX = STORES_PANEL_HEIGHT_PX;
+export const STORES_MAP_MIN_HEIGHT_PX = STORES_PANEL_HEIGHT_PX;
 export const STORES_MAP_MIN_HEIGHT_MOBILE_PX = 320;
 
 /** Yerevan center — default map viewport before stores load. */
