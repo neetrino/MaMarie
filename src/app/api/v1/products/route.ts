@@ -7,6 +7,7 @@ import {
   writeJsonCache,
 } from "@/lib/cache/storefront-cache";
 import { apiRouteErrorResponse, buildApiRouteErrorContext } from "@/lib/http/api-route-errors";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import { buildProductsListCacheKey } from "@/lib/products-list-cache-key";
 import { productsService } from "@/lib/services/products.service";
 
@@ -59,7 +60,9 @@ export async function GET(req: NextRequest) {
     };
 
     assertPostgresDatabaseUrlConfigured();
-    const result = await productsService.findAll(filters);
+    const result = await dedupeInflight(`storefront:products:${stableKey}`, () =>
+      productsService.findAll(filters)
+    );
 
     const onlyFeatured =
       filters.filter &&

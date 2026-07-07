@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { unstable_cache } from 'next/cache';
+import { cookies } from 'next/headers';
 import { getStoredLanguage } from '../../lib/language';
 import { t } from '../../lib/i18n';
 import { BrandFilter } from '../../components/BrandFilter';
@@ -22,6 +23,12 @@ import {
 import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
 import { productsService } from '../../lib/services/products.service';
+import { getCatalogFiltersCached } from '../../lib/services/products-catalog-filters-cache';
+import {
+  PRODUCTS_CATALOG_VIEW_MODE_COOKIE,
+  resolveCatalogLimitFromViewMode,
+  resolveInitialProductsCatalogViewMode,
+} from '../../lib/products-catalog-view-mode';
 import {
   PRODUCTS_CATALOG_MAIN_GAP_PX,
   PRODUCTS_CATALOG_TOP_ROW_PB_PX,
@@ -64,7 +71,7 @@ const getProductsCached = unstable_cache(
       brand,
       clothingTypes,
     }) as Promise<ProductsCatalogResponse>,
-  ['products-catalog-db-v1'],
+  ['products-catalog-db-v2'],
   { revalidate: PRODUCTS_LIST_REVALIDATE_SECONDS }
 );
 
@@ -74,6 +81,27 @@ function parseOptionalPriceFromString(value?: string): number | undefined {
   }
   const parsed = Number.parseFloat(value.trim());
   return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function hasExplicitLimitParam(
+  rawParams: Record<string, string | string[] | undefined>
+): boolean {
+  const limit = rawParams.limit;
+  return typeof limit === 'string' && limit.trim().length > 0;
+}
+
+function buildCatalogParams(
+  rawParams: Record<string, string | string[] | undefined>,
+  initialViewMode: ReturnType<typeof resolveInitialProductsCatalogViewMode>
+) {
+  const catalogParams = parseProductsCatalogParams(rawParams);
+  if (hasExplicitLimitParam(rawParams)) {
+    return catalogParams;
+  }
+  return {
+    ...catalogParams,
+    limit: resolveCatalogLimitFromViewMode(initialViewMode),
+  };
 }
 
 async function getProducts(params: ReturnType<typeof parseProductsCatalogParams>): Promise<ProductsCatalogResponse> {
@@ -137,10 +165,25 @@ export async function ProductsCatalog({
   searchParams: Promise<SearchParamsInput> | SearchParamsInput;
 }) {
   const rawParams = searchParams instanceof Promise ? await searchParams : searchParams;
-  const catalogParams = parseProductsCatalogParams(rawParams);
-  const productsData = await getProducts(catalogParams);
-  const normalizedProducts = productsData.data.map(normalizeProduct);
+  const cookieStore = await cookies();
+  const initialViewMode = resolveInitialProductsCatalogViewMode(
+    cookieStore.get(PRODUCTS_CATALOG_VIEW_MODE_COOKIE)?.value
+  );
+  const catalogParams = buildCatalogParams(rawParams, initialViewMode);
   const language = getStoredLanguage();
+
+  const [productsData, initialFilters] = await Promise.all([
+    getProducts(catalogParams),
+    getCatalogFiltersCached({
+      lang: language,
+      category: catalogParams.category,
+      search: catalogParams.search,
+      minPrice: parseOptionalPriceFromString(catalogParams.minPrice),
+      maxPrice: parseOptionalPriceFromString(catalogParams.maxPrice),
+    }),
+  ]);
+
+  const normalizedProducts = productsData.data.map(normalizeProduct);
 
   return (
     <HomeContentHorizontalFrame>
@@ -157,8 +200,9 @@ export async function ProductsCatalog({
           initialParams={catalogParams}
           initialProducts={normalizedProducts}
           initialMeta={productsData.meta}
+          initialViewMode={initialViewMode}
         >
-          <ProductsFiltersProviderBridge>
+          <ProductsFiltersProviderBridge initialFilters={initialFilters}>
             <div className="flex w-full flex-col items-start lg:flex-row" style={{ gap: PRODUCTS_CATALOG_MAIN_GAP_PX }}>
               <ProductsFilterSidebar />
 

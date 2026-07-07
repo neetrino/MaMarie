@@ -3,48 +3,34 @@
 import { useEffect, useState } from 'react';
 import {
   PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
-  normalizeProductsCatalogViewMode,
   type ProductsCatalogViewMode,
 } from '../../constants/products-catalog';
+import {
+  persistProductsCatalogViewMode,
+  readStoredProductsCatalogViewMode,
+  writeProductsCatalogViewModeCookie,
+  PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY,
+} from '../../lib/products-catalog-view-mode';
+import { useOptionalProductsCatalog } from './ProductsCatalogProvider';
 
-export const PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY = 'products-view-mode';
-
-/** Loads saved view mode when the user has chosen one; otherwise keeps the catalog default. */
-export function readStoredProductsCatalogViewMode(): ProductsCatalogViewMode | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const stored = localStorage.getItem(PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY);
-  if (stored === null) {
-    return null;
-  }
-
-  const mode = normalizeProductsCatalogViewMode(stored);
-  if (stored !== mode) {
-    localStorage.setItem(PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY, mode);
-  }
-
-  return mode;
-}
-
-export function persistProductsCatalogViewMode(mode: ProductsCatalogViewMode): void {
-  localStorage.setItem(PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY, mode);
-  window.dispatchEvent(new CustomEvent('view-mode-changed', { detail: mode }));
-}
-
-/** Shared catalog view mode — defaults to the 2nd toolbar option until the user picks another. */
+/** Shared catalog view mode — SSR seed + localStorage persistence. */
 export function useProductsCatalogViewMode() {
+  const catalog = useOptionalProductsCatalog();
   const [viewMode, setViewMode] = useState<ProductsCatalogViewMode>(
-    PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
+    catalog?.initialViewMode ?? PRODUCTS_CATALOG_DEFAULT_VIEW_MODE
   );
 
   useEffect(() => {
     const storedMode = readStoredProductsCatalogViewMode();
     if (storedMode !== null) {
       setViewMode(storedMode);
+      return;
     }
-  }, []);
+    if (catalog?.initialViewMode) {
+      localStorage.setItem(PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY, catalog.initialViewMode);
+      writeProductsCatalogViewModeCookie(catalog.initialViewMode);
+    }
+  }, [catalog?.initialViewMode]);
 
   useEffect(() => {
     const handleViewModeChange = (event: CustomEvent<ProductsCatalogViewMode>) => {
@@ -64,3 +50,7 @@ export function useProductsCatalogViewMode() {
 
   return { viewMode, setViewMode: setViewModePersisted };
 }
+
+export {
+  PRODUCTS_CATALOG_VIEW_MODE_STORAGE_KEY,
+} from '../../lib/products-catalog-view-mode';

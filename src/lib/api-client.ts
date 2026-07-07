@@ -11,14 +11,11 @@
 import { ApiError } from "./api-client/types";
 import type { RequestOptions } from "./api-client/types";
 import { getRequest, postRequest, putRequest, patchRequest, deleteRequest } from "./api-client/http-methods";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+import { resolveApiBaseUrl } from "./api-client/resolve-api-base-url";
 
 class ApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
+  private get baseUrl(): string {
+    return resolveApiBaseUrl();
   }
 
   async get<T>(endpoint: string, options?: RequestOptions, retryCount = 0): Promise<T> {
@@ -42,5 +39,5 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_BASE_URL);
+export const apiClient = new ApiClient();
 export { ApiError, RequestAbortedError } from "./api-client/types";

@@ -1,8 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../../../lib/api-client';
+import {
+  buildAdminListQueryKey,
+  fetchAdminList,
+} from '@/lib/admin/admin-fetch';
+import {
+  hydrateAdminListFromCache,
+  useAdminQuerySubscription,
+} from '@/lib/admin/admin-list-cache-ui';
+import { ADMIN_LIST_STALE_MS, ADMIN_QUERY_PREFIX } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency, convertPrice, getStoredCurrency, initializeCurrencyRates, CurrencyCode } from '../../../lib/currency';
 import { logger } from "@/lib/utils/logger";
@@ -123,32 +132,57 @@ export function useOrders() {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loadingOrderDetails, setLoadingOrderDetails] = useState(false);
 
-  const fetchOrders = useCallback(async () => {
+  const ordersListParams = useMemo(
+    () => ({
+      page: page.toString(),
+      limit: '20',
+      status: statusFilter || '',
+      paymentStatus: paymentStatusFilter || '',
+      search: searchQuery || '',
+      sortBy: sortBy || '',
+      sortOrder: sortOrder || '',
+    }),
+    [page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]
+  );
+
+  const ordersListCacheKey = useMemo(
+    () => buildAdminListQueryKey(ADMIN_QUERY_PREFIX.orders, ordersListParams),
+    [ordersListParams]
+  );
+
+  const applyOrdersResponse = useCallback((response: OrdersResponse) => {
+    setOrders(response.data || []);
+    setMeta(response.meta || null);
+  }, []);
+
+  useAdminQuerySubscription(ordersListCacheKey, true, applyOrdersResponse);
+
+  const fetchOrders = useCallback(async (force = false) => {
     try {
-      setLoading(true);
+      hydrateAdminListFromCache<OrdersResponse>(
+        ordersListCacheKey,
+        force,
+        setLoading,
+        applyOrdersResponse
+      );
       logger.debug('📦 [ADMIN] Fetching orders...', { page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder });
       
-      const response = await apiClient.get<OrdersResponse>('/api/v1/admin/orders', {
-        params: {
-          page: page.toString(),
-          limit: '20',
-          status: statusFilter || '',
-          paymentStatus: paymentStatusFilter || '',
-          search: searchQuery || '',
-          sortBy: sortBy || '',
-          sortOrder: sortOrder || '',
-        },
-      });
+      const response = await fetchAdminList<OrdersResponse>(
+        ADMIN_QUERY_PREFIX.orders,
+        '/api/v1/admin/orders',
+        ordersListParams,
+        ADMIN_LIST_STALE_MS,
+        force
+      );
 
       logger.debug('✅ [ADMIN] Orders fetched:', response);
-      setOrders(response.data || []);
-      setMeta(response.meta || null);
+      applyOrdersResponse(response);
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching orders:', err);
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]);
+  }, [ordersListCacheKey, ordersListParams, applyOrdersResponse, page, statusFilter, paymentStatusFilter, searchQuery, sortBy, sortOrder]);
 
   useEffect(() => {
     void fetchOrders();

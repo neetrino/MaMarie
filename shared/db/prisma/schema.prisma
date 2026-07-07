@@ -230,6 +230,7 @@ model Product {
   @@index([published, publishedAt])
   @@index([featured])
   @@index([deletedAt])
+  @@index([deletedAt, createdAt(sort: Desc)])
   @@map("products")
 }
 
@@ -248,6 +249,7 @@ model ProductTranslation {
 
   @@unique([productId, locale])
   @@index([slug, locale])
+  @@index([productId, locale])
   @@map("product_translations")
 }
 
@@ -275,6 +277,7 @@ model ProductVariant {
   orderItems OrderItem[]
 
   @@index([productId])
+  @@index([productId, published, price])
   @@map("product_variants")
 }
 
@@ -411,6 +414,7 @@ model Order {
   user User? @relation(fields: [userId], references: [id])
 
   @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
   @@index([status, createdAt(sort: Desc)])
   @@index([customerEmail])
   @@index([createdAt(sort: Desc)])

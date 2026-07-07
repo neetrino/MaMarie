@@ -4,8 +4,16 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminList } from '@/lib/admin/admin-fetch';
+import { buildAdminProductListParams } from '@/lib/admin/admin-product-list-params';
+import { ADMIN_LIST_STALE_MS, ADMIN_QUERY_PREFIX } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { QuickSettingsContent } from './QuickSettingsContent';
+import {
+  useAdminBrands,
+  useAdminCategories,
+  useAdminSettingsReference,
+} from '../providers/AdminReferenceDataProvider';
 import { logger } from "@/lib/utils/logger";
 
 interface AdminSettingsResponse {
@@ -42,7 +50,6 @@ interface AdminProductsResponse {
   };
 }
 
-const PRODUCTS_PAGE_LIMIT = 20;
 
 export default function QuickSettingsPage() {
   const { t } = useTranslation();
@@ -67,23 +74,25 @@ export default function QuickSettingsPage() {
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [categorySaving, setCategorySaving] = useState(false);
   const [brandSaving, setBrandSaving] = useState(false);
+  const { categories: sharedCategories, loading: sharedCategoriesLoading } = useAdminCategories();
+  const { brands: sharedBrands, loading: sharedBrandsLoading } = useAdminBrands();
+  const { settings: sharedSettings, loading: sharedSettingsLoading, refetchSettings } =
+    useAdminSettingsReference();
 
   const fetchSettings = useCallback(async () => {
     try {
-      logger.debug('⚙️ [QUICK SETTINGS] Fetching settings...');
       setDiscountLoading(true);
-      const settings = await apiClient.get<AdminSettingsResponse>('/api/v1/admin/settings');
+      const settings = await refetchSettings();
       setGlobalDiscount(settings.globalDiscount || 0);
       setCategoryDiscounts(settings.categoryDiscounts || {});
       setBrandDiscounts(settings.brandDiscounts || {});
-      logger.debug('✅ [QUICK SETTINGS] Settings loaded:', settings);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [QUICK SETTINGS] Error fetching settings:', err);
       setGlobalDiscount(0);
     } finally {
       setDiscountLoading(false);
     }
-  }, []);
+  }, [refetchSettings]);
 
   const fetchProducts = useCallback(async (page: number, search: string) => {
     try {
@@ -91,13 +100,15 @@ export default function QuickSettingsPage() {
       setProductsLoading(true);
       const normalizedSearch = search.trim();
 
-      const response = await apiClient.get<AdminProductsResponse>('/api/v1/admin/products', {
-        params: {
-          page: page.toString(),
-          limit: PRODUCTS_PAGE_LIMIT.toString(),
-          ...(normalizedSearch ? { search: normalizedSearch } : {}),
-        },
-      });
+      const response = await fetchAdminList<AdminProductsResponse>(
+        ADMIN_QUERY_PREFIX.products,
+        '/api/v1/admin/products',
+        buildAdminProductListParams({
+          page,
+          search: normalizedSearch,
+        }),
+        ADMIN_LIST_STALE_MS
+      );
 
       if (response?.data && Array.isArray(response.data)) {
         const safeTotalPages = Math.max(1, response.meta?.totalPages || 1);
@@ -141,43 +152,33 @@ export default function QuickSettingsPage() {
     }
   }, []);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      logger.debug('📂 [QUICK SETTINGS] Fetching categories...');
-      setCategoriesLoading(true);
-      const response = await apiClient.get<{ data: AdminCategory[] }>('/api/v1/admin/categories');
-      if (response?.data && Array.isArray(response.data)) {
-        setCategories(response.data);
-        logger.debug('✅ [QUICK SETTINGS] Categories loaded:', response.data.length);
-      } else {
-        setCategories([]);
-      }
-    } catch (err: any) {
-      console.error('❌ [QUICK SETTINGS] Error fetching categories:', err);
-      setCategories([]);
-    } finally {
-      setCategoriesLoading(false);
+  useEffect(() => {
+    if (sharedSettingsLoading) {
+      setDiscountLoading(true);
+      return;
     }
-  }, []);
 
-  const fetchBrands = useCallback(async () => {
-    try {
-      logger.debug('🏷️ [QUICK SETTINGS] Fetching brands...');
-      setBrandsLoading(true);
-      const response = await apiClient.get<{ data: AdminBrand[] }>('/api/v1/admin/brands');
-      if (response?.data && Array.isArray(response.data)) {
-        setBrands(response.data);
-        logger.debug('✅ [QUICK SETTINGS] Brands loaded:', response.data.length);
-      } else {
-        setBrands([]);
-      }
-    } catch (err: any) {
-      console.error('❌ [QUICK SETTINGS] Error fetching brands:', err);
-      setBrands([]);
-    } finally {
-      setBrandsLoading(false);
+    if (sharedSettings) {
+      setGlobalDiscount(sharedSettings.globalDiscount || 0);
+      setCategoryDiscounts(sharedSettings.categoryDiscounts || {});
+      setBrandDiscounts(sharedSettings.brandDiscounts || {});
     }
-  }, []);
+    setDiscountLoading(false);
+  }, [sharedSettings, sharedSettingsLoading]);
+
+  useEffect(() => {
+    setCategoriesLoading(sharedCategoriesLoading);
+    if (!sharedCategoriesLoading) {
+      setCategories(sharedCategories as AdminCategory[]);
+    }
+  }, [sharedCategories, sharedCategoriesLoading]);
+
+  useEffect(() => {
+    setBrandsLoading(sharedBrandsLoading);
+    if (!sharedBrandsLoading) {
+      setBrands(sharedBrands as AdminBrand[]);
+    }
+  }, [sharedBrands, sharedBrandsLoading]);
 
   const clampDiscountValue = (value: number) => {
     if (isNaN(value)) {
@@ -263,8 +264,8 @@ export default function QuickSettingsPage() {
         globalDiscount: discountValue,
         ...buildDiscountPayload(),
       });
-      
-      // Refresh products to get updated labels with new discount percentage
+
+      await fetchSettings();
       await fetchProducts(productsPage, productsSearch);
       
       alert(t('admin.quickSettings.savedSuccess'));
@@ -352,14 +353,6 @@ export default function QuickSettingsPage() {
       setSavingProductId(null);
     }
   };
-
-  useEffect(() => {
-    if (!isLoading && isLoggedIn && isAdmin) {
-      fetchSettings();
-      fetchCategories();
-      fetchBrands();
-    }
-  }, [isLoading, isLoggedIn, isAdmin, fetchSettings, fetchCategories, fetchBrands]);
 
   useEffect(() => {
     if (!isLoading && isLoggedIn && isAdmin) {

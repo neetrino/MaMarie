@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import {
   STOREFRONT_CACHE_KEYS,
   STOREFRONT_CACHE_TTL,
@@ -47,7 +48,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(cached, { headers: { "X-Cache": "HIT" } });
     }
 
-    const result = await productsService.getFilters(filters);
+    const result = await dedupeInflight(`storefront:filters:${stableSearchParamsKey(searchParams)}`, () =>
+      productsService.getFilters(filters)
+    );
     await writeJsonCache(cacheKey, STOREFRONT_CACHE_TTL.productsFilters, result);
 
     return NextResponse.json(result, { headers: { "X-Cache": "MISS" } });

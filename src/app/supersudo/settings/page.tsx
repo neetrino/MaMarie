@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
+import { invalidateAdminQuery } from '@/lib/admin/admin-fetch';
+import { ADMIN_QUERY_KEYS } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { logger } from "@/lib/utils/logger";
 import { ClaySelect } from '../../../components/ClaySelect';
+import { useAdminSettingsReference } from '../providers/AdminReferenceDataProvider';
 
 interface Settings {
   defaultCurrency?: string;
@@ -18,21 +21,24 @@ interface Settings {
   currencyRates?: Record<string, number>;
 }
 
+const DEFAULT_CURRENCY_RATES = {
+  USD: 1,
+  AMD: 400,
+  EUR: 0.92,
+  RUB: 90,
+  GEL: 2.7,
+};
+
 export default function SettingsPage() {
   const { t } = useTranslation();
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const router = useRouter();
+  const { settings: sharedSettings, loading: sharedLoading, refetchSettings } =
+    useAdminSettingsReference();
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<Settings>({
     defaultCurrency: 'AMD',
-    currencyRates: {
-      USD: 1,
-      AMD: 400,
-      EUR: 0.92,
-      RUB: 90,
-      GEL: 2.7,
-    },
+    currencyRates: DEFAULT_CURRENCY_RATES,
   });
 
   useEffect(() => {
@@ -45,47 +51,19 @@ export default function SettingsPage() {
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
   useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchSettings();
+    if (!sharedSettings) {
+      return;
     }
-  }, [isLoggedIn, isAdmin]);
 
-  const fetchSettings = async () => {
-    try {
-      setLoading(true);
-      logger.debug('⚙️ [ADMIN] Fetching settings...');
-      const data = await apiClient.get<Settings>('/api/v1/admin/settings');
-      setSettings({
-        defaultCurrency: data.defaultCurrency || 'AMD',
-        globalDiscount: data.globalDiscount,
-        categoryDiscounts: data.categoryDiscounts,
-        brandDiscounts: data.brandDiscounts,
-        currencyRates: data.currencyRates || {
-          USD: 1,
-          AMD: 400,
-          EUR: 0.92,
-          RUB: 90,
-          GEL: 2.7,
-        },
-      });
-      logger.debug('✅ [ADMIN] Settings loaded:', data);
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error fetching settings:', err);
-      // Use defaults if error
-      setSettings({
-        defaultCurrency: 'AMD',
-        currencyRates: {
-          USD: 1,
-          AMD: 400,
-          EUR: 0.92,
-          RUB: 90,
-          GEL: 2.7,
-        },
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    setSettings({
+      defaultCurrency: sharedSettings.defaultCurrency || 'AMD',
+      globalDiscount: sharedSettings.globalDiscount,
+      categoryDiscounts: sharedSettings.categoryDiscounts,
+      brandDiscounts: sharedSettings.brandDiscounts,
+      currencyRates: sharedSettings.currencyRates || DEFAULT_CURRENCY_RATES,
+    });
+    logger.debug('✅ [ADMIN] Settings loaded from reference provider:', sharedSettings);
+  }, [sharedSettings]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -105,6 +83,9 @@ export default function SettingsPage() {
         defaultCurrency: settings.defaultCurrency,
         currencyRates: currencyRatesToSave,
       });
+
+      invalidateAdminQuery(ADMIN_QUERY_KEYS.settings);
+      await refetchSettings();
       
       // Clear currency rates cache to force reload
       logger.debug('🔄 [ADMIN] Clearing currency rates cache...');
@@ -129,7 +110,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (isLoading || loading) {
+  if (isLoading || (sharedLoading && !sharedSettings)) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center py-12">
         <div className="text-center">

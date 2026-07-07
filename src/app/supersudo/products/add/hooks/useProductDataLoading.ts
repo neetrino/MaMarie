@@ -1,10 +1,15 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
-import { apiClient } from '@/lib/api-client';
 import { CURRENCIES, type CurrencyCode } from '@/lib/currency';
 import type { Brand, Category, Attribute } from '../types';
-import { logger } from "@/lib/utils/logger";
+import {
+  useAdminAttributesReference,
+  useAdminBrands,
+  useAdminCategories,
+  useAdminSettingsReference,
+} from '../../../providers/AdminReferenceDataProvider';
+import { logger } from '@/lib/utils/logger';
 
 interface UseProductDataLoadingProps {
   isLoggedIn: boolean;
@@ -40,18 +45,19 @@ export function useProductDataLoading({
   setBrandsExpanded,
 }: UseProductDataLoadingProps) {
   const router = useRouter();
+  const { brands, loading: brandsLoading } = useAdminBrands();
+  const { categories, loading: categoriesLoading } = useAdminCategories();
+  const { attributes, loading: attributesLoading } = useAdminAttributesReference();
+  const { settings, loading: settingsLoading } = useAdminSettingsReference();
 
-  // Auth check
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn || !isAdmin) {
         router.push('/supersudo');
-        return;
       }
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  // Close attributes dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (attributesDropdownRef.current && !attributesDropdownRef.current.contains(event.target as Node)) {
@@ -68,95 +74,53 @@ export function useProductDataLoading({
     };
   }, [attributesDropdownOpen, attributesDropdownRef, setAttributesDropdownOpen]);
 
-  // Load default currency from settings
   useEffect(() => {
-    const loadDefaultCurrency = async () => {
-      try {
-        const settingsRes = await apiClient.get<{ defaultCurrency?: string }>('/api/v1/admin/settings');
-        const currency = (settingsRes.defaultCurrency || 'AMD') as CurrencyCode;
-        if (currency in CURRENCIES) {
-          setDefaultCurrency(currency);
-          logger.debug('✅ [ADMIN] Default currency loaded:', currency);
-        }
-      } catch (err) {
-        console.error('❌ [ADMIN] Error loading default currency:', err);
-        setDefaultCurrency('AMD');
-      }
-    };
-    
-    if (isLoggedIn && isAdmin) {
-      loadDefaultCurrency();
+    if (!isLoggedIn || !isAdmin) {
+      return;
     }
-  }, [isLoggedIn, isAdmin, setDefaultCurrency]);
 
-  // Fetch brands, categories, and attributes
+    if (!brandsLoading) {
+      setBrands(brands as Brand[]);
+    }
+    if (!categoriesLoading) {
+      setCategories(categories as Category[]);
+    }
+    if (!attributesLoading) {
+      setAttributes(attributes as Attribute[]);
+      logger.debug('✅ [ADMIN] Reference data synced to product form', {
+        brands: brands.length,
+        categories: categories.length,
+        attributes: attributes.length,
+      });
+    }
+  }, [
+    isLoggedIn,
+    isAdmin,
+    brands,
+    categories,
+    attributes,
+    brandsLoading,
+    categoriesLoading,
+    attributesLoading,
+    setBrands,
+    setCategories,
+    setAttributes,
+  ]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        logger.debug('📥 [ADMIN] Fetching brands, categories, and attributes...');
-        const [brandsRes, categoriesRes, attributesRes] = await Promise.all([
-          apiClient.get<{ data: Brand[] }>('/api/v1/admin/brands'),
-          apiClient.get<{ data: Category[] }>('/api/v1/admin/categories'),
-          apiClient.get<{ data: Attribute[] }>('/api/v1/admin/attributes'),
-        ]);
-        setBrands(brandsRes.data || []);
-        setCategories(categoriesRes.data || []);
-        setAttributes(attributesRes.data || []);
-        logger.debug('✅ [ADMIN] Data fetched:', {
-          brands: brandsRes.data?.length || 0,
-          categories: categoriesRes.data?.length || 0,
-          attributes: attributesRes.data?.length || 0,
-        });
-        // Debug: Log attributes details
-        if (attributesRes.data && attributesRes.data.length > 0) {
-          logger.debug('📋 [ADMIN] Attributes loaded:', attributesRes.data.map(attr => ({
-            id: attr.id,
-            key: attr.key,
-            name: attr.name,
-            valuesCount: attr.values?.length || 0,
-            values: attr.values?.map(v => ({ 
-              value: v.value, 
-              label: v.label,
-              colors: v.colors,
-              colorsType: typeof v.colors,
-              colorsIsArray: Array.isArray(v.colors),
-              colorsLength: v.colors?.length,
-              imageUrl: v.imageUrl 
-            })) || []
-          })));
-          const colorAttr = attributesRes.data.find(a => a.key === 'color');
-          const sizeAttr = attributesRes.data.find(a => a.key === 'size');
-          if (!colorAttr) {
-            console.warn('⚠️ [ADMIN] Color attribute not found in loaded attributes!');
-          } else {
-            logger.debug('✅ [ADMIN] Color attribute found:', { id: colorAttr.id, valuesCount: colorAttr.values?.length || 0 });
-          }
-          if (!sizeAttr) {
-            console.warn('⚠️ [ADMIN] Size attribute not found in loaded attributes!');
-          } else {
-            logger.debug('✅ [ADMIN] Size attribute found:', { id: sizeAttr.id, valuesCount: sizeAttr.values?.length || 0 });
-          }
-        } else {
-          console.warn('⚠️ [ADMIN] No attributes loaded! This may cause issues with variant builder.');
-        }
-        // Debug: Log categories with requiresSizes
-        if (categoriesRes.data) {
-          logger.debug('📋 [ADMIN] Categories with requiresSizes:', 
-            categoriesRes.data.map(cat => ({ 
-              id: cat.id, 
-              title: cat.title, 
-              requiresSizes: cat.requiresSizes 
-            }))
-          );
-        }
-      } catch (err: any) {
-        console.error('❌ [ADMIN] Error fetching data:', err);
-      }
-    };
-    fetchData();
-  }, [setBrands, setCategories, setAttributes]);
+    if (!isLoggedIn || !isAdmin || settingsLoading) {
+      return;
+    }
 
-  // Close category dropdown when clicking outside
+    const currency = (settings?.defaultCurrency || 'AMD') as CurrencyCode;
+    if (currency in CURRENCIES) {
+      setDefaultCurrency(currency);
+      logger.debug('✅ [ADMIN] Default currency loaded from shared settings:', currency);
+    } else {
+      setDefaultCurrency('AMD');
+    }
+  }, [isLoggedIn, isAdmin, settings, settingsLoading, setDefaultCurrency]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -173,7 +137,6 @@ export function useProductDataLoading({
     }
   }, [categoriesExpanded, setCategoriesExpanded]);
 
-  // Close brand dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -190,5 +153,3 @@ export function useProductDataLoading({
     }
   }, [brandsExpanded, setBrandsExpanded]);
 }
-
-

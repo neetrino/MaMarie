@@ -41,6 +41,10 @@ import {
   type ProductsCatalogHistoryMode,
   type ProductsCatalogParams,
 } from '../../lib/products-catalog-params';
+import {
+  PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
+  type ProductsCatalogViewMode,
+} from '../../constants/products-catalog';
 
 interface UpdateParamsOptions {
   resetPage?: boolean;
@@ -51,6 +55,7 @@ interface ProductsCatalogContextValue {
   params: ProductsCatalogParams;
   products: ProductsCatalogProduct[];
   meta: ProductsCatalogMeta;
+  initialViewMode: ProductsCatalogViewMode;
   isFetching: boolean;
   isOptimistic: boolean;
   isServerOnlyFetch: boolean;
@@ -61,11 +66,15 @@ interface ProductsCatalogContextValue {
   selectedClothingTypes: string[];
   sortBy: string;
   updateParams: (patch: Partial<ProductsCatalogParams>, options?: UpdateParamsOptions) => void;
+  alignParamsWithoutFetch: (patch: Partial<ProductsCatalogParams>) => void;
   clearFilters: () => void;
   buildPaginationUrl: (page: number) => string;
 }
 
 const ProductsCatalogContext = createContext<ProductsCatalogContextValue | null>(null);
+
+/** Defer pool prefetch so initial catalog + filters requests get DB connections first. */
+const CATALOG_POOL_PREFETCH_DELAY_MS = 5_000;
 const PRODUCT_DATA_PARAM_KEYS: ReadonlyArray<keyof ProductsCatalogParams> = [
   'page',
   'limit',
@@ -83,6 +92,7 @@ interface ProductsCatalogProviderProps {
   initialParams: ProductsCatalogParams;
   initialProducts: ProductsCatalogProduct[];
   initialMeta: ProductsCatalogMeta;
+  initialViewMode?: ProductsCatalogViewMode;
   children: ReactNode;
 }
 
@@ -193,10 +203,27 @@ function persistCatalogResponse(
   writeCatalogClientCache(buildProductsListClientCacheKey(params), response);
 }
 
+function shouldSkipCatalogPoolPrefetch(
+  initialParams: ProductsCatalogParams,
+  initialProducts: ProductsCatalogProduct[],
+  initialMeta: ProductsCatalogMeta
+): boolean {
+  if (initialMeta.total > 0 && initialMeta.total <= initialParams.limit) {
+    return true;
+  }
+
+  return (
+    initialMeta.total > 0 &&
+    initialMeta.total <= PRODUCTS_CATALOG_CLIENT_POOL_LIMIT &&
+    initialProducts.length >= initialMeta.total
+  );
+}
+
 export function ProductsCatalogProvider({
   initialParams,
   initialProducts,
   initialMeta,
+  initialViewMode = PRODUCTS_CATALOG_DEFAULT_VIEW_MODE,
   children,
 }: ProductsCatalogProviderProps) {
   const normalizedInitialParams = useMemo(
@@ -401,6 +428,20 @@ export function ProductsCatalogProvider({
     void loadProducts(next);
   }, [loadProducts, clearSearchDebounce]);
 
+  const alignParamsWithoutFetch = useCallback((patch: Partial<ProductsCatalogParams>) => {
+    const next = mergeParams(paramsRef.current, patch, true);
+    if (productsCatalogParamsKey(paramsRef.current) === productsCatalogParamsKey(next)) {
+      return;
+    }
+    paramsRef.current = next;
+    syncProductsCatalogUrl(next, 'replace');
+    setParams(next);
+    cacheRef.current.set(productsCatalogParamsKey(next), {
+      data: products,
+      meta,
+    });
+  }, [products, meta]);
+
   useEffect(() => {
     persistCatalogResponse(normalizedInitialParams, {
       data: initialProducts,
@@ -415,29 +456,58 @@ export function ProductsCatalogProvider({
       return;
     }
 
-    const controller = new AbortController();
-    void fetchCatalogProducts(poolParams, controller.signal)
-      .then((response) => {
-        if (controller.signal.aborted) {
-          return;
-        }
-        const poolProducts = Array.isArray(response.data) ? response.data : [];
-        cacheRef.current.set(poolKey, {
-          data: poolProducts,
-          meta: response.meta ?? initialMeta,
-        });
-        persistCatalogResponse(poolParams, {
-          data: poolProducts,
-          meta: response.meta ?? initialMeta,
-        });
-        poolRef.current = mergeCatalogPool(poolRef.current, poolProducts);
-      })
-      .catch(() => {
-        // Pool prefetch is best-effort; catalog still works via per-filter API calls.
+    if (shouldSkipCatalogPoolPrefetch(normalizedInitialParams, initialProducts, initialMeta)) {
+      cacheRef.current.set(poolKey, {
+        data: initialProducts,
+        meta: initialMeta,
       });
+      poolRef.current = mergeCatalogPool(poolRef.current, initialProducts);
+      return;
+    }
 
-    return () => controller.abort();
-  }, [normalizedInitialParams, initialMeta]);
+    const controller = new AbortController();
+
+    const prefetchPool = () => {
+      void fetchCatalogProducts(poolParams, controller.signal)
+        .then((response) => {
+          if (controller.signal.aborted) {
+            return;
+          }
+          const poolProducts = Array.isArray(response.data) ? response.data : [];
+          cacheRef.current.set(poolKey, {
+            data: poolProducts,
+            meta: response.meta ?? initialMeta,
+          });
+          persistCatalogResponse(poolParams, {
+            data: poolProducts,
+            meta: response.meta ?? initialMeta,
+          });
+          poolRef.current = mergeCatalogPool(poolRef.current, poolProducts);
+        })
+        .catch(() => {
+          // Pool prefetch is best-effort; catalog still works via per-filter API calls.
+        });
+    };
+
+    let timeoutId: number | undefined;
+    if (typeof window.requestIdleCallback === 'function') {
+      const idleId = window.requestIdleCallback(prefetchPool, {
+        timeout: CATALOG_POOL_PREFETCH_DELAY_MS,
+      });
+      return () => {
+        controller.abort();
+        window.cancelIdleCallback(idleId);
+      };
+    }
+
+    timeoutId = window.setTimeout(prefetchPool, CATALOG_POOL_PREFETCH_DELAY_MS);
+    return () => {
+      controller.abort();
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [normalizedInitialParams, initialMeta, initialProducts]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -492,7 +562,9 @@ export function ProductsCatalogProvider({
       selectedBrands: brands,
       selectedClothingTypes: clothingTypes,
       sortBy: params.sort ?? 'default',
+      initialViewMode,
       updateParams,
+      alignParamsWithoutFetch,
       clearFilters,
       buildPaginationUrl,
     };
@@ -500,11 +572,13 @@ export function ProductsCatalogProvider({
     params,
     products,
     meta,
+    initialViewMode,
     isFetching,
     isOptimistic,
     isServerOnlyFetch,
     gridRevision,
     updateParams,
+    alignParamsWithoutFetch,
     clearFilters,
     buildPaginationUrl,
   ]);

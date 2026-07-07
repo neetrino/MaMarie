@@ -1,41 +1,67 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
+import {
+  invalidateServerReadCache,
+  withServerReadCache,
+} from "@/lib/cache/server-read-cache";
+
+const SETTINGS_CACHE_TTL_MS = 60_000;
+
+const DEFAULT_CURRENCY_RATES = {
+  USD: 1,
+  AMD: 400,
+  EUR: 0.92,
+  RUB: 90,
+  GEL: 2.7,
+} as const;
 
 class AdminSettingsService {
+  /**
+   * Lightweight currency rates read (single settings row, cached in-process).
+   */
+  async getCurrencyRates(): Promise<Record<string, number>> {
+    return withServerReadCache("admin:currency-rates", SETTINGS_CACHE_TTL_MS, async () => {
+      const row = await db.settings.findUnique({
+        where: { key: "currencyRates" },
+        select: { value: true },
+      });
+
+      return row?.value
+        ? (row.value as Record<string, number>)
+        : { ...DEFAULT_CURRENCY_RATES };
+    });
+  }
+
   /**
    * Get settings
    */
   async getSettings() {
-    const settings = await db.settings.findMany({
-      where: {
-        key: {
-          in: ['globalDiscount', 'categoryDiscounts', 'brandDiscounts', 'defaultCurrency', 'currencyRates'],
+    return withServerReadCache("admin:settings:full", SETTINGS_CACHE_TTL_MS, async () => {
+      const settings = await db.settings.findMany({
+        where: {
+          key: {
+            in: ['globalDiscount', 'categoryDiscounts', 'brandDiscounts', 'defaultCurrency', 'currencyRates'],
+          },
         },
-      },
+        select: { key: true, value: true },
+      });
+
+      const globalDiscountSetting = settings.find((s) => s.key === 'globalDiscount');
+      const categoryDiscountsSetting = settings.find((s) => s.key === 'categoryDiscounts');
+      const brandDiscountsSetting = settings.find((s) => s.key === 'brandDiscounts');
+      const defaultCurrencySetting = settings.find((s) => s.key === 'defaultCurrency');
+      const currencyRatesSetting = settings.find((s) => s.key === 'currencyRates');
+
+      return {
+        globalDiscount: globalDiscountSetting ? Number(globalDiscountSetting.value) : 0,
+        categoryDiscounts: categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) : {},
+        brandDiscounts: brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) : {},
+        defaultCurrency: defaultCurrencySetting ? (defaultCurrencySetting.value as string) : 'AMD',
+        currencyRates: currencyRatesSetting
+          ? (currencyRatesSetting.value as Record<string, number>)
+          : { ...DEFAULT_CURRENCY_RATES },
+      };
     });
-    
-    const globalDiscountSetting = settings.find((s) => s.key === 'globalDiscount');
-    const categoryDiscountsSetting = settings.find((s) => s.key === 'categoryDiscounts');
-    const brandDiscountsSetting = settings.find((s) => s.key === 'brandDiscounts');
-    const defaultCurrencySetting = settings.find((s) => s.key === 'defaultCurrency');
-    const currencyRatesSetting = settings.find((s) => s.key === 'currencyRates');
-    
-    // Default currency rates (fallback)
-    const defaultCurrencyRates = {
-      USD: 1,
-      AMD: 400,
-      EUR: 0.92,
-      RUB: 90,
-      GEL: 2.7,
-    };
-    
-    return {
-      globalDiscount: globalDiscountSetting ? Number(globalDiscountSetting.value) : 0,
-      categoryDiscounts: categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) : {},
-      brandDiscounts: brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) : {},
-      defaultCurrency: defaultCurrencySetting ? (defaultCurrencySetting.value as string) : 'AMD',
-      currencyRates: currencyRatesSetting ? (currencyRatesSetting.value as Record<string, number>) : defaultCurrencyRates,
-    };
   }
 
   /**
@@ -130,7 +156,10 @@ class AdminSettingsService {
       });
       logger.debug('✅ [ADMIN SERVICE] Currency rates updated:', data.currencyRates);
     }
-    
+
+    invalidateServerReadCache('admin:settings:full');
+    invalidateServerReadCache('admin:currency-rates');
+
     return { success: true };
   }
 
@@ -138,39 +167,41 @@ class AdminSettingsService {
    * Get price filter settings
    */
   async getPriceFilterSettings() {
-    logger.debug('⚙️ [ADMIN SERVICE] Fetching price filter settings...');
-    const setting = await db.settings.findUnique({
-      where: { key: 'price-filter' },
-    });
+    return withServerReadCache('admin:settings:price-filter', SETTINGS_CACHE_TTL_MS, async () => {
+      logger.debug('⚙️ [ADMIN SERVICE] Fetching price filter settings...');
+      const setting = await db.settings.findUnique({
+        where: { key: 'price-filter' },
+      });
 
-    if (!setting) {
-      logger.debug('✅ [ADMIN SERVICE] Price filter settings not found, returning defaults');
+      if (!setting) {
+        logger.debug('✅ [ADMIN SERVICE] Price filter settings not found, returning defaults');
+        return {
+          minPrice: null,
+          maxPrice: null,
+          stepSize: null,
+          stepSizePerCurrency: null,
+        };
+      }
+
+      const value = setting.value as {
+        minPrice?: number;
+        maxPrice?: number;
+        stepSize?: number;
+        stepSizePerCurrency?: {
+          USD?: number;
+          AMD?: number;
+          RUB?: number;
+          GEL?: number;
+        };
+      };
+      logger.debug('✅ [ADMIN SERVICE] Price filter settings loaded:', value);
       return {
-        minPrice: null,
-        maxPrice: null,
-        stepSize: null,
-        stepSizePerCurrency: null,
+        minPrice: value.minPrice ?? null,
+        maxPrice: value.maxPrice ?? null,
+        stepSize: value.stepSize ?? null,
+        stepSizePerCurrency: value.stepSizePerCurrency ?? null,
       };
-    }
-
-    const value = setting.value as {
-      minPrice?: number;
-      maxPrice?: number;
-      stepSize?: number;
-      stepSizePerCurrency?: {
-        USD?: number;
-        AMD?: number;
-        RUB?: number;
-        GEL?: number;
-      };
-    };
-    logger.debug('✅ [ADMIN SERVICE] Price filter settings loaded:', value);
-    return {
-      minPrice: value.minPrice ?? null,
-      maxPrice: value.maxPrice ?? null,
-      stepSize: value.stepSize ?? null,
-      stepSizePerCurrency: value.stepSizePerCurrency ?? null,
-    };
+    });
   }
 
   /**
@@ -243,7 +274,18 @@ class AdminSettingsService {
     });
 
     logger.debug('✅ [ADMIN SERVICE] Price filter settings updated:', setting);
-    const stored = setting.value as any;
+    invalidateServerReadCache('admin:settings:price-filter');
+    const stored = setting.value as {
+      minPrice?: number;
+      maxPrice?: number;
+      stepSize?: number;
+      stepSizePerCurrency?: {
+        USD?: number;
+        AMD?: number;
+        RUB?: number;
+        GEL?: number;
+      } | null;
+    };
     return {
       success: true,
       minPrice: stored.minPrice ?? null,

@@ -7,6 +7,7 @@ import { updateOrCreateVariant } from "./variant-updater";
 import { updateAttributeValueImageUrls } from "./attribute-value-updater";
 import { buildAttributeValueLookupCache } from "./variant-processor";
 import { ensureUniqueProductSlug } from "../product-slug-utils";
+import { invalidateAdminProductsListCache } from "../admin-products-read/list-cache";
 
 const PRODUCT_UPDATE_TX_TIMEOUT_MS = 60000;
 const PRODUCT_UPDATE_TX_MAX_WAIT_MS = 5000;
@@ -153,6 +154,8 @@ export async function updateProduct(
     });
 
     await updateAttributeValueImageUrls(productId);
+
+    invalidateAdminProductsListCache();
 
     return result;
   } catch (error: unknown) {

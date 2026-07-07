@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { invalidateAdminAttributesCache } from "@/lib/cache/admin-reference-cache";
 import { logger } from "@/lib/utils/logger";
 
 class AdminAttributesDeleteService {
@@ -142,6 +143,7 @@ class AdminAttributesDeleteService {
         timestamp: new Date().toISOString(),
       });
       
+      invalidateAdminAttributesCache();
       return { success: true };
     } catch (error: any) {
       // Եթե սա մեր ստեղծած սխալ է, ապա վերադարձնում ենք այն
@@ -267,6 +269,7 @@ class AdminAttributesDeleteService {
       const translation = attribute.translations[0];
       const values = attribute.values || [];
 
+      invalidateAdminAttributesCache();
       return {
         id: attribute.id,
         key: attribute.key,

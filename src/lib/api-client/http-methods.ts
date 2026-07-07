@@ -11,13 +11,19 @@ import {
   isQuietCartStockValidationError,
 } from "./error-handler";
 import { logger } from "@/lib/utils/logger";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 
 /**
  * Handle network errors
  */
-function handleNetworkError(error: unknown, baseUrl: string, url: string): never {
-  if (error instanceof RequestAbortedError) {
-    throw error;
+function handleNetworkError(
+  error: unknown,
+  baseUrl: string,
+  url: string,
+  signal?: AbortSignal
+): never {
+  if (error instanceof RequestAbortedError || signal?.aborted) {
+    throw new RequestAbortedError();
   }
 
   const networkError = error as { message?: string; name?: string };
@@ -138,7 +144,26 @@ export async function getRequest<T>(
   const maxRetries = 3;
   const retryDelay = 1000; // 1 second
   const timeout = 30000; // 30 seconds timeout
-  
+
+  if (!options?.signal) {
+    return dedupeInflight(`GET:${url}`, () =>
+      executeGetRequest<T>(baseUrl, endpoint, url, options, retryCount, maxRetries, retryDelay, timeout)
+    );
+  }
+
+  return executeGetRequest<T>(baseUrl, endpoint, url, options, retryCount, maxRetries, retryDelay, timeout);
+}
+
+async function executeGetRequest<T>(
+  baseUrl: string,
+  endpoint: string,
+  url: string,
+  options: RequestOptions | undefined,
+  retryCount: number,
+  maxRetries: number,
+  retryDelay: number,
+  timeout: number
+): Promise<T> {
   logger.debug('🌐 [API CLIENT] GET request:', { url, endpoint, baseUrl });
 
   if (isRequestAborted(options)) {
@@ -170,6 +195,9 @@ export async function getRequest<T>(
       }
       const error = fetchError as { name?: string };
       if (error.name === 'AbortError') {
+        if (options?.signal?.aborted) {
+          throw new RequestAbortedError();
+        }
         throw new Error(`Request timeout: API server did not respond within ${timeout / 1000} seconds. URL: ${url}`);
       }
       throw fetchError;
@@ -182,7 +210,10 @@ export async function getRequest<T>(
       console.warn('⚠️ [API CLIENT] Failed to log response status');
     }
   } catch (networkError: unknown) {
-    handleNetworkError(networkError, baseUrl, url);
+    if (isRequestAborted(options)) {
+      throw new RequestAbortedError();
+    }
+    handleNetworkError(networkError, baseUrl, url, options?.signal ?? undefined);
   }
 
   if (!response.ok) {
@@ -191,7 +222,7 @@ export async function getRequest<T>(
       const delay = retryDelay * (retryCount + 1); // Exponential backoff
       console.warn(`⚠️ [API CLIENT] Rate limited, retrying in ${delay}ms... (attempt ${retryCount + 1}/${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, delay));
-      return getRequest<T>(baseUrl, endpoint, options, retryCount + 1);
+      return executeGetRequest<T>(baseUrl, endpoint, url, options, retryCount + 1, maxRetries, retryDelay, timeout);
     }
 
     await handleErrorResponse(response, url, baseUrl);

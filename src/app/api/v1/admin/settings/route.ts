@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { invalidateStorefrontAfterAdminSettingsUpdate } from "@/lib/cache/storefront-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { adminService } from "@/lib/services/admin.service";
+
+const ADMIN_SETTINGS_CACHE_KEY = "admin:settings:full";
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,7 +22,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const result = await adminService.getSettings();
+    const result = await dedupeInflight(ADMIN_SETTINGS_CACHE_KEY, () => adminService.getSettings());
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("❌ [ADMIN] Error:", error);

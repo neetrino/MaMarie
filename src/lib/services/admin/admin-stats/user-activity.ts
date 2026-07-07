@@ -17,101 +17,100 @@ function formatUser(user: {
     phone: user.phone || undefined,
     name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || user.phone || "Unknown",
     registeredAt: user.createdAt.toISOString(),
-    lastLoginAt: undefined, // We don't track last login yet
+    lastLoginAt: undefined,
   };
 }
 
-/**
- * Format active user for activity response
- */
-function formatActiveUser(user: {
-  id: string;
+function formatUserName(user: {
   email: string | null;
   phone: string | null;
   firstName: string | null;
   lastName: string | null;
-  createdAt: Date;
-  orders: Array<{
-    id: string;
-    total: number;
-    createdAt: Date;
-  }>;
-}) {
-  const orders = Array.isArray(user.orders) ? user.orders : [];
-  const orderCount = orders.length;
-  const totalSpent = orders.reduce((sum: number, order: { total: number }) => sum + order.total, 0);
-  const lastOrder = orders[0] || null;
-
-  return {
-    id: user.id,
-    email: user.email || undefined,
-    phone: user.phone || undefined,
-    name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || user.phone || "Unknown",
-    orderCount,
-    totalSpent,
-    lastOrderDate: lastOrder ? lastOrder.createdAt.toISOString() : user.createdAt.toISOString(),
-    lastLoginAt: undefined, // We don't track last login yet
-  };
+}): string {
+  return [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email || user.phone || "Unknown";
 }
 
 /**
- * Get user activity (recent registrations and active users)
+ * Get user activity (recent registrations and active users).
+ * Uses order aggregates instead of loading all orders per user (N+1 fix).
  */
 export async function getUserActivity(limit: number = 10) {
-  // Get recent registrations
-  const recentUsers = await db.user.findMany({
-    where: {
-      deletedAt: null,
-    },
-    take: limit,
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      email: true,
-      phone: true,
-      firstName: true,
-      lastName: true,
-      createdAt: true,
-    },
-  });
-
-  const recentRegistrations = recentUsers.map(formatUser);
-
-  // Get active users (users with orders)
-  const usersWithOrders = await db.user.findMany({
-    where: {
-      deletedAt: null,
-      orders: {
-        some: {},
+  const [recentUsers, orderAggregates] = await Promise.all([
+    db.user.findMany({
+      where: { deletedAt: null },
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
       },
-    },
-    select: {
-      id: true,
-      email: true,
-      phone: true,
-      firstName: true,
-      lastName: true,
-      createdAt: true,
-      orders: {
-        select: {
-          id: true,
-          total: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-      },
-    },
-    take: limit,
-  });
+    }),
+    db.order.groupBy({
+      by: ["userId"],
+      where: { userId: { not: null } },
+      _sum: { total: true },
+      _count: { _all: true },
+      _max: { createdAt: true },
+    }),
+  ]);
 
-  const activeUsers = usersWithOrders.map(formatActiveUser);
+  const rankedAggregates = orderAggregates
+    .filter((row) => row.userId)
+    .sort((a, b) => {
+      const aCount = typeof a._count === "object" && a._count ? a._count._all ?? 0 : 0;
+      const bCount = typeof b._count === "object" && b._count ? b._count._all ?? 0 : 0;
+      return bCount - aCount;
+    })
+    .slice(0, limit);
+
+  const userIds = rankedAggregates
+    .map((row) => row.userId)
+    .filter((id): id is string => typeof id === "string");
+
+  const activeUserProfiles =
+    userIds.length > 0
+      ? await db.user.findMany({
+          where: { id: { in: userIds }, deletedAt: null },
+          select: {
+            id: true,
+            email: true,
+            phone: true,
+            firstName: true,
+            lastName: true,
+            createdAt: true,
+          },
+        })
+      : [];
+
+  const profileById = new Map(activeUserProfiles.map((user) => [user.id, user]));
+
+  const activeUsers = rankedAggregates
+    .filter((row) => row.userId && profileById.has(row.userId))
+    .map((row) => {
+      const user = profileById.get(row.userId!)!;
+      const orderCount =
+        typeof row._count === "object" && row._count ? row._count._all ?? 0 : 0;
+      const totalSpent = row._sum?.total ?? 0;
+      const lastOrderDate = row._max?.createdAt ?? user.createdAt;
+
+      return {
+        id: user.id,
+        email: user.email || undefined,
+        phone: user.phone || undefined,
+        name: formatUserName(user),
+        orderCount,
+        totalSpent,
+        lastOrderDate: lastOrderDate.toISOString(),
+        lastLoginAt: undefined,
+      };
+    });
 
   return {
-    recentRegistrations,
+    recentRegistrations: recentUsers.map(formatUser),
     activeUsers,
   };
 }
-
-
-
-

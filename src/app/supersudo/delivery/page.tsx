@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
+import { fetchAdminResource, invalidateAdminQuery } from '@/lib/admin/admin-fetch';
+import { ADMIN_QUERY_KEYS, ADMIN_RESOURCE_STALE_MS } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
@@ -39,27 +41,31 @@ export default function DeliveryPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  useEffect(() => {
-    if (isLoggedIn && isAdmin) {
-      fetchDeliverySettings();
-    }
-  }, [isLoggedIn, isAdmin]);
-
-  const fetchDeliverySettings = async () => {
+  const loadDeliverySettings = useCallback(async (force = false) => {
     try {
       setLoading(true);
       logger.debug('🚚 [ADMIN] Fetching delivery settings...');
-      const data = await apiClient.get<DeliverySettings>('/api/v1/admin/delivery');
+      const data = await fetchAdminResource<DeliverySettings>(
+        ADMIN_QUERY_KEYS.delivery,
+        () => apiClient.get<DeliverySettings>('/api/v1/admin/delivery'),
+        ADMIN_RESOURCE_STALE_MS,
+        force
+      );
       setLocations(data.locations || []);
       logger.debug('✅ [ADMIN] Delivery settings loaded:', data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ [ADMIN] Error fetching delivery settings:', err);
-      // Use defaults if error
       setLocations([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn && isAdmin) {
+      void loadDeliverySettings();
+    }
+  }, [isLoggedIn, isAdmin, loadDeliverySettings]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -69,7 +75,7 @@ export default function DeliveryPage() {
       alert(t('admin.delivery.savedSuccess'));
       logger.debug('✅ [ADMIN] Delivery settings saved');
       setEditingId(null);
-      await fetchDeliverySettings();
+      await loadDeliverySettings(true);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error saving delivery settings:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save delivery settings';

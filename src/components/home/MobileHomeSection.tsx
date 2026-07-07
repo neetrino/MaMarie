@@ -1,36 +1,12 @@
-import { unstable_cache } from 'next/cache';
-import { DEFAULT_LANGUAGE } from '../../lib/language';
-import { logger } from '../../lib/utils/logger';
-import { productsService } from '../../lib/services/products.service';
-import { BEST_PRODUCTS_CARD_COUNT } from '../../constants/home-sections';
+import type { HomeProductCardData } from './HomeProductCard';
 import { MOBILE_HOME_PRODUCTS_VISIBLE_COUNT } from '../../constants/mobile-home';
-import { mapToHomeProductCard } from './best-products-data';
 import { MobileHomePage } from './MobileHomePage';
 
-const MOBILE_HOME_PRODUCTS_REVALIDATE_SECONDS = 600;
+interface MobileHomeSectionProps {
+  products: HomeProductCardData[];
+}
 
-const getMobileHomeProductsCached = unstable_cache(
-  async (lang: string) => {
-    try {
-      const result = await productsService.findAll({
-        filter: 'featured',
-        limit: BEST_PRODUCTS_CARD_COUNT,
-        page: 1,
-        lang,
-      });
-
-      return result.data.map(mapToHomeProductCard);
-    } catch (error) {
-      logger.error('Failed to load mobile home products', { error, lang });
-      return [];
-    }
-  },
-  ['mobile-home-featured-products-v3'],
-  { revalidate: MOBILE_HOME_PRODUCTS_REVALIDATE_SECONDS },
-);
-
-export async function MobileHomeSection() {
-  const products = await getMobileHomeProductsCached(DEFAULT_LANGUAGE);
+export function MobileHomeSection({ products }: MobileHomeSectionProps) {
   const rowCount = MOBILE_HOME_PRODUCTS_VISIBLE_COUNT * 2;
 
   return <MobileHomePage products={products.slice(0, rowCount)} />;

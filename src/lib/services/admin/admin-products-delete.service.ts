@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
+import { invalidateAdminProductsListCache } from "./admin-products-read/list-cache";
 
 class AdminProductsDeleteService {
   /**
@@ -26,6 +27,8 @@ class AdminProductsDeleteService {
         published: false,
       },
     });
+
+    invalidateAdminProductsListCache();
 
     return { success: true };
   }
@@ -68,6 +71,8 @@ class AdminProductsDeleteService {
       productId,
       discountPercent: updated.discountPercent,
     });
+
+    invalidateAdminProductsListCache();
 
     return { success: true, discountPercent: updated.discountPercent };
   }

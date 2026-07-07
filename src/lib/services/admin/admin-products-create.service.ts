@@ -10,6 +10,7 @@ import {
 } from "../../utils/image-utils";
 import { logger } from "@/lib/utils/logger";
 import { ensureUniqueProductSlug } from "./product-slug-utils";
+import { invalidateAdminProductsListCache } from "./admin-products-read/list-cache";
 
 const PRODUCT_CREATE_TX_TIMEOUT_MS = 30000;
 const PRODUCT_CREATE_TX_MAX_WAIT_MS = 5000;
@@ -432,6 +433,7 @@ class AdminProductsCreateService {
         revalidatePath('/products');
         // @ts-expect-error - revalidateTag type issue in Next.js
         revalidateTag('products');
+        invalidateAdminProductsListCache();
       } catch (e) {
         console.warn('⚠️ [ADMIN PRODUCTS CREATE SERVICE] Revalidation failed:', e);
       }

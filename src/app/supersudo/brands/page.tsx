@@ -10,6 +10,7 @@ import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { ClaySelect } from '../../../components/ClaySelect';
+import { useAdminBrands } from '../providers/AdminReferenceDataProvider';
 interface Brand {
   id: string;
   name: string;
@@ -27,6 +28,7 @@ interface BrandFormData {
 function BrandsSection() {
   const { t } = useTranslation();
   const { confirm: confirmDialog } = useAdminDialogs();
+  const { brands: sharedBrands, loading: sharedBrandsLoading, refetchBrands } = useAdminBrands();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -52,21 +54,24 @@ function BrandsSection() {
   const fetchBrands = useCallback(async () => {
     try {
       setLoading(true);
-      logger.debug('🏷️ [ADMIN] Fetching brands...');
-      const response = await apiClient.get<{ data: Brand[] }>('/api/v1/admin/brands');
-      setBrands(response.data || []);
-      logger.debug('✅ [ADMIN] Brands loaded:', response.data?.length || 0);
+      logger.debug('🏷️ [ADMIN] Refreshing brands...');
+      const data = await refetchBrands();
+      setBrands((data as Brand[]) || []);
+      logger.debug('✅ [ADMIN] Brands loaded:', data.length);
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching brands:', err);
       setBrands([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refetchBrands]);
 
   useEffect(() => {
-    fetchBrands();
-  }, [fetchBrands]);
+    if (!sharedBrandsLoading) {
+      setBrands(sharedBrands as Brand[]);
+      setLoading(false);
+    }
+  }, [sharedBrands, sharedBrandsLoading]);
 
   const handleDeleteBrand = async (brandId: string, brandName: string) => {
     const isConfirmed = await confirmDialog({

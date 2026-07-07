@@ -5,14 +5,9 @@ import { buildProductWhereClause, buildProductOrderByClause } from "./query-buil
 import { executeProductListQuery, executeProductDetailQuery } from "./query-executor";
 import { formatProductForList } from "./product-formatter";
 import { formatVariantForAdmin } from "./variant-formatter";
+import { withAdminProductsListCache } from "./list-cache";
 
-/**
- * Get products for admin
- */
-export async function getProducts(filters: ProductFilters) {
-  logger.debug("getProducts called with filters", { filters });
-  const startTime = Date.now();
-  
+async function fetchProductsFromDb(filters: ProductFilters) {
   const page = filters.page || 1;
   const limit = filters.limit || 20;
   const skip = (page - 1) * limit;
@@ -23,11 +18,7 @@ export async function getProducts(filters: ProductFilters) {
   logger.debug('Executing database queries...', { where: JSON.stringify(where, null, 2) });
 
   const { products, total } = await executeProductListQuery(where, orderBy, skip, limit);
-
   const data = products.map(formatProductForList);
-
-  const totalTime = Date.now() - startTime;
-  logger.debug(`getProducts completed in ${totalTime}ms. Returning ${data.length} products`);
 
   return {
     data,
@@ -38,6 +29,21 @@ export async function getProducts(filters: ProductFilters) {
       totalPages: Math.ceil(total / limit),
     },
   };
+}
+
+/**
+ * Get products for admin
+ */
+export async function getProducts(filters: ProductFilters) {
+  logger.debug("getProducts called with filters", { filters });
+  const startTime = Date.now();
+
+  const result = await withAdminProductsListCache(filters, () => fetchProductsFromDb(filters));
+
+  const totalTime = Date.now() - startTime;
+  logger.debug(`getProducts completed in ${totalTime}ms. Returning ${result.data.length} products`);
+
+  return result;
 }
 
 /**

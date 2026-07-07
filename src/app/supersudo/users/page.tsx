@@ -1,10 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { apiClient } from '../../../lib/api-client';
+import {
+  buildAdminListQueryKey,
+  fetchAdminList,
+  invalidateAdminQueryPrefix,
+} from '@/lib/admin/admin-fetch';
+import {
+  hydrateAdminListFromCache,
+  useAdminQuerySubscription,
+} from '@/lib/admin/admin-list-cache-ui';
+import { ADMIN_LIST_STALE_MS, ADMIN_QUERY_PREFIX } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import {
   ADMIN_TABLE,
@@ -70,41 +80,76 @@ export default function UsersPage() {
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
 
-  const fetchUsers = useCallback(async () => {
+  const usersListParams = useMemo(
+    () => ({
+      page: page.toString(),
+      limit: '20',
+      search: search || '',
+      role: roleFilter === 'all' ? '' : roleFilter,
+    }),
+    [page, search, roleFilter]
+  );
+
+  const usersListCacheKey = useMemo(
+    () => buildAdminListQueryKey(ADMIN_QUERY_PREFIX.users, usersListParams),
+    [usersListParams]
+  );
+
+  const applyUsersResponse = useCallback((response: UsersResponse) => {
+    setUsers(response.data || []);
+    setMeta(response.meta || null);
+  }, []);
+
+  useAdminQuerySubscription(
+    usersListCacheKey,
+    isLoggedIn && isAdmin,
+    applyUsersResponse
+  );
+
+  const fetchUsers = useCallback(async (force = false) => {
     try {
-      setLoading(true);
+      hydrateAdminListFromCache<UsersResponse>(
+        usersListCacheKey,
+        force,
+        setLoading,
+        applyUsersResponse
+      );
       logger.debug('👥 [ADMIN] Fetching users...', { page, search, roleFilter });
-      
-      const response = await apiClient.get<UsersResponse>('/api/v1/admin/users', {
-        params: {
-          page: page.toString(),
-          limit: '20',
-          search: search || '',
-          role: roleFilter === 'all' ? '' : roleFilter,
-        },
-      });
+
+      const response = await fetchAdminList<UsersResponse>(
+        ADMIN_QUERY_PREFIX.users,
+        '/api/v1/admin/users',
+        usersListParams,
+        ADMIN_LIST_STALE_MS,
+        force
+      );
 
       logger.debug('✅ [ADMIN] Users fetched:', response);
-      setUsers(response.data || []);
-      setMeta(response.meta || null);
+      applyUsersResponse(response);
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching users:', err);
     } finally {
       setLoading(false);
     }
-  }, [page, search, roleFilter]);
+  }, [usersListCacheKey, usersListParams, applyUsersResponse, page, search, roleFilter]);
 
   useEffect(() => {
     if (isLoggedIn && isAdmin) {
-      fetchUsers();
+      void fetchUsers();
     }
-     
-  }, [isLoggedIn, isAdmin, page, search, roleFilter]);
+  }, [isLoggedIn, isAdmin, fetchUsers]);
+
+  const refetchUsers = useCallback(async () => {
+    invalidateAdminQueryPrefix(ADMIN_QUERY_PREFIX.users);
+    await fetchUsers(true);
+  }, [fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchUsers();
+    if (page === 1) {
+      void refetchUsers();
+    }
   };
 
   const toggleSelect = (id: string) => {
@@ -152,7 +197,7 @@ export default function UsersPage() {
       );
       const failed = results.filter(r => r.status === 'rejected');
       setSelectedIds(new Set());
-      await fetchUsers();
+      await refetchUsers();
       alert(t('admin.users.bulkDeleteFinished').replace('{success}', (ids.length - failed.length).toString()).replace('{total}', ids.length.toString()));
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete users error:', err);
@@ -172,7 +217,7 @@ export default function UsersPage() {
       logger.debug(`✅ [ADMIN] User ${newStatus ? 'blocked' : 'unblocked'} successfully`);
       
       // Refresh users list
-      fetchUsers();
+      void refetchUsers();
       
       if (newStatus) {
         alert(t('admin.users.userBlocked').replace('{name}', userName));

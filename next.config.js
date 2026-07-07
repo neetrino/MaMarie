@@ -26,7 +26,6 @@ const DEV_LAN_ALLOWED_ORIGINS = [
 
 const nextConfig = {
   reactStrictMode: true,
-  optimizePackageImports: ['lucide-react'],
   allowedDevOrigins: DEV_LAN_ALLOWED_ORIGINS,
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,

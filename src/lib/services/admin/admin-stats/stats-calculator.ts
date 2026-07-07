@@ -1,81 +1,63 @@
+import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 
+const REVENUE_WHERE = {
+  OR: [{ status: "completed" }, { paymentStatus: "paid" }],
+};
+
+type StatsAggregateRow = {
+  total_users: number;
+  total_products: number;
+  low_stock_products: number;
+  total_orders: number;
+  recent_orders: number;
+  pending_orders: number;
+  revenue_total: number;
+};
+
 /**
- * Get dashboard stats
+ * Get dashboard stats (single SQL round-trip + currency sample).
  */
 export async function getStats() {
-  // Count users
-  const totalUsers = await db.user.count({
-    where: { deletedAt: null },
-  });
-
-  // Count products
-  const totalProducts = await db.product.count({
-    where: { deletedAt: null },
-  });
-
-  // Count products with low stock (stock < 10)
-  const lowStockProducts = await db.productVariant.count({
-    where: {
-      stock: { lt: 10 },
-      published: true,
-    },
-  });
-
-  // Count orders
-  const totalOrders = await db.order.count();
-
-  // Count recent orders (last 7 days)
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const recentOrders = await db.order.count({
-    where: {
-      createdAt: { gte: sevenDaysAgo },
-    },
-  });
 
-  // Count pending orders
-  const pendingOrders = await db.order.count({
-    where: { status: "pending" },
-  });
+  const [statsRows, currencySample] = await Promise.all([
+    db.$queryRaw<StatsAggregateRow[]>(Prisma.sql`
+      SELECT
+        (SELECT COUNT(*)::int FROM users WHERE "deletedAt" IS NULL) AS total_users,
+        (SELECT COUNT(*)::int FROM products WHERE "deletedAt" IS NULL) AS total_products,
+        (SELECT COUNT(*)::int FROM product_variants WHERE stock < 10 AND published = true) AS low_stock_products,
+        (SELECT COUNT(*)::int FROM orders) AS total_orders,
+        (SELECT COUNT(*)::int FROM orders WHERE "createdAt" >= ${sevenDaysAgo}) AS recent_orders,
+        (SELECT COUNT(*)::int FROM orders WHERE status = 'pending') AS pending_orders,
+        (SELECT COALESCE(SUM(total), 0)::float FROM orders WHERE status = 'completed' OR "paymentStatus" = 'paid') AS revenue_total
+    `),
+    db.order.findFirst({
+      where: REVENUE_WHERE,
+      select: { currency: true },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
 
-  // Calculate total revenue from completed/paid orders
-  const completedOrders = await db.order.findMany({
-    where: {
-      OR: [
-        { status: "completed" },
-        { paymentStatus: "paid" },
-      ],
-    },
-    select: {
-      total: true,
-      currency: true,
-    },
-  });
-
-  const totalRevenue = completedOrders.reduce((sum: number, order: { total: number; currency: string | null }) => sum + order.total, 0);
-  const currency = completedOrders[0]?.currency || "AMD";
+  const row = statsRows[0];
 
   return {
     users: {
-      total: totalUsers,
+      total: row?.total_users ?? 0,
     },
     products: {
-      total: totalProducts,
-      lowStock: lowStockProducts,
+      total: row?.total_products ?? 0,
+      lowStock: row?.low_stock_products ?? 0,
     },
     orders: {
-      total: totalOrders,
-      recent: recentOrders,
-      pending: pendingOrders,
+      total: row?.total_orders ?? 0,
+      recent: row?.recent_orders ?? 0,
+      pending: row?.pending_orders ?? 0,
     },
     revenue: {
-      total: totalRevenue,
-      currency,
+      total: row?.revenue_total ?? 0,
+      currency: currencySample?.currency || "AMD",
     },
   };
 }
-
-
-
-
