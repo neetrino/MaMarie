@@ -33,10 +33,13 @@ export function ProfilePersonalInfo({
 }: ProfilePersonalInfoProps) {
   return (
     <ProfileSectionCard mobileFrameless>
-      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS}`}>
-        {t('profile.personal.title')}
-      </h2>
-      <form onSubmit={onSave} className="mx-auto max-w-xl space-y-6 lg:mx-0 lg:max-w-2xl">
+      <div className="mx-auto w-full max-w-lg lg:max-w-xl">
+        <h2
+          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} text-center`}
+        >
+          {t('profile.personal.title')}
+        </h2>
+        <form onSubmit={onSave} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
           <Input
             label={t('profile.personal.firstName')}
@@ -69,7 +72,7 @@ export function ProfilePersonalInfo({
           placeholder={t('profile.personal.phonePlaceholder')}
           className={PROFILE_DESKTOP_INPUT_CLASS}
         />
-        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4 sm:pt-4">
+        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-center sm:gap-4 sm:pt-4">
           <ProfileClayButton
             type="button"
             variant="secondary"
@@ -95,6 +98,7 @@ export function ProfilePersonalInfo({
           </ProfileClayButton>
         </div>
       </form>
+      </div>
     </ProfileSectionCard>
   );
 }

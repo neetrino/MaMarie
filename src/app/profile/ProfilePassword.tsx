@@ -29,10 +29,13 @@ export function ProfilePassword({
 }: ProfilePasswordProps) {
   return (
     <ProfileSectionCard mobileFrameless>
-      <h2 className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS}`}>
-        {t('profile.password.title')}
-      </h2>
-      <form onSubmit={onSave} className="mx-auto max-w-xl space-y-6 lg:mx-0 lg:max-w-2xl">
+      <div className="mx-auto w-full max-w-md lg:max-w-lg">
+        <h2
+          className={`${PROFILE_DESKTOP_SECTION_TITLE_CLASS} ${PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS} text-center`}
+        >
+          {t('profile.password.title')}
+        </h2>
+        <form onSubmit={onSave} className="space-y-6">
         <Input
           label={t('profile.password.currentPassword')}
           type="password"
@@ -60,7 +63,7 @@ export function ProfilePassword({
           className={PROFILE_DESKTOP_INPUT_CLASS}
           required
         />
-        <div className="pt-2 sm:pt-4">
+        <div className="flex justify-center pt-2 sm:pt-4">
           <ProfileClayButton
             type="submit"
             variant="primary"
@@ -71,6 +74,7 @@ export function ProfilePassword({
           </ProfileClayButton>
         </div>
       </form>
+      </div>
     </ProfileSectionCard>
   );
 }
