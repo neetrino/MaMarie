@@ -317,8 +317,9 @@ function ProductsTableLoadedView({
                     onClick={(event) => {
                       event.stopPropagation();
                       handleToggleFeatured(product.id, Boolean(product.featured));
+                      event.currentTarget.blur();
                     }}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded transition-all duration-200 hover:scale-110 focus:outline-none ${
                       togglingFeaturedIds.has(product.id) ? 'cursor-wait opacity-75' : ''
                     }`}
                     title={
