@@ -10,10 +10,11 @@ import { warmStorefrontCatalogRoute } from '../../lib/storefront/storefront-cata
 const HOME_GENDER_PREFETCH_IDLE_TIMEOUT_MS = 4_000;
 const HOME_GENDER_PREFETCH_FALLBACK_DELAY_MS = 2_000;
 
-/** Warms girls/boys catalog APIs while the home hero is visible. */
+/** Warms default + girls/boys catalog APIs while the home page is visible. */
 export function HomeGenderCatalogPrefetch() {
   useEffect(() => {
     const warmGenderCatalogs = () => {
+      warmStorefrontCatalogRoute('/products');
       warmStorefrontCatalogRoute(
         homeGenderCategoryProductsHref(HOME_GENDER_CATEGORY_SLUG.girls)
       );

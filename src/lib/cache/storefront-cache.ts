@@ -20,6 +20,8 @@ export const STOREFRONT_CACHE_TTL = {
   productDetails: 300,
   /** PDP related carousel (same shape as list items). */
   productRelated: 180,
+  /** Published partner stores list. */
+  partnerStores: 300,
 } as const;
 
 export const STOREFRONT_CACHE_KEYS = {
@@ -33,6 +35,7 @@ export const STOREFRONT_CACHE_KEYS = {
   productVisual: (lang: string, slug: string) => `product:visual:${lang}:${slug}`,
   productDetails: (lang: string, slug: string) => `product:details:${lang}:${slug}`,
   productRelated: (lang: string, slug: string) => `product:related:v2:${lang}:${slug}`,
+  partnerStores: (lang: string) => `partner-stores:${lang}`,
 } as const;
 
 /** Deterministic cache key fragment from URL search params (sorted keys). */
@@ -126,4 +129,9 @@ export async function invalidateProductPageCaches(): Promise<void> {
     cacheService.deletePattern("product:details:*"),
     cacheService.deletePattern("product:related:*"),
   ]);
+}
+
+/** After partner store create/update/delete (admin). */
+export async function invalidatePartnerStoresStorefrontCache(): Promise<void> {
+  await cacheService.deletePattern("partner-stores:*");
 }

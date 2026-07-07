@@ -4,10 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { HEADER_CONTENT_CLEARANCE_MOBILE_PX } from '../../../constants/header';
 import {
-  HOME_GENDER_CATEGORY_SLUG,
-  homeGenderCategoryProductsHref,
-} from '../../../constants/home-gender-categories';
-import {
   MOBILE_HOME_ASSETS,
   MOBILE_HOME_GENDER_BOYS_BG,
   MOBILE_HOME_GENDER_BUTTON_GAP_PX,
@@ -19,7 +15,11 @@ import {
   MOBILE_HOME_HORIZONTAL_PADDING_PX,
 } from '../../../constants/mobile-home';
 import { useTranslation } from '../../../lib/i18n-client';
-import { warmStorefrontCatalogRoute } from '../../../lib/storefront/storefront-catalog-prefetch';
+import { mergeStorefrontCatalogPrefetchProps } from '../../../lib/storefront/storefront-catalog-prefetch';
+import {
+  HOME_GENDER_CATEGORY_SLUG,
+  homeGenderCategoryProductsHref,
+} from '../../../constants/home-gender-categories';
 import { MobileHomeSaleBanner } from './MobileHomeSaleBanner';
 import { MobileHomeSearchField } from './MobileHomeSearchField';
 
@@ -31,22 +31,17 @@ interface GenderCtaProps {
 }
 
 function GenderCta({ href, label, backgroundColor, chevronSrc }: GenderCtaProps) {
-  const handlePrefetch = () => {
-    warmStorefrontCatalogRoute(href);
-  };
+  const prefetchProps = mergeStorefrontCatalogPrefetchProps(href);
 
   return (
     <Link
       href={href}
-      prefetch
-      onMouseEnter={handlePrefetch}
-      onFocus={handlePrefetch}
-      onTouchStart={handlePrefetch}
       className="flex min-w-0 flex-1 items-center justify-between rounded-full pl-5 pr-2.5 text-sm font-semibold leading-7 text-white"
       style={{
         height: MOBILE_HOME_GENDER_BUTTON_HEIGHT_PX,
         backgroundColor,
       }}
+      {...prefetchProps}
     >
       <span className="truncate">{label}</span>
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">

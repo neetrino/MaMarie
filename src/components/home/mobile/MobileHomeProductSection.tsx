@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { StorefrontCatalogLink } from '../../storefront/StorefrontCatalogLink';
 import {
   MOBILE_HOME_ASSETS,
   MOBILE_HOME_HORIZONTAL_PADDING_PX,
@@ -61,7 +61,7 @@ export function MobileHomeProductSection({
           {t('home.mobile.forYou')}
         </h2>
 
-        <Link
+        <StorefrontCatalogLink
           href={seeAllHref}
           className="flex shrink-0 items-center justify-center bg-white transition-opacity hover:opacity-80"
           style={{
@@ -79,7 +79,7 @@ export function MobileHomeProductSection({
             height={MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX}
             className="rotate-90"
           />
-        </Link>
+        </StorefrontCatalogLink>
       </div>
 
       <div

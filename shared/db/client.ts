@@ -133,10 +133,27 @@ function createPrismaClient(): PrismaClient {
   return extendClientWithSemaphore(base, semaphore);
 }
 
-export const db = globalForPrisma.prisma ?? createPrismaClient();
+function isPrismaClientSchemaCurrent(client: PrismaClient): boolean {
+  const delegate = (client as PrismaClient & { partnerStore?: { findMany?: unknown } }).partnerStore;
+  return typeof delegate?.findMany === "function";
+}
 
-// Reuse one client per serverless isolate (Vercel/Next) and across dev HMR.
-globalForPrisma.prisma = db;
+function resolvePrismaClient(): PrismaClient {
+  const cached = globalForPrisma.prisma;
+  if (cached && (process.env.NODE_ENV === "production" || isPrismaClientSchemaCurrent(cached))) {
+    return cached;
+  }
+
+  if (cached) {
+    void cached.$disconnect().catch(() => undefined);
+  }
+
+  const client = createPrismaClient();
+  globalForPrisma.prisma = client;
+  return client;
+}
+
+export const db = resolvePrismaClient();
 
 let dbReadyPromise: Promise<void> | null = null;
 let dbResetPromise: Promise<void> | null = null;

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { StorefrontCatalogLink } from '../storefront/StorefrontCatalogLink';
 import {
   HOME_SECTION_CHEVRON_SIZE_PX,
   HOME_SECTION_HEADING_MIN_HEIGHT_PX,
@@ -92,7 +92,7 @@ export function HomeSectionHeadingRow({
       </h2>
 
       {showSeeAllLink ? (
-      <Link
+      <StorefrontCatalogLink
         href={seeAllHref}
         className="group inline-flex shrink-0 items-center font-bold transition-transform duration-300 ease-out hover:-translate-y-0.5 focus-visible:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0"
         style={{
@@ -111,7 +111,7 @@ export function HomeSectionHeadingRow({
           aria-hidden
           className="shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-focus-visible:translate-x-0"
         />
-      </Link>
+      </StorefrontCatalogLink>
       ) : null}
     </div>
   );

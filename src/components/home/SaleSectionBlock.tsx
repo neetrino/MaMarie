@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { StorefrontCatalogLink } from '../storefront/StorefrontCatalogLink';
 import {
   SALE_BANNER_BG,
   SALE_BANNER_CONTENT_LEFT_PX,
@@ -112,7 +112,7 @@ export function SaleSectionBlock() {
             {t('home.sale.banner.subtitle')}
           </p>
 
-          <Link
+          <StorefrontCatalogLink
             href="/products"
             className="inline-flex w-fit items-center justify-center rounded-full bg-white font-bold transition-opacity hover:opacity-90"
             style={{
@@ -126,7 +126,7 @@ export function SaleSectionBlock() {
             }}
           >
             {t('home.sale.banner.cta')}
-          </Link>
+          </StorefrontCatalogLink>
         </div>
       </section>
     </>

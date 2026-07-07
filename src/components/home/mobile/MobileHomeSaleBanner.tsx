@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { StorefrontCatalogLink } from '../../storefront/StorefrontCatalogLink';
 import {
   MOBILE_HOME_ASSETS,
   MOBILE_HOME_SALE_BANNER_BG,
@@ -111,7 +111,7 @@ export function MobileHomeSaleBanner() {
         </div>
       </div>
 
-      <Link
+      <StorefrontCatalogLink
         href="/products"
         className="mobile-home-sale-cta absolute flex items-center rounded-full bg-white pr-2.5 text-sm font-medium text-brand-brown"
       >
@@ -130,7 +130,7 @@ export function MobileHomeSaleBanner() {
             className="mobile-home-sale-cta__arrow rotate-90"
           />
         </span>
-      </Link>
+      </StorefrontCatalogLink>
     </div>
   );
 }

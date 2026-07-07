@@ -9,6 +9,7 @@ const CACHE_KEYS = {
   categories: 'admin:categories',
   brands: 'admin:brands',
   attributes: 'admin:attributes',
+  partnerStores: 'admin:partner-stores',
 } as const;
 
 export function withAdminCategoriesCache<T>(fetcher: () => Promise<T>): Promise<T> {
@@ -23,10 +24,15 @@ export function withAdminAttributesCache<T>(fetcher: () => Promise<T>): Promise<
   return withServerReadCache(CACHE_KEYS.attributes, ADMIN_REFERENCE_CACHE_TTL_MS, fetcher);
 }
 
+export function withAdminPartnerStoresCache<T>(fetcher: () => Promise<T>): Promise<T> {
+  return withServerReadCache(CACHE_KEYS.partnerStores, ADMIN_REFERENCE_CACHE_TTL_MS, fetcher);
+}
+
 export function invalidateAdminReferenceCaches(): void {
   invalidateServerReadCache(CACHE_KEYS.categories);
   invalidateServerReadCache(CACHE_KEYS.brands);
   invalidateServerReadCache(CACHE_KEYS.attributes);
+  invalidateServerReadCache(CACHE_KEYS.partnerStores);
 }
 
 export function invalidateAdminCategoriesCache(): void {
@@ -39,4 +45,8 @@ export function invalidateAdminBrandsCache(): void {
 
 export function invalidateAdminAttributesCache(): void {
   invalidateServerReadCache(CACHE_KEYS.attributes);
+}
+
+export function invalidateAdminPartnerStoresCache(): void {
+  invalidateServerReadCache(CACHE_KEYS.partnerStores);
 }

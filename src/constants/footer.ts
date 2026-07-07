@@ -164,7 +164,7 @@ export interface FooterNavLink {
 export const FOOTER_COMPANY_LINKS: FooterNavLink[] = [
   { labelKey: 'common.footer.company.shop', href: '/products' },
   { labelKey: 'common.footer.company.about', href: '/about' },
-  { labelKey: 'common.footer.company.partners', href: '/about' },
+  { labelKey: 'common.footer.company.partners', href: '/stores' },
   { labelKey: 'common.footer.company.categories', href: '/products' },
   { labelKey: 'common.footer.company.contact', href: '/contact' },
 ];

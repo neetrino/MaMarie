@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { StorefrontCatalogLink } from '../storefront/StorefrontCatalogLink';
 import {
   NOT_FOUND_ACTIONS_GAP_PX,
   NOT_FOUND_ASSETS,
@@ -30,7 +30,7 @@ function NotFoundActionButton({
   iconSrc,
 }: NotFoundActionButtonProps) {
   return (
-    <Link
+    <StorefrontCatalogLink
       href={href}
       className={`${CLAY_PRIMARY_BUTTON_CLASS} inline-flex w-auto max-w-full whitespace-nowrap`}
       style={{
@@ -49,7 +49,7 @@ function NotFoundActionButton({
         />
       ) : null}
       <span>{label}</span>
-    </Link>
+    </StorefrontCatalogLink>
   );
 }
 

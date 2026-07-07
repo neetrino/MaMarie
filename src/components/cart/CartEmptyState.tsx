@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { StorefrontCatalogLink } from '../storefront/StorefrontCatalogLink';
 import { useLayoutEffect, useRef, useState } from 'react';
 import {
   CART_EMPTY_ASSETS,
@@ -91,7 +91,7 @@ export function CartEmptyState({ t, onCtaClick }: CartEmptyStateProps) {
         </div>
       </div>
 
-      <Link
+      <StorefrontCatalogLink
         href="/products"
         onClick={onCtaClick}
         className="flex items-center justify-between rounded-full bg-brand-pink py-[5px] pl-6 pr-[9px] text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -118,7 +118,7 @@ export function CartEmptyState({ t, onCtaClick }: CartEmptyStateProps) {
             aria-hidden
           />
         </span>
-      </Link>
+      </StorefrontCatalogLink>
     </div>
   );
 }

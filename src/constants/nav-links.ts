@@ -1,5 +1,5 @@
 /** i18n keys under `common.navigation.*` */
-export type NavLinkKey = 'home' | 'catalog' | 'about' | 'partners' | 'contact';
+export type NavLinkKey = 'home' | 'catalog' | 'about' | 'stores' | 'contact';
 
 export interface NavLinkItem {
   href: string;
@@ -11,7 +11,7 @@ export const NAV_LINKS: readonly NavLinkItem[] = [
   { href: '/', labelKey: 'home' },
   { href: '/products', labelKey: 'catalog' },
   { href: '/about', labelKey: 'about' },
-  { href: '/about', labelKey: 'partners' },
+  { href: '/stores', labelKey: 'stores' },
   { href: '/contact', labelKey: 'contact' },
 ] as const;
 
@@ -37,8 +37,8 @@ export function isNavLinkActive(labelKey: NavLinkKey, pathname: string): boolean
   if (labelKey === 'about') {
     return pathname.startsWith('/about');
   }
-  if (labelKey === 'partners') {
-    return pathname.startsWith('/about');
+  if (labelKey === 'stores') {
+    return pathname.startsWith('/stores');
   }
   if (labelKey === 'contact') {
     return pathname.startsWith('/contact');
