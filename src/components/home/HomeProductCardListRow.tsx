@@ -33,6 +33,7 @@ import {
 import { formatPrice } from '../../lib/currency';
 import { homeProductCardLayoutPx, resolveHomeProductCardTypography } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
+import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCurrency } from '../hooks/useCurrency';
 import { useWishlist } from '../hooks/useWishlist';
@@ -79,7 +80,7 @@ function HomeProductCardListRowComponent({
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    toggleWishlist();
+    toggleWishlist(buildWishlistSnapshotFromHomeCard(product));
     event.currentTarget.blur();
   };
 

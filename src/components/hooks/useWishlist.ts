@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import { WISHLIST_KEY } from '../../lib/storageCounts';
 import { logger } from '../../lib/utils/logger';
+import {
+  cacheWishlistProduct,
+  pruneWishlistProductCache,
+  removeWishlistProductFromCache,
+  type WishlistProductSnapshotInput,
+} from '../../lib/wishlist-product-cache';
 
 export interface WishlistUpdatedDetail {
   ids: string[];
@@ -50,7 +56,7 @@ export function useWishlist(productId: string) {
     };
   }, [productId]);
 
-  const toggleWishlist = () => {
+  const toggleWishlist = (snapshot?: WishlistProductSnapshotInput) => {
     if (typeof window === 'undefined') return;
     
     try {
@@ -61,6 +67,14 @@ export function useWishlist(productId: string) {
         : wishlist.filter((id) => id !== productId);
 
       window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
+      if (nextIsInWishlist) {
+        if (snapshot) {
+          cacheWishlistProduct(snapshot);
+        }
+      } else {
+        removeWishlistProductFromCache(productId);
+      }
+      pruneWishlistProductCache(updated);
       setIsInWishlist(nextIsInWishlist);
       
       window.dispatchEvent(

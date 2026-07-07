@@ -49,6 +49,7 @@ import {
 } from '../../lib/mobile-products-catalog-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
+import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { resolveComparePrice } from '../home/home-product-card-shared';
 import type { HomeProductCardData } from '../home/HomeProductCard';
 import { MobileProductsCatalogColorSwatches } from './MobileProductsCatalogColorSwatches';
@@ -128,7 +129,7 @@ function MobileProductsCatalogProductCardComponent({
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    toggleWishlist();
+    toggleWishlist(buildWishlistSnapshotFromHomeCard(product));
     event.currentTarget.blur();
   };
 

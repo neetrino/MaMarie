@@ -2,9 +2,17 @@ import type { MouseEvent } from 'react';
 import { WISHLIST_KEY, COMPARE_KEY } from '../types';
 import { t } from '../../../../lib/i18n';
 import type { LanguageCode } from '../../../../lib/language';
+import {
+  cacheWishlistProduct,
+  pruneWishlistProductCache,
+  removeWishlistProductFromCache,
+  type WishlistProductSnapshotInput,
+} from '../../../../lib/wishlist-product-cache';
+import type { WishlistUpdatedDetail } from '../../../../components/hooks/useWishlist';
 
 interface UseProductActionsProps {
   productId: string | null;
+  productSnapshot?: WishlistProductSnapshotInput | null;
   isInWishlist: boolean;
   setIsInWishlist: (value: boolean) => void;
   isInCompare: boolean;
@@ -15,6 +23,7 @@ interface UseProductActionsProps {
 
 export function useProductActions({
   productId,
+  productSnapshot,
   isInWishlist,
   setIsInWishlist,
   isInCompare,
@@ -32,15 +41,30 @@ export function useProductActions({
       const wishlist: string[] = stored ? JSON.parse(stored) : [];
       
       if (isInWishlist) {
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist.filter(id => id !== productId)));
+        const updated = wishlist.filter(id => id !== productId);
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
+        removeWishlistProductFromCache(productId);
+        pruneWishlistProductCache(updated);
         setIsInWishlist(false);
+        window.dispatchEvent(
+          new CustomEvent<WishlistUpdatedDetail>('wishlist-updated', {
+            detail: { ids: updated, count: updated.length },
+          }),
+        );
       } else {
-        wishlist.push(productId);
-        localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+        const updated = [...wishlist, productId];
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify(updated));
+        if (productSnapshot) {
+          cacheWishlistProduct(productSnapshot);
+        }
+        pruneWishlistProductCache(updated);
         setIsInWishlist(true);
+        window.dispatchEvent(
+          new CustomEvent<WishlistUpdatedDetail>('wishlist-updated', {
+            detail: { ids: updated, count: updated.length },
+          }),
+        );
       }
-
-      window.dispatchEvent(new Event('wishlist-updated'));
     } catch {
       // Silently fail
     }
@@ -82,7 +106,3 @@ export function useProductActions({
     handleCompareToggle,
   };
 }
-
-
-
-

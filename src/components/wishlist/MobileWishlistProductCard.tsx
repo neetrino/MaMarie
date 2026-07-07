@@ -58,6 +58,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { formatPrice } from '../../lib/currency';
 import { mobileWishlistCardLayoutPx, resolveMobileWishlistCardHeightPx } from '../../lib/mobile-wishlist-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
+import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { resolveComparePrice } from '../home/home-product-card-shared';
 import type { HomeProductCardData } from '../home/HomeProductCard';
@@ -125,7 +126,7 @@ function MobileWishlistProductCardComponent({
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    toggleWishlist();
+    toggleWishlist(buildWishlistSnapshotFromHomeCard(product));
     event.currentTarget.blur();
   };
 

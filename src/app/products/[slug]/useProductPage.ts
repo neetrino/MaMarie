@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getStoredCurrency, DEFAULT_CURRENCY } from '../../../lib/currency';
 import { getStoredLanguage, DEFAULT_LANGUAGE, type LanguageCode } from '../../../lib/language';
 import { t } from '../../../lib/i18n';
+import { buildWishlistProductSnapshot } from '../../../lib/wishlist-product-cache';
 import type { Review } from '../../../components/ProductReviews/utils';
 import { useAttributeGroups } from './useAttributeGroups';
 import { useProductImages } from './hooks/useProductImages';
@@ -118,8 +119,42 @@ export function useProductPage({
     initialReviews,
   });
 
+  const wishlistSnapshot = useMemo(() => {
+    if (!product) {
+      return null;
+    }
+
+    return buildWishlistProductSnapshot({
+      id: product.id,
+      slug: product.slug,
+      title: product.title,
+      price,
+      originalPrice,
+      compareAtPrice,
+      discountPercent,
+      image: images[0] ?? currentVariant?.imageUrl ?? null,
+      inStock: !isOutOfStock,
+      brand: product.brand ? { id: product.brand.id, name: product.brand.name } : null,
+      defaultVariantId: currentVariant?.id ?? product.variants[0]?.id ?? null,
+      averageRating,
+      reviewsCount: reviews.length,
+    });
+  }, [
+    product,
+    price,
+    originalPrice,
+    compareAtPrice,
+    discountPercent,
+    images,
+    currentVariant,
+    isOutOfStock,
+    averageRating,
+    reviews.length,
+  ]);
+
   const { handleAddToWishlist, handleCompareToggle } = useProductActions({
     productId: product?.id || null,
+    productSnapshot: wishlistSnapshot,
     isInWishlist,
     setIsInWishlist,
     isInCompare,

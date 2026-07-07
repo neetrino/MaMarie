@@ -38,6 +38,7 @@ import {
 } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
+import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
@@ -156,7 +157,7 @@ function HomeProductCardComponent({
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    toggleWishlist();
+    toggleWishlist(buildWishlistSnapshotFromHomeCard(product));
     event.currentTarget.blur();
   };
 
