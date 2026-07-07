@@ -11,15 +11,11 @@ import { getStoredLanguage } from '@/lib/language';
 import {
   BEST_PRODUCTS_ASSETS,
   BEST_PRODUCTS_HEADING_COLOR,
-  BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX,
-  BEST_PRODUCTS_HEADING_PADDING_Y_PX,
   BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX,
 } from '@/constants/home-sections';
 import {
-  RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX,
   RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX,
   RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX,
-  RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES,
 } from '@/constants/products-catalog';
 import {
   STORES_LIST_PANEL_WIDTH_PX,
@@ -28,6 +24,10 @@ import {
   STORES_PAGE_CARD_RADIUS_PX,
   STORES_PAGE_CARD_SHADOW,
   STORES_PAGE_COLUMN_GAP_PX,
+  STORES_PAGE_HEADING_BOTTOM_GAP_LG_PX,
+  STORES_PAGE_HEADING_BOTTOM_GAP_PX,
+  STORES_PAGE_HEADING_MIN_HEIGHT_PX,
+  STORES_PAGE_HEADING_PADDING_Y_PX,
   STORES_PAGE_MAX_WIDTH_PX,
   STORES_PANEL_HEIGHT_PX,
 } from '@/constants/stores-page';
@@ -126,7 +126,13 @@ export function StoresPageClient() {
       className="mx-auto w-full max-w-full px-5 pb-8 pt-7 lg:px-8 lg:pb-12 lg:pt-12"
       style={{ backgroundColor: STORES_PAGE_BG, maxWidth: STORES_PAGE_MAX_WIDTH_PX }}
     >
-      <header className="mb-6 lg:mb-8">
+      <header
+        className="mb-[var(--stores-heading-gap)] lg:mb-[var(--stores-heading-gap-lg)]"
+        style={{
+          ['--stores-heading-gap' as string]: `${STORES_PAGE_HEADING_BOTTOM_GAP_PX}px`,
+          ['--stores-heading-gap-lg' as string]: `${STORES_PAGE_HEADING_BOTTOM_GAP_LG_PX}px`,
+        }}
+      >
         <HomeSectionHeadingRow
           id="stores-page-heading"
           title={t('stores.title')}
@@ -135,12 +141,10 @@ export function StoresPageClient() {
           color={BEST_PRODUCTS_HEADING_COLOR}
           chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
           titleLineHeightPx={BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX}
-          minHeightPx={BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX}
-          headingPaddingYPx={BEST_PRODUCTS_HEADING_PADDING_Y_PX}
+          minHeightPx={STORES_PAGE_HEADING_MIN_HEIGHT_PX}
+          headingPaddingYPx={STORES_PAGE_HEADING_PADDING_Y_PX}
           mobileTitleFontSizePx={RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX}
           mobileTitleLineHeightPx={RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX}
-          mobileMinHeightPx={RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX}
-          mobileTitleMaxLines={RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES}
           showSeeAllLink={false}
         />
       </header>
