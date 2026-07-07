@@ -1,8 +1,7 @@
 'use client';
 
-import { Button } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
-import { AdminSideSheet } from '../../components/AdminSideSheet';
+import { AdminDeleteModal } from '../../components/AdminDeleteModal';
 
 interface DeleteCategoryModalProps {
   isOpen: boolean;
@@ -21,35 +20,16 @@ export function DeleteCategoryModal({
 }: DeleteCategoryModalProps) {
   const { t } = useTranslation();
 
-  const footer = (
-    <div className="flex items-center justify-end gap-3">
-      <Button variant="outline" onClick={onCancel} disabled={deleting} className="min-w-24">
-        {t('admin.common.cancel')}
-      </Button>
-      <Button
-        variant="primary"
-        onClick={() => {
-          void onConfirm();
-        }}
-        disabled={deleting}
-        className="min-w-24 !bg-red-600 !text-white hover:!bg-red-700 focus:!ring-red-600"
-      >
-        {deleting ? `${t('admin.common.delete')}...` : t('admin.common.delete')}
-      </Button>
-    </div>
-  );
-
   return (
-    <AdminSideSheet
+    <AdminDeleteModal
       isOpen={isOpen}
       title={t('admin.common.delete')}
-      closeLabel={t('admin.common.close')}
-      onClose={onCancel}
-      footer={footer}
-    >
-      <p className="text-sm leading-6 text-gray-600">
-        {t('admin.categories.deleteConfirm').replace('{name}', categoryTitle)}
-      </p>
-    </AdminSideSheet>
+      message={t('admin.categories.deleteConfirm').replace('{name}', categoryTitle)}
+      confirming={deleting}
+      onCancel={onCancel}
+      onConfirm={() => {
+        void onConfirm();
+      }}
+    />
   );
 }

@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from '@shop/ui';
-import { ADMIN_DANGER_BUTTON_CLASS, ADMIN_OUTLINE_BUTTON_CLASS, ADMIN_PRIMARY_BUTTON_CLASS } from '../../../constants/admin-ui-classes';
 import {
   createContext,
   useCallback,
@@ -12,7 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminSideSheet } from '../components/AdminSideSheet';
+import { AdminDeleteModal } from '../components/AdminDeleteModal';
 
 type DialogType = 'confirm' | 'alert';
 
@@ -112,51 +110,27 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
     [alert, confirm],
   );
 
-  const dialogFooter = activeDialog ? (
-    <div className="flex items-center justify-end gap-3">
-      {activeDialog.type === 'confirm' ? (
-        <Button
-          variant="outline"
-          onClick={() => {
-            finishDialog(false);
-          }}
-          className={ADMIN_OUTLINE_BUTTON_CLASS}
-        >
-          {activeDialog.options.cancelText ?? t('admin.common.cancel')}
-        </Button>
-      ) : null}
-      <Button
-        variant="primary"
-        onClick={() => {
-          finishDialog(true);
-        }}
-        className={
-          activeDialog.options.destructive ? ADMIN_DANGER_BUTTON_CLASS : ADMIN_PRIMARY_BUTTON_CLASS
-        }
-      >
-        {activeDialog.options.confirmText ??
-          (activeDialog.type === 'confirm' ? t('admin.common.confirm') : t('admin.common.close'))}
-      </Button>
-    </div>
-  ) : null;
-
   return (
     <AdminDialogsContext.Provider value={contextValue}>
       {children}
 
-      <AdminSideSheet
+      <AdminDeleteModal
         isOpen={Boolean(activeDialog)}
         title={activeDialog?.options.title ?? t('admin.common.confirm')}
-        closeLabel={t('admin.common.close')}
-        onClose={() => {
+        message={activeDialog?.options.message ?? ''}
+        confirmText={
+          activeDialog?.options.confirmText ??
+          (activeDialog?.type === 'confirm' ? t('admin.common.confirm') : t('admin.common.close'))
+        }
+        cancelText={activeDialog?.options.cancelText ?? t('admin.common.cancel')}
+        showCancel={activeDialog?.type === 'confirm'}
+        onCancel={() => {
           finishDialog(false);
         }}
-        footer={dialogFooter}
-      >
-        {activeDialog ? (
-          <p className="text-sm leading-6 text-gray-600">{activeDialog.options.message}</p>
-        ) : null}
-      </AdminSideSheet>
+        onConfirm={() => {
+          finishDialog(true);
+        }}
+      />
     </AdminDialogsContext.Provider>
   );
 }

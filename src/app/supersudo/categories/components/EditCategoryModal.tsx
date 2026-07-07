@@ -7,6 +7,7 @@ import type { Category, CategoryFormData } from '../types';
 import { ParentCategorySelector } from './ParentCategorySelector';
 import { ClaySelect } from '../../../../components/ClaySelect';
 import { AdminSideSheet } from '../../components/AdminSideSheet';
+import { ADMIN_OUTLINE_BUTTON_CLASS, ADMIN_PRIMARY_BUTTON_CLASS } from '../../../../constants/admin-ui-classes';
 
 interface EditCategoryModalProps {
   isOpen: boolean;
@@ -44,11 +45,11 @@ export function EditCategoryModal({
         variant="primary"
         onClick={onSubmit}
         disabled={saving || imageUploading || !formData.title.trim()}
-        className="flex-1"
+        className={`flex-1 ${ADMIN_PRIMARY_BUTTON_CLASS}`}
       >
         {saving ? t('admin.categories.updating') : t('admin.categories.updateCategory')}
       </Button>
-      <Button variant="ghost" onClick={onClose} disabled={saving}>
+      <Button variant="outline" onClick={onClose} disabled={saving} className={ADMIN_OUTLINE_BUTTON_CLASS}>
         {t('admin.common.cancel')}
       </Button>
     </div>

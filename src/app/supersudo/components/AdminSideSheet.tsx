@@ -67,7 +67,7 @@ function AdminSideSheetPanel({
       >
         <DrawerCloseTab edge="start" onClose={onClose} closeLabel={closeLabel} />
         <aside
-          className="relative flex h-full w-full flex-col overflow-hidden rounded-l-[15px] border border-gray-100 bg-white shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
+          className="admin-side-sheet relative flex h-full w-full flex-col overflow-hidden rounded-l-[15px] border border-gray-100 bg-white shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
           style={{ zIndex: ADMIN_SIDE_SHEET_PANEL_Z_INDEX }}
           role="dialog"
           aria-modal="true"
