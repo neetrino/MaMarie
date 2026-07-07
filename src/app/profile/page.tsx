@@ -8,7 +8,8 @@ import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
-import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_ALERT_ERROR_CLASS, PROFILE_DESKTOP_ALERT_SUCCESS_CLASS, PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX, PROFILE_DESKTOP_SHELL_PADDING_TOP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
+import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX, PROFILE_DESKTOP_SHELL_PADDING_TOP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
+import { AutoDismissAlert } from '../../components/AutoDismissAlert';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
 import { ProfileOrders } from './ProfileOrders';
@@ -168,8 +169,6 @@ function ProfilePageContent() {
 
   const tabContent = (
     <>
-      {error ? <div className={PROFILE_DESKTOP_ALERT_ERROR_CLASS}>{error}</div> : null}
-      {success ? <div className={PROFILE_DESKTOP_ALERT_SUCCESS_CLASS}>{success}</div> : null}
       {activeTab === 'dashboard' && (
         <ProfileDashboard
           dashboardData={dashboardData}
@@ -247,6 +246,17 @@ function ProfilePageContent() {
 
   return (
     <>
+      <AutoDismissAlert
+        message={error}
+        variant="error"
+        onDismiss={() => setError(null)}
+      />
+      <AutoDismissAlert
+        message={success}
+        variant="success"
+        autoDismiss
+        onDismiss={() => setSuccess(null)}
+      />
       <ProfileMobilePage
         profile={profile}
         tabs={tabs}

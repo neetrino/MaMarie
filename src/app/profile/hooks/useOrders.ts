@@ -3,6 +3,10 @@ import { useRouter } from 'next/navigation';
 import { openCartDrawer } from '../../../lib/cart-drawer';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import {
+  REORDER_CART_DRAWER_DELAY_MS,
+  REORDER_SUCCESS_ALERT_DELAY_MS,
+} from '../../../constants/profile-desktop-page';
 import type { OrderDetails, OrderListItem, ProfileTab } from '../types';
 import { createOrderDetailsPreview, type OrderDetailsClickPreview } from '../order-details-preview';
 import { logger } from "@/lib/utils/logger";
@@ -145,19 +149,29 @@ export function useOrders({
       }
 
       window.dispatchEvent(new Event('cart-updated'));
-      
+
       if (addedCount > 0) {
         const skippedText = skippedCount > 0 ? `, ${skippedCount} ${t('profile.orderDetails.skipped')}` : '';
-        onSuccess(`${addedCount} ${t('profile.orderDetails.itemsAdded')}${skippedText}`);
-        setTimeout(() => {
+        const successMessage = `${addedCount} ${t('profile.orderDetails.itemsAdded')}${skippedText}`;
+        closeOrderDetails();
+        window.setTimeout(() => {
+          onSuccess(successMessage);
+        }, REORDER_SUCCESS_ALERT_DELAY_MS);
+        window.setTimeout(() => {
           openCartDrawer();
-        }, 1500);
+        }, REORDER_SUCCESS_ALERT_DELAY_MS + REORDER_CART_DRAWER_DELAY_MS);
       } else {
-        onError(t('profile.orderDetails.failedToAdd'));
+        closeOrderDetails();
+        window.setTimeout(() => {
+          onError(t('profile.orderDetails.failedToAdd'));
+        }, REORDER_SUCCESS_ALERT_DELAY_MS);
       }
     } catch (error: unknown) {
       console.error('[Profile][ReOrder] Error during re-order:', error);
-      onError(t('profile.orderDetails.failedToAdd'));
+      closeOrderDetails();
+      window.setTimeout(() => {
+        onError(t('profile.orderDetails.failedToAdd'));
+      }, REORDER_SUCCESS_ALERT_DELAY_MS);
     } finally {
       setIsReordering(false);
     }

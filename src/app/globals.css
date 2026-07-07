@@ -107,6 +107,66 @@
     animation: fade-in 0.3s ease-out;
   }
 
+  @keyframes alert-slide-in-top {
+    from {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes alert-slide-out-top {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+  }
+
+  @keyframes top-banner-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes top-banner-slide-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+  }
+
+  .animate-alert-in {
+    animation: alert-slide-in-top 0.35s ease-out forwards;
+  }
+
+  .animate-alert-out {
+    animation: alert-slide-out-top 0.3s ease-in forwards;
+  }
+
+  .animate-top-banner-in {
+    animation: top-banner-slide-in 0.4s ease-out forwards;
+  }
+
+  .animate-top-banner-out {
+    animation: top-banner-slide-out 0.3s ease-in forwards;
+  }
+
   @keyframes catalog-grid-in {
     from {
       opacity: 0;
