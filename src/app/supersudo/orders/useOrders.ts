@@ -11,6 +11,13 @@ import {
   hydrateAdminListFromCache,
   useAdminQuerySubscription,
 } from '@/lib/admin/admin-list-cache-ui';
+import {
+  adminOrderDetailCacheKey,
+  invalidateAdminOrderDetail,
+  loadAdminOrderDetail,
+  prefetchAdminOrderDetail,
+} from '@/lib/admin/admin-order-detail-loader';
+import { peekAdminQuery } from '@/lib/admin/admin-query-cache';
 import { ADMIN_LIST_STALE_MS, ADMIN_QUERY_PREFIX } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency, convertPrice, getStoredCurrency, initializeCurrencyRates, CurrencyCode } from '../../../lib/currency';
@@ -252,18 +259,33 @@ export function useOrders() {
 
   const handleViewOrderDetails = async (orderId: string) => {
     setSelectedOrderId(orderId);
-    setLoadingOrderDetails(true);
+
+    const cached = peekAdminQuery<OrderDetails>(adminOrderDetailCacheKey(orderId));
+    if (cached) {
+      setOrderDetails(cached);
+      setLoadingOrderDetails(false);
+    } else {
+      setOrderDetails(null);
+      setLoadingOrderDetails(true);
+    }
+
     try {
-      const response = await apiClient.get<OrderDetails>(`/api/v1/admin/orders/${orderId}`);
+      const response = await loadAdminOrderDetail<OrderDetails>(orderId);
       setOrderDetails(response);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('admin.orders.orderDetails.failedToLoad');
       console.error('❌ [ADMIN] Failed to load order details:', err);
-      alert(err?.message || t('admin.orders.orderDetails.failedToLoad'));
+      alert(message);
       setSelectedOrderId(null);
+      setOrderDetails(null);
     } finally {
       setLoadingOrderDetails(false);
     }
   };
+
+  const handlePrefetchOrderDetails = useCallback((orderId: string) => {
+    prefetchAdminOrderDetail(orderId);
+  }, []);
 
   const handleCloseModal = () => {
     setSelectedOrderId(null);
@@ -380,6 +402,7 @@ export function useOrders() {
           order.id === orderId ? { ...order, status: newStatus } : order
         )
       );
+      invalidateAdminOrderDetail(orderId);
 
       // Show success message
       setUpdateMessage({ type: 'success', text: t('admin.orders.statusUpdated') });
@@ -422,6 +445,7 @@ export function useOrders() {
           order.id === orderId ? { ...order, paymentStatus: newPaymentStatus } : order
         )
       );
+      invalidateAdminOrderDetail(orderId);
 
       // Show success message
       setUpdateMessage({ type: 'success', text: t('admin.orders.paymentStatusUpdated') });
@@ -468,6 +492,7 @@ export function useOrders() {
     fetchOrders,
     formatCurrency,
     handleViewOrderDetails,
+    handlePrefetchOrderDetails,
     handleCloseModal,
     toggleSelect,
     toggleSelectAll,

@@ -35,6 +35,7 @@ interface OrdersTableProps {
   onToggleSelectAll: () => void;
   onSort: (column: string) => void;
   onViewDetails: (orderId: string) => void;
+  onPrefetchDetails?: (orderId: string) => void;
   onStatusChange: (orderId: string, newStatus: string) => void;
   onPaymentStatusChange: (orderId: string, newPaymentStatus: string) => void;
   onPageChange: (newPage: number) => void;
@@ -92,6 +93,7 @@ export function OrdersTable({
   onToggleSelectAll,
   onSort,
   onViewDetails,
+  onPrefetchDetails,
   onStatusChange,
   onPaymentStatusChange,
   onPageChange,
@@ -185,6 +187,9 @@ export function OrdersTable({
                 updatingPaymentStatus={updatingPaymentStatuses.has(order.id)}
                 onToggleSelect={() => onToggleSelect(order.id)}
                 onViewDetails={() => onViewDetails(order.id)}
+                onPrefetchDetails={
+                  onPrefetchDetails ? () => onPrefetchDetails(order.id) : undefined
+                }
                 onStatusChange={(newStatus) => onStatusChange(order.id, newStatus)}
                 onPaymentStatusChange={(newPaymentStatus) => onPaymentStatusChange(order.id, newPaymentStatus)}
                 formatCurrency={formatCurrency}

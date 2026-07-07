@@ -10,7 +10,9 @@ import type { OrderDetails } from '../useOrders';
 import { AdminSideSheet } from '../../components/AdminSideSheet';
 
 interface OrderDetailsModalProps {
+  isOpen: boolean;
   orderDetails: OrderDetails | null;
+  previewNumber?: string;
   loading: boolean;
   currency: string;
   onClose: () => void;
@@ -18,19 +20,22 @@ interface OrderDetailsModalProps {
 }
 
 export function OrderDetailsModal({
+  isOpen,
   orderDetails,
+  previewNumber,
   loading,
   currency,
   onClose,
   formatCurrency,
 }: OrderDetailsModalProps) {
   const { t } = useTranslation();
+  const subtitleNumber = orderDetails?.number ?? previewNumber;
 
   return (
     <AdminSideSheet
-      isOpen={Boolean(orderDetails)}
+      isOpen={isOpen}
       title={t('admin.orders.orderDetails.title')}
-      subtitle={orderDetails ? `#${orderDetails.number}` : undefined}
+      subtitle={subtitleNumber ? `#${subtitleNumber}` : undefined}
       closeLabel={t('admin.common.close')}
       onClose={onClose}
     >

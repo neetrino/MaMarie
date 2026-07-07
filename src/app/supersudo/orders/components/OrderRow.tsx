@@ -14,6 +14,7 @@ interface OrderRowProps {
   updatingPaymentStatus: boolean;
   onToggleSelect: () => void;
   onViewDetails: () => void;
+  onPrefetchDetails?: () => void;
   onStatusChange: (newStatus: string) => void;
   onPaymentStatusChange: (newPaymentStatus: string) => void;
   formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string;
@@ -28,6 +29,7 @@ export function OrderRow({
   updatingPaymentStatus,
   onToggleSelect,
   onViewDetails,
+  onPrefetchDetails,
   onStatusChange,
   onPaymentStatusChange,
   formatCurrency,
@@ -57,6 +59,8 @@ export function OrderRow({
     <tr
       className="cursor-pointer hover:bg-gray-50"
       onClick={onViewDetails}
+      onMouseEnter={onPrefetchDetails}
+      onFocus={onPrefetchDetails}
       aria-label={rowDetailsLabel}
     >
       <td
