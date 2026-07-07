@@ -1,13 +1,17 @@
 'use client';
 
-import { Button, Input } from '@shop/ui';
+import { Input } from '@shop/ui';
 import { type ChangeEvent } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
 import { ParentCategorySelector } from './ParentCategorySelector';
 import { ClaySelect } from '../../../../components/ClaySelect';
 import { AdminSideSheet } from '../../components/AdminSideSheet';
-import { ADMIN_OUTLINE_BUTTON_CLASS, ADMIN_PRIMARY_BUTTON_CLASS } from '../../../../constants/admin-ui-classes';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+  AdminSideSheetPrimaryButton,
+} from '../../components/AdminSideSheetActions';
 
 interface EditCategoryModalProps {
   isOpen: boolean;
@@ -40,19 +44,17 @@ export function EditCategoryModal({
   const isSheetOpen = isOpen && Boolean(editingCategory);
 
   const footer = (
-    <div className="flex gap-3">
-      <Button
-        variant="primary"
+    <AdminSideSheetFooter>
+      <AdminSideSheetCancelButton onClick={onClose} disabled={saving}>
+        {t('admin.common.cancel')}
+      </AdminSideSheetCancelButton>
+      <AdminSideSheetPrimaryButton
         onClick={onSubmit}
         disabled={saving || imageUploading || !formData.title.trim()}
-        className={`flex-1 ${ADMIN_PRIMARY_BUTTON_CLASS}`}
       >
         {saving ? t('admin.categories.updating') : t('admin.categories.updateCategory')}
-      </Button>
-      <Button variant="outline" onClick={onClose} disabled={saving} className={ADMIN_OUTLINE_BUTTON_CLASS}>
-        {t('admin.common.cancel')}
-      </Button>
-    </div>
+      </AdminSideSheetPrimaryButton>
+    </AdminSideSheetFooter>
   );
 
   return (

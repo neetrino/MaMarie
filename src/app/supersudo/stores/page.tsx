@@ -17,6 +17,11 @@ import { logger } from '@/lib/utils/logger';
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { ClaySelect } from '../../../components/ClaySelect';
 import { AdminSideSheet } from '../components/AdminSideSheet';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+  AdminSideSheetPrimaryButton,
+} from '../components/AdminSideSheetActions';
 import type { PartnerStoreFormData, PartnerStoreItem } from '@/lib/partner-stores/types';
 import { getStoredLanguage } from '@/lib/language';
 
@@ -317,18 +322,22 @@ function PartnerStoresSection() {
         closeLabel={t('admin.common.close')}
         onClose={handleCloseModal}
         footer={
-          <div className="flex items-center justify-end gap-3">
-            <Button type="button" variant="outline" onClick={handleCloseModal} disabled={submitting}>
+          <AdminSideSheetFooter>
+            <AdminSideSheetCancelButton type="button" onClick={handleCloseModal} disabled={submitting}>
               {t('admin.stores.cancel')}
-            </Button>
-            <Button type="submit" form="store-form" variant="primary" disabled={submitting || imageUploading}>
+            </AdminSideSheetCancelButton>
+            <AdminSideSheetPrimaryButton
+              type="submit"
+              form="store-form"
+              disabled={submitting || imageUploading}
+            >
               {submitting
                 ? t('admin.stores.saving')
                 : editingStore
                   ? t('admin.stores.update')
                   : t('admin.stores.create')}
-            </Button>
-          </div>
+            </AdminSideSheetPrimaryButton>
+          </AdminSideSheetFooter>
         }
       >
         <form id="store-form" onSubmit={(event) => void handleSubmit(event)} className="space-y-4">

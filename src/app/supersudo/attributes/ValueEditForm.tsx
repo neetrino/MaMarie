@@ -2,6 +2,11 @@
 
 import { useTranslation } from '../../../lib/i18n-client';
 import { ColorPaletteSelector } from '../../../components/ColorPaletteSelector';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+  AdminSideSheetPrimaryButton,
+} from '../components/AdminSideSheetActions';
 import { type AttributeValue } from './useAttributes';
 
 interface ValueEditFormProps {
@@ -132,31 +137,27 @@ export function ValueEditForm({
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-gray-200">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={savingValue}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {t('admin.attributes.valueModal.cancel')}
-        </button>
-        <button
-          type="button"
-          onClick={onSave}
-          disabled={savingValue || !editingLabel.trim()}
-          className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {savingValue ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              {t('admin.attributes.valueModal.saving')}
-            </>
-          ) : (
-            t('admin.attributes.valueModal.save')
-          )}
-        </button>
+      <div className="border-t border-gray-200 pt-2">
+        <AdminSideSheetFooter>
+          <AdminSideSheetCancelButton type="button" onClick={onCancel} disabled={savingValue}>
+            {t('admin.attributes.valueModal.cancel')}
+          </AdminSideSheetCancelButton>
+          <AdminSideSheetPrimaryButton
+            type="button"
+            onClick={onSave}
+            disabled={savingValue || !editingLabel.trim()}
+            className="flex items-center gap-2"
+          >
+            {savingValue ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                {t('admin.attributes.valueModal.saving')}
+              </>
+            ) : (
+              t('admin.attributes.valueModal.save')
+            )}
+          </AdminSideSheetPrimaryButton>
+        </AdminSideSheetFooter>
       </div>
     </div>
   );

@@ -35,6 +35,10 @@ import {
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { AdminSideSheet } from '../components/AdminSideSheet';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+} from '../components/AdminSideSheetActions';
 
 interface Message {
   id: string;
@@ -63,11 +67,11 @@ interface MessageDetailsModalProps {
 
 function MessageDetailsModal({ message, onClose, t }: MessageDetailsModalProps) {
   const footer = (
-    <div className="flex justify-end">
-      <Button type="button" variant="ghost" onClick={onClose}>
+    <AdminSideSheetFooter>
+      <AdminSideSheetCancelButton type="button" onClick={onClose}>
         {t('admin.common.cancel')}
-      </Button>
-    </div>
+      </AdminSideSheetCancelButton>
+    </AdminSideSheetFooter>
   );
 
   return (

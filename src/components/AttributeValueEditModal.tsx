@@ -5,6 +5,11 @@ import { useTranslation } from '../lib/i18n-client';
 import { ColorPaletteSelector } from './ColorPaletteSelector';
 import { logger } from '@/lib/utils/logger';
 import { AdminSideSheet } from '../app/supersudo/components/AdminSideSheet';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+  AdminSideSheetPrimaryButton,
+} from '../app/supersudo/components/AdminSideSheetActions';
 
 interface AttributeValueEditModalProps {
   isOpen: boolean;
@@ -111,20 +116,15 @@ export function AttributeValueEditModal({
   };
 
   const footer = (
-    <div className="flex items-center justify-end gap-3">
-      <button
-        type="button"
-        onClick={onClose}
-        disabled={saving}
-        className="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
-      >
+    <AdminSideSheetFooter>
+      <AdminSideSheetCancelButton type="button" onClick={onClose} disabled={saving}>
         {t('admin.attributes.valueModal.cancel')}
-      </button>
-      <button
+      </AdminSideSheetCancelButton>
+      <AdminSideSheetPrimaryButton
         type="button"
         onClick={handleSave}
         disabled={saving || !label.trim()}
-        className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex items-center gap-2"
       >
         {saving ? (
           <>
@@ -134,8 +134,8 @@ export function AttributeValueEditModal({
         ) : (
           t('admin.attributes.valueModal.save')
         )}
-      </button>
-    </div>
+      </AdminSideSheetPrimaryButton>
+    </AdminSideSheetFooter>
   );
 
   return (

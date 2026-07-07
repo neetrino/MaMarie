@@ -11,7 +11,11 @@ import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { ClaySelect } from '../../../components/ClaySelect';
 import { useAdminBrands } from '../providers/AdminReferenceDataProvider';
 import { AdminSideSheet } from '../components/AdminSideSheet';
-import { ADMIN_OUTLINE_BUTTON_CLASS, ADMIN_PRIMARY_BUTTON_CLASS } from '../../../constants/admin-ui-classes';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+  AdminSideSheetPrimaryButton,
+} from '../components/AdminSideSheetActions';
 interface Brand {
   id: string;
   name: string;
@@ -349,26 +353,22 @@ function BrandsSection() {
         closeLabel={t('admin.common.close')}
         onClose={handleCloseModal}
         footer={
-          <div className="flex items-center justify-end gap-3">
-            <Button
+          <AdminSideSheetFooter>
+            <AdminSideSheetCancelButton
               type="button"
-              variant="outline"
               onClick={handleCloseModal}
               disabled={submitting}
-              className={ADMIN_OUTLINE_BUTTON_CLASS}
             >
               {t('admin.brands.cancel')}
-            </Button>
-            <Button
+            </AdminSideSheetCancelButton>
+            <AdminSideSheetPrimaryButton
               type="submit"
               form="brand-form"
-              variant="primary"
               disabled={submitting || imageUploading}
-              className={ADMIN_PRIMARY_BUTTON_CLASS}
             >
               {submitting ? t('admin.brands.saving') : editingBrand ? t('admin.brands.update') : t('admin.brands.create')}
-            </Button>
-          </div>
+            </AdminSideSheetPrimaryButton>
+          </AdminSideSheetFooter>
         }
       >
         <form id="brand-form" onSubmit={handleSubmit} className="space-y-4">

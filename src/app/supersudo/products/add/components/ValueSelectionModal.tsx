@@ -1,11 +1,14 @@
 'use client';
 
-import { Button } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { getColorHex } from '../../../../../lib/colorMap';
 import type { Attribute, GeneratedVariant } from '../types';
 import { logger } from '@/lib/utils/logger';
 import { AdminSideSheet } from '../../../components/AdminSideSheet';
+import {
+  AdminSideSheetCancelButton,
+  AdminSideSheetFooter,
+} from '../../../components/AdminSideSheetActions';
 
 interface ValueSelectionModalProps {
   openValueModal: { variantId: string; attributeId: string } | null;
@@ -107,11 +110,11 @@ export function ValueSelectionModal({
   };
 
   const footer = (
-    <div className="flex items-center justify-end">
-      <Button type="button" variant="outline" onClick={onClose}>
+    <AdminSideSheetFooter>
+      <AdminSideSheetCancelButton type="button" onClick={onClose}>
         {t('admin.common.close')}
-      </Button>
-    </div>
+      </AdminSideSheetCancelButton>
+    </AdminSideSheetFooter>
   );
 
   return (
