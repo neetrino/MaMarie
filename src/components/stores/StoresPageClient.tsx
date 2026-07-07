@@ -3,10 +3,24 @@
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PartnerStoreList } from '@/components/stores/PartnerStoreList';
+import { HomeSectionHeadingRow } from '@/components/home/HomeSectionHeading';
 import type { PartnerStoreItem } from '@/lib/partner-stores/types';
 import { apiClient } from '@/lib/api-client';
 import { useTranslation } from '@/lib/i18n-client';
 import { getStoredLanguage } from '@/lib/language';
+import {
+  BEST_PRODUCTS_ASSETS,
+  BEST_PRODUCTS_HEADING_COLOR,
+  BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX,
+  BEST_PRODUCTS_HEADING_PADDING_Y_PX,
+  BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX,
+} from '@/constants/home-sections';
+import {
+  RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX,
+  RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX,
+  RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX,
+  RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES,
+} from '@/constants/products-catalog';
 import {
   STORES_LIST_PANEL_WIDTH_PX,
   STORES_MAP_MIN_HEIGHT_MOBILE_PX,
@@ -112,14 +126,24 @@ export function StoresPageClient() {
       className="mx-auto w-full max-w-full px-5 pb-8 pt-7 lg:px-8 lg:pb-12 lg:pt-12"
       style={{ backgroundColor: STORES_PAGE_BG, maxWidth: STORES_PAGE_MAX_WIDTH_PX }}
     >
-      <div className="mb-6 text-center lg:mb-8">
-        <h1 className="text-2xl font-bold uppercase tracking-[0.08em] text-brand-pink lg:text-3xl">
-          {t('stores.title')}
-        </h1>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-brand-muted lg:mt-3 lg:text-base">
-          {t('stores.description')}
-        </p>
-      </div>
+      <header className="mb-6 lg:mb-8">
+        <HomeSectionHeadingRow
+          id="stores-page-heading"
+          title={t('stores.title')}
+          seeAllHref="/stores"
+          seeAllLabel=""
+          color={BEST_PRODUCTS_HEADING_COLOR}
+          chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
+          titleLineHeightPx={BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX}
+          minHeightPx={BEST_PRODUCTS_HEADING_MIN_HEIGHT_PX}
+          headingPaddingYPx={BEST_PRODUCTS_HEADING_PADDING_Y_PX}
+          mobileTitleFontSizePx={RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX}
+          mobileTitleLineHeightPx={RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX}
+          mobileMinHeightPx={RELATED_PRODUCTS_MOBILE_HEADING_MIN_HEIGHT_PX}
+          mobileTitleMaxLines={RELATED_PRODUCTS_MOBILE_TITLE_MAX_LINES}
+          showSeeAllLink={false}
+        />
+      </header>
 
       <div
         className="grid grid-cols-1 items-stretch lg:[grid-template-columns:var(--stores-list-width)_minmax(0,1fr)]"
