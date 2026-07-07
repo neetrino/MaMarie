@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useTranslation } from '../../../lib/i18n-client';
-import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { AdminSideSheet } from '../components/AdminSideSheet';
 
 type DialogType = 'confirm' | 'alert';
 
@@ -57,7 +57,6 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const [activeDialog, setActiveDialog] = useState<ActiveDialog | null>(null);
   const queueRef = useRef<ActiveDialog[]>([]);
-  useBodyScrollLock(Boolean(activeDialog));
 
   const openDialog = useCallback(
     (type: DialogType, rawOptions: ConfirmDialogOptions | AlertDialogOptions | string) =>
@@ -113,48 +112,51 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
     [alert, confirm],
   );
 
+  const dialogFooter = activeDialog ? (
+    <div className="flex items-center justify-end gap-3">
+      {activeDialog.type === 'confirm' ? (
+        <Button
+          variant="outline"
+          onClick={() => {
+            finishDialog(false);
+          }}
+          className={ADMIN_OUTLINE_BUTTON_CLASS}
+        >
+          {activeDialog.options.cancelText ?? t('admin.common.cancel')}
+        </Button>
+      ) : null}
+      <Button
+        variant="primary"
+        onClick={() => {
+          finishDialog(true);
+        }}
+        className={
+          activeDialog.options.destructive ? ADMIN_DANGER_BUTTON_CLASS : ADMIN_PRIMARY_BUTTON_CLASS
+        }
+      >
+        {activeDialog.options.confirmText ??
+          (activeDialog.type === 'confirm' ? t('admin.common.confirm') : t('admin.common.close'))}
+      </Button>
+    </div>
+  ) : null;
+
   return (
     <AdminDialogsContext.Provider value={contextValue}>
       {children}
 
-      {activeDialog ? (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-[15px] border border-gray-100 bg-white p-5 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">
-              {activeDialog.options.title ?? t('admin.common.confirm')}
-            </h3>
-            <p className="text-sm leading-6 text-gray-600">{activeDialog.options.message}</p>
-
-            <div className="mt-5 flex items-center justify-end gap-3">
-              {activeDialog.type === 'confirm' ? (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    finishDialog(false);
-                  }}
-                  className={ADMIN_OUTLINE_BUTTON_CLASS}
-                >
-                  {activeDialog.options.cancelText ?? t('admin.common.cancel')}
-                </Button>
-              ) : null}
-              <Button
-                variant="primary"
-                onClick={() => {
-                  finishDialog(true);
-                }}
-                className={
-                  activeDialog.options.destructive
-                    ? ADMIN_DANGER_BUTTON_CLASS
-                    : ADMIN_PRIMARY_BUTTON_CLASS
-                }
-              >
-                {activeDialog.options.confirmText ??
-                  (activeDialog.type === 'confirm' ? t('admin.common.confirm') : t('admin.common.close'))}
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <AdminSideSheet
+        isOpen={Boolean(activeDialog)}
+        title={activeDialog?.options.title ?? t('admin.common.confirm')}
+        closeLabel={t('admin.common.close')}
+        onClose={() => {
+          finishDialog(false);
+        }}
+        footer={dialogFooter}
+      >
+        {activeDialog ? (
+          <p className="text-sm leading-6 text-gray-600">{activeDialog.options.message}</p>
+        ) : null}
+      </AdminSideSheet>
     </AdminDialogsContext.Provider>
   );
 }

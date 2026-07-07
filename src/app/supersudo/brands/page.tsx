@@ -8,9 +8,9 @@ import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
-import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { ClaySelect } from '../../../components/ClaySelect';
 import { useAdminBrands } from '../providers/AdminReferenceDataProvider';
+import { AdminSideSheet } from '../components/AdminSideSheet';
 interface Brand {
   id: string;
   name: string;
@@ -41,8 +41,6 @@ function BrandsSection() {
   const [submitting, setSubmitting] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  useBodyScrollLock(showModal);
-
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -344,127 +342,103 @@ function BrandsSection() {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
-              </h3>
-              <button
-                onClick={handleCloseModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="brand-name" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.brands.brandName')}
-                </label>
-                <input
-                  id="brand-name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  placeholder={t('admin.brands.enterBrandName')}
-                  required
-                />
-              </div>
-              <ClaySelect
-                id="brand-status"
-                label={t('admin.brands.status')}
-                value={formData.published}
-                onChange={(value) =>
-                  setFormData({
-                    ...formData,
-                    published: value as BrandFormData['published'],
-                  })
-                }
-                placeholder={t('admin.brands.published')}
-                options={[
-                  { value: 'published', label: t('admin.brands.published') },
-                  { value: 'draft', label: t('admin.brands.draft') },
-                ]}
-              />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('admin.brands.logo')}
-                </label>
-                {formData.logoUrl ? (
-                  <div className="mb-3">
-                    <div className="relative inline-block">
-                      <img
-                        src={formData.logoUrl}
-                        alt={t('admin.brands.logoPreview')}
-                        className="h-24 w-24 rounded-lg border border-gray-300 object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white transition-colors hover:bg-red-700"
-                        title={t('admin.brands.removeLogo')}
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200">
-                  {imageUploading ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-600 border-t-transparent" />
-                      {t('admin.brands.uploadingLogo')}
-                    </>
-                  ) : (
-                    <>
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      {formData.logoUrl ? t('admin.brands.changeLogo') : t('admin.brands.uploadLogo')}
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(event) => {
-                      void handleImageUpload(event);
-                    }}
-                    disabled={imageUploading}
-                  />
-                </label>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCloseModal}
-                  disabled={submitting}
-                >
-                  {t('admin.brands.cancel')}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  disabled={submitting || imageUploading}
-                >
-                  {submitting ? t('admin.brands.saving') : (editingBrand ? t('admin.brands.update') : t('admin.brands.create'))}
-                </Button>
-              </div>
-            </form>
+      <AdminSideSheet
+        isOpen={showModal}
+        title={editingBrand ? t('admin.brands.editBrand') : t('admin.brands.addNewBrand')}
+        closeLabel={t('admin.common.close')}
+        onClose={handleCloseModal}
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <Button type="button" variant="outline" onClick={handleCloseModal} disabled={submitting}>
+              {t('admin.brands.cancel')}
+            </Button>
+            <Button type="submit" form="brand-form" variant="primary" disabled={submitting || imageUploading}>
+              {submitting ? t('admin.brands.saving') : editingBrand ? t('admin.brands.update') : t('admin.brands.create')}
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        <form id="brand-form" onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="brand-name" className="mb-1 block text-sm font-medium text-gray-700">
+              {t('admin.brands.brandName')}
+            </label>
+            <input
+              id="brand-name"
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-gray-900"
+              placeholder={t('admin.brands.enterBrandName')}
+              required
+            />
+          </div>
+          <ClaySelect
+            id="brand-status"
+            label={t('admin.brands.status')}
+            value={formData.published}
+            onChange={(value) =>
+              setFormData({
+                ...formData,
+                published: value as BrandFormData['published'],
+              })
+            }
+            placeholder={t('admin.brands.published')}
+            options={[
+              { value: 'published', label: t('admin.brands.published') },
+              { value: 'draft', label: t('admin.brands.draft') },
+            ]}
+          />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">{t('admin.brands.logo')}</label>
+            {formData.logoUrl ? (
+              <div className="mb-3">
+                <div className="relative inline-block">
+                  <img
+                    src={formData.logoUrl}
+                    alt={t('admin.brands.logoPreview')}
+                    className="h-24 w-24 rounded-lg border border-gray-300 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white transition-colors hover:bg-red-700"
+                    title={t('admin.brands.removeLogo')}
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200">
+              {imageUploading ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-600 border-t-transparent" />
+                  {t('admin.brands.uploadingLogo')}
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  {formData.logoUrl ? t('admin.brands.changeLogo') : t('admin.brands.uploadLogo')}
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => {
+                  void handleImageUpload(event);
+                }}
+                disabled={imageUploading}
+              />
+            </label>
+          </div>
+        </form>
+      </AdminSideSheet>
     </>
   );
 }
