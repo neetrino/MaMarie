@@ -8,8 +8,10 @@ import { buildGoogleMapsDirectionsUrl } from '@/lib/partner-stores/types';
 import {
   STORES_MAP_DEFAULT_CENTER,
   STORES_MAP_DEFAULT_ZOOM,
+  STORES_MAP_POPUP_AUTO_PAN,
   STORES_MAP_SELECTED_ZOOM,
 } from '@/constants/stores-page';
+import styles from './PartnerStoresMap.module.css';
 
 const markerIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -23,6 +25,10 @@ const markerIcon = L.icon({
 
 const OSM_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
+const POPUP_OPTIONS: L.PopupOptions = {
+  autoPan: STORES_MAP_POPUP_AUTO_PAN,
+};
 
 function resetLeafletContainer(element: HTMLElement | null): void {
   if (!element) {
@@ -55,9 +61,16 @@ function buildMarkerPopup(store: PartnerStoreItem, directionsLabel: string): HTM
   return wrapper;
 }
 
+function scheduleMapInvalidate(map: L.Map): void {
+  requestAnimationFrame(() => {
+    map.invalidateSize({ animate: false, pan: false });
+  });
+}
+
 interface PartnerStoresMapProps {
   stores: PartnerStoreItem[];
-  selectedStoreId: string | null;
+  focusStoreId: string | null;
+  onFocusStoreHandled: () => void;
   onSelectStore: (storeId: string) => void;
   mapTitle: string;
   getDirectionsLabel: string;
@@ -66,7 +79,8 @@ interface PartnerStoresMapProps {
 
 export function PartnerStoresMap({
   stores,
-  selectedStoreId,
+  focusStoreId,
+  onFocusStoreHandled,
   onSelectStore,
   mapTitle,
   getDirectionsLabel,
@@ -75,11 +89,15 @@ export function PartnerStoresMap({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const markersByIdRef = useRef<Map<string, L.Marker>>(new Map());
+  const hasFitBoundsRef = useRef(false);
   const onSelectStoreRef = useRef(onSelectStore);
   const directionsLabelRef = useRef(getDirectionsLabel);
+  const onFocusStoreHandledRef = useRef(onFocusStoreHandled);
 
   onSelectStoreRef.current = onSelectStore;
   directionsLabelRef.current = getDirectionsLabel;
+  onFocusStoreHandledRef.current = onFocusStoreHandled;
 
   useEffect(() => {
     const container = mapContainerRef.current;
@@ -102,10 +120,24 @@ export function PartnerStoresMap({
     markersLayerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
 
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleMapInvalidate(map);
+    });
+    resizeObserver.observe(container);
+
+    const handleWindowResize = () => {
+      scheduleMapInvalidate(map);
+    };
+    window.addEventListener('resize', handleWindowResize);
+
     return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleWindowResize);
       map.remove();
       mapRef.current = null;
       markersLayerRef.current = null;
+      markersByIdRef.current.clear();
+      hasFitBoundsRef.current = false;
       resetLeafletContainer(container);
     };
   }, []);
@@ -118,34 +150,44 @@ export function PartnerStoresMap({
     }
 
     markersLayer.clearLayers();
+    markersByIdRef.current.clear();
 
     stores.forEach((store) => {
       const marker = L.marker([store.latitude, store.longitude], { icon: markerIcon });
-      marker.bindPopup(buildMarkerPopup(store, directionsLabelRef.current));
+      marker.bindPopup(buildMarkerPopup(store, directionsLabelRef.current), POPUP_OPTIONS);
       marker.on('click', () => {
         onSelectStoreRef.current(store.id);
+        marker.openPopup();
       });
       marker.addTo(markersLayer);
+      markersByIdRef.current.set(store.id, marker);
     });
+
+    if (stores.length > 0 && !hasFitBoundsRef.current) {
+      const bounds = L.latLngBounds(stores.map((store) => [store.latitude, store.longitude]));
+      map.fitBounds(bounds, { padding: [48, 48], maxZoom: STORES_MAP_DEFAULT_ZOOM });
+      hasFitBoundsRef.current = true;
+    }
   }, [stores]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || stores.length === 0) {
+    if (!map || !focusStoreId) {
       return;
     }
 
-    const selectedStore = stores.find((store) => store.id === selectedStoreId);
-    if (selectedStore) {
-      map.flyTo([selectedStore.latitude, selectedStore.longitude], STORES_MAP_SELECTED_ZOOM, {
-        duration: 0.8,
-      });
+    const store = stores.find((item) => item.id === focusStoreId);
+    if (!store) {
+      onFocusStoreHandledRef.current();
       return;
     }
 
-    const bounds = L.latLngBounds(stores.map((store) => [store.latitude, store.longitude]));
-    map.fitBounds(bounds, { padding: [48, 48], maxZoom: STORES_MAP_DEFAULT_ZOOM });
-  }, [selectedStoreId, stores]);
+    map.flyTo([store.latitude, store.longitude], STORES_MAP_SELECTED_ZOOM, {
+      duration: 0.8,
+    });
+    markersByIdRef.current.get(focusStoreId)?.openPopup();
+    onFocusStoreHandledRef.current();
+  }, [focusStoreId, stores]);
 
   return (
     <div className={`flex h-full flex-col ${className}`}>
@@ -153,8 +195,8 @@ export function PartnerStoresMap({
         {mapTitle}
       </h2>
 
-      <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-gray-100">
-        <div ref={mapContainerRef} className="h-full min-h-[320px] w-full" />
+      <div className={`relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-gray-100 ${styles.mapShell}`}>
+        <div ref={mapContainerRef} className="absolute inset-0 h-full w-full min-h-[320px]" />
       </div>
     </div>
   );

@@ -31,6 +31,8 @@ export const STORES_MAP_DEFAULT_CENTER = {
 
 export const STORES_MAP_DEFAULT_ZOOM = 13;
 export const STORES_MAP_SELECTED_ZOOM = 15;
+/** Keep viewport fixed when marker popups open (no auto-pan). */
+export const STORES_MAP_POPUP_AUTO_PAN = false;
 
 export const STORES_PAGE_ASSETS = {
   iconLocation: '/assets/contact/icon-location.png',

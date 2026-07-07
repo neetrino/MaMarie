@@ -52,6 +52,12 @@ export function StoresPageClient() {
   const [stores, setStores] = useState<PartnerStoreItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [focusStoreId, setFocusStoreId] = useState<string | null>(null);
+
+  const handleSelectStoreFromList = useCallback((storeId: string) => {
+    setSelectedStoreId(storeId);
+    setFocusStoreId(storeId);
+  }, []);
 
   const fetchStores = useCallback(async () => {
     try {
@@ -163,20 +169,21 @@ export function StoresPageClient() {
           <PartnerStoreList
             stores={stores}
             selectedStoreId={selectedStoreId}
-            onSelectStore={setSelectedStoreId}
+            onSelectStore={handleSelectStoreFromList}
             title={t('stores.partnerStoresTitle')}
             hint={t('stores.selectStoreHint')}
           />
         </section>
 
         <section
-          className="flex min-h-0 flex-col bg-white p-4 lg:h-[var(--stores-panel-height)] lg:p-6"
+          className="relative z-0 flex min-h-0 flex-col bg-white p-4 lg:h-[var(--stores-panel-height)] lg:p-6"
           style={{ ...panelStyle, minHeight: STORES_MAP_MIN_HEIGHT_MOBILE_PX }}
         >
           <div className="min-h-[320px] flex-1">
             <PartnerStoresMap
               stores={stores}
-              selectedStoreId={selectedStoreId}
+              focusStoreId={focusStoreId}
+              onFocusStoreHandled={() => setFocusStoreId(null)}
               onSelectStore={setSelectedStoreId}
               mapTitle={t('stores.storeMapTitle')}
               getDirectionsLabel={t('stores.getDirections')}
