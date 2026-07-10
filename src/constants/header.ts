@@ -53,6 +53,9 @@ export const HEADER_MOBILE_VISIBLE_BOTTOM_PX =
 
 /** Fixed stacking — header stays above menu scrim/panel and bottom-nav overlays on real devices. */
 export const HEADER_MOBILE_Z_INDEX = 80;
+
+/** Portaled navbar dropdowns — above header bar, below cart drawer (90). */
+export const HEADER_DROPDOWN_PORTAL_Z_INDEX = 85;
 export const MOBILE_NAV_MENU_SCRIM_Z_INDEX = 60;
 export const MOBILE_NAV_MENU_PANEL_Z_INDEX = 75;
 

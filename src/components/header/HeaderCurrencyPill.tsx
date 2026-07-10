@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BrandChevronDown } from './BrandChevronDown';
+import { HEADER_PROFILE_MENU_DROPDOWN_GAP_PX } from '../../constants/header';
 import {
   CURRENCIES,
   setStoredCurrency,
@@ -18,6 +19,8 @@ const CURRENCY_PILL_MIN_WIDTH_PX = 77;
 /** Shared duration for chevron rotation and dropdown fade. */
 const CURRENCY_DROPDOWN_ANIMATION_MS = 300;
 
+const CURRENCY_DROPDOWN_GAP_PX = HEADER_PROFILE_MENU_DROPDOWN_GAP_PX;
+
 export function HeaderCurrencyPill() {
   const currency = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +33,7 @@ export function HeaderCurrencyPill() {
 
   const syncTriggerWidth = useCallback(() => {
     if (!buttonRef.current) return;
-    setTriggerWidthPx(buttonRef.current.offsetWidth);
+    setTriggerWidthPx(buttonRef.current.getBoundingClientRect().width);
   }, []);
 
   const clearCloseTimer = useCallback(() => {
@@ -127,7 +130,7 @@ export function HeaderCurrencyPill() {
         />
       </button>
 
-      {isDropdownVisible && (
+      {isDropdownVisible ? (
         <ul
           role="listbox"
           aria-label="Select currency"
@@ -161,7 +164,7 @@ export function HeaderCurrencyPill() {
             );
           })}
         </ul>
-      )}
+      ) : null}
     </div>
   );
 }
