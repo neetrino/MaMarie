@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import {
   ABOUT_US_ASSETS,
   ABOUT_US_CARD_LEFT_TEXT_WIDTH_PX,
@@ -44,11 +45,20 @@ import {
 } from '../../constants/about-us-section';
 import { useTranslation } from '../../lib/i18n-client';
 
-function AboutUsBrandLogo() {
+const ABOUT_US_STORY_LOGO_INLINE_RAISE_PX = 10;
+const ABOUT_US_STORY_TEXT_BLOCK_RAISE_PX = 6;
+
+function AboutUsBrandLogo({
+  className = '',
+  style,
+}: {
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <div
-      className="relative shrink-0 overflow-hidden"
-      style={{ width: ABOUT_US_LOGO_WIDTH_PX, height: ABOUT_US_LOGO_HEIGHT_PX }}
+    <span
+      className={`relative inline-block shrink-0 overflow-hidden align-baseline ${className}`.trim()}
+      style={{ width: ABOUT_US_LOGO_WIDTH_PX, height: ABOUT_US_LOGO_HEIGHT_PX, ...style }}
     >
       <img
         src={ABOUT_US_ASSETS.logoInline}
@@ -63,7 +73,7 @@ function AboutUsBrandLogo() {
           top: `${ABOUT_US_LOGO_CROP_TOP_PERCENT}%`,
         }}
       />
-    </div>
+    </span>
   );
 }
 
@@ -187,37 +197,42 @@ function AboutUsStoryColumn({
           paddingRight: ABOUT_US_STORY_CARD_PADDING_X_PX,
         }}
       >
-        <div className="flow-root">
-          <div
-            className="float-left"
-            style={{ marginTop: ABOUT_US_STORY_LOGO_TEXT_OFFSET_TOP_PX }}
+        <div
+          style={{
+            maxWidth: ABOUT_US_STORY_TEXT_WIDTH_PX,
+            transform: `translateY(-${ABOUT_US_STORY_TEXT_BLOCK_RAISE_PX}px)`,
+          }}
+        >
+          <p
+            className="m-0 font-normal"
+            style={{
+              color: ABOUT_US_TEXT_COLOR,
+              fontSize: ABOUT_US_TEXT_SIZE_PX,
+              lineHeight: `${ABOUT_US_STORY_TEXT_LINE_HEIGHT_PX}px`,
+              letterSpacing: `${ABOUT_US_STORY_TEXT_TRACKING_PX}px`,
+            }}
           >
-            <AboutUsBrandLogo />
-          </div>
-          <div style={{ maxWidth: ABOUT_US_STORY_TEXT_WIDTH_PX }}>
-            <p
-              className="m-0 font-normal"
+            <AboutUsBrandLogo
+              className="mr-1.5"
               style={{
-                color: ABOUT_US_TEXT_COLOR,
-                fontSize: ABOUT_US_TEXT_SIZE_PX,
-                lineHeight: `${ABOUT_US_STORY_TEXT_LINE_HEIGHT_PX}px`,
-                letterSpacing: `${ABOUT_US_STORY_TEXT_TRACKING_PX}px`,
+                transform: `translateY(${
+                  ABOUT_US_STORY_LOGO_TEXT_OFFSET_TOP_PX - ABOUT_US_STORY_LOGO_INLINE_RAISE_PX
+                }px)`,
               }}
-            >
-              {storyLead}
-            </p>
-            <p
-              className="m-0 font-normal"
-              style={{
-                color: ABOUT_US_TEXT_COLOR,
-                fontSize: ABOUT_US_TEXT_SIZE_PX,
-                lineHeight: `${ABOUT_US_STORY_TEXT_LINE_HEIGHT_PX}px`,
-                letterSpacing: `${ABOUT_US_STORY_TEXT_TRACKING_PX}px`,
-              }}
-            >
-              {storyBody}
-            </p>
-          </div>
+            />
+            {storyLead}
+          </p>
+          <p
+            className="m-0 font-normal"
+            style={{
+              color: ABOUT_US_TEXT_COLOR,
+              fontSize: ABOUT_US_TEXT_SIZE_PX,
+              lineHeight: `${ABOUT_US_STORY_TEXT_LINE_HEIGHT_PX}px`,
+              letterSpacing: `${ABOUT_US_STORY_TEXT_TRACKING_PX}px`,
+            }}
+          >
+            {storyBody}
+          </p>
         </div>
       </article>
 

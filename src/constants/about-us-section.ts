@@ -129,13 +129,15 @@ export const ABOUT_US_YELLOW_CARD_DECORATIONS: Array<
 
 /** Bow / bird (`51:422`) — tilt reduced so beak points at story copy below. */
 export const ABOUT_US_STORY_BOW_ROTATE_DEG = 248;
+/** Music-note icon under story text — pushed lower per layout tweak. */
+export const ABOUT_US_STORY_MELODY_TOP_PX = 276.99;
 
 export const ABOUT_US_STORY_DECORATIONS: Array<
   AboutUsDecorationLayout & { imageSrc: string }
 > = [
   {
     leftPx: 47,
-    topPx: 256.99,
+    topPx: ABOUT_US_STORY_MELODY_TOP_PX,
     wrapperSizePx: 150.771,
     imageSizePx: 107.701,
     rotateDeg: 53.16,
