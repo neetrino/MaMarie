@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useRef,
   useState,
   type CSSProperties,
   type RefObject,
@@ -71,8 +70,6 @@ export function useAnchoredPortalPosition(
   options: AnchoredPortalPositionOptions
 ): CSSProperties | undefined {
   const [position, setPosition] = useState<CSSProperties | undefined>();
-  const optionsRef = useRef(options);
-  optionsRef.current = options;
 
   const updatePosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -80,8 +77,8 @@ export function useAnchoredPortalPosition(
       return;
     }
 
-    setPosition(buildAnchoredPortalStyle(trigger.getBoundingClientRect(), optionsRef.current));
-  }, [triggerRef]);
+    setPosition(buildAnchoredPortalStyle(trigger.getBoundingClientRect(), options));
+  }, [triggerRef, options]);
 
   useLayoutEffect(() => {
     if (!enabled || !isOpen) {
