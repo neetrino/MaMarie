@@ -1,11 +1,11 @@
 'use client';
 
 import type { CSSProperties, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
 import {
   HEADER_CONTENT_CLEARANCE_DESKTOP_PX,
   HEADER_CONTENT_CLEARANCE_MOBILE_PX,
 } from '../constants/header';
+import { useResolvedPathname } from './hooks/useResolvedPathname';
 
 interface MainContentProps {
   children: ReactNode;
@@ -21,7 +21,7 @@ const headerClearanceVars = {
  * Home hero and admin routes are excluded — hero sits under the transparent bar.
  */
 export function MainContent({ children }: MainContentProps) {
-  const pathname = usePathname() ?? '';
+  const pathname = useResolvedPathname();
 
   const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
   const mainContentBase = 'w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';

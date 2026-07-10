@@ -1,8 +1,8 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { HEADER_HOME_SCROLL_THRESHOLD_PX } from '../../constants/header';
+import { useResolvedPathname } from '../hooks/useResolvedPathname';
 
 function resolveWindowScrollTop(): number {
   return (
@@ -18,7 +18,7 @@ function resolveWindowScrollTop(): number {
  * Also listens to profile desktop internal scroll (iPad Pro `lg` layout).
  */
 export function useHeaderScrolled(): boolean {
-  const pathname = usePathname() ?? '';
+  const pathname = useResolvedPathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollRafRef = useRef(0);
 

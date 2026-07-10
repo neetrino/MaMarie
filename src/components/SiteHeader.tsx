@@ -1,7 +1,6 @@
 'use client';
 
 import { Suspense, useId, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import {
   HEADER_ACTIONS_GAP_PX,
 } from '../constants/brand';
@@ -36,6 +35,7 @@ import { HeaderMobileActions } from './header/HeaderMobileActions';
 import { HeaderNavLinks } from './header/HeaderNavLinks';
 import { MobileMenuModal } from './header/MobileMenuModal';
 import { useHeaderScrolled } from './header/useHomeHeaderScrolled';
+import { useResolvedPathname } from './hooks/useResolvedPathname';
 
 export interface SiteHeaderProps {
   navLinks: readonly NavLinkItem[];
@@ -202,7 +202,7 @@ function DesktopHeaderBar({
 }
 
 export function SiteHeader({ navLinks }: SiteHeaderProps) {
-  const pathname = usePathname() ?? '';
+  const pathname = useResolvedPathname();
   const isHomeRoute = pathname === '/';
   const isScrolled = useHeaderScrolled();
   const [menuOpen, setMenuOpen] = useState(false);
