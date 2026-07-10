@@ -13,6 +13,7 @@ import {
   HEADER_MOBILE_NAV_ROW_HEIGHT_PX,
   HEADER_MOBILE_NAV_TOP_INSET_PX,
   HEADER_MOBILE_PADDING_X_PX,
+  HEADER_MOBILE_Z_INDEX,
   HEADER_MOBILE_PILL_CONTENT_INSET_PX,
   HEADER_MOBILE_PILL_HEIGHT_PX,
   HEADER_MOBILE_PILL_LOGO_INSET_PX,
@@ -59,7 +60,7 @@ function HeaderDesktopNav({ navLinks }: { navLinks: readonly NavLinkItem[] }) {
       </div>
 
       <div
-        className="flex shrink-0 items-center"
+        className="flex shrink-0 items-center overflow-visible"
         style={{ gap: HEADER_ACTIONS_GAP_PX }}
       >
         <HeaderActionIcons />
@@ -168,7 +169,7 @@ function DesktopHeaderBar({
   navLinks: readonly NavLinkItem[];
 }) {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full overflow-visible">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-0 flex items-center"
@@ -188,7 +189,7 @@ function DesktopHeaderBar({
       </div>
 
       <HeaderContentFrame
-        className="pointer-events-auto relative z-10 flex w-full items-center"
+        className="pointer-events-auto relative z-10 flex w-full items-center overflow-visible"
         style={{
           paddingTop: HEADER_DESKTOP_ROW_PADDING_Y_PX,
           paddingBottom: HEADER_DESKTOP_ROW_PADDING_Y_PX,
@@ -230,8 +231,9 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
   return (
     <header
       data-site-header
-      className="fixed left-0 right-0 top-0 z-[80] w-full bg-transparent lg:z-50"
+      className="fixed left-0 right-0 top-0 w-full overflow-visible bg-transparent"
       style={{
+        zIndex: HEADER_MOBILE_Z_INDEX,
         paddingTop: HEADER_HOME_OVERLAY_TOP_PX,
         transform: `translateY(${HEADER_HOME_OFFSET_Y_PX}px)`,
       }}
@@ -244,7 +246,7 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
         onMenuToggle={handleMenuToggle}
         onMenuClose={handleMenuClose}
       />
-      <DesktopFluidFrame className="hidden lg:flex">
+      <DesktopFluidFrame allowOverflow className="hidden lg:flex">
         <DesktopHeaderBar showPill={isScrolled} navLinks={navLinks} />
       </DesktopFluidFrame>
     </header>

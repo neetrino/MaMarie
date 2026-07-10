@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode, type Ref } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { BRAND_ASSETS } from '../../constants/brand';
 import {
@@ -14,10 +15,12 @@ import {
   HEADER_MOBILE_LANGUAGE_ICON_SIZE_PX,
   HEADER_MOBILE_MENU_ICON_SIZE_PX,
   HEADER_MOBILE_PILL_CONTENT_INSET_PX,
+  HEADER_DROPDOWN_PORTAL_Z_INDEX,
   HEADER_PILL_APPEAR_DURATION_MS,
   MOBILE_NAV_MENU_BUTTON_ANIMATION_MS,
 } from '../../constants/header';
 import { useTranslation } from '../../lib/i18n-client';
+import { useAnchoredPortalPosition } from '../../lib/use-anchored-portal-position';
 import { HeaderLanguageSwitcher } from './HeaderLanguageSwitcher';
 
 /** MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — inline pill below `lg`. */
@@ -29,16 +32,19 @@ function MobileIconButton({
   onClick,
   showPill,
   ariaExpanded,
+  buttonRef,
   children,
 }: {
   label: string;
   onClick: () => void;
   showPill?: boolean;
   ariaExpanded?: boolean;
+  buttonRef?: Ref<HTMLButtonElement>;
   children: ReactNode;
 }) {
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={onClick}
       aria-label={label}
@@ -79,7 +85,15 @@ export function HeaderMobileActions({
   const [isLanguageDropdownVisible, setIsLanguageDropdownVisible] = useState(false);
   const [isLanguageDropdownExpanded, setIsLanguageDropdownExpanded] = useState(false);
   const languageContainerRef = useRef<HTMLDivElement>(null);
+  const languageButtonRef = useRef<HTMLButtonElement>(null);
+  const languageDropdownRef = useRef<HTMLDivElement>(null);
   const languageCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const portalPosition = useAnchoredPortalPosition(true, languageOpen, languageButtonRef, {
+    gapPx: HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX,
+    anchor: 'right',
+    minWidthPx: HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX,
+    zIndex: HEADER_DROPDOWN_PORTAL_Z_INDEX,
+  });
 
   const clearLanguageCloseTimer = useCallback(() => {
     if (languageCloseTimerRef.current) {
@@ -121,9 +135,14 @@ export function HeaderMobileActions({
     if (!languageOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (!languageContainerRef.current?.contains(event.target as Node)) {
-        closeLanguageDropdown();
+      const target = event.target as Node;
+      if (
+        languageContainerRef.current?.contains(target) ||
+        languageDropdownRef.current?.contains(target)
+      ) {
+        return;
       }
+      closeLanguageDropdown();
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -137,6 +156,24 @@ export function HeaderMobileActions({
       clearLanguageCloseTimer();
     };
   }, [clearLanguageCloseTimer]);
+
+  const languageDropdown = isLanguageDropdownVisible ? (
+    <div
+      ref={languageDropdownRef}
+      className={`fixed origin-top rounded-2xl border border-gray-200 bg-white shadow-lg transition-all ease-out ${
+        isLanguageDropdownExpanded
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-2 opacity-0'
+      }`}
+      style={{
+        ...portalPosition,
+        padding: HEADER_MOBILE_LANGUAGE_DROPDOWN_PADDING_PX,
+        transitionDuration: `${HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS}ms`,
+      }}
+    >
+      <HeaderLanguageSwitcher />
+    </div>
+  ) : null;
 
   return (
     <div
@@ -154,6 +191,7 @@ export function HeaderMobileActions({
           label={t('common.navigation.language')}
           showPill={showPill}
           ariaExpanded={languageOpen}
+          buttonRef={languageButtonRef}
           onClick={() => {
             if (menuOpen) {
               onMenuToggle();
@@ -170,23 +208,9 @@ export function HeaderMobileActions({
           />
         </MobileIconButton>
 
-        {isLanguageDropdownVisible ? (
-          <div
-            className={`absolute right-0 z-50 origin-top rounded-2xl border border-gray-200 bg-white shadow-lg transition-all ease-out ${
-              isLanguageDropdownExpanded
-                ? 'pointer-events-auto translate-y-0 opacity-100'
-                : 'pointer-events-none -translate-y-2 opacity-0'
-            }`}
-            style={{
-              top: `calc(100% + ${HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX}px)`,
-              padding: HEADER_MOBILE_LANGUAGE_DROPDOWN_PADDING_PX,
-              minWidth: HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX,
-              transitionDuration: `${HEADER_MOBILE_LANGUAGE_DROPDOWN_ANIMATION_MS}ms`,
-            }}
-          >
-            <HeaderLanguageSwitcher />
-          </div>
-        ) : null}
+        {typeof document !== 'undefined' && languageDropdown
+          ? createPortal(languageDropdown, document.body)
+          : null}
       </div>
 
       <div className={HEADER_MOBILE_LANGUAGE_TABLET_INLINE_CLASS}>

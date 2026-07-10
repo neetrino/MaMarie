@@ -13,6 +13,14 @@
     overflow-x: clip;
   }
 
+  .frameAllowOverflow {
+    overflow: visible;
+  }
+
+  .frameAllowOverflow .stage {
+    overflow: visible;
+  }
+
   .stage {
     width: var(--desktop-layout-design-width);
     flex-shrink: 0;

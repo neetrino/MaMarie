@@ -5,6 +5,8 @@ interface DesktopFluidFrameProps {
   children: ReactNode;
   className?: string;
   stageClassName?: string;
+  /** Allow vertical overflow — navbar dropdowns must not be clipped in Safari. */
+  allowOverflow?: boolean;
 }
 
 /**
@@ -15,9 +17,18 @@ export function DesktopFluidFrame({
   children,
   className = '',
   stageClassName = '',
+  allowOverflow = false,
 }: DesktopFluidFrameProps) {
+  const frameClassName = [
+    styles.frame,
+    allowOverflow ? styles.frameAllowOverflow : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <div className={`${styles.frame} ${className}`.trim()}>
+    <div className={frameClassName}>
       <div className={`${styles.stage} ${stageClassName}`.trim()}>{children}</div>
     </div>
   );
