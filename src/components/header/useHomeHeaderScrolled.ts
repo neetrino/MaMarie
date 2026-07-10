@@ -21,9 +21,11 @@ export function useHeaderScrolled(): boolean {
   const pathname = useResolvedPathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollRafRef = useRef(0);
+  const hasUserScrolledRef = useRef(false);
 
   useEffect(() => {
     const profileScrollArea = document.querySelector('.profile-scroll-area');
+    hasUserScrolledRef.current = false;
 
     const updateScrollState = () => {
       let scrolled = resolveWindowScrollTop() > HEADER_HOME_SCROLL_THRESHOLD_PX;
@@ -33,10 +35,16 @@ export function useHeaderScrolled(): boolean {
           scrolled || profileScrollArea.scrollTop > HEADER_HOME_SCROLL_THRESHOLD_PX;
       }
 
+      // Home pill should appear only after the user starts scrolling.
+      if (pathname === '/' && !hasUserScrolledRef.current) {
+        scrolled = false;
+      }
+
       setIsScrolled((prev) => (prev === scrolled ? prev : scrolled));
     };
 
     const scheduleUpdate = () => {
+      hasUserScrolledRef.current = true;
       if (scrollRafRef.current) {
         return;
       }

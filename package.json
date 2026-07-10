@@ -4,7 +4,8 @@
   "private": true,
   "description": "WhiteShop.am — Next.js app at root, pnpm workspace",
   "scripts": {
-    "dev": "next dev -H 0.0.0.0",
+    "dev": "next dev --port 3000",
+    "dev:network": "next dev --hostname $(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo 127.0.0.1) --port 3000",
     "dev:webpack": "next dev --no-turbo",
     "dev:clean": "node -e \"require('fs').rmSync('.next', {recursive: true, force: true})\" && next dev",
     "prebuild": "node src/scripts/prebuild-prisma.js",

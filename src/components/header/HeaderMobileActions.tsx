@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState, type ReactNode, type Ref } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { BRAND_ASSETS } from '../../constants/brand';
@@ -88,12 +88,21 @@ export function HeaderMobileActions({
   const languageButtonRef = useRef<HTMLButtonElement>(null);
   const languageDropdownRef = useRef<HTMLDivElement>(null);
   const languageCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const portalPosition = useAnchoredPortalPosition(true, languageOpen, languageButtonRef, {
-    gapPx: HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX,
-    anchor: 'right',
-    minWidthPx: HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX,
-    zIndex: HEADER_DROPDOWN_PORTAL_Z_INDEX,
-  });
+  const languagePortalOptions = useMemo(
+    () => ({
+      gapPx: HEADER_MOBILE_LANGUAGE_DROPDOWN_GAP_PX,
+      anchor: 'right' as const,
+      minWidthPx: HEADER_MOBILE_LANGUAGE_DROPDOWN_MIN_WIDTH_PX,
+      zIndex: HEADER_DROPDOWN_PORTAL_Z_INDEX,
+    }),
+    [],
+  );
+  const portalPosition = useAnchoredPortalPosition(
+    true,
+    languageOpen,
+    languageButtonRef,
+    languagePortalOptions,
+  );
 
   const clearLanguageCloseTimer = useCallback(() => {
     if (languageCloseTimerRef.current) {
