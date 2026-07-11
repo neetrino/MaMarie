@@ -34,7 +34,7 @@ function ContactPageContent() {
       className="grid grid-cols-1 lg:grid-cols-2 lg:items-stretch"
       style={contactGridStyle}
     >
-      <div className="flex w-full min-w-0 flex-col gap-8">
+      <div className="flex w-full min-w-0 flex-col gap-8 max-lg:translate-x-4">
         <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconPhone} title={t('contact.callToUs.title')}>
           <p className="mb-2 text-gray-600">{t('contact.callToUs.description')}</p>
           <a href={`tel:${t('contact.phone')}`} className="font-medium text-gray-700 hover:text-gray-900">
@@ -58,7 +58,7 @@ function ContactPageContent() {
         </ContactInfoBlock>
       </div>
 
-      <div className="relative flex w-full min-w-0 overflow-visible">
+      <div className="relative flex w-full min-w-0 overflow-visible max-lg:-mr-8 max-lg:w-[calc(100%+32px)]">
         <ContactForm />
       </div>
     </div>
