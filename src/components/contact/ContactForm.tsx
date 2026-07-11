@@ -159,23 +159,25 @@ export function ContactForm() {
           gap: CONTACT_FORM_FIELD_GAP_PX,
         }}
       >
-        <ContactFormField
-          id="name"
-          label={t('contact.form.name')}
-          placeholder={t('contact.form.namePlaceholder')}
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <ContactFormField
-          id="email"
-          label={t('contact.form.email')}
-          placeholder={t('contact.form.emailPlaceholder')}
-          value={formData.email}
-          onChange={handleChange}
-          type="email"
-          required
-        />
+        <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-2 xl:grid-cols-1">
+          <ContactFormField
+            id="name"
+            label={t('contact.form.name')}
+            placeholder={t('contact.form.namePlaceholder')}
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+          <ContactFormField
+            id="email"
+            label={t('contact.form.email')}
+            placeholder={t('contact.form.emailPlaceholder')}
+            value={formData.email}
+            onChange={handleChange}
+            type="email"
+            required
+          />
+        </div>
         <ContactFormField
           id="subject"
           label={t('contact.form.subject')}
