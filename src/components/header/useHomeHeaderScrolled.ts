@@ -44,7 +44,6 @@ export function useHeaderScrolled(): boolean {
     };
 
     const scheduleUpdate = () => {
-      hasUserScrolledRef.current = true;
       if (scrollRafRef.current) {
         return;
       }
@@ -55,12 +54,36 @@ export function useHeaderScrolled(): boolean {
       });
     };
 
+    const markUserScrollIntent = () => {
+      hasUserScrolledRef.current = true;
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === 'ArrowDown' ||
+        event.key === 'ArrowUp' ||
+        event.key === 'PageDown' ||
+        event.key === 'PageUp' ||
+        event.key === 'Home' ||
+        event.key === 'End' ||
+        event.key === ' '
+      ) {
+        markUserScrollIntent();
+      }
+    };
+
     updateScrollState();
     window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('wheel', markUserScrollIntent, { passive: true });
+    window.addEventListener('touchstart', markUserScrollIntent, { passive: true });
+    window.addEventListener('keydown', handleKeyDown);
     profileScrollArea?.addEventListener('scroll', scheduleUpdate, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('wheel', markUserScrollIntent);
+      window.removeEventListener('touchstart', markUserScrollIntent);
+      window.removeEventListener('keydown', handleKeyDown);
       profileScrollArea?.removeEventListener('scroll', scheduleUpdate);
       if (scrollRafRef.current) {
         window.cancelAnimationFrame(scrollRafRef.current);
