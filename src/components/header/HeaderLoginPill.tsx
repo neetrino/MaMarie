@@ -60,15 +60,18 @@ function AccountPillButton({
   menuId,
   menuOpen,
   disabled = false,
+  onClick,
 }: {
   label: string;
   menuId?: string;
   menuOpen?: boolean;
   disabled?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="flex items-center justify-center rounded-[22px] bg-brand-yellow transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
       style={{
         width: HEADER_LOGIN_PILL_WIDTH_PX,
@@ -150,6 +153,7 @@ export function HeaderLoginPill() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
+  const [supportsHover, setSupportsHover] = useState(false);
 
   const label = isLoggedIn
     ? t('common.navigation.profile')
@@ -192,12 +196,18 @@ export function HeaderLoginPill() {
   }, [clearCloseTimer, closeMenu]);
 
   const handleContainerMouseEnter = useCallback(() => {
+    if (!supportsHover) {
+      return;
+    }
     openMenu();
-  }, [openMenu]);
+  }, [openMenu, supportsHover]);
 
   const handleContainerMouseLeave = useCallback(() => {
+    if (!supportsHover) {
+      return;
+    }
     scheduleCloseMenu();
-  }, [scheduleCloseMenu]);
+  }, [scheduleCloseMenu, supportsHover]);
 
   const handleContainerFocus = useCallback(() => {
     openMenu();
@@ -212,6 +222,30 @@ export function HeaderLoginPill() {
     },
     [scheduleCloseMenu],
   );
+
+  const handlePillClick = useCallback(() => {
+    if (!supportsHover) {
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+  }, [closeMenu, menuOpen, openMenu, supportsHover]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const updateSupportsHover = () => {
+      setSupportsHover(mediaQuery.matches);
+    };
+
+    updateSupportsHover();
+    mediaQuery.addEventListener('change', updateSupportsHover);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateSupportsHover);
+    };
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -263,6 +297,7 @@ export function HeaderLoginPill() {
         label={label}
         menuId={menuId}
         menuOpen={menuOpen}
+        onClick={handlePillClick}
       />
 
       {isMenuVisible ? (

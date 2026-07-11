@@ -157,7 +157,7 @@ export function ProductInfoAndActions({
             <p className="text-sm text-gray-500">{product.brand.name}</p>
           </div>
         )}
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="mb-4 flex items-start justify-between gap-4 lg:mb-6">
           <h1 className="min-w-0 flex-1 text-4xl font-bold text-gray-900">
             {getProductText(language, product.id, 'title') || product.title}
           </h1>
@@ -184,7 +184,7 @@ export function ProductInfoAndActions({
                 </span>
               )}
             </div>
-            <div className="shrink-0 lg:hidden">
+            <div className="shrink-0 min-[744px]:hidden">
               <ProductQuantityStepper
                 quantity={quantity}
                 maxQuantity={maxQuantity}
@@ -251,7 +251,7 @@ export function ProductInfoAndActions({
           </div>
         )}
         <div className="flex items-center gap-3">
-          <div className="hidden shrink-0 lg:block">
+          <div className="hidden shrink-0 min-[744px]:block">
             <ProductQuantityStepper
               quantity={quantity}
               maxQuantity={maxQuantity}

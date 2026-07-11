@@ -52,13 +52,13 @@ export const PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS = 'h-5 w-5 shrink-0';
 
 /** Mobile PDP — compact quantity stepper (- 1 +). */
 export const PRODUCT_PDP_QUANTITY_STEPPER_CLASS =
-  'flex items-center overflow-hidden rounded-full border bg-gray-50';
+  'flex items-center overflow-hidden rounded-full border bg-gray-50 min-[744px]:h-12';
 
 export const PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS =
-  'flex h-9 w-9 items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 lg:h-12 lg:w-12';
+  'flex h-9 w-9 items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 min-[744px]:h-12 min-[744px]:w-12';
 
 export const PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS =
-  'w-8 text-center text-sm font-bold lg:w-12 lg:text-base';
+  'w-8 text-center text-sm font-bold min-[744px]:w-12 min-[744px]:text-base';
 
 /** Below-the-fold related row — reserve space before lazy mount. */
 export const PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX = 420;
