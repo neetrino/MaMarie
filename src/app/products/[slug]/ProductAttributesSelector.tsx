@@ -85,7 +85,13 @@ export function ProductAttributesSelector({
   }
 
   return (
-    <div className="space-y-4">
+    <div
+      className={`space-y-4 ${
+        useNewFormat
+          ? 'min-[744px]:max-[1023px]:grid min-[744px]:max-[1023px]:grid-cols-2 min-[744px]:max-[1023px]:gap-4 min-[744px]:max-[1023px]:space-y-0'
+          : ''
+      }`}
+    >
       {/* Attribute Selectors - Support both new (productAttributes) and old (colorGroups) format */}
       {/* Display all attributes from attributeGroups, not just from productAttributes */}
       {useNewFormat ? (
@@ -103,7 +109,12 @@ export function ProductAttributesSelector({
           const isUnavailable = unavailableAttributes.get(attrKey) || false;
           
           return (
-            <div key={attrKey} className="space-y-1.5">
+            <div
+              key={attrKey}
+              className={`space-y-1.5 ${
+                !isColor && !isSize ? 'min-[744px]:max-[1023px]:col-span-2' : ''
+              }`}
+            >
               <label className={`text-xs font-bold uppercase ${isUnavailable ? 'text-red-600' : ''}`}>
                 {attrKey === 'color' ? t(language, 'product.color') : 
                  attrKey === 'size' ? t(language, 'product.size') : 
