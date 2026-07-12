@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../lib/auth/AuthContext';
 import { LanguageHtmlUpdater } from './LanguageHtmlUpdater';
+import { MobileRouteScrollReset } from './MobileRouteScrollReset';
 import { LanguageScrollRestorer } from './LanguageScrollRestorer';
 import { LazyCartDrawer, LazySearchModal } from './LazyClientOverlays';
 import { ToastContainer } from './Toast';
@@ -15,6 +16,7 @@ export function ClientProviders({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <LanguageHtmlUpdater />
+      <MobileRouteScrollReset />
       <LanguageScrollRestorer />
       {children}
       <LazyCartDrawer />
