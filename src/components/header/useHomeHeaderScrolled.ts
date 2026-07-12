@@ -35,8 +35,9 @@ export function useHeaderScrolled(): boolean {
           scrolled || profileScrollArea.scrollTop > HEADER_HOME_SCROLL_THRESHOLD_PX;
       }
 
-      // Home pill should appear only after the user starts scrolling.
-      if (pathname === '/' && !hasUserScrolledRef.current) {
+      // On mobile/tablet, pill should appear only after real user scroll intent.
+      const isMobileViewport = window.matchMedia('(max-width: 1023px)').matches;
+      if (isMobileViewport && !hasUserScrolledRef.current) {
         scrolled = false;
       }
 

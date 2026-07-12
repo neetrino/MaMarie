@@ -2,6 +2,7 @@
  * Flies a small product thumbnail from a source element toward the header cart target.
  * Respects `prefers-reduced-motion`. No-op on server or missing source.
  */
+import { CART_DRAWER_PANEL_Z_INDEX } from '../constants/cart-drawer';
 
 export type CartFlyAnimationOptions = {
   fromElement?: Element | null;
@@ -129,7 +130,8 @@ function appendFlyShell(
   shell.style.position = 'fixed';
   shell.style.borderRadius = '50%';
   shell.style.overflow = 'hidden';
-  shell.style.zIndex = '10000';
+  // Keep fly animation under the cart side sheet panel on mobile.
+  shell.style.zIndex = String(CART_DRAWER_PANEL_Z_INDEX - 1);
   shell.style.pointerEvents = 'none';
   shell.style.boxShadow = '0 8px 24px rgba(15, 23, 42, 0.18)';
   shell.setAttribute('aria-hidden', 'true');

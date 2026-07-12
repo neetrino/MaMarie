@@ -35,7 +35,6 @@ import { HeaderMobileActions } from './header/HeaderMobileActions';
 import { HeaderNavLinks } from './header/HeaderNavLinks';
 import { MobileMenuModal } from './header/MobileMenuModal';
 import { useHeaderScrolled } from './header/useHomeHeaderScrolled';
-import { useResolvedPathname } from './hooks/useResolvedPathname';
 
 export interface SiteHeaderProps {
   navLinks: readonly NavLinkItem[];
@@ -202,14 +201,12 @@ function DesktopHeaderBar({
 }
 
 export function SiteHeader({ navLinks }: SiteHeaderProps) {
-  const pathname = useResolvedPathname();
-  const isHomeRoute = pathname === '/';
   const isScrolled = useHeaderScrolled();
   const [menuOpen, setMenuOpen] = useState(false);
   const [pillFrozen, setPillFrozen] = useState<boolean | null>(null);
   const menuId = useId();
 
-  const showPill = pillFrozen ?? (isHomeRoute ? isScrolled : true);
+  const showPill = pillFrozen ?? isScrolled;
 
   const handleMenuToggle = () => {
     setMenuOpen((open) => {
