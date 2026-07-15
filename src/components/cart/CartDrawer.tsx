@@ -82,8 +82,8 @@ function CartDrawerPanel({
           aria-labelledby="cart-drawer-title"
           onClick={(event) => event.stopPropagation()}
         >
-          <header className="flex items-center border-b border-gray-100 px-6 py-5">
-            <div className="flex min-h-10 flex-col justify-center">
+          <header className="flex items-start justify-between gap-3 border-b border-gray-100 px-6 py-5">
+            <div className="flex min-h-10 min-w-0 flex-col justify-center">
               <h2 id="cart-drawer-title" className="text-xl font-bold leading-tight text-gray-900">
                 {t('common.cart.title')}
               </h2>
@@ -93,6 +93,16 @@ function CartDrawerPanel({
                 </p>
               ) : null}
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900"
+              aria-label={t('common.buttons.close')}
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </header>
 
           <div className="flex min-h-0 flex-1 flex-col">
