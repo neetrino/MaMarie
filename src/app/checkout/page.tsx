@@ -95,6 +95,7 @@ export default function CheckoutPage() {
 
       <CheckoutOrderItemsPreview
         cart={cart}
+        currency={currency}
         onRemoveItem={handleRemoveCartItem}
         t={t}
         className={CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS}
