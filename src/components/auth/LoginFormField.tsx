@@ -50,6 +50,32 @@ export function LoginFormField({
   trailing,
   onChange,
 }: LoginFormFieldProps) {
+  const handleEnterToNextField = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') {
+      return;
+    }
+
+    const form = event.currentTarget.form;
+    if (!form) {
+      return;
+    }
+
+    const currentField = event.currentTarget;
+    const fields = Array.from(
+      form.querySelectorAll<HTMLInputElement>(
+        'input[type="text"], input[type="email"], input[type="tel"], input[type="password"]',
+      ),
+    ).filter((field) => !field.disabled && field.offsetParent !== null);
+
+    const currentIndex = fields.indexOf(currentField);
+    const nextField = currentIndex >= 0 ? fields[currentIndex + 1] : null;
+
+    if (nextField) {
+      event.preventDefault();
+      nextField.focus();
+    }
+  };
+
   return (
     <div className="flex w-full flex-col" style={{ gap: LOGIN_LABEL_TO_INPUT_GAP_PX }}>
       <label
@@ -95,13 +121,22 @@ export function LoginFormField({
           spellCheck={type === 'email' ? false : undefined}
           suppressHydrationWarning
           onChange={onChange}
+          onKeyDown={handleEnterToNextField}
           className={LOGIN_INPUT_FIELD_CLASS}
           style={{
             lineHeight: 1.5,
             color: LOGIN_INPUT_TEXT_COLOR,
             letterSpacing: '-0.24px',
+            outline: 'none',
+            boxShadow: 'none',
+            WebkitAppearance: 'none',
           }}
         />
+        {trailing ? (
+          <div className="relative -left-0.5 ml-2 flex h-full shrink-0 items-center self-center">
+            {trailing}
+          </div>
+        ) : null}
       </div>
     </div>
   );

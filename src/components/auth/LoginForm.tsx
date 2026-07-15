@@ -118,7 +118,7 @@ export function LoginForm({
               type="button"
               onClick={onTogglePassword}
               disabled={disabled}
-              className="shrink-0 hover:opacity-70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-full shrink-0 items-center justify-center hover:opacity-70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               aria-label={showPassword ? labels.hidePassword : labels.showPassword}
             >
               <span className="lg:hidden">

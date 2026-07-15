@@ -98,7 +98,7 @@ function PasswordToggleButton({
       type="button"
       onClick={onToggle}
       disabled={disabled}
-      className="shrink-0 hover:opacity-70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex h-full shrink-0 items-center justify-center hover:opacity-70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       aria-label={visible ? hideLabel : showLabel}
     >
       <span className="lg:hidden">
