@@ -3,6 +3,7 @@
 import type { MouseEvent } from 'react';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
+import { MOBILE_PRODUCTS_CATALOG_CARD_ASSETS } from '../../../constants/mobile-products-catalog';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -131,6 +132,19 @@ export function ProductInfoAndActions({
     originalPrice || (compareAtPrice && compareAtPrice > price),
   );
   const regularPriceValue = originalPrice || compareAtPrice || 0;
+  const actionLabel = isAddingToCart
+    ? t(language, 'product.adding')
+    : isOutOfStock
+      ? t(language, 'product.outOfStock')
+      : isVariationRequired
+        ? getRequiredAttributesMessage()
+        : hasUnavailableAttributes
+          ? t(language, 'product.outOfStock')
+          : t(language, 'product.addToCart');
+  const mobileFormattedActionLabel =
+    isVariationRequired && actionLabel.includes(' և ')
+      ? actionLabel.replace(' և ', '\nև ')
+      : actionLabel;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -247,10 +261,23 @@ export function ProductInfoAndActions({
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 
-            className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full uppercase font-bold transition-colors hover:brightness-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+            className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full font-bold transition-colors hover:brightness-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
             onClick={onAddToCart}
           >
-            {isAddingToCart ? t(language, 'product.adding') : (isOutOfStock ? t(language, 'product.outOfStock') : (isVariationRequired ? getRequiredAttributesMessage() : (hasUnavailableAttributes ? t(language, 'product.outOfStock') : t(language, 'product.addToCart'))))}
+            <span className="relative block h-full w-full">
+              <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
+                {mobileFormattedActionLabel}
+              </span>
+              <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
+                <Image
+                  src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
+                  alt=""
+                  width={20}
+                  height={20}
+                  aria-hidden
+                />
+              </span>
+            </span>
           </button>
           <button 
             onClick={onAddToWishlist} 
