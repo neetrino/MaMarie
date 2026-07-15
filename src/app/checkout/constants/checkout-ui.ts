@@ -37,12 +37,12 @@ export const CHECKOUT_ORDER_ITEMS_PREVIEW_CARD_CLASS =
   'rounded-[15px] border border-gray-200 bg-white px-5 py-4 sm:px-6 sm:py-5';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_TITLE_CLASS =
-  'text-sm font-bold uppercase tracking-wide text-gray-900';
+  'text-sm font-bold tracking-wide text-gray-900';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_COUNT_CLASS = 'shrink-0 text-sm text-gray-500';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_LIST_CLASS =
-  'flex gap-6 overflow-x-auto overscroll-x-contain pt-4';
+  'scrollbar-hide flex gap-6 overflow-x-auto overscroll-x-contain pt-4';
 
 export const CHECKOUT_ORDER_ITEMS_THUMB_FRAME_CLASS =
   'relative overflow-hidden rounded-xl border border-gray-200 bg-white';
