@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import { useAuth } from '../../../lib/auth/AuthContext';
+import { syncStoredAuthUser } from '../../../lib/auth/sync-stored-auth-user';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { UserProfile } from '../types';
 
@@ -57,9 +58,14 @@ export function usePersonalInfo({
       const updated = await apiClient.put<UserProfile>('/api/v1/users/profile', personalInfo);
       onProfileUpdate(updated);
       onSuccess(t('profile.personal.updatedSuccess'));
-      
+
       if (authUser) {
-        window.dispatchEvent(new Event('auth-updated'));
+        syncStoredAuthUser({
+          firstName: updated.firstName,
+          lastName: updated.lastName,
+          email: updated.email,
+          phone: updated.phone,
+        });
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);

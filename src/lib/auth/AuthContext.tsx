@@ -111,6 +111,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadAuthState();
   }, []);
 
+  // Re-read user after profile edits (syncStoredAuthUser) / other auth writers
+  useEffect(() => {
+    const handleAuthUpdated = () => {
+      try {
+        const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+        const storedUser = localStorage.getItem(AUTH_USER_KEY);
+
+        if (!storedToken || !storedUser) {
+          setToken(null);
+          setUser(null);
+          return;
+        }
+
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser) as User);
+      } catch {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_USER_KEY);
+        setToken(null);
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('auth-updated', handleAuthUpdated);
+    return () => window.removeEventListener('auth-updated', handleAuthUpdated);
+  }, []);
+
   /**
    * Login user
    */
