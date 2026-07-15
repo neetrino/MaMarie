@@ -45,34 +45,63 @@ class UsersService {
   }
 
   /**
-   * Update user profile
+   * Update user profile (personal fields used by checkout / contact autofill).
    */
-  async updateProfile(userId: string, data: any) {
-    const user = await db.user.update({
-      where: { id: userId },
-      data: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        locale: data.locale,
-      },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        firstName: true,
-        lastName: true,
-        locale: true,
-      },
-    });
+  async updateProfile(
+    userId: string,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      email?: string;
+      locale?: string;
+    },
+  ) {
+    const email =
+      typeof data.email === "string" ? data.email.trim() || null : undefined;
+    const phone =
+      typeof data.phone === "string" ? data.phone.trim() || null : undefined;
 
-    return {
-      id: user.id,
-      email: user.email,
-      phone: user.phone,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      locale: user.locale,
-    };
+    try {
+      const user = await db.user.update({
+        where: { id: userId },
+        data: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          locale: data.locale,
+          ...(email !== undefined ? { email } : {}),
+          ...(phone !== undefined ? { phone } : {}),
+        },
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          firstName: true,
+          lastName: true,
+          locale: true,
+        },
+      });
+
+      return {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        locale: user.locale,
+      };
+    } catch (error: unknown) {
+      const prismaError = error as { code?: string };
+      if (prismaError.code === "P2002") {
+        throw {
+          status: 409,
+          type: "https://api.shop.am/problems/conflict",
+          title: "Conflict",
+          detail: "User with this email or phone already exists",
+        };
+      }
+      throw error;
+    }
   }
 
   /**

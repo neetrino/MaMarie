@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import {
   CONTACT_FORM_CARD_BG,
@@ -27,6 +27,7 @@ import { ContactFormMessageField } from './ContactFormMessageField';
 import { ContactFormStrawberry } from './ContactFormStrawberry';
 import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
+import { useAuth } from '../../lib/auth/AuthContext';
 import { logger } from '../../lib/utils/logger';
 
 interface ContactFormFields {
@@ -42,6 +43,10 @@ const EMPTY_FORM: ContactFormFields = {
   subject: '',
   message: '',
 };
+
+function buildDisplayName(firstName?: string | null, lastName?: string | null): string {
+  return [firstName, lastName].filter(Boolean).join(' ').trim();
+}
 
 interface ContactFormFieldProps {
   id: keyof ContactFormFields;
@@ -105,8 +110,55 @@ function ContactFormField({
 /** Figma contact form — white card, stacked fields, pink pill submit, strawberry decoration. */
 export function ContactForm() {
   const { t } = useTranslation();
+  const { user, isLoggedIn, isLoading } = useAuth();
   const [formData, setFormData] = useState<ContactFormFields>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isLoading || !isLoggedIn) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadProfile() {
+      try {
+        const profile = await apiClient.get<{
+          firstName?: string;
+          lastName?: string;
+          email?: string;
+        }>('/api/v1/users/profile');
+
+        if (cancelled) {
+          return;
+        }
+
+        const name = buildDisplayName(profile.firstName, profile.lastName);
+        setFormData((current) => ({
+          ...current,
+          name: current.name || name,
+          email: current.email || profile.email || '',
+        }));
+      } catch {
+        if (cancelled || !user) {
+          return;
+        }
+
+        const name = buildDisplayName(user.firstName, user.lastName);
+        setFormData((current) => ({
+          ...current,
+          name: current.name || name,
+          email: current.email || user.email || '',
+        }));
+      }
+    }
+
+    void loadProfile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, isLoading, user]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((current) => ({
