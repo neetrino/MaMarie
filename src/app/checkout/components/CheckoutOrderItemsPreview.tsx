@@ -16,6 +16,7 @@ import {
 import { HOME_PRODUCT_CARD_ASSETS, HOME_PRODUCT_CARD_BG } from '../../../constants/home-sections';
 import type { CurrencyCode } from '../../../lib/currency';
 import { resolveColorSwatch } from '../../../lib/resolve-color-swatch';
+import { useHorizontalWheelScroll } from '../../../lib/use-horizontal-wheel-scroll';
 import {
   CHECKOUT_ORDER_ITEM_CARD_CLASS,
   CHECKOUT_ORDER_ITEMS_COLOR_SWATCH_CLASS,
@@ -151,6 +152,7 @@ export function CheckoutOrderItemsPreview({
   const itemsLabel =
     cart.itemsCount === 1 ? t('common.cart.item') : t('common.cart.items');
   const currencyCode = currency as CurrencyCode;
+  const listScrollRef = useHorizontalWheelScroll<HTMLDivElement>();
 
   return (
     <section
@@ -166,7 +168,7 @@ export function CheckoutOrderItemsPreview({
         </p>
       </div>
 
-      <div className={CHECKOUT_ORDER_ITEMS_PREVIEW_LIST_CLASS}>
+      <div ref={listScrollRef} className={CHECKOUT_ORDER_ITEMS_PREVIEW_LIST_CLASS}>
         {cart.items.map((item) => (
           <CheckoutOrderItemPreview
             key={item.id}
