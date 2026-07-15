@@ -311,6 +311,7 @@ function readCartItemForUpdate(
       price,
       originalPrice: line.originalPrice ?? null,
       total: price * line.quantity,
+      selectedColor: line.selectedColor ?? null,
     };
   }
 

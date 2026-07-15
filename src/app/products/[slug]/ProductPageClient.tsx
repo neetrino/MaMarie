@@ -58,7 +58,6 @@ export function ProductPageClient({
     showMessage,
     setShowMessage,
     isInWishlist,
-    isInCompare,
     quantity,
     reviews,
     averageRating,
@@ -84,7 +83,6 @@ export function ProductPageClient({
     handleSizeSelect,
     handleAttributeValueSelect,
     handleAddToWishlist,
-    handleCompareToggle,
     getRequiredAttributesMessage,
   } = useProductPage({
     slugParam,
@@ -101,6 +99,13 @@ export function ProductPageClient({
   }, [product?.id]);
 
   const handleAddToCart = async () => {
+    const requiresColorSelection = colorGroups.length > 0 && colorGroups.some((group) => group.stock > 0);
+    if (requiresColorSelection && !selectedColor) {
+      setShowMessage(t(language, 'product.selectColor'));
+      setTimeout(() => setShowMessage(null), 2000);
+      return;
+    }
+
     if (!canAddToCart || !product || !currentVariant) {
       return;
     }
@@ -117,12 +122,16 @@ export function ProductPageClient({
         const existing = cart.find((item) => item.variantId === currentVariant.id);
         if (existing) {
           existing.quantity += quantity;
+          if (selectedColor) {
+            existing.selectedColor = selectedColor;
+          }
         } else {
           const newItem: GuestCartItem = {
             productId: product.id,
             productSlug: product.slug,
             variantId: currentVariant.id,
             quantity,
+            selectedColor: selectedColor ?? undefined,
             price,
             title: product.title,
             image: imageUrl,
@@ -206,7 +215,6 @@ export function ProductPageClient({
           canAddToCart={canAddToCart}
           isAddingToCart={isAddingToCart}
           isInWishlist={isInWishlist}
-          isInCompare={isInCompare}
           showMessage={showMessage}
           isLoggedIn={isLoggedIn}
           currentVariant={currentVariant}
@@ -219,7 +227,6 @@ export function ProductPageClient({
           onQuantityAdjust={adjustQuantity}
           onAddToCart={handleAddToCart}
           onAddToWishlist={handleAddToWishlist}
-          onCompareToggle={handleCompareToggle}
           onScrollToReviews={scrollToReviews}
           onColorSelect={handleColorSelect}
           onSizeSelect={handleSizeSelect}

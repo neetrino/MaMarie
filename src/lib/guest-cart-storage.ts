@@ -21,6 +21,7 @@ function guestItemToCartItem(item: GuestCartItem, index: number, productLabel: s
     price,
     originalPrice: item.originalPrice ?? null,
     total: price * item.quantity,
+    selectedColor: item.selectedColor ?? null,
   };
 }
 
@@ -156,6 +157,7 @@ export function syncGuestCartDisplayFromApiCart(
       stock: apiLine.variant.stock,
       originalPrice: apiLine.originalPrice ?? stored.originalPrice,
       sku: apiLine.variant.sku || stored.sku,
+      selectedColor: apiLine.selectedColor ?? stored.selectedColor,
     };
   });
 }
@@ -182,6 +184,7 @@ export function mergeNormalizedGuestItems(
       stock: item.stock ?? prev.stock,
       originalPrice: item.originalPrice ?? prev.originalPrice,
       sku: item.sku ?? prev.sku,
+      selectedColor: item.selectedColor ?? prev.selectedColor,
     };
   });
 }

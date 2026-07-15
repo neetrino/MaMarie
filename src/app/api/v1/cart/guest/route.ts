@@ -8,6 +8,7 @@ interface GuestCartItemInput {
   productSlug?: string;
   variantId: string;
   quantity: number;
+  selectedColor?: string;
   price?: number;
 }
 
@@ -40,6 +41,7 @@ interface GuestCartLine {
   price: number;
   originalPrice: number | null;
   total: number;
+  selectedColor?: string | null;
 }
 
 interface GuestCartResponse {
@@ -75,8 +77,34 @@ function sanitizeItems(items: GuestCartItemInput[] | undefined): GuestCartItemIn
       productSlug: typeof item.productSlug === "string" ? item.productSlug : undefined,
       variantId: item.variantId,
       quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? Math.floor(item.quantity) : 1,
+      selectedColor: typeof item.selectedColor === "string" ? item.selectedColor : undefined,
       price: typeof item.price === "number" ? item.price : undefined,
     }));
+}
+
+function extractSelectedColor(
+  options: Array<{
+    attributeKey: string | null;
+    value: string | null;
+    attributeValue: {
+      value: string;
+      translations: Array<{ locale: string; label: string }>;
+    } | null;
+  }>,
+  lang: string,
+): string | undefined {
+  const colorOption = options.find((option) => {
+    const attributeKey = option.attributeKey?.toLowerCase().trim();
+    return attributeKey === "color";
+  });
+  if (!colorOption) {
+    return undefined;
+  }
+
+  const translatedLabel = colorOption.attributeValue?.translations.find(
+    (translation) => translation.locale === lang,
+  )?.label;
+  return translatedLabel || colorOption.value || colorOption.attributeValue?.value || undefined;
 }
 
 export async function POST(req: NextRequest) {
@@ -117,6 +145,23 @@ export async function POST(req: NextRequest) {
             price: true,
             compareAtPrice: true,
             stock: true,
+            options: {
+              select: {
+                attributeKey: true,
+                value: true,
+                attributeValue: {
+                  select: {
+                    value: true,
+                    translations: {
+                      select: {
+                        locale: true,
+                        label: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -152,6 +197,7 @@ export async function POST(req: NextRequest) {
         productSlug: productSlug || undefined,
         variantId: selectedVariant.id,
         quantity: item.quantity,
+        selectedColor: extractSelectedColor(selectedVariant.options, lang) ?? item.selectedColor,
         price: selectedVariant.price,
       });
 
@@ -174,6 +220,7 @@ export async function POST(req: NextRequest) {
         price: selectedVariant.price,
         originalPrice: selectedVariant.compareAtPrice,
         total: selectedVariant.price * item.quantity,
+        selectedColor: extractSelectedColor(selectedVariant.options, lang) ?? item.selectedColor ?? null,
       });
     });
 

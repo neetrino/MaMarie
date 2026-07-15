@@ -7,7 +7,6 @@ import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
-import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import { ProductRatingSummary } from './ProductRatingSummary';
 import {
@@ -36,7 +35,6 @@ interface ProductInfoAndActionsProps {
   canAddToCart: boolean;
   isAddingToCart: boolean;
   isInWishlist: boolean;
-  isInCompare: boolean;
   showMessage: string | null;
   isLoggedIn: boolean;
   currentVariant: ProductVariant | null;
@@ -49,7 +47,6 @@ interface ProductInfoAndActionsProps {
   onQuantityAdjust: (delta: number) => void;
   onAddToCart: () => Promise<void>;
   onAddToWishlist: (e: MouseEvent) => void;
-  onCompareToggle: (e: MouseEvent) => void;
   onScrollToReviews: () => void;
   onColorSelect: (color: string) => void;
   onSizeSelect: (size: string) => void;
@@ -111,7 +108,6 @@ export function ProductInfoAndActions({
   canAddToCart,
   isAddingToCart,
   isInWishlist,
-  isInCompare,
   showMessage,
   isLoggedIn,
   currentVariant,
@@ -124,7 +120,6 @@ export function ProductInfoAndActions({
   onQuantityAdjust,
   onAddToCart,
   onAddToWishlist,
-  onCompareToggle,
   onScrollToReviews,
   onColorSelect,
   onSizeSelect,
@@ -228,14 +223,6 @@ export function ProductInfoAndActions({
       
       {/* Action buttons — bottom-aligned with gallery image on desktop */}
       <div className="mt-auto lg:pt-0 pt-6">
-        {/* Show required attributes message if needed */}
-        {isVariationRequired && (
-          <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800 font-medium">
-              {getRequiredAttributesMessage()}
-            </p>
-          </div>
-        )}
         {/* Show unavailable attributes message if needed */}
         {hasUnavailableAttributes && !isVariationRequired && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -264,12 +251,6 @@ export function ProductInfoAndActions({
             onClick={onAddToCart}
           >
             {isAddingToCart ? t(language, 'product.adding') : (isOutOfStock ? t(language, 'product.outOfStock') : (isVariationRequired ? getRequiredAttributesMessage() : (hasUnavailableAttributes ? t(language, 'product.outOfStock') : t(language, 'product.addToCart'))))}
-          </button>
-          <button 
-            onClick={onCompareToggle} 
-            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${isInCompare ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
-          >
-            <CompareIcon isActive={isInCompare} />
           </button>
           <button 
             onClick={onAddToWishlist} 

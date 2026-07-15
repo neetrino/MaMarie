@@ -80,6 +80,11 @@ export function CartItemRow({
           >
             {item.variant.product.title}
           </Link>
+          {item.selectedColor ? (
+            <p className="text-xs text-gray-500 mt-1">
+              {t('common.ariaLabels.color').replace('{color}', item.selectedColor)}
+            </p>
+          ) : null}
           {item.variant.sku && (
             <p className="text-xs text-gray-500 mt-1">{t('common.messages.sku')}: {item.variant.sku}</p>
           )}

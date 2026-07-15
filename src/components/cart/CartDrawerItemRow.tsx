@@ -106,6 +106,11 @@ export function CartDrawerItemRow({
               >
                 {item.variant.product.title}
               </Link>
+              {item.selectedColor ? (
+                <p className="mt-1 text-xs text-gray-500">
+                  {t('common.ariaLabels.color').replace('{color}', item.selectedColor)}
+                </p>
+              ) : null}
               <p className="mt-1 text-sm font-semibold text-gray-900">
                 {formatCartLineAmountInCurrency(lineTotal, currencyCode)}
               </p>

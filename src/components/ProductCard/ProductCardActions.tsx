@@ -1,19 +1,16 @@
 'use client';
 
 import type { MouseEvent } from 'react';
-import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { useTranslation } from '../../lib/i18n-client';
 
 interface ProductCardActionsProps {
   isInWishlist: boolean;
-  isInCompare: boolean;
   isAddingToCart: boolean;
   inStock: boolean;
   isCompact?: boolean;
   onWishlistToggle: (e: MouseEvent) => void;
-  onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
   showOnHover?: boolean;
 }
@@ -23,12 +20,10 @@ interface ProductCardActionsProps {
  */
 export function ProductCardActions({
   isInWishlist,
-  isInCompare,
   isAddingToCart,
   inStock,
   isCompact = false,
   onWishlistToggle,
-  onCompareToggle,
   onAddToCart,
   showOnHover = false,
 }: ProductCardActionsProps) {
@@ -38,20 +33,6 @@ export function ProductCardActions({
 
   const actions = (
     <>
-      {/* Compare Icon */}
-      <button
-        onClick={onCompareToggle}
-        className={`${buttonSize} rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-          isInCompare
-            ? 'border-gray-900 text-gray-900 bg-white shadow-sm'
-            : 'border-gray-200 text-gray-700 bg-white hover:border-gray-300 hover:bg-gray-50'
-        }`}
-        title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
-        aria-label={isInCompare ? t('common.ariaLabels.removeFromCompare') : t('common.ariaLabels.addToCompare')}
-      >
-        <CompareIcon isActive={isInCompare} size={isCompact ? 16 : 18} />
-      </button>
-
       {/* Wishlist Icon */}
       <button
         onClick={onWishlistToggle}

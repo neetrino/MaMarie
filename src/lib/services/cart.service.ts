@@ -3,6 +3,31 @@ import { logger } from "../utils/logger";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
 
 class CartService {
+  private extractSelectedColor(
+    options: Array<{
+      attributeKey: string | null;
+      value: string | null;
+      attributeValue: {
+        value: string;
+        translations: Array<{ locale: string; label: string }>;
+      } | null;
+    }>,
+    locale: string,
+  ): string | null {
+    const colorOption = options.find((option) => {
+      const key = option.attributeKey?.toLowerCase().trim();
+      return key === "color";
+    });
+    if (!colorOption) {
+      return null;
+    }
+
+    const translatedLabel = colorOption.attributeValue?.translations.find(
+      (translation) => translation.locale === locale,
+    )?.label;
+    return translatedLabel ?? colorOption.value ?? colorOption.attributeValue?.value ?? null;
+  }
+
   /**
    * Get or create user's cart
    */
@@ -40,6 +65,15 @@ class CartService {
                     translations: true,
                   },
                 },
+                options: {
+                  include: {
+                    attributeValue: {
+                      include: {
+                        translations: true,
+                      },
+                    },
+                  },
+                },
               },
             },
             product: {
@@ -70,6 +104,15 @@ class CartService {
                   product: {
                     include: {
                       translations: true,
+                    },
+                  },
+                  options: {
+                    include: {
+                      attributeValue: {
+                        include: {
+                          translations: true,
+                        },
+                      },
                     },
                   },
                 },
@@ -106,6 +149,14 @@ class CartService {
           stock: number;
           price: number;
           compareAtPrice?: number | null;
+          options: Array<{
+            attributeKey: string | null;
+            value: string | null;
+            attributeValue: {
+              value: string;
+              translations: Array<{ locale: string; label: string }>;
+            } | null;
+          }>;
         };
       }) => {
         const product = item.product;
@@ -161,6 +212,7 @@ class CartService {
           price: finalPrice,
           originalPrice,
           total: finalPrice * item.quantity,
+          selectedColor: this.extractSelectedColor(variant?.options ?? [], locale),
         };
       }
     );
