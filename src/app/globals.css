@@ -44,6 +44,17 @@
     user-select: text;
   }
 
+  /* Auth inputs — neutralize browser autofill blue highlight. */
+  .auth-page-form input:-webkit-autofill,
+  .auth-page-form input:-webkit-autofill:hover,
+  .auth-page-form input:-webkit-autofill:focus,
+  .auth-page-form input:-webkit-autofill:active {
+    -webkit-text-fill-color: #232323;
+    box-shadow: 0 0 0 1000px #ffffff inset;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+    transition: background-color 9999s ease-out 0s;
+  }
+
   img,
   video,
   canvas {

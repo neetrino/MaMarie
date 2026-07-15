@@ -179,6 +179,7 @@
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
     "color": "Color: {color}",
+    "size": "Size: {size}",
     "previousImage": "Previous image",
     "nextImage": "Next image",
     "goToSlide": "Go to slide {number}",

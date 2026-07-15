@@ -12,6 +12,8 @@ export const MOBILE_HOME_DESIGN_WIDTH_PX = 375;
 
 export const MOBILE_HOME_BG = '#f1f1f3';
 export const MOBILE_HOME_SECTION_GAP_PX = 50;
+/** Tighten first section gap under hero buttons by 6px. */
+export const MOBILE_HOME_HERO_TO_FIRST_SECTION_GAP_PX = MOBILE_HOME_SECTION_GAP_PX - 6;
 export const MOBILE_HOME_HORIZONTAL_PADDING_PX = 20;
 /** Slightly tighter than full nav shell — less empty strip above bottom bar. */
 export const MOBILE_HOME_BOTTOM_NAV_CLEARANCE_OFFSET_PX = 10;

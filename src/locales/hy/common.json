@@ -177,6 +177,7 @@
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
     "color": "Գույն: {color}",
+    "size": "Չափ: {size}",
     "previousImage": "Նախորդ պատկեր",
     "nextImage": "Հաջորդ պատկեր",
     "goToSlide": "Գնալ {number} սլայդ",

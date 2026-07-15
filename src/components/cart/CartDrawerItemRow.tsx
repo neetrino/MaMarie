@@ -16,6 +16,7 @@ import {
 import { HOME_PRODUCT_CARD_ASSETS, HOME_PRODUCT_CARD_BG } from '../../constants/home-sections';
 import type { CurrencyCode } from '../../lib/currency';
 import { closeCartDrawer } from '../../lib/cart-drawer';
+import { resolveColorSwatch } from '../../lib/resolve-color-swatch';
 
 interface CartDrawerItemRowProps {
   item: CartItem;
@@ -72,15 +73,15 @@ export function CartDrawerItemRow({
   };
 
   return (
-    <article className="border-b border-gray-100 py-4 first:pt-0 last:border-b-0">
-      <div className="flex items-start gap-3">
+    <article className="mb-3 rounded-[20px] border border-gray-200 bg-white p-3 shadow-sm last:mb-0">
+      <div className="flex items-stretch gap-3">
         <Link
           href={productHref}
           onClick={handleProductNavigate}
-          className="relative block shrink-0 overflow-hidden"
+          className="relative block shrink-0 self-stretch overflow-hidden"
           style={{
             width: CART_DRAWER_ITEM_THUMB_SIZE_PX,
-            height: CART_DRAWER_ITEM_THUMB_SIZE_PX,
+            minHeight: CART_DRAWER_ITEM_THUMB_SIZE_PX,
             borderRadius: CART_DRAWER_ITEM_THUMB_RADIUS_PX,
             backgroundColor: HOME_PRODUCT_CARD_BG,
           }}
@@ -89,14 +90,14 @@ export function CartDrawerItemRow({
             src={imageSrc}
             alt={item.variant.product.title}
             fill
-            className="object-contain p-1"
+            className="object-contain p-0.5"
             sizes={`${CART_DRAWER_ITEM_THUMB_SIZE_PX}px`}
             unoptimized
             onError={() => setImageError(true)}
           />
         </Link>
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <Link
@@ -123,26 +124,44 @@ export function CartDrawerItemRow({
             </button>
           </div>
 
-          <div className="mt-2 flex justify-end">
-            <div className="inline-flex items-center rounded-full border border-gray-200 bg-sky-50/70 px-1 py-1">
+          <div className="flex min-w-0 items-center gap-2">
+            {item.selectedColor ? (
+              <span
+                className="h-7 w-7 shrink-0 rounded-full"
+                style={{ backgroundColor: resolveColorSwatch(item.selectedColor) }}
+                aria-label={t('common.ariaLabels.color').replace('{color}', item.selectedColor)}
+                title={item.selectedColor}
+              />
+            ) : null}
+            {item.selectedSize ? (
+              <span
+                className="inline-flex h-7 min-w-[28px] shrink-0 items-center justify-center rounded-full bg-brand-pink px-2.5 text-xs font-semibold uppercase leading-none text-white shadow-sm"
+                aria-label={t('common.ariaLabels.size').replace('{size}', item.selectedSize)}
+                title={item.selectedSize}
+              >
+                {item.selectedSize}
+              </span>
+            ) : null}
+
+            <div className="ml-auto inline-flex shrink-0 items-center rounded-full border border-gray-200 bg-sky-50/70 px-0.5 py-0.5">
               <button
                 type="button"
                 onClick={() => handleQuantityChange(displayQuantity - 1)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white"
                 aria-label={t('common.ariaLabels.decreaseQuantity')}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                 </svg>
               </button>
-              <span className="min-w-[1.75rem] text-center text-sm font-semibold text-gray-900">
+              <span className="min-w-[1.25rem] text-center text-sm font-semibold text-gray-900">
                 {displayQuantity}
               </span>
               <button
                 type="button"
                 onClick={() => handleQuantityChange(displayQuantity + 1)}
                 disabled={atMaxStock}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={t('common.ariaLabels.increaseQuantity')}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

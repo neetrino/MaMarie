@@ -27,13 +27,11 @@ interface ProductCardGridProps {
   };
   currency: CurrencyCode;
   isInWishlist: boolean;
-  isInCompare: boolean;
   isAddingToCart: boolean;
   imageError: boolean;
   isCompact?: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
-  onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
 }
 
@@ -44,13 +42,11 @@ export function ProductCardGrid({
   product,
   currency,
   isInWishlist,
-  isInCompare,
   isAddingToCart,
   imageError,
   isCompact = false,
   onImageError,
   onWishlistToggle,
-  onCompareToggle,
   onAddToCart,
 }: ProductCardGridProps) {
   const { t } = useTranslation();
@@ -90,12 +86,10 @@ export function ProductCardGrid({
         {/* Action Icons - appear on hover */}
         <ProductCardActions
           isInWishlist={isInWishlist}
-          isInCompare={isInCompare}
           isAddingToCart={isAddingToCart}
           inStock={product.inStock}
           isCompact={isCompact}
           onWishlistToggle={onWishlistToggle}
-          onCompareToggle={onCompareToggle}
           onAddToCart={onAddToCart}
           showOnHover
         />

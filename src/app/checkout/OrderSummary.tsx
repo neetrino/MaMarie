@@ -73,12 +73,14 @@ export function OrderSummary({
             <span>{t('checkout.summary.shipping')}</span>
             <span className="text-right font-medium text-gray-900">{shippingLabel}</span>
           </div>
-          <div className="flex justify-between gap-3">
-            <span>{t('checkout.summary.tax')}</span>
-            <span className="font-medium text-gray-900">
-              {formatPriceInCurrency(orderSummary.taxDisplay, currency)}
-            </span>
-          </div>
+          {orderSummary.taxDisplay > 0 ? (
+            <div className="flex justify-between gap-3">
+              <span>{t('checkout.summary.tax')}</span>
+              <span className="font-medium text-gray-900">
+                {formatPriceInCurrency(orderSummary.taxDisplay, currency)}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-4 border-t border-dashed border-gray-300 pt-4">

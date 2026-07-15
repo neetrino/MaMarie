@@ -89,6 +89,8 @@ async function fetchGuestCartItems(
             price: variant.price,
             originalPrice: variant.originalPrice || null,
             total: variant.price * item.quantity,
+            selectedColor: item.selectedColor ?? null,
+            selectedSize: item.selectedSize ?? null,
           },
           shouldRemove: false,
         };

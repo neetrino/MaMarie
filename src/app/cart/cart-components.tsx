@@ -10,6 +10,7 @@ import type { CurrencyCode } from '../../lib/currency';
 import type { Cart, CartItem } from './types';
 import { useCartDeliveryEstimate } from './use-cart-delivery-estimate';
 import { buildCartShippingAndTotalLabels } from './cart-summary-labels';
+import { resolveColorSwatch } from '../../lib/resolve-color-swatch';
 
 /** Matches order confirmation receipt panel (rounded top, zigzag bottom via clip-path). */
 const CART_SUMMARY_RECEIPT_INNER_CLASS =
@@ -95,7 +96,7 @@ export function CartItemRow({
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
             disabled={updatingItems.has(item.id)}
-            className="w-9 h-9 flex-shrink-0 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-8 h-8 flex-shrink-0 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={t('common.ariaLabels.decreaseQuantity')}
           >
             <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,13 +113,13 @@ export function CartItemRow({
               onUpdateQuantity(item.id, newQuantity);
             }}
             disabled={updatingItems.has(item.id)}
-            className="w-20 h-9 text-right border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 font-medium pl-2 pr-5"
+            className="w-16 h-8 text-right border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 font-medium pl-2 pr-4"
             title={item.variant.stock !== undefined ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : ''}
           />
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
             disabled={updatingItems.has(item.id) || (item.variant.stock !== undefined && item.quantity >= item.variant.stock)}
-            className="w-9 h-9 flex-shrink-0 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-8 h-8 flex-shrink-0 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={t('common.ariaLabels.increaseQuantity')}
             title={item.variant.stock !== undefined && item.quantity >= item.variant.stock ? t('common.messages.availableQuantity').replace('{stock}', item.variant.stock.toString()) : t('common.messages.addQuantity')}
           >
@@ -138,6 +139,27 @@ export function CartItemRow({
           <span className="text-lg font-semibold text-blue-600">
             {formatPrice(item.total, currencyCode)}
           </span>
+          {(item.selectedColor || item.selectedSize) ? (
+            <div className="flex items-center gap-2">
+              {item.selectedColor ? (
+                <span
+                  className="h-5 w-5 rounded-full"
+                  style={{ backgroundColor: resolveColorSwatch(item.selectedColor) }}
+                  aria-label={t('common.ariaLabels.color').replace('{color}', item.selectedColor)}
+                  title={item.selectedColor}
+                />
+              ) : null}
+              {item.selectedSize ? (
+                <span
+                  className="inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-full bg-brand-pink px-2.5 text-xs font-semibold uppercase leading-none text-white shadow-sm"
+                  aria-label={t('common.ariaLabels.size').replace('{size}', item.selectedSize)}
+                  title={item.selectedSize}
+                >
+                  {item.selectedSize}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
           {item.originalPrice && item.originalPrice > item.price && (
             <span className="text-sm text-gray-500 line-through">
               {formatPrice(item.originalPrice * item.quantity, currencyCode)}

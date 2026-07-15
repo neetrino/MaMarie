@@ -52,6 +52,6 @@ export const CART_DRAWER_BACKDROP_TRANSITION_MS = 200;
 /** Checkout CTA pill height (px). */
 export const CART_DRAWER_CHECKOUT_BUTTON_HEIGHT_PX = 50;
 
-/** Line item thumbnail — compact square, catalog list density. */
-export const CART_DRAWER_ITEM_THUMB_SIZE_PX = 72;
-export const CART_DRAWER_ITEM_THUMB_RADIUS_PX = 12;
+/** Line item thumbnail — tall enough to align with color/size row. */
+export const CART_DRAWER_ITEM_THUMB_SIZE_PX = 96;
+export const CART_DRAWER_ITEM_THUMB_RADIUS_PX = 16;

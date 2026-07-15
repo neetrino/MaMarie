@@ -18,6 +18,8 @@ export interface CartItem {
   price: number;
   originalPrice?: number | null;
   total: number;
+  selectedColor?: string | null;
+  selectedSize?: string | null;
 }
 
 /**
@@ -45,6 +47,8 @@ export interface GuestCartItem {
   productSlug?: string;
   variantId: string;
   quantity: number;
+  selectedColor?: string;
+  selectedSize?: string;
   price?: number;
   /** Cached from product card for instant cart drawer display. */
   title?: string;

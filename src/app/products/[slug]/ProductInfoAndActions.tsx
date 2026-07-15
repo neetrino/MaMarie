@@ -3,11 +3,11 @@
 import type { MouseEvent } from 'react';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
+import { MOBILE_PRODUCTS_CATALOG_CARD_ASSETS } from '../../../constants/mobile-products-catalog';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
-import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import { ProductRatingSummary } from './ProductRatingSummary';
 import {
@@ -36,7 +36,6 @@ interface ProductInfoAndActionsProps {
   canAddToCart: boolean;
   isAddingToCart: boolean;
   isInWishlist: boolean;
-  isInCompare: boolean;
   showMessage: string | null;
   isLoggedIn: boolean;
   currentVariant: ProductVariant | null;
@@ -49,7 +48,6 @@ interface ProductInfoAndActionsProps {
   onQuantityAdjust: (delta: number) => void;
   onAddToCart: () => Promise<void>;
   onAddToWishlist: (e: MouseEvent) => void;
-  onCompareToggle: (e: MouseEvent) => void;
   onScrollToReviews: () => void;
   onColorSelect: (color: string) => void;
   onSizeSelect: (size: string) => void;
@@ -111,7 +109,6 @@ export function ProductInfoAndActions({
   canAddToCart,
   isAddingToCart,
   isInWishlist,
-  isInCompare,
   showMessage,
   isLoggedIn,
   currentVariant,
@@ -124,7 +121,6 @@ export function ProductInfoAndActions({
   onQuantityAdjust,
   onAddToCart,
   onAddToWishlist,
-  onCompareToggle,
   onScrollToReviews,
   onColorSelect,
   onSizeSelect,
@@ -136,6 +132,19 @@ export function ProductInfoAndActions({
     originalPrice || (compareAtPrice && compareAtPrice > price),
   );
   const regularPriceValue = originalPrice || compareAtPrice || 0;
+  const actionLabel = isAddingToCart
+    ? t(language, 'product.adding')
+    : isOutOfStock
+      ? t(language, 'product.outOfStock')
+      : isVariationRequired
+        ? getRequiredAttributesMessage()
+        : hasUnavailableAttributes
+          ? t(language, 'product.outOfStock')
+          : t(language, 'product.addToCart');
+  const mobileFormattedActionLabel =
+    isVariationRequired && actionLabel.includes(' և ')
+      ? actionLabel.replace(' և ', '\nև ')
+      : actionLabel;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -228,14 +237,6 @@ export function ProductInfoAndActions({
       
       {/* Action buttons — bottom-aligned with gallery image on desktop */}
       <div className="mt-auto lg:pt-0 pt-6">
-        {/* Show required attributes message if needed */}
-        {isVariationRequired && (
-          <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800 font-medium">
-              {getRequiredAttributesMessage()}
-            </p>
-          </div>
-        )}
         {/* Show unavailable attributes message if needed */}
         {hasUnavailableAttributes && !isVariationRequired && (
           <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -260,16 +261,23 @@ export function ProductInfoAndActions({
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 
-            className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full uppercase font-bold transition-colors hover:brightness-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+            className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full font-bold transition-colors hover:brightness-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
             onClick={onAddToCart}
           >
-            {isAddingToCart ? t(language, 'product.adding') : (isOutOfStock ? t(language, 'product.outOfStock') : (isVariationRequired ? getRequiredAttributesMessage() : (hasUnavailableAttributes ? t(language, 'product.outOfStock') : t(language, 'product.addToCart'))))}
-          </button>
-          <button 
-            onClick={onCompareToggle} 
-            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${isInCompare ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
-          >
-            <CompareIcon isActive={isInCompare} />
+            <span className="relative block h-full w-full">
+              <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
+                {mobileFormattedActionLabel}
+              </span>
+              <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
+                <Image
+                  src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
+                  alt=""
+                  width={20}
+                  height={20}
+                  aria-hidden
+                />
+              </span>
+            </span>
           </button>
           <button 
             onClick={onAddToWishlist} 

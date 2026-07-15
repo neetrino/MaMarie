@@ -4,7 +4,6 @@ import { useState } from 'react';
 import type { MouseEvent } from 'react';
 import { useWishlist } from './hooks/useWishlist';
 import { buildWishlistProductSnapshot } from '../lib/wishlist-product-cache';
-import { useCompare } from './hooks/useCompare';
 import { useAddToCart } from './hooks/useAddToCart';
 import { useCurrency } from './hooks/useCurrency';
 import { ProductCardList } from './ProductCard/ProductCardList';
@@ -46,7 +45,6 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
   const isCompact = viewMode === 'grid-3';
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
-  const { isInCompare, toggleCompare } = useCompare(product.id);
   const { isAddingToCart, addToCart } = useAddToCart({
     productId: product.id,
     productSlug: product.slug,
@@ -79,13 +77,6 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
     }));
   };
 
-  // Handle compare toggle
-  const handleCompareToggle = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleCompare();
-  };
-
   // Handle add to cart
   const handleAddToCart = (e: MouseEvent) => {
     e.preventDefault();
@@ -104,12 +95,10 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
         product={product}
         currency={currency}
         isInWishlist={isInWishlist}
-        isInCompare={isInCompare}
         isAddingToCart={isAddingToCart}
         imageError={imageError}
         onImageError={() => setImageError(true)}
         onWishlistToggle={handleWishlistToggle}
-        onCompareToggle={handleCompareToggle}
         onAddToCart={handleAddToCart}
       />
     );
@@ -121,13 +110,11 @@ export function ProductCard({ product, viewMode = 'grid-3' }: ProductCardProps) 
       product={product}
       currency={currency}
       isInWishlist={isInWishlist}
-      isInCompare={isInCompare}
       isAddingToCart={isAddingToCart}
       imageError={imageError}
       isCompact={isCompact}
       onImageError={() => setImageError(true)}
       onWishlistToggle={handleWishlistToggle}
-      onCompareToggle={handleCompareToggle}
       onAddToCart={handleAddToCart}
     />
   );

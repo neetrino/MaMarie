@@ -5,7 +5,6 @@ import Image from 'next/image';
 import type { MouseEvent } from 'react';
 import { formatPrice } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
-import { CompareIcon } from '../icons/CompareIcon';
 import { CartIcon as CartPngIcon } from '../icons/CartIcon';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { ProductColors } from './ProductColors';
@@ -30,12 +29,10 @@ interface ProductCardListProps {
   };
   currency: CurrencyCode;
   isInWishlist: boolean;
-  isInCompare: boolean;
   isAddingToCart: boolean;
   imageError: boolean;
   onImageError: () => void;
   onWishlistToggle: (e: MouseEvent) => void;
-  onCompareToggle: (e: MouseEvent) => void;
   onAddToCart: (e: MouseEvent) => void;
 }
 
@@ -46,12 +43,10 @@ export function ProductCardList({
   product,
   currency,
   isInWishlist,
-  isInCompare,
   isAddingToCart,
   imageError,
   onImageError,
   onWishlistToggle,
-  onCompareToggle,
   onAddToCart,
 }: ProductCardListProps) {
   const { t } = useTranslation();
@@ -163,20 +158,6 @@ export function ProductCardList({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 self-start sm:self-center">
-            {/* Compare Icon */}
-            <button
-              onClick={onCompareToggle}
-              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                isInCompare
-                  ? 'border-gray-900 text-gray-900 bg-white shadow-sm'
-                  : 'border-gray-200 text-gray-700 bg-white hover:border-gray-300 hover:bg-gray-50'
-              }`}
-              title={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
-              aria-label={isInCompare ? t('common.messages.removedFromCompare') : t('common.messages.addedToCompare')}
-            >
-              <CompareIcon isActive={isInCompare} />
-            </button>
-
             {/* Wishlist Icon */}
             <button
               onClick={onWishlistToggle}

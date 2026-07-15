@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
-import { CompareIcon } from '../../../components/icons/CompareIcon';
 import { formatPrice } from '../../../lib/currency';
 import { t } from '../../../lib/i18n';
 import type { ProductPageSnapshot } from '../../../lib/product-page-snapshot';
@@ -131,11 +130,6 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
       </div>
 
       <div className="mt-auto lg:pt-0 pt-6">
-        {isVariationRequired ? (
-          <div className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-            <p className="text-sm font-medium text-yellow-800">{requiredAttributesMessage}</p>
-          </div>
-        ) : null}
         <div className="flex items-center gap-3 pointer-events-none">
           <div className="hidden shrink-0 lg:block">
             <ProductPageSnapshotQuantityStepper />
@@ -146,14 +140,6 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
             className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full uppercase font-bold disabled:cursor-default"
           >
             {actionLabel}
-          </button>
-          <button
-            type="button"
-            disabled
-            className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-200"
-            aria-hidden
-          >
-            <CompareIcon isActive={false} />
           </button>
           <button
             type="button"

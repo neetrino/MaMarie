@@ -32,26 +32,41 @@ export const CHECKOUT_SECONDARY_BUTTON_CLASS =
 export const CHECKOUT_ORDER_SUMMARY_WRAP_CLASS =
   'w-full lg:ml-auto lg:mr-0 lg:max-w-[300px]';
 
-/** Order items preview — top of checkout (Figma). */
+/** Order items preview — top of checkout. */
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_CARD_CLASS =
   'rounded-[15px] border border-gray-200 bg-white px-5 py-4 sm:px-6 sm:py-5';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_TITLE_CLASS =
-  'text-sm font-bold uppercase tracking-wide text-gray-900';
+  'text-sm font-bold tracking-wide text-gray-900';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_COUNT_CLASS = 'shrink-0 text-sm text-gray-500';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_LIST_CLASS =
-  'flex gap-6 overflow-x-auto overscroll-x-contain pt-4';
+  'scrollbar-hide flex gap-3 overflow-x-auto overscroll-x-contain pt-4';
+
+export const CHECKOUT_ORDER_ITEM_CARD_CLASS =
+  'w-max shrink-0 rounded-[20px] border border-gray-200 bg-white p-3 shadow-sm';
 
 export const CHECKOUT_ORDER_ITEMS_THUMB_FRAME_CLASS =
-  'relative overflow-hidden rounded-xl border border-gray-200 bg-white';
+  'relative block shrink-0 self-stretch overflow-hidden';
 
 export const CHECKOUT_ORDER_ITEMS_REMOVE_BUTTON_CLASS =
-  'absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-800';
+  'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700';
 
 export const CHECKOUT_ORDER_ITEMS_NAME_CLASS =
-  'mt-2 max-w-[6.5rem] text-center text-xs font-bold uppercase leading-snug text-gray-900';
+  'line-clamp-2 w-max max-w-[var(--checkout-order-item-title-max-width)] text-sm font-medium text-gray-900';
+
+export const CHECKOUT_ORDER_ITEMS_PRICE_CLASS = 'mt-1 text-sm font-semibold text-gray-900';
+
+export const CHECKOUT_ORDER_ITEMS_VARIANT_ROW_CLASS = 'flex min-w-0 items-center gap-2';
+
+export const CHECKOUT_ORDER_ITEMS_COLOR_SWATCH_CLASS = 'h-6 w-6 shrink-0 rounded-full';
+
+export const CHECKOUT_ORDER_ITEMS_SIZE_PILL_CLASS =
+  'inline-flex h-6 min-w-[24px] shrink-0 items-center justify-center rounded-full bg-brand-pink px-2 text-[11px] font-semibold uppercase leading-none text-white shadow-sm';
+
+export const CHECKOUT_ORDER_ITEMS_QTY_CLASS =
+  'inline-flex h-6 min-w-[24px] shrink-0 items-center justify-center rounded-full border border-gray-200 bg-sky-50/70 px-2 text-[11px] font-semibold text-gray-900';
 
 export const CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS = 'mb-6';
 

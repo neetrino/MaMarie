@@ -45,9 +45,7 @@ export function useVariantSelection({
     if (product && product.variants && product.variants.length > 0 && !selectedVariant) {
       const initialVariant = product.variants[0];
       setSelectedVariant(initialVariant);
-      const colorValue = getOptionValueFn(initialVariant.options, 'color');
       const sizeValue = getOptionValueFn(initialVariant.options, 'size');
-      if (colorValue) setSelectedColor(colorValue);
       if (sizeValue) setSelectedSize(sizeValue);
     }
   }, [product, selectedVariant, getOptionValueFn, setSelectedVariant, setSelectedColor, setSelectedSize]);
@@ -59,11 +57,7 @@ export function useVariantSelection({
       if (newVariant && newVariant.id !== selectedVariant?.id) {
         setSelectedVariant(newVariant);
         switchToVariantImageFn(newVariant);
-        const colorValue = getOptionValueFn(newVariant.options, 'color');
         const sizeValue = getOptionValueFn(newVariant.options, 'size');
-        if (colorValue && colorValue !== selectedColor?.toLowerCase().trim()) {
-          setSelectedColor(colorValue);
-        }
         if (sizeValue && sizeValue !== selectedSize?.toLowerCase().trim()) {
           setSelectedSize(sizeValue);
         }

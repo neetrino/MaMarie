@@ -179,6 +179,7 @@
     "facebook": "Facebook",
     "linkedin": "LinkedIn",
     "color": "Цвет: {color}",
+    "size": "Размер: {size}",
     "previousImage": "Предыдущее изображение",
     "nextImage": "Следующее изображение",
     "goToSlide": "Перейти к слайду {number}",
