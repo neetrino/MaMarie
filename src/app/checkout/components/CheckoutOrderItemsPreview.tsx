@@ -8,6 +8,11 @@ import {
   CART_DRAWER_ITEM_THUMB_RADIUS_PX,
   CART_DRAWER_ITEM_THUMB_SIZE_PX,
 } from '../../../constants/cart-drawer';
+import {
+  CHECKOUT_ORDER_ITEM_CARD_MAX_WIDTH_PX,
+  CHECKOUT_ORDER_ITEM_CARD_MIN_WIDTH_PX,
+  CHECKOUT_ORDER_ITEM_TITLE_MAX_WIDTH_PX,
+} from '../../../constants/checkout-page';
 import { HOME_PRODUCT_CARD_ASSETS, HOME_PRODUCT_CARD_BG } from '../../../constants/home-sections';
 import type { CurrencyCode } from '../../../lib/currency';
 import { resolveColorSwatch } from '../../../lib/resolve-color-swatch';
@@ -57,7 +62,14 @@ function CheckoutOrderItemPreview({
   }, [rawImage]);
 
   return (
-    <article className={CHECKOUT_ORDER_ITEM_CARD_CLASS}>
+    <article
+      className={CHECKOUT_ORDER_ITEM_CARD_CLASS}
+      style={{
+        minWidth: CHECKOUT_ORDER_ITEM_CARD_MIN_WIDTH_PX,
+        maxWidth: CHECKOUT_ORDER_ITEM_CARD_MAX_WIDTH_PX,
+        ['--checkout-order-item-title-max-width' as string]: `${CHECKOUT_ORDER_ITEM_TITLE_MAX_WIDTH_PX}px`,
+      }}
+    >
       <div className="flex items-stretch gap-3">
         <div
           className={CHECKOUT_ORDER_ITEMS_THUMB_FRAME_CLASS}
@@ -79,9 +91,9 @@ function CheckoutOrderItemPreview({
           />
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
+        <div className="flex w-max min-w-0 max-w-full flex-1 flex-col justify-between gap-2">
           <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
+            <div className="w-max min-w-0 max-w-full">
               <p className={CHECKOUT_ORDER_ITEMS_NAME_CLASS}>{item.variant.product.title}</p>
               <p className={CHECKOUT_ORDER_ITEMS_PRICE_CLASS}>
                 {formatCartLineAmountInCurrency(lineTotal, currency)}

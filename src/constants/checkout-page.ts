@@ -29,6 +29,11 @@ export const CHECKOUT_ORDER_SUMMARY_MAX_WIDTH_PX = 300;
 /** Order items preview thumbnail (px). */
 export const CHECKOUT_ORDER_ITEMS_THUMB_SIZE_PX = 88;
 
+/** Order item card — grows with title length within this range. */
+export const CHECKOUT_ORDER_ITEM_CARD_MIN_WIDTH_PX = 200;
+export const CHECKOUT_ORDER_ITEM_CARD_MAX_WIDTH_PX = 320;
+export const CHECKOUT_ORDER_ITEM_TITLE_MAX_WIDTH_PX = 180;
+
 /** Primary CTA pill — matches cart drawer checkout button. */
 export const CHECKOUT_PRIMARY_BUTTON_HEIGHT_PX = 50;
 

@@ -45,7 +45,7 @@ export const CHECKOUT_ORDER_ITEMS_PREVIEW_LIST_CLASS =
   'scrollbar-hide flex gap-3 overflow-x-auto overscroll-x-contain pt-4';
 
 export const CHECKOUT_ORDER_ITEM_CARD_CLASS =
-  'w-[min(100%,240px)] shrink-0 rounded-[20px] border border-gray-200 bg-white p-3 shadow-sm';
+  'w-max shrink-0 rounded-[20px] border border-gray-200 bg-white p-3 shadow-sm';
 
 export const CHECKOUT_ORDER_ITEMS_THUMB_FRAME_CLASS =
   'relative block shrink-0 self-stretch overflow-hidden';
@@ -54,7 +54,7 @@ export const CHECKOUT_ORDER_ITEMS_REMOVE_BUTTON_CLASS =
   'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700';
 
 export const CHECKOUT_ORDER_ITEMS_NAME_CLASS =
-  'line-clamp-2 text-sm font-medium text-gray-900';
+  'line-clamp-2 w-max max-w-[var(--checkout-order-item-title-max-width)] text-sm font-medium text-gray-900';
 
 export const CHECKOUT_ORDER_ITEMS_PRICE_CLASS = 'mt-1 text-sm font-semibold text-gray-900';
 
