@@ -63,12 +63,14 @@ export function OrderSummaryModal({
         <span className="text-gray-600">{t('checkout.summary.shipping')}:</span>
         <span className="font-medium text-gray-900">{shippingDisplay}</span>
       </div>
-      <div className="flex justify-between text-sm">
-        <span className="text-gray-600">{t('checkout.summary.tax')}:</span>
-        <span className="font-medium text-gray-900">
-          {formatPriceInCurrency(orderSummary.taxDisplay, currency)}
-        </span>
-      </div>
+      {orderSummary.taxDisplay > 0 ? (
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">{t('checkout.summary.tax')}:</span>
+          <span className="font-medium text-gray-900">
+            {formatPriceInCurrency(orderSummary.taxDisplay, currency)}
+          </span>
+        </div>
+      ) : null}
       <div className="mt-2 border-t border-dashed border-brand-pink/30 pt-2">
         <div className="flex justify-between">
           <span className="font-semibold text-gray-900">{t('checkout.summary.total')}:</span>
