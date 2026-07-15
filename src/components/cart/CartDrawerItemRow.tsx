@@ -132,7 +132,7 @@ export function CartDrawerItemRow({
   };
 
   return (
-    <article className="border-b border-gray-100 py-4 first:pt-0 last:border-b-0">
+    <article className="mb-3 rounded-[20px] border border-gray-200 bg-white p-3 shadow-sm last:mb-0">
       <div className="flex items-start gap-3">
         <Link
           href={productHref}
@@ -149,7 +149,7 @@ export function CartDrawerItemRow({
             src={imageSrc}
             alt={item.variant.product.title}
             fill
-            className="object-contain p-1"
+            className="object-contain p-0.5"
             sizes={`${CART_DRAWER_ITEM_THUMB_SIZE_PX}px`}
             unoptimized
             onError={() => setImageError(true)}
