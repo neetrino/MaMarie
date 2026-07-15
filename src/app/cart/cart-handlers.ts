@@ -312,6 +312,7 @@ function readCartItemForUpdate(
       originalPrice: line.originalPrice ?? null,
       total: price * line.quantity,
       selectedColor: line.selectedColor ?? null,
+      selectedSize: line.selectedSize ?? null,
     };
   }
 

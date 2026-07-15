@@ -125,6 +125,9 @@ export function ProductPageClient({
           if (selectedColor) {
             existing.selectedColor = selectedColor;
           }
+          if (selectedSize) {
+            existing.selectedSize = selectedSize;
+          }
         } else {
           const newItem: GuestCartItem = {
             productId: product.id,
@@ -132,6 +135,7 @@ export function ProductPageClient({
             variantId: currentVariant.id,
             quantity,
             selectedColor: selectedColor ?? undefined,
+            selectedSize: selectedSize ?? undefined,
             price,
             title: product.title,
             image: imageUrl,

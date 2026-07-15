@@ -25,6 +25,66 @@ interface CartDrawerItemRowProps {
   t: (key: string) => string;
 }
 
+function resolveColorSwatch(color: string | null | undefined): string {
+  if (!color) {
+    return '#cbd5e1';
+  }
+
+  const value = color.trim().toLowerCase();
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value) || /^(rgb|hsl)a?\(/i.test(value)) {
+    return color;
+  }
+
+  const colorMap: Record<string, string> = {
+    white: '#ffffff',
+    black: '#111827',
+    beige: '#f5f5dc',
+    cream: '#fff7d6',
+    ivory: '#fffff0',
+    gray: '#9ca3af',
+    grey: '#9ca3af',
+    blue: '#3b82f6',
+    red: '#ef4444',
+    green: '#22c55e',
+    pink: '#ec4899',
+    brown: '#92400e',
+    yellow: '#facc15',
+    orange: '#f97316',
+    purple: '#a855f7',
+    navy: '#1e3a8a',
+    'белый': '#ffffff',
+    'черный': '#111827',
+    'чёрный': '#111827',
+    'бежевый': '#f5f5dc',
+    'серый': '#9ca3af',
+    'синий': '#3b82f6',
+    'красный': '#ef4444',
+    'зеленый': '#22c55e',
+    'зелёный': '#22c55e',
+    'розовый': '#ec4899',
+    'коричневый': '#92400e',
+    'желтый': '#facc15',
+    'жёлтый': '#facc15',
+    'оранжевый': '#f97316',
+    'фиолетовый': '#a855f7',
+    'սպիտակ': '#ffffff',
+    'սև': '#111827',
+    'սեւ': '#111827',
+    'բեժ': '#f5f5dc',
+    'մոխրագույն': '#9ca3af',
+    'կապույտ': '#3b82f6',
+    'կարմիր': '#ef4444',
+    'կանաչ': '#22c55e',
+    'վարդագույն': '#ec4899',
+    'շագանակագույն': '#92400e',
+    'դեղին': '#facc15',
+    'նարնջագույն': '#f97316',
+    'մանուշակագույն': '#a855f7',
+  };
+
+  return colorMap[value] ?? '#cbd5e1';
+}
+
 export function CartDrawerItemRow({
   item,
   currency,
@@ -106,14 +166,30 @@ export function CartDrawerItemRow({
               >
                 {item.variant.product.title}
               </Link>
-              {item.selectedColor ? (
-                <p className="mt-1 text-xs text-gray-500">
-                  {t('common.ariaLabels.color').replace('{color}', item.selectedColor)}
-                </p>
-              ) : null}
               <p className="mt-1 text-sm font-semibold text-gray-900">
                 {formatCartLineAmountInCurrency(lineTotal, currencyCode)}
               </p>
+              {(item.selectedColor || item.selectedSize) ? (
+                <div className="mt-1 flex items-center gap-2">
+                  {item.selectedColor ? (
+                    <span
+                      className="h-5 w-5 rounded-full"
+                      style={{ backgroundColor: resolveColorSwatch(item.selectedColor) }}
+                      aria-label={t('common.ariaLabels.color').replace('{color}', item.selectedColor)}
+                      title={item.selectedColor}
+                    />
+                  ) : null}
+                  {item.selectedSize ? (
+                    <span
+                      className="inline-flex min-h-[24px] min-w-[24px] items-center justify-center rounded-full bg-brand-pink px-2.5 text-xs font-semibold uppercase leading-none text-white shadow-sm"
+                      aria-label={t('common.ariaLabels.size').replace('{size}', item.selectedSize)}
+                      title={item.selectedSize}
+                    >
+                      {item.selectedSize}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             <button
@@ -133,21 +209,21 @@ export function CartDrawerItemRow({
               <button
                 type="button"
                 onClick={() => handleQuantityChange(displayQuantity - 1)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white"
                 aria-label={t('common.ariaLabels.decreaseQuantity')}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                 </svg>
               </button>
-              <span className="min-w-[1.75rem] text-center text-sm font-semibold text-gray-900">
+              <span className="min-w-[1.5rem] text-center text-sm font-semibold text-gray-900">
                 {displayQuantity}
               </span>
               <button
                 type="button"
                 onClick={() => handleQuantityChange(displayQuantity + 1)}
                 disabled={atMaxStock}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={t('common.ariaLabels.increaseQuantity')}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

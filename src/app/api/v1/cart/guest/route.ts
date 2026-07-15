@@ -9,6 +9,7 @@ interface GuestCartItemInput {
   variantId: string;
   quantity: number;
   selectedColor?: string;
+  selectedSize?: string;
   price?: number;
 }
 
@@ -42,6 +43,7 @@ interface GuestCartLine {
   originalPrice: number | null;
   total: number;
   selectedColor?: string | null;
+  selectedSize?: string | null;
 }
 
 interface GuestCartResponse {
@@ -78,33 +80,39 @@ function sanitizeItems(items: GuestCartItemInput[] | undefined): GuestCartItemIn
       variantId: item.variantId,
       quantity: Number.isFinite(item.quantity) && item.quantity > 0 ? Math.floor(item.quantity) : 1,
       selectedColor: typeof item.selectedColor === "string" ? item.selectedColor : undefined,
+      selectedSize: typeof item.selectedSize === "string" ? item.selectedSize : undefined,
       price: typeof item.price === "number" ? item.price : undefined,
     }));
 }
 
-function extractSelectedColor(
+function extractSelectedOption(
   options: Array<{
     attributeKey: string | null;
     value: string | null;
     attributeValue: {
       value: string;
+      attribute: {
+        key: string;
+      };
       translations: Array<{ locale: string; label: string }>;
     } | null;
   }>,
+  key: string,
   lang: string,
 ): string | undefined {
-  const colorOption = options.find((option) => {
+  const selectedOption = options.find((option) => {
     const attributeKey = option.attributeKey?.toLowerCase().trim();
-    return attributeKey === "color";
+    const nestedAttributeKey = option.attributeValue?.attribute?.key?.toLowerCase().trim();
+    return attributeKey === key || nestedAttributeKey === key;
   });
-  if (!colorOption) {
+  if (!selectedOption) {
     return undefined;
   }
 
-  const translatedLabel = colorOption.attributeValue?.translations.find(
+  const translatedLabel = selectedOption.attributeValue?.translations.find(
     (translation) => translation.locale === lang,
   )?.label;
-  return translatedLabel || colorOption.value || colorOption.attributeValue?.value || undefined;
+  return translatedLabel || selectedOption.value || selectedOption.attributeValue?.value || undefined;
 }
 
 export async function POST(req: NextRequest) {
@@ -152,6 +160,11 @@ export async function POST(req: NextRequest) {
                 attributeValue: {
                   select: {
                     value: true,
+                    attribute: {
+                      select: {
+                        key: true,
+                      },
+                    },
                     translations: {
                       select: {
                         locale: true,
@@ -197,7 +210,8 @@ export async function POST(req: NextRequest) {
         productSlug: productSlug || undefined,
         variantId: selectedVariant.id,
         quantity: item.quantity,
-        selectedColor: extractSelectedColor(selectedVariant.options, lang) ?? item.selectedColor,
+        selectedColor: extractSelectedOption(selectedVariant.options, "color", lang) ?? item.selectedColor,
+        selectedSize: extractSelectedOption(selectedVariant.options, "size", lang) ?? item.selectedSize,
         price: selectedVariant.price,
       });
 
@@ -220,7 +234,8 @@ export async function POST(req: NextRequest) {
         price: selectedVariant.price,
         originalPrice: selectedVariant.compareAtPrice,
         total: selectedVariant.price * item.quantity,
-        selectedColor: extractSelectedColor(selectedVariant.options, lang) ?? item.selectedColor ?? null,
+        selectedColor: extractSelectedOption(selectedVariant.options, "color", lang) ?? item.selectedColor ?? null,
+        selectedSize: extractSelectedOption(selectedVariant.options, "size", lang) ?? item.selectedSize ?? null,
       });
     });
 
