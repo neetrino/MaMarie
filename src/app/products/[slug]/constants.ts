@@ -12,6 +12,9 @@ export const WISHLIST_KEY = 'shop_wishlist';
 export const COMPARE_KEY = 'shop_compare';
 export const THUMBNAILS_PER_VIEW = 3;
 
+/** Show thumbnail rail + prev/next only when the gallery has at least this many images. */
+export const PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT = 2;
+
 /** PDP gallery vertical thumbnail frame — brand blue. */
 export const PRODUCT_PDP_THUMBNAIL_BORDER_COLOR = PRODUCTS_CATALOG_FILTER_ACCENT;
 

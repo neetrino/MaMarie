@@ -22,6 +22,7 @@ import {
   PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
   PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS,
   PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT,
   PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
 } from "./constants";
 
@@ -130,7 +131,7 @@ export function ProductImageGallery({
   const snapshotFailed = snapshotSrc ? failedSources.has(snapshotSrc) : false;
   const canShowSnapshot = Boolean(snapshotSrc && !snapshotFailed);
   const canShowMainImage = Boolean(currentSrc && !mainImageFailed);
-  const hasMultipleImages = images.length > 1;
+  const hasMultipleImages = images.length >= PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT;
 
   useEffect(() => {
     const entrySnapshot = readProductPageSnapshot(product.slug);
