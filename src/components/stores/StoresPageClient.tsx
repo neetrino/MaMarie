@@ -11,12 +11,7 @@ import { getStoredLanguage } from '@/lib/language';
 import {
   BEST_PRODUCTS_ASSETS,
   BEST_PRODUCTS_HEADING_COLOR,
-  BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX,
 } from '@/constants/home-sections';
-import {
-  RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX,
-  RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX,
-} from '@/constants/products-catalog';
 import {
   STORES_LIST_PANEL_WIDTH_PX,
   STORES_MAP_MIN_HEIGHT_MOBILE_PX,
@@ -28,7 +23,14 @@ import {
   STORES_PAGE_HEADING_BOTTOM_GAP_PX,
   STORES_PAGE_HEADING_MIN_HEIGHT_PX,
   STORES_PAGE_HEADING_PADDING_Y_PX,
+  STORES_PAGE_HORIZONTAL_PADDING_LEFT_PX,
+  STORES_PAGE_HORIZONTAL_PADDING_RIGHT_PX,
   STORES_PAGE_MAX_WIDTH_PX,
+  STORES_PAGE_MOBILE_PADDING_PX,
+  STORES_PAGE_MOBILE_TITLE_FONT_SIZE_PX,
+  STORES_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX,
+  STORES_PAGE_TITLE_FONT_SIZE_PX,
+  STORES_PAGE_TITLE_LINE_HEIGHT_PX,
   STORES_PANEL_HEIGHT_PX,
 } from '@/constants/stores-page';
 
@@ -99,11 +101,22 @@ export function StoresPageClient() {
     [],
   );
 
+  const pageInsetStyle = {
+    backgroundColor: STORES_PAGE_BG,
+    maxWidth: STORES_PAGE_MAX_WIDTH_PX,
+    ['--stores-page-padding-left' as string]: `${STORES_PAGE_HORIZONTAL_PADDING_LEFT_PX}px`,
+    ['--stores-page-padding-right' as string]: `${STORES_PAGE_HORIZONTAL_PADDING_RIGHT_PX}px`,
+    ['--stores-page-padding-x-mobile' as string]: `${STORES_PAGE_MOBILE_PADDING_PX}px`,
+  };
+
+  const pageInsetClassName =
+    'max-lg:px-[var(--stores-page-padding-x-mobile)] lg:pl-[var(--stores-page-padding-left)] lg:pr-[var(--stores-page-padding-right)]';
+
   if (loading) {
     return (
       <div
-        className="flex min-h-[50vh] items-center justify-center px-5 lg:px-8"
-        style={{ backgroundColor: STORES_PAGE_BG }}
+        className={`flex min-h-[50vh] items-center justify-center ${pageInsetClassName}`}
+        style={pageInsetStyle}
       >
         <div className="text-center">
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-b-2 border-brand-brown" />
@@ -116,8 +129,8 @@ export function StoresPageClient() {
   if (stores.length === 0) {
     return (
       <div
-        className="flex min-h-[50vh] items-center justify-center px-5 lg:px-8"
-        style={{ backgroundColor: STORES_PAGE_BG }}
+        className={`flex min-h-[50vh] items-center justify-center ${pageInsetClassName}`}
+        style={pageInsetStyle}
       >
         <div className="max-w-lg rounded-3xl bg-white p-8 text-center shadow-lg">
           <h1 className="text-2xl font-bold text-brand-pink">{t('stores.title')}</h1>
@@ -129,8 +142,8 @@ export function StoresPageClient() {
 
   return (
     <div
-      className="mx-auto w-full max-w-full px-5 pb-8 pt-7 lg:px-8 lg:pb-12 lg:pt-12"
-      style={{ backgroundColor: STORES_PAGE_BG, maxWidth: STORES_PAGE_MAX_WIDTH_PX }}
+      className={`mx-auto w-full max-w-full pb-8 pt-7 lg:pb-12 lg:pt-12 ${pageInsetClassName}`}
+      style={pageInsetStyle}
     >
       <header
         className="mb-[var(--stores-heading-gap)] lg:mb-[var(--stores-heading-gap-lg)]"
@@ -146,11 +159,12 @@ export function StoresPageClient() {
           seeAllLabel=""
           color={BEST_PRODUCTS_HEADING_COLOR}
           chevronSrc={BEST_PRODUCTS_ASSETS.chevronRight}
-          titleLineHeightPx={BEST_PRODUCTS_TITLE_LINE_HEIGHT_PX}
+          titleFontSizePx={STORES_PAGE_TITLE_FONT_SIZE_PX}
+          titleLineHeightPx={STORES_PAGE_TITLE_LINE_HEIGHT_PX}
           minHeightPx={STORES_PAGE_HEADING_MIN_HEIGHT_PX}
           headingPaddingYPx={STORES_PAGE_HEADING_PADDING_Y_PX}
-          mobileTitleFontSizePx={RELATED_PRODUCTS_MOBILE_TITLE_FONT_SIZE_PX}
-          mobileTitleLineHeightPx={RELATED_PRODUCTS_MOBILE_TITLE_LINE_HEIGHT_PX}
+          mobileTitleFontSizePx={STORES_PAGE_MOBILE_TITLE_FONT_SIZE_PX}
+          mobileTitleLineHeightPx={STORES_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX}
           showSeeAllLink={false}
         />
       </header>
