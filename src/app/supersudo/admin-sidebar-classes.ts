@@ -2,8 +2,11 @@
 export const ADMIN_SIDEBAR_WIDTH_EXPANDED_PX = 256;
 export const ADMIN_SIDEBAR_WIDTH_COLLAPSED_PX = 64;
 
-/** Full viewport height for desktop admin sidebar. */
-export const ADMIN_SIDEBAR_HEIGHT = '100dvh';
+/**
+ * Desktop admin sidebar height — fill the scaled fluid stage
+ * (`100dvh` breaks under DesktopFluidFrame zoom).
+ */
+export const ADMIN_SIDEBAR_HEIGHT = '100%';
 
 /** Header row — admin clay wordmark (666×375 source, transparent). */
 export const ADMIN_SIDEBAR_HEADER_LOGO_HEIGHT_PX = 56;
@@ -25,7 +28,7 @@ export const ADMIN_SIDEBAR_MOBILE_DRAWER_WRAP =
   'lg:hidden shrink-0 px-4 pt-4 pb-3 sm:px-6';
 
 export const ADMIN_PAGE_SHELL =
-  'admin-page-shell flex min-h-screen flex-col bg-[#faf8f5] lg:flex-row lg:items-stretch';
+  'admin-page-shell flex min-h-screen flex-col bg-[#faf8f5] lg:min-h-full lg:flex-1 lg:flex-row lg:items-stretch';
 
 export const ADMIN_SIDEBAR_ASIDE =
   'admin-desktop-sidebar hidden lg:sticky lg:top-0 lg:flex lg:min-h-0 lg:shrink-0 lg:flex-col lg:overflow-hidden border-r border-gray-200/80 bg-white transition-[width] duration-200 ease-out';
@@ -35,6 +38,7 @@ export const ADMIN_SIDEBAR_NAV =
 
 export const ADMIN_SIDEBAR_FOOTER = 'shrink-0 border-t border-gray-100 py-3';
 
-export const ADMIN_MAIN_COLUMN = 'admin-main-column min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8';
+export const ADMIN_MAIN_COLUMN =
+  'admin-main-column min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6 lg:px-8 lg:py-8';
 
 export const ADMIN_MAIN_INNER = 'mx-auto w-full max-w-7xl';
