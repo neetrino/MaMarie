@@ -7,7 +7,9 @@ interface DrawerTransitionState {
 
 /** Keeps drawer mounted through exit; double rAF on enter/exit so transform transitions paint. */
 export function useDrawerTransition(open: boolean, panelTransitionMs: number): DrawerTransitionState {
-  const [rendered, setRendered] = useState(open);
+  // Always start unmounted in the DOM — even if `open` is true on first render —
+  // so the closed → open transform has a frame to paint (lazy first-open case).
+  const [rendered, setRendered] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useLayoutEffect(() => {

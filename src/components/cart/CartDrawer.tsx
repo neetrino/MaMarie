@@ -135,7 +135,8 @@ interface CartDrawerProps {
 
 /** Global cart drawer — slides in from the right when `openCartDrawer()` is called. */
 export function CartDrawer({ initialOpen = false }: CartDrawerProps) {
-  const [open, setOpen] = useState(initialOpen);
+  // Start closed so lazy first-mount with `initialOpen` still gets enter animation.
+  const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const { rendered, visible } = useDrawerTransition(open, CART_DRAWER_PANEL_TRANSITION_MS);
@@ -149,6 +150,13 @@ export function CartDrawer({ initialOpen = false }: CartDrawerProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted || !initialOpen) {
+      return;
+    }
+    setOpen(true);
+  }, [mounted, initialOpen]);
 
   useEffect(() => {
     const handleOpen = () => setOpen(true);

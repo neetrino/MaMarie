@@ -777,7 +777,11 @@ html:has(main.profile-page-main)::-webkit-scrollbar {
   main.admin-page-main {
     background-color: #faf8f5;
     box-sizing: border-box;
-    min-height: 100dvh;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .layout-shell-mobile-bottom-clearance:has(.profile-desktop-page) {
@@ -789,7 +793,16 @@ html:has(main.profile-page-main)::-webkit-scrollbar {
   }
 
   .layout-shell-mobile-bottom-clearance:has(.admin-page-shell) {
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
     background-color: #faf8f5;
+  }
+
+  /* Design-pixel height so after DesktopFluidFrame zoom the admin shell fills the viewport. */
+  .admin-page-shell {
+    min-height: calc(100dvh / var(--desktop-layout-scale, 1));
   }
 }
 

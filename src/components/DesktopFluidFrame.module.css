@@ -10,6 +10,7 @@
   .frame {
     display: flex;
     justify-content: center;
+    align-items: stretch;
     overflow-x: clip;
   }
 

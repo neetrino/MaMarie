@@ -11,7 +11,7 @@ interface DesktopFluidFrameProps {
 
 /**
  * Scales fixed-width desktop layout (1440px Figma) to match viewport width
- * while preserving composition — navbar, hero, and sections stay aligned.
+ * while preserving composition — navbar, footer, and page sections stay aligned.
  */
 export function DesktopFluidFrame({
   children,

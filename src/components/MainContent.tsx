@@ -5,6 +5,7 @@ import {
   HEADER_CONTENT_CLEARANCE_DESKTOP_PX,
   HEADER_CONTENT_CLEARANCE_MOBILE_PX,
 } from '../constants/header';
+import { DesktopFluidFrame } from './DesktopFluidFrame';
 import { useResolvedPathname } from './hooks/useResolvedPathname';
 
 interface MainContentProps {
@@ -17,11 +18,46 @@ const headerClearanceVars = {
 } as CSSProperties;
 
 /**
+ * Home, shop, and PDP already scale via their own DesktopFluidFrame.
+ */
+function shouldSkipDesktopFluidFrame(pathname: string): boolean {
+  return pathname === '/' || pathname.startsWith('/products');
+}
+
+function needsViewportFillFrame(pathname: string): boolean {
+  return (
+    pathname.startsWith('/profile') ||
+    pathname.startsWith('/supersudo') ||
+    pathname.startsWith('/admin')
+  );
+}
+
+function wrapStorefrontContent(pathname: string, children: ReactNode): ReactNode {
+  if (shouldSkipDesktopFluidFrame(pathname)) {
+    return children;
+  }
+
+  const fillViewport = needsViewportFillFrame(pathname);
+
+  return (
+    <DesktopFluidFrame
+      className={fillViewport ? 'min-h-0 flex-1' : ''}
+      stageClassName={fillViewport ? 'flex h-full min-h-0 flex-col' : ''}
+    >
+      {children}
+    </DesktopFluidFrame>
+  );
+}
+
+/**
  * Wraps page content with top clearance for the fixed navbar.
- * Home hero and admin routes are excluded — hero sits under the transparent bar.
+ * Home hero is excluded — hero sits under the transparent bar.
+ * Storefront and admin share the same 1440px DesktopFluidFrame scaling as home/shop.
+ * Home and /products keep their own frames to avoid double-scaling.
  */
 export function MainContent({ children }: MainContentProps) {
   const pathname = useResolvedPathname();
+  const content = wrapStorefrontContent(pathname, children);
 
   const mainBase = 'flex-1 w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
   const mainContentBase = 'w-full bg-white max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden';
@@ -29,7 +65,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname === '/') {
     return (
       <main className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white">
-        {children}
+        {content}
       </main>
     );
   }
@@ -40,7 +76,7 @@ export function MainContent({ children }: MainContentProps) {
         className="home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
@@ -51,7 +87,7 @@ export function MainContent({ children }: MainContentProps) {
         className="home-main-surface order-page-main flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
@@ -62,7 +98,7 @@ export function MainContent({ children }: MainContentProps) {
         className="home-main-surface order-page-main flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
@@ -73,15 +109,15 @@ export function MainContent({ children }: MainContentProps) {
         className="home-main-surface w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
 
-  if (pathname.startsWith('/supersudo')) {
+  if (pathname.startsWith('/supersudo') || pathname.startsWith('/admin')) {
     return (
       <main className="admin-page-main home-main-surface flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden">
-        {children}
+        {content}
       </main>
     );
   }
@@ -92,14 +128,14 @@ export function MainContent({ children }: MainContentProps) {
         className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
 
   if (pathname.startsWith('/products')) {
     return (
-      <main className={`${mainContentBase} home-main-surface max-lg:overflow-visible`}>{children}</main>
+      <main className={`${mainContentBase} home-main-surface max-lg:overflow-visible`}>{content}</main>
     );
   }
 
@@ -109,7 +145,7 @@ export function MainContent({ children }: MainContentProps) {
         className={`${mainContentBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
@@ -120,7 +156,7 @@ export function MainContent({ children }: MainContentProps) {
         className="auth-main-surface home-main-surface flex-1 w-full max-[743px]:flex-none max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-visible pt-[var(--header-clearance-mobile)] lg:bg-white lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
-        {children}
+        {content}
       </main>
     );
   }
@@ -130,7 +166,7 @@ export function MainContent({ children }: MainContentProps) {
       className={`${mainBase} flex min-h-0 flex-col pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
       style={headerClearanceVars}
     >
-      {children}
+      {content}
     </main>
   );
 }

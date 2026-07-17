@@ -1,16 +1,35 @@
-/** Partner stores page layout tokens — aligned with contact page patterns. */
+/** Partner stores page layout tokens — match wishlist page chrome. */
 import { BRAND_COLORS } from './brand';
-import { HOME_SECTION_MAX_WIDTH_PX } from './home-sections';
+import { MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX } from './mobile-wishlist';
+import {
+  WISHLIST_PAGE_CONTENT_WIDTH_PX,
+  WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX,
+  WISHLIST_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX,
+  WISHLIST_PAGE_TITLE_FONT_SIZE_PX,
+  WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX,
+} from './wishlist-empty-state';
 
-export const STORES_PAGE_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
+/** `lg:px-8` — same side inset as wishlist desktop. */
 export const STORES_PAGE_HORIZONTAL_PADDING_PX = 32;
+export const STORES_PAGE_HORIZONTAL_PADDING_LEFT_PX = STORES_PAGE_HORIZONTAL_PADDING_PX;
+export const STORES_PAGE_HORIZONTAL_PADDING_RIGHT_PX = STORES_PAGE_HORIZONTAL_PADDING_PX;
+
+/** Tailwind `max-w-7xl` — same shell as wishlist desktop. */
+export const STORES_PAGE_MAX_WIDTH_PX =
+  WISHLIST_PAGE_CONTENT_WIDTH_PX + STORES_PAGE_HORIZONTAL_PADDING_PX * 2;
 export const STORES_PAGE_VERTICAL_PADDING_PX = 48;
 export const STORES_PAGE_BG = '#ffffff';
 export const STORES_PAGE_MOBILE_BG = '#ffffff';
-export const STORES_PAGE_MOBILE_PADDING_PX = 20;
+export const STORES_PAGE_MOBILE_PADDING_PX = MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX;
 export const STORES_PAGE_COLUMN_GAP_PX = 24;
 export const STORES_PAGE_CARD_RADIUS_PX = 24;
 export const STORES_PAGE_CARD_SHADOW = '0 8px 32px rgba(87, 66, 59, 0.08)';
+
+/** Same title scale as wishlist page (`Իմ ցանկությունների ցուցակ`). */
+export const STORES_PAGE_TITLE_FONT_SIZE_PX = WISHLIST_PAGE_TITLE_FONT_SIZE_PX;
+export const STORES_PAGE_TITLE_LINE_HEIGHT_PX = WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX;
+export const STORES_PAGE_MOBILE_TITLE_FONT_SIZE_PX = WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX;
+export const STORES_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX = WISHLIST_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX;
 
 export const STORES_PAGE_HEADING_PADDING_Y_PX = 0;
 export const STORES_PAGE_HEADING_MIN_HEIGHT_PX = 0;
