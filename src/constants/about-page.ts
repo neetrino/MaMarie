@@ -7,12 +7,12 @@ export const ABOUT_PAGE_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
 export const ABOUT_PAGE_BG = '#ffffff';
 
 export const ABOUT_PAGE_ASSETS = {
-  title: '/assets/about/title-about-us.png',
-  hero: '/assets/about/hero-portrait.png',
-  gallery1: '/assets/about/gallery-1.jpg',
-  gallery2: '/assets/about/gallery-2.jpg',
-  gallery3: '/assets/about/gallery-3.jpg',
-  decoBird: '/assets/about/deco-bird.png',
+  title: '/assets/about/title-about-us.webp',
+  hero: '/assets/about/hero-portrait.webp',
+  gallery1: '/assets/about/gallery-1.webp',
+  gallery2: '/assets/about/gallery-2.webp',
+  gallery3: '/assets/about/gallery-3.webp',
+  decoBird: '/assets/about/deco-bird.webp',
   decoStrawberry: ABOUT_US_ASSETS.decoStar,
   decoBunny: ABOUT_US_ASSETS.decoBunny,
   logoInline: ABOUT_US_ASSETS.logoInline,
