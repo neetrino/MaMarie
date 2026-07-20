@@ -415,6 +415,7 @@ export default function ProductsPage() {
               handleTogglePublished={handlers.handleTogglePublished}
               handleToggleFeatured={handlers.handleToggleFeatured}
               togglingFeaturedIds={handlers.togglingFeaturedIds}
+              togglingPublishedIds={handlers.togglingPublishedIds}
               meta={meta}
               page={page}
               setPage={setPage}

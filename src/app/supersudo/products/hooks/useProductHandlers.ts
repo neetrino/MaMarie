@@ -28,6 +28,16 @@ function patchProductFeatured(
   );
 }
 
+function patchProductPublished(
+  setProducts: Dispatch<SetStateAction<Product[]>>,
+  productId: string,
+  published: boolean
+): void {
+  setProducts((prev) =>
+    prev.map((product) => (product.id === productId ? { ...product, published } : product))
+  );
+}
+
 export function useProductHandlers({
   products,
   setProducts,
@@ -42,6 +52,7 @@ export function useProductHandlers({
   const { confirm: confirmDialog } = useAdminDialogs();
   const [duplicatingProductId, setDuplicatingProductId] = useState<string | null>(null);
   const [togglingFeaturedIds, setTogglingFeaturedIds] = useState<Set<string>>(new Set());
+  const [togglingPublishedIds, setTogglingPublishedIds] = useState<Set<string>>(new Set());
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -143,30 +154,43 @@ export function useProductHandlers({
     }
   };
 
-  const handleTogglePublished = async (productId: string, currentStatus: boolean, productTitle: string) => {
+  const handleTogglePublished = async (
+    productId: string,
+    currentStatus: boolean,
+    productTitle: string,
+  ) => {
+    if (togglingPublishedIds.has(productId)) {
+      return;
+    }
+
+    const newStatus = !currentStatus;
+    const previousProducts = products;
+
+    patchProductPublished(setProducts, productId, newStatus);
+    setTogglingPublishedIds((prev) => new Set(prev).add(productId));
+
     try {
-      const newStatus = !currentStatus;
-      const updateData = {
-        published: newStatus,
-      };
-
       logger.debug(`🔄 [ADMIN] Updating product status to ${newStatus ? 'published' : 'draft'}`);
-
-      await apiClient.put(`/api/v1/admin/products/${productId}`, updateData);
-
+      await apiClient.put(`/api/v1/admin/products/${productId}`, { published: newStatus });
       logger.debug(`✅ [ADMIN] Product ${newStatus ? 'published' : 'unpublished'} successfully`);
 
-      fetchProducts();
-
-      if (newStatus) {
-        showToast(t('admin.products.productPublished').replace('{title}', productTitle), 'success');
-      } else {
-        showToast(t('admin.products.productDraft').replace('{title}', productTitle), 'success');
-      }
+      showToast(
+        newStatus
+          ? t('admin.products.productPublished').replace('{title}', productTitle)
+          : t('admin.products.productDraft').replace('{title}', productTitle),
+        'success',
+      );
     } catch (err: unknown) {
+      setProducts(previousProducts);
       const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product status:', err);
       showToast(t('admin.products.errorUpdatingStatus').replace('{message}', message), 'error');
+    } finally {
+      setTogglingPublishedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(productId);
+        return next;
+      });
     }
   };
 
@@ -247,6 +271,7 @@ export function useProductHandlers({
     handleDuplicateProduct,
     duplicatingProductId,
     togglingFeaturedIds,
+    togglingPublishedIds,
     handleDeleteProduct,
     handleTogglePublished,
     handleToggleFeatured,

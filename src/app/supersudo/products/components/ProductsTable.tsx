@@ -39,6 +39,7 @@ interface ProductsTableProps {
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
   handleToggleFeatured: (productId: string, currentStatus: boolean) => void;
   togglingFeaturedIds: Set<string>;
+  togglingPublishedIds: Set<string>;
   meta: ProductsResponse['meta'] | null;
   page: number;
   setPage: (page: number | ((prev: number) => number)) => void;
@@ -110,6 +111,7 @@ interface ProductsTableLoadedViewProps {
   handleTogglePublished: (productId: string, currentStatus: boolean, productTitle: string) => void;
   handleToggleFeatured: (productId: string, currentStatus: boolean) => void;
   togglingFeaturedIds: Set<string>;
+  togglingPublishedIds: Set<string>;
   meta: ProductsResponse['meta'] | null;
   page: number;
   t: (key: string) => string;
@@ -162,6 +164,7 @@ function ProductsTableLoadedView({
   handleTogglePublished,
   handleToggleFeatured,
   togglingFeaturedIds,
+  togglingPublishedIds,
   meta,
   page,
   t,
@@ -402,14 +405,18 @@ function ProductsTableLoadedView({
                     </Button>
                     <button
                       type="button"
-                      onClick={() => handleTogglePublished(product.id, product.published, product.title)}
+                      disabled={togglingPublishedIds.has(product.id)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleTogglePublished(product.id, product.published, product.title);
+                        event.currentTarget.blur();
+                      }}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                        product.published
-                          ? 'bg-green-500'
-                          : 'bg-gray-300'
-                      }`}
+                        product.published ? 'bg-green-500' : 'bg-gray-300'
+                      } ${togglingPublishedIds.has(product.id) ? 'cursor-wait opacity-75' : ''}`}
                       title={product.published ? t('admin.products.clickToDraft') : t('admin.products.clickToPublished')}
                       aria-label={product.published ? `${t('admin.products.published')} - ${t('admin.products.clickToDraft')}` : `${t('admin.products.draft')} - ${t('admin.products.clickToPublished')}`}
+                      aria-busy={togglingPublishedIds.has(product.id)}
                     >
                       <span
                         className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200 ${
@@ -498,6 +505,7 @@ export function ProductsTable({
   handleTogglePublished,
   handleToggleFeatured,
   togglingFeaturedIds,
+  togglingPublishedIds,
   meta,
   page,
   setPage,
@@ -544,6 +552,7 @@ export function ProductsTable({
           handleTogglePublished={handleTogglePublished}
           handleToggleFeatured={handleToggleFeatured}
           togglingFeaturedIds={togglingFeaturedIds}
+          togglingPublishedIds={togglingPublishedIds}
           meta={meta}
           page={page}
           t={t}
