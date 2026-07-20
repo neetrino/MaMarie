@@ -24,7 +24,36 @@
   "errorAddingToCart": "Error adding to cart",
   "pcs": "pcs",
   "outOfStockLabel": "Out of Stock",
-  "noRelatedProducts": "Related products not found"
+  "noRelatedProducts": "Related products not found",
+  "sizeGuide": {
+    "title": "Size guide",
+    "subtitle": "All measurements are in centimeters (cm)",
+    "open": "Size guide",
+    "illustrationAlt": "Kids clothing measurement diagram",
+    "cmValue": "{value} cm",
+    "tip": "If your child is between two sizes, we recommend choosing the larger size for a more comfortable fit.",
+    "table": {
+      "size": "Size"
+    },
+    "measures": {
+      "height": {
+        "label": "Height",
+        "hint": "Measure from the top of the head to the bottom of the feet."
+      },
+      "chest": {
+        "label": "Chest",
+        "hint": "Measure around the fullest part of the chest, under the arms."
+      },
+      "waist": {
+        "label": "Waist",
+        "hint": "Measure around the natural waistline."
+      },
+      "hip": {
+        "label": "Hip",
+        "hint": "Measure around the fullest part of the hips."
+      }
+    }
+  }
 }
 
 

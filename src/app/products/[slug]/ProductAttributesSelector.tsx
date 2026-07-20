@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { SizeGuideSideSheet } from '../../../components/size-guide/SizeGuideSideSheet';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -72,6 +74,7 @@ export function ProductAttributesSelector({
   onAttributeValueSelect,
   getOptionValue,
 }: ProductAttributesSelectorProps) {
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const attributeGroupsEntries = Array.from(attributeGroups.entries());
   logger.debug('🎨 [PRODUCT ATTRIBUTES SELECTOR] attributeGroups entries:', attributeGroupsEntries.length);
   logger.debug('🎨 [PRODUCT ATTRIBUTES SELECTOR] attributeGroups keys:', Array.from(attributeGroups.keys()));
@@ -84,7 +87,18 @@ export function ProductAttributesSelector({
     return null;
   }
 
+  const sizeGuideOpenButton = (
+    <button
+      type="button"
+      onClick={() => setIsSizeGuideOpen(true)}
+      className="text-[11px] font-semibold uppercase tracking-wide text-brand-pink underline-offset-2 hover:underline"
+    >
+      {t(language, 'product.sizeGuide.open')}
+    </button>
+  );
+
   return (
+    <>
     <div
       className={`space-y-4 ${
         useNewFormat
@@ -115,11 +129,14 @@ export function ProductAttributesSelector({
                 !isColor && !isSize ? 'min-[744px]:max-[1023px]:col-span-2' : ''
               }`}
             >
-              <label className={`text-xs font-bold uppercase ${isUnavailable ? 'text-red-600' : ''}`}>
-                {attrKey === 'color' ? t(language, 'product.color') : 
-                 attrKey === 'size' ? t(language, 'product.size') : 
-                 attributeName}:
-              </label>
+              <div className="flex items-center justify-between gap-2">
+                <label className={`text-xs font-bold uppercase ${isUnavailable ? 'text-red-600' : ''}`}>
+                  {attrKey === 'color' ? t(language, 'product.color') :
+                   attrKey === 'size' ? t(language, 'product.size') :
+                   attributeName}:
+                </label>
+                {isSize ? sizeGuideOpenButton : null}
+              </div>
               {isColor ? (
                 <div className="flex flex-wrap gap-1.5 items-center">
                   {attrGroups.map((g) => {
@@ -380,7 +397,10 @@ export function ProductAttributesSelector({
       {/* Size Groups - Show only if not using new format */}
       {!product?.productAttributes && sizeGroups.length > 0 && (
         <div className="space-y-2">
-          <label className="text-sm font-bold uppercase">{t(language, 'product.size')}</label>
+          <div className="flex items-center justify-between gap-2">
+            <label className="text-sm font-bold uppercase">{t(language, 'product.size')}</label>
+            {sizeGuideOpenButton}
+          </div>
           <div className="flex flex-wrap gap-2">
             {sizeGroups.map((g) => {
               let displayStock = g.stock;
@@ -420,6 +440,12 @@ export function ProductAttributesSelector({
         </div>
       )}
     </div>
+    <SizeGuideSideSheet
+      isOpen={isSizeGuideOpen}
+      language={language}
+      onClose={() => setIsSizeGuideOpen(false)}
+    />
+    </>
   );
 }
 
