@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { CartEmptyState } from '../../components/cart/CartEmptyState';
 import { MOBILE_ORDER_ASSETS } from '../../constants/mobile-orders';
 import { useTranslation } from '../../lib/i18n-client';
 import { preloadOrderSuccessIllustration } from '../orders/[number]/utils/order-success-pending';
@@ -9,7 +9,6 @@ import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
 import { CheckoutOrderItemsPreview } from './components/CheckoutOrderItemsPreview';
 import { CheckoutPageShell, checkoutPageShellStyles } from './components/CheckoutPageShell';
-import { CheckoutPrimaryButton } from './components/CheckoutPrimaryButton';
 import {
   CHECKOUT_ORDER_ITEMS_PREVIEW_MARGIN_CLASS,
   CHECKOUT_PAGE_TITLE_CLASS,
@@ -37,7 +36,6 @@ function CheckoutSkeleton() {
 }
 
 export default function CheckoutPage() {
-  const router = useRouter();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -81,15 +79,7 @@ export default function CheckoutPage() {
   if (!cart || cart.items.length === 0) {
     return (
       <CheckoutPageShell>
-        <h1 className={`${CHECKOUT_PAGE_TITLE_CLASS} ${checkoutPageShellStyles.titleOffset}`}>
-          {t('checkout.title')}
-        </h1>
-        <div className={`${CHECKOUT_SECTION_CARD_CLASS} text-center`}>
-          <p className="mb-5 text-gray-600">{t('checkout.errors.cartEmpty')}</p>
-          <CheckoutPrimaryButton type="button" onClick={() => router.push('/products')}>
-            {t('checkout.buttons.continueShopping')}
-          </CheckoutPrimaryButton>
-        </div>
+        <CartEmptyState t={t} />
       </CheckoutPageShell>
     );
   }
