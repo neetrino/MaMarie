@@ -3,7 +3,7 @@ import { DEFAULT_LANGUAGE } from '@/lib/language';
 import { getProductPageCore } from './get-product-by-slug';
 
 const DEFAULT_TITLE = 'Product';
-const SITE_NAME = 'MAMARIE';
+const SITE_NAME = 'MaMarie';
 
 type Props = {
   params: Promise<{ slug: string }>;

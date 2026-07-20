@@ -25,8 +25,8 @@ const notoSansArmenian = Noto_Sans_Armenian({
 });
 
 export const metadata: Metadata = {
-  title: 'MAMARIE',
-  description: 'MAMARIE — handmade clay art & gifts',
+  title: 'MaMarie',
+  description: 'MaMarie — handmade clay art & gifts',
 };
 
 export const viewport: Viewport = {
