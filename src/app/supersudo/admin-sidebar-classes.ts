@@ -31,12 +31,12 @@ export const ADMIN_PAGE_SHELL =
   'admin-page-shell flex min-h-screen flex-col bg-[#faf8f5] lg:min-h-full lg:flex-1 lg:flex-row lg:items-stretch';
 
 export const ADMIN_SIDEBAR_ASIDE =
-  'admin-desktop-sidebar hidden lg:sticky lg:top-0 lg:flex lg:min-h-0 lg:shrink-0 lg:flex-col lg:overflow-hidden border-r border-gray-200/80 bg-white transition-[width] duration-200 ease-out';
+  'admin-desktop-sidebar hidden lg:sticky lg:top-0 lg:flex lg:min-h-0 lg:shrink-0 lg:flex-col lg:overflow-hidden rounded-tr-[15px] rounded-br-[15px] border-r border-gray-200/80 bg-white transition-[width] duration-200 ease-out';
 
 export const ADMIN_SIDEBAR_NAV =
   'admin-sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain py-4';
 
-export const ADMIN_SIDEBAR_FOOTER = 'shrink-0 border-t border-gray-100 py-3';
+export const ADMIN_SIDEBAR_FOOTER = 'shrink-0 border-t border-gray-100 py-1.5';
 
 export const ADMIN_MAIN_COLUMN =
   'admin-main-column min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6 lg:px-8 lg:py-8';

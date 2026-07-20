@@ -289,7 +289,7 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
           href="/"
           title={t('common.navigation.home')}
           className={`flex items-center rounded-[15px] border-l-4 border-transparent transition-colors hover:bg-[#faf8f5] ${
-            collapsed ? 'justify-center px-0 py-2' : 'gap-3 px-3 py-2.5'
+            collapsed ? 'justify-center px-0 py-1' : 'gap-3 px-3 py-1.5'
           }`}
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fdeef2] text-brand-pink">
