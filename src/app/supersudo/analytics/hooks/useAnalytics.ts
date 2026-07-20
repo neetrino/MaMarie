@@ -11,6 +11,7 @@ import {
   ADMIN_STATS_STALE_MS,
 } from '@/lib/admin/admin-query-keys';
 import type { AnalyticsData, AdminStatsSummary } from '../types';
+import { showToast } from '../../../../components/Toast';
 
 interface UseAnalyticsParams {
   period: string;
@@ -96,7 +97,7 @@ export function useAnalytics({
         }
 
         setError(errorMessage);
-        alert(`${t('admin.common.error')}: ${errorMessage}`);
+        showToast(`${t('admin.common.error')}: ${errorMessage}`, 'error');
       } finally {
         setLoading(false);
       }

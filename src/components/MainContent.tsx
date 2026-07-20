@@ -136,8 +136,14 @@ export function MainContent({ children }: MainContentProps) {
   }
 
   if (pathname.startsWith('/products')) {
+    // PDP owns its own top offset; global 404 under /products/* needs navbar clearance.
     return (
-      <main className={`${mainContentBase} home-main-surface max-lg:overflow-visible`}>{content}</main>
+      <main
+        className={`${mainContentBase} home-main-surface flex min-h-0 flex-1 flex-col max-lg:overflow-visible has-[.not-found-page]:pt-[var(--header-clearance-mobile)] lg:has-[.not-found-page]:pt-[var(--header-clearance-desktop)]`}
+        style={headerClearanceVars}
+      >
+        {content}
+      </main>
     );
   }
 

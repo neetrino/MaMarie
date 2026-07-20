@@ -12,6 +12,7 @@ import { clearCurrencyRatesCache } from '../../../lib/currency';
 import { logger } from "@/lib/utils/logger";
 import { ClaySelect } from '../../../components/ClaySelect';
 import { useAdminSettingsReference } from '../providers/AdminReferenceDataProvider';
+import { showToast } from '../../../components/Toast';
 
 interface Settings {
   defaultCurrency?: string;
@@ -99,12 +100,12 @@ export default function SettingsPage() {
         }
       }, 100);
       
-      alert(t('admin.settings.savedSuccess'));
+      showToast(t('admin.settings.savedSuccess'), 'success');
       logger.debug('✅ [ADMIN] Settings saved, currency rates:', currencyRatesToSave);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error saving settings:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save settings';
-      alert(t('admin.settings.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.settings.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setSaving(false);
     }

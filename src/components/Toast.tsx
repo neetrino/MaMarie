@@ -41,14 +41,14 @@ function ToastItem({ toast, onClose, onStartExit }: ToastProps) {
   }, [toast.phase, toast.id, onClose]);
 
   const bgColors = {
-    success: 'bg-green-50 border-green-200 text-green-800',
+    success: 'border-brand-pink/30 bg-white text-gray-900',
     error: 'bg-red-50 border-red-200 text-red-800',
     warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
     info: 'bg-blue-50 border-blue-200 text-blue-800',
   };
 
   const iconColors = {
-    success: 'text-green-600',
+    success: 'text-brand-pink',
     error: 'text-red-600',
     warning: 'text-yellow-600',
     info: 'text-blue-600',
@@ -83,8 +83,7 @@ function ToastItem({ toast, onClose, onStartExit }: ToastProps) {
     <div
       className={`
         ${bgColors[toast.type]}
-        border rounded-lg shadow-lg p-4 mb-3 flex items-start gap-3
-        max-w-md w-full
+        mb-3 flex w-full max-w-md items-start gap-3 rounded-2xl border p-4 shadow-lg
         ${animationClass}
       `}
       role="alert"
@@ -146,21 +145,23 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col items-end">
+    <div className="pointer-events-none fixed inset-x-0 top-4 z-[120] flex flex-col items-center px-4">
       {toasts.map((toast) => (
-        <ToastItem
-          key={toast.id}
-          toast={toast}
-          onClose={handleClose}
-          onStartExit={handleStartExit}
-        />
+        <div key={toast.id} className="pointer-events-auto w-full max-w-md">
+          <ToastItem
+            toast={toast}
+            onClose={handleClose}
+            onStartExit={handleStartExit}
+          />
+        </div>
       ))}
     </div>
   );
 }
 
 /**
- * Show a toast notification
+ * Show a toast notification — shared replacement for native `alert()`.
+ * Appears from the top and auto-dismisses with slide animation.
  * @param message - The message to display
  * @param type - The type of toast (success, error, warning, info)
  * @param duration - Duration in milliseconds (default: 3000)

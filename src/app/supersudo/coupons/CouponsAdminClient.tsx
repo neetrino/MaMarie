@@ -19,6 +19,7 @@ import {
 import type { PromoFormFields } from './coupons-admin-types';
 import { PromoCodesAdminFormCard } from './PromoCodesAdminFormCard';
 import { PromoCodesAdminTable } from './PromoCodesAdminTable';
+import { showToast } from '../../../components/Toast';
 
 type PromoListResponse = { data: PromoCodeAdminRow[] };
 
@@ -130,7 +131,7 @@ export function CouponsAdminClient() {
       setRows(res.data);
     } catch (e) {
       logger.error('[ADMIN COUPONS] load failed', { err: e });
-      alert(t('admin.coupons.loadError'));
+      showToast(t('admin.coupons.loadError'), 'error');
     } finally {
       setLoading(false);
     }
@@ -176,22 +177,22 @@ export function CouponsAdminClient() {
   const buildPayload = (): Record<string, unknown> | null => {
     const discountValue = Number(form.discountValue);
     if (!Number.isFinite(discountValue)) {
-      alert(t('admin.coupons.saveError').replace('{message}', 'Invalid discount value'));
+      showToast(t('admin.coupons.saveError').replace('{message}', 'Invalid discount value'), 'error');
       return null;
     }
     const minSubtotal = parseNumField(form.minSubtotal);
     const maxDiscountAmount = parseNumField(form.maxDiscountAmount);
     const usageLimitRaw = parseNumField(form.usageLimit);
     if (form.minSubtotal.trim() !== '' && Number.isNaN(minSubtotal!)) {
-      alert(t('admin.coupons.saveError').replace('{message}', 'Invalid minimum subtotal'));
+      showToast(t('admin.coupons.saveError').replace('{message}', 'Invalid minimum subtotal'), 'error');
       return null;
     }
     if (form.maxDiscountAmount.trim() !== '' && Number.isNaN(maxDiscountAmount!)) {
-      alert(t('admin.coupons.saveError').replace('{message}', 'Invalid max discount'));
+      showToast(t('admin.coupons.saveError').replace('{message}', 'Invalid max discount'), 'error');
       return null;
     }
     if (form.usageLimit.trim() !== '' && (usageLimitRaw == null || Number.isNaN(usageLimitRaw))) {
-      alert(t('admin.coupons.saveError').replace('{message}', 'Invalid usage limit'));
+      showToast(t('admin.coupons.saveError').replace('{message}', 'Invalid usage limit'), 'error');
       return null;
     }
     const validFromIso = parseDatetimeLocalToIso(form.validFrom);
@@ -228,7 +229,7 @@ export function CouponsAdminClient() {
       const msg =
         e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Error';
       logger.error('[ADMIN COUPONS] save failed', { err: e });
-      alert(t('admin.coupons.saveError').replace('{message}', msg));
+      showToast(t('admin.coupons.saveError').replace('{message}', msg), 'error');
     } finally {
       setSaving(false);
     }
@@ -251,7 +252,7 @@ export function CouponsAdminClient() {
       const msg =
         e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Error';
       logger.error('[ADMIN COUPONS] delete failed', { err: e });
-      alert(t('admin.coupons.saveError').replace('{message}', msg));
+      showToast(t('admin.coupons.saveError').replace('{message}', msg), 'error');
     }
   };
 

@@ -55,9 +55,7 @@ export function HeaderMobileActions({
         }
         aria-expanded={menuOpen}
         aria-controls={menuId}
-        className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full transition-[opacity,background-color] hover:opacity-80 touch-manipulation ${
-          showPill ? 'bg-transparent' : 'bg-white'
-        }`}
+        className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-pink transition-opacity hover:opacity-80 touch-manipulation"
         style={{
           width: HEADER_MOBILE_ACTION_BUTTON_SIZE_PX,
           height: HEADER_MOBILE_ACTION_BUTTON_SIZE_PX,
@@ -69,7 +67,7 @@ export function HeaderMobileActions({
           width={HEADER_MOBILE_MENU_ICON_SIZE_PX}
           height={HEADER_MOBILE_MENU_ICON_SIZE_PX}
           aria-hidden
-          className="pointer-events-none absolute transition-[opacity,transform] ease-out"
+          className="pointer-events-none absolute brightness-0 invert transition-[opacity,transform] ease-out"
           style={{
             opacity: menuOpen ? 0 : 1,
             transform: menuOpen ? 'rotate(-90deg) scale(0.82)' : 'rotate(0deg) scale(1)',
@@ -77,7 +75,7 @@ export function HeaderMobileActions({
           }}
         />
         <X
-          className="pointer-events-none absolute text-brand-brown transition-[opacity,transform] ease-out"
+          className="pointer-events-none absolute text-white transition-[opacity,transform] ease-out"
           aria-hidden
           style={{
             width: HEADER_MOBILE_MENU_ICON_SIZE_PX,

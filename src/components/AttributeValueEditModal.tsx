@@ -5,6 +5,7 @@ import { useTranslation } from '../lib/i18n-client';
 import { ColorPaletteSelector } from './ColorPaletteSelector';
 import { logger } from '@/lib/utils/logger';
 import { AdminSideSheet } from '../app/supersudo/components/AdminSideSheet';
+import { showToast } from './Toast';
 import {
   AdminSideSheetCancelButton,
   AdminSideSheetFooter,
@@ -65,7 +66,7 @@ export function AttributeValueEditModal({
 
     const imageFile = files.find((file) => file.type.startsWith('image/'));
     if (!imageFile) {
-      alert(t('admin.attributes.valueModal.selectImageFile'));
+      showToast(t('admin.attributes.valueModal.selectImageFile'), 'warning');
       if (event.target) {
         event.target.value = '';
       }
@@ -79,7 +80,7 @@ export function AttributeValueEditModal({
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : t('admin.attributes.valueModal.failedToProcessImage');
       logger.error('Error uploading attribute value image', { attributeId, error: message });
-      alert(message);
+      showToast(message, 'error');
     } finally {
       setImageUploading(false);
       if (event.target) {
@@ -109,7 +110,7 @@ export function AttributeValueEditModal({
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : t('admin.attributes.valueModal.failedToSave');
       logger.error('Error saving attribute value', { valueId: value.id, error: message });
-      alert(message);
+      showToast(message, 'error');
     } finally {
       setSaving(false);
     }

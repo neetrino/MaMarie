@@ -20,12 +20,20 @@
 }
 
 main.admin-page-main:has(.not-found-standalone-shell),
-main.home-main-surface:has(.not-found-standalone-shell) {
+main.home-main-surface:has(.not-found-standalone-shell),
+main.home-main-surface:has(.not-found-page) {
   background-color: #fff;
 }
 
 .admin-page-shell:has(.not-found-standalone-shell) {
   background-color: #fff;
+}
+
+/* Mobile shell uses gray for storefront; keep 404 white including navbar clearance. */
+@media (max-width: 1023px) {
+  .layout-shell-mobile-bottom-clearance:has(.not-found-page) {
+    background-color: #fff;
+  }
 }
 
 .not-found-page {

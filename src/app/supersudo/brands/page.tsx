@@ -11,6 +11,7 @@ import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { ClaySelect } from '../../../components/ClaySelect';
 import { useAdminBrands } from '../providers/AdminReferenceDataProvider';
 import { AdminSideSheet } from '../components/AdminSideSheet';
+import { showToast } from '../../../components/Toast';
 import {
   AdminSideSheetCancelButton,
   AdminSideSheetFooter,
@@ -92,7 +93,7 @@ function BrandsSection() {
       await apiClient.delete(`/api/v1/admin/brands/${brandId}`);
       logger.debug('✅ [ADMIN] Brand deleted successfully');
       fetchBrands();
-      alert(t('admin.brands.deletedSuccess'));
+      showToast(t('admin.brands.deletedSuccess'), 'success');
     } catch (err: any) {
       console.error('❌ [ADMIN] Error deleting brand:', err);
       let errorMessage = 'Unknown error occurred';
@@ -105,7 +106,7 @@ function BrandsSection() {
       } else if (err.response?.data?.detail) {
         errorMessage = err.response.data.detail;
       }
-      alert(t('admin.brands.errorDeleting') + '\n\n' + errorMessage);
+      showToast(t('admin.brands.errorDeleting') + '\n\n' + errorMessage, 'error');
     }
   };
 
@@ -145,7 +146,7 @@ function BrandsSection() {
 
     const imageFile = files.find((file) => file.type.startsWith('image/'));
     if (!imageFile) {
-      alert(t('admin.attributes.valueModal.selectImageFile'));
+      showToast(t('admin.attributes.valueModal.selectImageFile'), 'warning');
       if (event.target) {
         event.target.value = '';
       }
@@ -158,7 +159,7 @@ function BrandsSection() {
       setFormData((current) => ({ ...current, logoUrl: base64 }));
     } catch (error) {
       const message = error instanceof Error ? error.message : t('admin.attributes.valueModal.failedToProcessImage');
-      alert(message);
+      showToast(message, 'error');
     } finally {
       setImageUploading(false);
       if (event.target) {
@@ -175,7 +176,7 @@ function BrandsSection() {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      alert(t('admin.brands.nameRequired'));
+      showToast(t('admin.brands.nameRequired'), 'warning');
       return;
     }
 
@@ -190,7 +191,7 @@ function BrandsSection() {
           published: formData.published === 'published',
         });
         logger.debug('✅ [ADMIN] Brand updated successfully');
-        alert(t('admin.brands.updatedSuccess'));
+        showToast(t('admin.brands.updatedSuccess'), 'success');
       } else {
         // Create new brand
         logger.debug('➕ [ADMIN] Creating brand:', formData.name);
@@ -200,7 +201,7 @@ function BrandsSection() {
           published: formData.published === 'published',
         });
         logger.debug('✅ [ADMIN] Brand created successfully');
-        alert(t('admin.brands.createdSuccess'));
+        showToast(t('admin.brands.createdSuccess'), 'success');
       }
       
       fetchBrands();
@@ -217,7 +218,7 @@ function BrandsSection() {
       } else if (err.response?.data?.detail) {
         errorMessage = err.response.data.detail;
       }
-      alert(t('admin.brands.errorSaving') + '\n\n' + errorMessage);
+      showToast(t('admin.brands.errorSaving') + '\n\n' + errorMessage, 'error');
     } finally {
       setSubmitting(false);
     }

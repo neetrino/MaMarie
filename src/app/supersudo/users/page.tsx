@@ -35,6 +35,7 @@ import {
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { AdminSegmentedControl } from '../components/AdminSegmentedControl';
+import { showToast } from '../../../components/Toast';
 
 interface User {
   id: string;
@@ -199,10 +200,10 @@ export default function UsersPage() {
       const failed = results.filter(r => r.status === 'rejected');
       setSelectedIds(new Set());
       await refetchUsers();
-      alert(t('admin.users.bulkDeleteFinished').replace('{success}', (ids.length - failed.length).toString()).replace('{total}', ids.length.toString()));
+      showToast(t('admin.users.bulkDeleteFinished').replace('{success}', (ids.length - failed.length).toString()).replace('{total}', ids.length.toString()), 'success');
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete users error:', err);
-      alert(t('admin.users.failedToDelete'));
+      showToast(t('admin.users.failedToDelete'), 'error');
     } finally {
       setBulkDeleting(false);
     }
@@ -221,13 +222,13 @@ export default function UsersPage() {
       void refetchUsers();
       
       if (newStatus) {
-        alert(t('admin.users.userBlocked').replace('{name}', userName));
+        showToast(t('admin.users.userBlocked').replace('{name}', userName), 'success');
       } else {
-        alert(t('admin.users.userActive').replace('{name}', userName));
+        showToast(t('admin.users.userActive').replace('{name}', userName), 'success');
       }
     } catch (err: any) {
       console.error('❌ [ADMIN] Error updating user status:', err);
-      alert(t('admin.users.errorUpdatingStatus').replace('{message}', err.message || t('admin.common.unknownErrorFallback')));
+      showToast(t('admin.users.errorUpdatingStatus').replace('{message}', err.message || t('admin.common.unknownErrorFallback')), 'error');
     }
   };
 
