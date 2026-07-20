@@ -12,7 +12,8 @@ export function AboutPageView() {
   const { t } = useTranslation();
 
   const copy: AboutPageCopy = {
-    leadAfterLogo: t('about.description.leadAfterLogo'),
+    leadLine1: t('about.description.leadLine1'),
+    leadLine2: t('about.description.leadLine2'),
     body: t('about.description.paragraph2'),
     pinkParagraphs: [
       t('about.description.paragraph3'),

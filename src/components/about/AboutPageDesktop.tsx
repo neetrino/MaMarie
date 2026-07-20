@@ -24,14 +24,18 @@ import {
   ABOUT_PAGE_HERO_TOP_PX,
   ABOUT_PAGE_HERO_WIDTH_PX,
   ABOUT_PAGE_IMAGE_QUALITY,
+  ABOUT_PAGE_LEAD_GAP_PX,
   ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT,
+  ABOUT_PAGE_LEAD_LOGO_CROP_LEFT_PERCENT,
   ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT,
+  ABOUT_PAGE_LEAD_LOGO_CROP_WIDTH_PERCENT,
   ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX,
-  ABOUT_PAGE_LEAD_LOGO_RAISE_PX,
+  ABOUT_PAGE_LEAD_LOGO_LEFT_PX,
   ABOUT_PAGE_LEAD_LOGO_TOP_PX,
   ABOUT_PAGE_LEAD_LOGO_WIDTH_PX,
   ABOUT_PAGE_LEAD_TEXT_COLOR,
-  ABOUT_PAGE_LEAD_TEXT_LEFT_PX,
+  ABOUT_PAGE_LEAD_TEXT_LINE_HEIGHT_PX,
+  ABOUT_PAGE_LEAD_TEXT_OFFSET_TOP_PX,
   ABOUT_PAGE_LEAD_TEXT_SIZE_PX,
   ABOUT_PAGE_LEAD_TEXT_WIDTH_PX,
   ABOUT_PAGE_MAX_WIDTH_PX,
@@ -43,31 +47,35 @@ import { AboutDecoration } from './AboutDecoration';
 import { AboutGallery } from './AboutGallery';
 
 export interface AboutPageCopy {
-  leadAfterLogo: string;
+  leadLine1: string;
+  leadLine2: string;
   body: string;
   pinkParagraphs: [string, string];
   titleAlt: string;
 }
 
-function AboutLeadBlock({ leadAfterLogo }: { leadAfterLogo: string }) {
+function AboutLeadBlock({
+  leadLine1,
+  leadLine2,
+}: {
+  leadLine1: string;
+  leadLine2: string;
+}) {
   return (
-    <p
-      className="absolute m-0 font-normal leading-normal"
+    <div
+      className="absolute flex items-start"
       style={{
-        left: ABOUT_PAGE_LEAD_TEXT_LEFT_PX,
+        left: ABOUT_PAGE_LEAD_LOGO_LEFT_PX,
         top: ABOUT_PAGE_LEAD_LOGO_TOP_PX,
-        width: ABOUT_PAGE_LEAD_TEXT_WIDTH_PX,
-        color: ABOUT_PAGE_LEAD_TEXT_COLOR,
-        fontSize: ABOUT_PAGE_LEAD_TEXT_SIZE_PX,
+        gap: ABOUT_PAGE_LEAD_GAP_PX,
         zIndex: 10,
       }}
     >
       <span
-        className="relative mr-1 inline-block shrink-0 overflow-hidden align-baseline"
+        className="relative shrink-0 overflow-hidden"
         style={{
           width: ABOUT_PAGE_LEAD_LOGO_WIDTH_PX,
           height: ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX,
-          transform: `translateY(-${ABOUT_PAGE_LEAD_LOGO_RAISE_PX}px)`,
         }}
       >
         <Image
@@ -77,16 +85,30 @@ function AboutLeadBlock({ leadAfterLogo }: { leadAfterLogo: string }) {
           height={ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX}
           quality={ABOUT_PAGE_IMAGE_QUALITY}
           unoptimized
-          className="pointer-events-none absolute left-0 w-full max-w-none"
+          className="pointer-events-none absolute max-w-none"
           style={{
             height: `${ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT}%`,
+            width: `${ABOUT_PAGE_LEAD_LOGO_CROP_WIDTH_PERCENT}%`,
+            left: `${ABOUT_PAGE_LEAD_LOGO_CROP_LEFT_PERCENT}%`,
             top: `${ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT}%`,
-            width: '100%',
           }}
         />
       </span>
-      {leadAfterLogo}
-    </p>
+      <p
+        className="m-0 font-normal"
+        style={{
+          width: ABOUT_PAGE_LEAD_TEXT_WIDTH_PX,
+          color: ABOUT_PAGE_LEAD_TEXT_COLOR,
+          fontSize: ABOUT_PAGE_LEAD_TEXT_SIZE_PX,
+          lineHeight: `${ABOUT_PAGE_LEAD_TEXT_LINE_HEIGHT_PX}px`,
+          marginTop: ABOUT_PAGE_LEAD_TEXT_OFFSET_TOP_PX,
+        }}
+      >
+        {leadLine1}
+        <br />
+        {leadLine2}
+      </p>
+    </div>
   );
 }
 
@@ -161,7 +183,7 @@ export function AboutPageDesktop({ copy }: { copy: AboutPageCopy }) {
       </div>
 
       <AboutHeroPortrait />
-      <AboutLeadBlock leadAfterLogo={copy.leadAfterLogo} />
+      <AboutLeadBlock leadLine1={copy.leadLine1} leadLine2={copy.leadLine2} />
 
       <AboutDecoration
         imageSrc={ABOUT_PAGE_ASSETS.decoBunny}

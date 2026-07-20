@@ -37,20 +37,22 @@ export const ABOUT_PAGE_HERO_IMG_HEIGHT_PERCENT = 140.38;
 export const ABOUT_PAGE_HERO_IMG_LEFT_PERCENT = -39.31;
 export const ABOUT_PAGE_HERO_IMG_TOP_PERCENT = -35.18;
 
-/** Lead (logo + short line) — Figma `307:624`. */
-export const ABOUT_PAGE_LEAD_LOGO_LEFT_PX = 242;
+/** Lead (logo + two-line copy) — matches design screenshot. */
+export const ABOUT_PAGE_LEAD_LOGO_LEFT_PX = 211;
 export const ABOUT_PAGE_LEAD_LOGO_TOP_PX = 335;
-export const ABOUT_PAGE_LEAD_LOGO_WIDTH_PX = 86;
-export const ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX = 37;
-export const ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT = 237.18;
-export const ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT = -67.18;
-/** Nudge clay wordmark vs text baseline (positive = up, negative = down). */
-export const ABOUT_PAGE_LEAD_LOGO_RAISE_PX = -44;
-export const ABOUT_PAGE_LEAD_TEXT_LEFT_PX = 211;
-export const ABOUT_PAGE_LEAD_TEXT_TOP_PX = 346;
-export const ABOUT_PAGE_LEAD_TEXT_WIDTH_PX = 298;
+export const ABOUT_PAGE_LEAD_LOGO_WIDTH_PX = 120;
+export const ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX = 54;
+export const ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT = 207.48;
+export const ABOUT_PAGE_LEAD_LOGO_CROP_WIDTH_PERCENT = 112.61;
+export const ABOUT_PAGE_LEAD_LOGO_CROP_LEFT_PERCENT = -7.56;
+export const ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT = -53.74;
+export const ABOUT_PAGE_LEAD_GAP_PX = 4;
+export const ABOUT_PAGE_LEAD_TEXT_WIDTH_PX = 220;
 export const ABOUT_PAGE_LEAD_TEXT_SIZE_PX = 16;
+export const ABOUT_PAGE_LEAD_TEXT_LINE_HEIGHT_PX = 22;
 export const ABOUT_PAGE_LEAD_TEXT_COLOR = '#5d5d5d';
+/** Push lead copy down relative to the logo. */
+export const ABOUT_PAGE_LEAD_TEXT_OFFSET_TOP_PX = 26;
 
 /** Body copy right of hero — Figma `307:635`. */
 export const ABOUT_PAGE_BODY_LEFT_PX = 1006;

@@ -1,8 +1,20 @@
 import Image from 'next/image';
 import {
   ABOUT_PAGE_ASSETS,
+  ABOUT_PAGE_BODY_TEXT_COLOR,
   ABOUT_PAGE_GALLERY_PINK_BG,
   ABOUT_PAGE_IMAGE_QUALITY,
+  ABOUT_PAGE_LEAD_GAP_PX,
+  ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT,
+  ABOUT_PAGE_LEAD_LOGO_CROP_LEFT_PERCENT,
+  ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT,
+  ABOUT_PAGE_LEAD_LOGO_CROP_WIDTH_PERCENT,
+  ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX,
+  ABOUT_PAGE_LEAD_LOGO_WIDTH_PX,
+  ABOUT_PAGE_LEAD_TEXT_COLOR,
+  ABOUT_PAGE_LEAD_TEXT_LINE_HEIGHT_PX,
+  ABOUT_PAGE_LEAD_TEXT_OFFSET_TOP_PX,
+  ABOUT_PAGE_LEAD_TEXT_SIZE_PX,
   ABOUT_PAGE_MOBILE_CARD_RADIUS_PX,
   ABOUT_PAGE_MOBILE_GALLERY_GAP_PX,
   ABOUT_PAGE_MOBILE_HERO_HEIGHT_PX,
@@ -13,13 +25,6 @@ import {
   ABOUT_PAGE_MOBILE_PINK_PADDING_PX,
   ABOUT_PAGE_MOBILE_SECTION_GAP_PX,
   ABOUT_PAGE_MOBILE_TITLE_MAX_WIDTH_PX,
-  ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT,
-  ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT,
-  ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX,
-  ABOUT_PAGE_LEAD_LOGO_RAISE_PX,
-  ABOUT_PAGE_LEAD_LOGO_WIDTH_PX,
-  ABOUT_PAGE_LEAD_TEXT_COLOR,
-  ABOUT_PAGE_BODY_TEXT_COLOR,
   ABOUT_PAGE_TITLE_HEIGHT_PX,
   ABOUT_PAGE_TITLE_WIDTH_PX,
 } from '../../constants/about-page';
@@ -79,16 +84,12 @@ export function AboutPageMobile({ copy }: { copy: AboutPageCopy }) {
         />
       </div>
 
-      <p
-        className="m-0 text-base font-normal leading-snug"
-        style={{ color: ABOUT_PAGE_LEAD_TEXT_COLOR }}
-      >
+      <div className="flex items-start" style={{ gap: ABOUT_PAGE_LEAD_GAP_PX }}>
         <span
-          className="relative mr-1 inline-block shrink-0 overflow-hidden align-baseline"
+          className="relative shrink-0 overflow-hidden"
           style={{
             width: ABOUT_PAGE_LEAD_LOGO_WIDTH_PX,
             height: ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX,
-            transform: `translateY(-${ABOUT_PAGE_LEAD_LOGO_RAISE_PX}px)`,
           }}
         >
           <Image
@@ -98,16 +99,29 @@ export function AboutPageMobile({ copy }: { copy: AboutPageCopy }) {
             height={ABOUT_PAGE_LEAD_LOGO_HEIGHT_PX}
             quality={ABOUT_PAGE_IMAGE_QUALITY}
             unoptimized
-            className="pointer-events-none absolute left-0 w-full max-w-none"
+            className="pointer-events-none absolute max-w-none"
             style={{
               height: `${ABOUT_PAGE_LEAD_LOGO_CROP_HEIGHT_PERCENT}%`,
+              width: `${ABOUT_PAGE_LEAD_LOGO_CROP_WIDTH_PERCENT}%`,
+              left: `${ABOUT_PAGE_LEAD_LOGO_CROP_LEFT_PERCENT}%`,
               top: `${ABOUT_PAGE_LEAD_LOGO_CROP_TOP_PERCENT}%`,
-              width: '100%',
             }}
           />
         </span>
-        {copy.leadAfterLogo}
-      </p>
+        <p
+          className="m-0 min-w-0 flex-1 font-normal"
+          style={{
+            color: ABOUT_PAGE_LEAD_TEXT_COLOR,
+            fontSize: ABOUT_PAGE_LEAD_TEXT_SIZE_PX,
+            lineHeight: `${ABOUT_PAGE_LEAD_TEXT_LINE_HEIGHT_PX}px`,
+            marginTop: ABOUT_PAGE_LEAD_TEXT_OFFSET_TOP_PX,
+          }}
+        >
+          {copy.leadLine1}
+          <br />
+          {copy.leadLine2}
+        </p>
+      </div>
 
       <p
         className="m-0 text-[15px] font-normal leading-5"
