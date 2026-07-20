@@ -1,8 +1,8 @@
 /** Kids size guide — body measurements (cm). */
 export const SIZE_GUIDE_ILLUSTRATION_SRC = '/assets/product/size-guide-illustration.webp';
 
-export const SIZE_GUIDE_ILLUSTRATION_WIDTH_PX = 644;
-export const SIZE_GUIDE_ILLUSTRATION_HEIGHT_PX = 975;
+export const SIZE_GUIDE_ILLUSTRATION_WIDTH_PX = 641;
+export const SIZE_GUIDE_ILLUSTRATION_HEIGHT_PX = 984;
 
 export type SizeGuideRow = {
   sizeLabel: string;
