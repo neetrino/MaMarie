@@ -33,11 +33,11 @@ function SizeGuideTable({ language }: SizeGuideContentProps) {
       <table className="w-full min-w-[280px] border-collapse text-center text-base">
         <thead>
           <tr className="bg-[#efe8df]">
-            <th className="px-3 py-2.5 text-xs font-bold uppercase tracking-wide">
+            <th className="px-3 py-2.5 text-xs font-extrabold uppercase tracking-wide">
               {t(language, 'product.sizeGuide.table.size')}
             </th>
             {SIZE_GUIDE_MEASURE_KEYS.map((key) => (
-              <th key={key} className="px-2 py-2.5 text-xs font-bold uppercase tracking-wide">
+              <th key={key} className="px-2 py-2.5 text-xs font-extrabold uppercase tracking-wide">
                 {t(language, `product.sizeGuide.measures.${key}.label`)}
               </th>
             ))}
@@ -70,10 +70,10 @@ function SizeGuideMeasureTips({ language }: SizeGuideContentProps) {
             key={key}
             className={`flex flex-col items-start gap-1.5${isLowerRow ? ' mt-3' : ''}`}
           >
-            <p className="text-sm font-bold uppercase tracking-wide">
+            <p className="text-sm font-extrabold uppercase tracking-wide">
               {t(language, `product.sizeGuide.measures.${key}.label`)}
             </p>
-            <p className="text-sm leading-snug text-[#6b5e55]">
+            <p className="text-sm font-medium leading-snug text-[#6b5e55]">
               {t(language, `product.sizeGuide.measures.${key}.hint`)}
             </p>
           </li>

@@ -53,18 +53,19 @@ export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS = 'right-4';
 
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS = 'h-5 w-5 shrink-0';
 
-/** Mobile PDP — compact quantity stepper (- 1 +). */
-export const PRODUCT_PDP_QUANTITY_STEPPER_CLASS =
-  'flex items-center overflow-hidden rounded-full border bg-gray-50 min-[744px]:h-12';
-
-export const PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS =
-  'flex h-9 w-9 items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 min-[744px]:h-12 min-[744px]:w-12';
-
-export const PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS =
-  'w-8 text-center text-sm font-bold min-[744px]:w-12 min-[744px]:text-base';
-
 /** Below-the-fold related row — reserve space before lazy mount. */
 export const PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX = 420;
 
 /** Reviews block skeleton height before lazy mount. */
 export const PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX = 280;
+
+/** PDP action row — Add to cart / size guide height (`h-12`). */
+export const PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX = 48;
+
+/** Pink clay −/+ quantity stepper — slightly under compact CTA. */
+export const PRODUCT_QUANTITY_STEPPER_HEIGHT_PX = 40;
+export const PRODUCT_QUANTITY_STEPPER_SHELL_CLASS = 'gap-0 overflow-hidden !px-0';
+export const PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS =
+  'flex h-full w-9 items-center justify-center text-sm font-bold text-white';
+export const PRODUCT_QUANTITY_STEPPER_VALUE_CLASS =
+  'min-w-[1.5rem] text-center text-sm font-bold text-white';

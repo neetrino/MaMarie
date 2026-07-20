@@ -2,17 +2,23 @@
 
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
+import {
+  CLAY_PRIMARY_BUTTON_CLASS,
+  getClayPrimaryButtonCompactStyle,
+} from '../../../constants/clay-primary-button';
+import { HERO_GENDER_BUTTON_GIRLS_BG_COLOR } from '../../../constants/hero';
 import { formatPrice } from '../../../lib/currency';
 import { t } from '../../../lib/i18n';
 import type { ProductPageSnapshot } from '../../../lib/product-page-snapshot';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
+import {
+  PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+  PRODUCT_QUANTITY_STEPPER_SHELL_CLASS,
+  PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS,
+  PRODUCT_QUANTITY_STEPPER_VALUE_CLASS,
+} from './constants';
 import { ProductRatingSummary } from './ProductRatingSummary';
 import { ProductPageSnapshotAttributes } from './ProductPageSnapshotAttributes';
-import {
-  PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS,
-  PRODUCT_PDP_QUANTITY_STEPPER_CLASS,
-  PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS,
-} from './constants';
 
 interface ProductPageSnapshotInfoProps {
   snapshot: ProductPageSnapshot;
@@ -20,12 +26,28 @@ interface ProductPageSnapshotInfoProps {
 
 function ProductPageSnapshotQuantityStepper() {
   return (
-    <div className={PRODUCT_PDP_QUANTITY_STEPPER_CLASS}>
-      <button type="button" disabled className={PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS}>
+    <div
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_QUANTITY_STEPPER_SHELL_CLASS}`}
+      style={{
+        ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_GIRLS_BG_COLOR),
+        paddingLeft: 0,
+        paddingRight: 0,
+        height: PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+      }}
+    >
+      <button
+        type="button"
+        disabled
+        className={`${PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS} disabled:opacity-50`}
+      >
         -
       </button>
-      <div className={PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS}>1</div>
-      <button type="button" disabled className={PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS}>
+      <div className={PRODUCT_QUANTITY_STEPPER_VALUE_CLASS}>1</div>
+      <button
+        type="button"
+        disabled
+        className={`${PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS} disabled:opacity-50`}
+      >
         +
       </button>
     </div>
@@ -109,7 +131,7 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
                 </span>
               ) : null}
             </div>
-            <div className="shrink-0 lg:hidden">
+            <div className="shrink-0">
               <ProductPageSnapshotQuantityStepper />
             </div>
           </div>
@@ -131,9 +153,6 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
 
       <div className="mt-auto lg:pt-0 pt-6">
         <div className="flex items-center gap-3 pointer-events-none">
-          <div className="hidden shrink-0 lg:block">
-            <ProductPageSnapshotQuantityStepper />
-          </div>
           <button
             type="button"
             disabled

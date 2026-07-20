@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { SizeGuideSideSheet } from '../../../components/size-guide/SizeGuideSideSheet';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -74,7 +72,6 @@ export function ProductAttributesSelector({
   onAttributeValueSelect,
   getOptionValue,
 }: ProductAttributesSelectorProps) {
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const attributeGroupsEntries = Array.from(attributeGroups.entries());
   logger.debug('🎨 [PRODUCT ATTRIBUTES SELECTOR] attributeGroups entries:', attributeGroupsEntries.length);
   logger.debug('🎨 [PRODUCT ATTRIBUTES SELECTOR] attributeGroups keys:', Array.from(attributeGroups.keys()));
@@ -83,25 +80,11 @@ export function ProductAttributesSelector({
   const useNewFormat = attributeGroupsEntries.some(([, arr]) => arr.length > 0);
   const hasLegacyColor = colorGroups.length > 0;
   const hasLegacySize = !product?.productAttributes && sizeGroups.length > 0;
-  const showSizeGuideLink =
-    hasLegacySize ||
-    (useNewFormat && (attributeGroups.get('size')?.length ?? 0) > 0);
   if (!useNewFormat && !hasLegacyColor && !hasLegacySize) {
     return null;
   }
 
-  const sizeGuideOpenButton = (
-    <button
-      type="button"
-      onClick={() => setIsSizeGuideOpen(true)}
-      className="text-sm font-semibold tracking-wide text-blue-600"
-    >
-      {t(language, 'product.sizeGuide.open')}
-    </button>
-  );
-
   return (
-    <>
     <div
       className={`space-y-4 ${
         useNewFormat
@@ -445,17 +428,6 @@ export function ProductAttributesSelector({
         </div>
       )}
     </div>
-    {showSizeGuideLink ? (
-      <div className="my-8 flex justify-start min-[744px]:my-10">
-        {sizeGuideOpenButton}
-      </div>
-    ) : null}
-    <SizeGuideSideSheet
-      isOpen={isSizeGuideOpen}
-      language={language}
-      onClose={() => setIsSizeGuideOpen(false)}
-    />
-    </>
   );
 }
 

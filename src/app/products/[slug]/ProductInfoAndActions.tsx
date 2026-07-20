@@ -1,20 +1,32 @@
 'use client';
 
 import type { MouseEvent } from 'react';
+import { useState } from 'react';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
+import { SizeGuideSideSheet } from '../../../components/size-guide/SizeGuideSideSheet';
+import {
+  CLAY_PRIMARY_BUTTON_CLASS,
+  getClayPrimaryButtonCompactStyle,
+} from '../../../constants/clay-primary-button';
+import {
+  HERO_GENDER_BUTTON_BOYS_BG_COLOR,
+  HERO_GENDER_BUTTON_GIRLS_BG_COLOR,
+} from '../../../constants/hero';
 import { MOBILE_PRODUCTS_CATALOG_CARD_ASSETS } from '../../../constants/mobile-products-catalog';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
+import {
+  PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+  PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+  PRODUCT_QUANTITY_STEPPER_SHELL_CLASS,
+  PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS,
+  PRODUCT_QUANTITY_STEPPER_VALUE_CLASS,
+} from './constants';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
 import { ProductRatingSummary } from './ProductRatingSummary';
-import {
-  PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS,
-  PRODUCT_PDP_QUANTITY_STEPPER_CLASS,
-  PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS,
-} from './constants';
 import type { Product, ProductVariant } from './types';
 
 interface ProductInfoAndActionsProps {
@@ -68,21 +80,29 @@ function ProductQuantityStepper({
   onQuantityAdjust,
 }: ProductQuantityStepperProps) {
   return (
-    <div className={PRODUCT_PDP_QUANTITY_STEPPER_CLASS}>
+    <div
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_QUANTITY_STEPPER_SHELL_CLASS}`}
+      style={{
+        ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_GIRLS_BG_COLOR),
+        paddingLeft: 0,
+        paddingRight: 0,
+        height: PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+      }}
+    >
       <button
         type="button"
         onClick={() => onQuantityAdjust(-1)}
         disabled={quantity <= 1}
-        className={PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS}
+        className={`${PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS} disabled:cursor-not-allowed disabled:opacity-50`}
       >
         -
       </button>
-      <div className={PRODUCT_PDP_QUANTITY_STEPPER_VALUE_CLASS}>{quantity}</div>
+      <div className={PRODUCT_QUANTITY_STEPPER_VALUE_CLASS}>{quantity}</div>
       <button
         type="button"
         onClick={() => onQuantityAdjust(1)}
         disabled={quantity >= maxQuantity}
-        className={PRODUCT_PDP_QUANTITY_STEPPER_BUTTON_CLASS}
+        className={`${PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS} disabled:cursor-not-allowed disabled:opacity-50`}
       >
         +
       </button>
@@ -145,6 +165,10 @@ export function ProductInfoAndActions({
     isVariationRequired && actionLabel.includes(' և ')
       ? actionLabel.replace(' և ', '\nև ')
       : actionLabel;
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const showSizeGuide =
+    sizeGroups.length > 0 ||
+    (attributeGroups.get('size')?.length ?? 0) > 0;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -193,7 +217,7 @@ export function ProductInfoAndActions({
                 </span>
               )}
             </div>
-            <div className="shrink-0 min-[744px]:hidden">
+            <div className="shrink-0">
               <ProductQuantityStepper
                 quantity={quantity}
                 maxQuantity={maxQuantity}
@@ -251,47 +275,61 @@ export function ProductInfoAndActions({
             </p>
           </div>
         )}
-        <div className="flex items-center gap-3">
-          <div className="hidden shrink-0 min-[744px]:block">
-            <ProductQuantityStepper
-              quantity={quantity}
-              maxQuantity={maxQuantity}
-              onQuantityAdjust={onQuantityAdjust}
-            />
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          {showSizeGuide ? (
+            <button
+              type="button"
+              onClick={() => setIsSizeGuideOpen(true)}
+              className={`${CLAY_PRIMARY_BUTTON_CLASS} shrink-0 self-center lg:self-auto`}
+              style={{
+                ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_BOYS_BG_COLOR),
+                height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+              }}
+            >
+              {t(language, 'product.sizeGuide.open')}
+            </button>
+          ) : null}
+          <div className="flex flex-1 items-center gap-3">
+            <button 
+              disabled={!canAddToCart || isAddingToCart} 
+              className="flex-1 rounded-full bg-brand-cart font-bold text-gray-900 transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+              style={{ height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX }}
+              onClick={onAddToCart}
+            >
+              <span className="relative block h-full w-full">
+                <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
+                  {mobileFormattedActionLabel}
+                </span>
+                <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
+                  <Image
+                    src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
+                    alt=""
+                    width={20}
+                    height={20}
+                    aria-hidden
+                  />
+                </span>
+              </span>
+            </button>
+            <button 
+              onClick={onAddToWishlist} 
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                isInWishlist
+                  ? 'border-gray-200 text-brand-pink'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Heart fill={isInWishlist ? 'currentColor' : 'none'} />
+            </button>
           </div>
-          <button 
-            disabled={!canAddToCart || isAddingToCart} 
-            className="flex-1 h-12 bg-brand-cart text-gray-900 rounded-full font-bold transition-colors hover:brightness-95 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-            onClick={onAddToCart}
-          >
-            <span className="relative block h-full w-full">
-              <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
-                {mobileFormattedActionLabel}
-              </span>
-              <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
-                <Image
-                  src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
-                  alt=""
-                  width={20}
-                  height={20}
-                  aria-hidden
-                />
-              </span>
-            </span>
-          </button>
-          <button 
-            onClick={onAddToWishlist} 
-            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-              isInWishlist
-                ? 'border-gray-200 text-brand-pink'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <Heart fill={isInWishlist ? 'currentColor' : 'none'} />
-          </button>
         </div>
       </div>
       {showMessage && <div className="mt-4 p-4 bg-gray-900 text-white rounded-md shadow-lg">{showMessage}</div>}
+      <SizeGuideSideSheet
+        isOpen={isSizeGuideOpen}
+        language={language}
+        onClose={() => setIsSizeGuideOpen(false)}
+      />
     </div>
   );
 }

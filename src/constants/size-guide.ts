@@ -28,11 +28,11 @@ export type SizeGuideMeasureKey = (typeof SIZE_GUIDE_MEASURE_KEYS)[number];
  */
 export const SIZE_GUIDE_OVERLAY_LABEL_CLASS: Record<SizeGuideMeasureKey, string> = {
   height:
-    'pointer-events-none absolute left-[1%] top-[49%] -translate-x-1/2 -translate-y-1/2 -rotate-90 text-[11px] font-bold uppercase tracking-wide text-[#57423b] sm:text-xs',
+    'pointer-events-none absolute left-[1%] top-[49%] -translate-x-1/2 -translate-y-1/2 -rotate-90 text-[11px] font-extrabold uppercase tracking-wide text-[#57423b] sm:text-xs',
   chest:
-    'pointer-events-none absolute left-[56%] top-[22.5%] -translate-x-1/2 -translate-y-full text-[11px] font-bold uppercase tracking-wide text-[#57423b] sm:text-xs',
+    'pointer-events-none absolute left-[56%] top-[22.5%] -translate-x-1/2 -translate-y-full text-[11px] font-extrabold uppercase tracking-wide text-[#57423b] sm:text-xs',
   waist:
-    'pointer-events-none absolute left-[56%] top-[37%] -translate-x-1/2 -translate-y-full text-[11px] font-bold uppercase tracking-wide text-[#57423b] sm:text-xs',
+    'pointer-events-none absolute left-[56%] top-[37%] -translate-x-1/2 -translate-y-full text-[11px] font-extrabold uppercase tracking-wide text-[#57423b] sm:text-xs',
   hip:
-    'pointer-events-none absolute left-[56%] top-[58%] -translate-x-1/2 -translate-y-full text-[11px] font-bold uppercase tracking-wide text-[#57423b] sm:text-xs',
+    'pointer-events-none absolute left-[56%] top-[58%] -translate-x-1/2 -translate-y-full text-[11px] font-extrabold uppercase tracking-wide text-[#57423b] sm:text-xs',
 };

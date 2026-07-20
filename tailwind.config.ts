@@ -27,8 +27,20 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-montserrat)', 'system-ui', '-apple-system', 'sans-serif'],
-        heading: ['var(--font-montserrat)', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: [
+          'var(--font-montserrat)',
+          'var(--font-noto-sans-armenian)',
+          'system-ui',
+          '-apple-system',
+          'sans-serif',
+        ],
+        heading: [
+          'var(--font-montserrat)',
+          'var(--font-noto-sans-armenian)',
+          'system-ui',
+          '-apple-system',
+          'sans-serif',
+        ],
       },
     },
   },
