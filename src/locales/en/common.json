@@ -9,6 +9,7 @@
     "remove": "Remove",
     "submit": "Submit",
     "cancel": "Cancel",
+    "edit": "Edit",
     "login": "Login",
     "register": "Register",
     "search": "Search",
@@ -119,7 +120,10 @@
     "noReviews": "No reviews yet. Be the first to review this product!",
     "review": "review",
     "reviews": "reviews",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "updateReview": "Update Review",
+    "updateYourReview": "Update Your Review",
+    "updateOwnOnly": "You can only update your own reviews"
   },
   "messages": {
     "addedToCart": "Added to cart",
