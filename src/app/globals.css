@@ -555,12 +555,22 @@
   .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-about-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-product-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
   .layout-shell-mobile-bottom-clearance:has(.checkout-page) {
     background-color: #f1f1f3;
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
+  }
+
+  /* About mobile — Figma `324:616` page bg `#f5f5f5`. */
+  .layout-shell-mobile-bottom-clearance:has(.mobile-about-page) {
+    background-color: #f5f5f5;
+  }
+
+  main.home-main-surface:has(.mobile-about-page) {
+    background-color: #f5f5f5;
   }
 
   .layout-shell-mobile-bottom-clearance:has(.mobile-auth-page) {
