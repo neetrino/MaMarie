@@ -36,17 +36,45 @@ const VIEW_MODE_LABEL_KEYS: Record<ProductsCatalogViewMode, string> = {
   'grid-4': 'grid4',
 };
 
-const VIEW_ICON_VIEWBOX = '0 0 25.4294 25';
-const GRID4_DOT_CENTERS_X = [2.054, 9.161, 16.268, 23.376] as const;
-const GRID4_DOT_CENTERS_Y = [2.054, 9.241, 16.429, 22.946] as const;
+const VIEW_ICON_WIDTH = 25.4294;
+const VIEW_ICON_HEIGHT = 25;
+const VIEW_ICON_VIEWBOX = `0 0 ${VIEW_ICON_WIDTH} ${VIEW_ICON_HEIGHT}`;
+/** Safari clips fills that sit on the SVG viewport edge — keep dots inset. */
+const VIEW_ICON_EDGE_INSET = 0.85;
 const GRID4_DOT_RADIUS = 2.054;
-const GRID3_DOT_CENTERS_X = [2.764, 12.715, 22.665] as const;
-const GRID3_DOT_CENTERS_Y = [2.764, 12.5, 22.236] as const;
+const GRID4_DOT_MIN = GRID4_DOT_RADIUS + VIEW_ICON_EDGE_INSET;
+const GRID4_DOT_SPAN_X = VIEW_ICON_WIDTH - 2 * GRID4_DOT_MIN;
+const GRID4_DOT_SPAN_Y = VIEW_ICON_HEIGHT - 2 * GRID4_DOT_MIN;
+const GRID4_DOT_CENTERS_X = [
+  GRID4_DOT_MIN,
+  GRID4_DOT_MIN + GRID4_DOT_SPAN_X / 3,
+  GRID4_DOT_MIN + (2 * GRID4_DOT_SPAN_X) / 3,
+  VIEW_ICON_WIDTH - GRID4_DOT_MIN,
+] as const;
+const GRID4_DOT_CENTERS_Y = [
+  GRID4_DOT_MIN,
+  GRID4_DOT_MIN + GRID4_DOT_SPAN_Y / 3,
+  GRID4_DOT_MIN + (2 * GRID4_DOT_SPAN_Y) / 3,
+  VIEW_ICON_HEIGHT - GRID4_DOT_MIN,
+] as const;
 const GRID3_DOT_RADIUS = 2.764;
+const GRID3_DOT_MIN = GRID3_DOT_RADIUS + VIEW_ICON_EDGE_INSET;
+const GRID3_DOT_SPAN_X = VIEW_ICON_WIDTH - 2 * GRID3_DOT_MIN;
+const GRID3_DOT_SPAN_Y = VIEW_ICON_HEIGHT - 2 * GRID3_DOT_MIN;
+const GRID3_DOT_CENTERS_X = [
+  GRID3_DOT_MIN,
+  GRID3_DOT_MIN + GRID3_DOT_SPAN_X / 2,
+  VIEW_ICON_WIDTH - GRID3_DOT_MIN,
+] as const;
+const GRID3_DOT_CENTERS_Y = [
+  GRID3_DOT_MIN,
+  GRID3_DOT_MIN + GRID3_DOT_SPAN_Y / 2,
+  VIEW_ICON_HEIGHT - GRID3_DOT_MIN,
+] as const;
 const LIST_BAR_WIDTH = 24;
 const LIST_BAR_HEIGHT = 3.5;
 const LIST_BAR_RADIUS = LIST_BAR_HEIGHT / 2;
-const LIST_BAR_X = (25.4294 - LIST_BAR_WIDTH) / 2;
+const LIST_BAR_X = (VIEW_ICON_WIDTH - LIST_BAR_WIDTH) / 2;
 const LIST_BAR_Y = [0.75, 10.75, 20.75] as const;
 
 function ViewModeIcon({ mode, active }: { mode: ProductsCatalogViewMode; active: boolean }) {
@@ -91,7 +119,14 @@ function ViewModeIcon({ mode, active }: { mode: ProductsCatalogViewMode; active:
   }
 
   return (
-    <svg width={iconSize} height={iconSize} viewBox={VIEW_ICON_VIEWBOX} fill="none" aria-hidden>
+    <svg
+      width={iconSize}
+      height={iconSize}
+      viewBox={VIEW_ICON_VIEWBOX}
+      fill="none"
+      overflow="visible"
+      aria-hidden
+    >
       {GRID4_DOT_CENTERS_X.flatMap((cx) =>
         GRID4_DOT_CENTERS_Y.map((cy) => (
           <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={GRID4_DOT_RADIUS} fill={color} />
@@ -179,7 +214,7 @@ function ProductsHeaderContent() {
             onClick={() => handleViewModeChange(mode)}
             aria-label={t(`products.header.viewModes.${VIEW_MODE_LABEL_KEYS[mode]}`)}
             aria-pressed={viewMode === mode}
-            className={`relative inline-flex items-center justify-center overflow-visible transition-opacity hover:opacity-80 ${mode === 'grid-3' ? 'z-10' : 'z-0'}`}
+            className={`relative inline-flex items-center justify-center overflow-visible ${mode === 'grid-3' ? 'z-10' : 'z-0'}`}
             style={{
               width: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
               height: PRODUCTS_CATALOG_VIEW_ICON_SIZE_PX,
