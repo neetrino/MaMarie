@@ -6,6 +6,22 @@
   width: 100%;
 }
 
+/* MOBILE_HOME_TABLET_MIN_VIEWPORT_PX (744) — optional tablet scale (About iPad). */
+@media (min-width: 744px) and (max-width: 1023px) {
+  .frameScaleOnTablet {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    overflow-x: clip;
+  }
+
+  .frameScaleOnTablet .stage {
+    width: var(--desktop-layout-design-width, 1440px);
+    flex-shrink: 0;
+    zoom: calc(100vw / var(--desktop-layout-design-width, 1440px));
+  }
+}
+
 @media (min-width: 1024px) {
   .frame {
     display: flex;

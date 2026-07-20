@@ -14,9 +14,13 @@ export function ConditionalFooter() {
   }
 
   const isAuthFormPage = pathname === '/login' || pathname === '/register';
+  const scaleOnTablet = pathname === '/about' || pathname?.startsWith('/about/');
+  const footerVisibilityClass = scaleOnTablet
+    ? 'mt-auto hidden min-[744px]:flex'
+    : 'mt-auto hidden lg:flex';
 
   return (
-    <DesktopFluidFrame className="mt-auto hidden lg:flex">
+    <DesktopFluidFrame className={footerVisibilityClass} scaleOnTablet={scaleOnTablet}>
       <div style={isAuthFormPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined}>
         <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
           <Footer topGapPx={isAuthFormPage ? 0 : undefined} />

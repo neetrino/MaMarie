@@ -156,7 +156,7 @@ function AboutHeroPortrait() {
 export function AboutPageDesktop({ copy }: { copy: AboutPageCopy }) {
   return (
     <div
-      className="relative mx-auto hidden w-full overflow-x-clip lg:block"
+      className="relative mx-auto hidden w-full overflow-x-clip min-[744px]:block"
       style={{
         maxWidth: ABOUT_PAGE_MAX_WIDTH_PX,
         height: ABOUT_PAGE_CANVAS_HEIGHT_PX,

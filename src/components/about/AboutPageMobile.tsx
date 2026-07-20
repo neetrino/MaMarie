@@ -65,7 +65,7 @@ export function AboutPageMobile({ copy }: { copy: AboutPageCopy }) {
 
   return (
     <div
-      className="mobile-about-page w-full overflow-x-clip lg:hidden"
+      className="mobile-about-page w-full overflow-x-clip min-[744px]:hidden"
       style={{
         paddingTop: ABOUT_PAGE_MOBILE_PADDING_TOP_PX,
         paddingBottom: ABOUT_PAGE_MOBILE_PADDING_BOTTOM_PX,

@@ -555,7 +555,6 @@
   .layout-shell-mobile-bottom-clearance:has(.mobile-home-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-wishlist-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
-  .layout-shell-mobile-bottom-clearance:has(.mobile-about-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-product-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
@@ -564,13 +563,17 @@
     padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
   }
 
-  /* About mobile — Figma `324:616` page bg `#f5f5f5`. */
-  .layout-shell-mobile-bottom-clearance:has(.mobile-about-page) {
-    background-color: #f5f5f5;
-  }
+  /* About phone only — Figma `324:616` bg `#f5f5f5` (match top clearance + page). */
+  @media (max-width: 743px) {
+    .layout-shell-mobile-bottom-clearance:has(.mobile-about-page) {
+      background-color: #f5f5f5;
+      padding-bottom: max(104px, env(safe-area-inset-bottom, 0px));
+    }
 
-  main.home-main-surface:has(.mobile-about-page) {
-    background-color: #f5f5f5;
+    main.home-main-surface:has(.mobile-about-page),
+    main.about-page-main {
+      background-color: #f5f5f5;
+    }
   }
 
   .layout-shell-mobile-bottom-clearance:has(.mobile-auth-page) {
@@ -684,6 +687,25 @@ main.home-main-surface.order-page-main {
     top: 0;
     left: 0;
     right: 0;
+  }
+
+  /* About — scaled desktop layout on iPad (same 1440 fluid scale as lg). */
+  :root:has(.about-page-root) {
+    --desktop-layout-design-width: 1440px;
+    --desktop-layout-scale: calc(100vw / var(--desktop-layout-design-width));
+  }
+
+  .layout-shell-mobile-bottom-clearance:has(.about-page-root) {
+    background-color: #ffffff;
+    padding-bottom: 0;
+  }
+
+  main.about-page-main {
+    background-color: #ffffff;
+  }
+
+  body:has(.about-page-root) [data-mobile-bottom-nav] {
+    display: none;
   }
 }
 

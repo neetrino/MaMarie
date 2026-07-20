@@ -7,6 +7,8 @@ interface DesktopFluidFrameProps {
   stageClassName?: string;
   /** Allow vertical overflow — navbar dropdowns must not be clipped in Safari. */
   allowOverflow?: boolean;
+  /** Also scale the 1440px stage on tablet (744–1023), e.g. About on iPad. */
+  scaleOnTablet?: boolean;
 }
 
 /**
@@ -18,10 +20,12 @@ export function DesktopFluidFrame({
   className = '',
   stageClassName = '',
   allowOverflow = false,
+  scaleOnTablet = false,
 }: DesktopFluidFrameProps) {
   const frameClassName = [
     styles.frame,
     allowOverflow ? styles.frameAllowOverflow : '',
+    scaleOnTablet ? styles.frameScaleOnTablet : '',
     className,
   ]
     .filter(Boolean)

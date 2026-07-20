@@ -5,7 +5,7 @@ import { AboutPageDesktop, type AboutPageCopy } from './AboutPageDesktop';
 import { AboutPageMobile } from './AboutPageMobile';
 
 /**
- * About us page — Figma `300:576` desktop / `324:616` mobile.
+ * About us page — Figma `300:576` desktop (from 744px / iPad) / `324:616` phone.
  * Header/footer come from root layout.
  */
 export function AboutPageView() {
@@ -23,7 +23,7 @@ export function AboutPageView() {
   };
 
   return (
-    <div className="w-full">
+    <div className="about-page-root w-full">
       <AboutPageDesktop copy={copy} />
       <AboutPageMobile copy={copy} />
     </div>
