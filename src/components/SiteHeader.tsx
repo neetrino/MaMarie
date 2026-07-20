@@ -28,8 +28,7 @@ import {
 } from './home/HomeSectionShell';
 import { HeaderActionIcons } from './header/HeaderActionIcons';
 import { HeaderContentFrame } from './header/HeaderContentFrame';
-import { HeaderCurrencyPill } from './header/HeaderCurrencyPill';
-import { HeaderLanguagePill } from './header/HeaderLanguagePill';
+import { HeaderLocaleCurrencyPill } from './header/HeaderLocaleCurrencyPill';
 import { HeaderLoginPill } from './header/HeaderLoginPill';
 import { HeaderMobileActions } from './header/HeaderMobileActions';
 import { HeaderNavLinks } from './header/HeaderNavLinks';
@@ -63,8 +62,7 @@ function HeaderDesktopNav({ navLinks }: { navLinks: readonly NavLinkItem[] }) {
         style={{ gap: HEADER_ACTIONS_GAP_PX }}
       >
         <HeaderActionIcons />
-        <HeaderLanguagePill />
-        <HeaderCurrencyPill />
+        <HeaderLocaleCurrencyPill />
         <HeaderLoginPill />
       </div>
     </>
