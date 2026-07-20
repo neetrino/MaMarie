@@ -115,10 +115,18 @@ export function ProductAttributesSelector({
                 !isColor && !isSize ? 'min-[744px]:max-[1023px]:col-span-2' : ''
               }`}
             >
-              <label className={`text-xs font-bold uppercase ${isUnavailable ? 'text-red-600' : ''}`}>
-                {attrKey === 'color' ? t(language, 'product.color') : 
-                 attrKey === 'size' ? t(language, 'product.size') : 
-                 attributeName}:
+              <label
+                className={`text-xs font-bold uppercase ${
+                  isUnavailable
+                    ? 'text-red-600'
+                    : isColor || isSize
+                      ? 'text-blue-600'
+                      : ''
+                }`}
+              >
+                {attrKey === 'color' ? t(language, 'product.color') :
+                 attrKey === 'size' ? t(language, 'product.size') :
+                 `${attributeName}:`}
               </label>
               {isColor ? (
                 <div className="flex flex-wrap gap-1.5 items-center">
@@ -344,7 +352,7 @@ export function ProductAttributesSelector({
         <>
           {colorGroups.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">{t(language, 'product.color')}:</label>
+              <label className="text-sm font-medium text-blue-600">{t(language, 'product.color')}</label>
               <div className="flex flex-wrap gap-2 items-center">
                 {colorGroups.map((g) => {
                   const isSelected = selectedColor === g.color?.toLowerCase().trim();
@@ -380,7 +388,7 @@ export function ProductAttributesSelector({
       {/* Size Groups - Show only if not using new format */}
       {!product?.productAttributes && sizeGroups.length > 0 && (
         <div className="space-y-2">
-          <label className="text-sm font-bold uppercase">{t(language, 'product.size')}</label>
+          <label className="text-sm font-bold uppercase text-blue-600">{t(language, 'product.size')}</label>
           <div className="flex flex-wrap gap-2">
             {sizeGroups.map((g) => {
               let displayStock = g.stock;

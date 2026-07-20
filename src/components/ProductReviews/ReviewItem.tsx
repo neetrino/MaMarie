@@ -1,6 +1,7 @@
 'use client';
 
 import { BrandPillButton } from '../BrandPillButton';
+import { useTranslation } from '../../lib/i18n-client';
 import { formatDate, type Review } from './utils';
 
 interface ReviewItemProps {
@@ -13,6 +14,7 @@ interface ReviewItemProps {
  * Single review item component
  */
 export function ReviewItem({ review, currentUserId, onEdit }: ReviewItemProps) {
+  const { t } = useTranslation();
   const isOwnReview = currentUserId && review.userId === currentUserId;
 
   return (
@@ -51,7 +53,7 @@ export function ReviewItem({ review, currentUserId, onEdit }: ReviewItemProps) {
             onClick={() => onEdit(review)}
             className="ml-4 shrink-0"
           >
-            Edit
+            {t('common.buttons.edit')}
           </BrandPillButton>
         )}
       </div>
@@ -59,7 +61,3 @@ export function ReviewItem({ review, currentUserId, onEdit }: ReviewItemProps) {
     </div>
   );
 }
-
-
-
-

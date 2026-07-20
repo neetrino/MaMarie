@@ -95,7 +95,7 @@ export function OrderRow({
         </div>
       </td>
       <td
-        className="min-w-0 whitespace-nowrap px-3 py-2.5 text-left align-middle text-sm font-semibold text-gray-900"
+        className="min-w-0 whitespace-nowrap px-3 py-2.5 text-center align-middle text-sm font-semibold text-gray-900"
         title={calculateTotalWithoutShipping()}
       >
         {calculateTotalWithoutShipping()}
@@ -104,7 +104,7 @@ export function OrderRow({
         {order.itemsCount}
       </td>
       <td
-        className="min-w-0 px-3 py-2.5 text-left align-middle"
+        className="min-w-0 px-3 py-2.5 text-center align-middle"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -118,7 +118,7 @@ export function OrderRow({
             <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-b-gray-900" />
           </div>
         ) : (
-          <div className="inline-block min-w-0 max-w-full">
+          <div className="inline-flex min-w-0 max-w-full justify-center">
             <ClaySelect
               compact
               value={order.status}
@@ -136,7 +136,7 @@ export function OrderRow({
         )}
       </td>
       <td
-        className="min-w-0 px-3 py-2.5 text-left align-middle"
+        className="min-w-0 px-3 py-2.5 text-center align-middle"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -150,7 +150,7 @@ export function OrderRow({
             <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-300 border-b-gray-900" />
           </div>
         ) : (
-          <div className="inline-block min-w-0 max-w-full">
+          <div className="inline-flex min-w-0 max-w-full justify-center">
             <ClaySelect
               compact
               value={order.paymentStatus}

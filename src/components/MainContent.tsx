@@ -142,7 +142,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/about')) {
     return (
       <main
-        className={`${mainContentBase} pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
+        className="home-main-surface w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
         {content}

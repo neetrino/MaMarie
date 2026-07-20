@@ -24,7 +24,7 @@ function SnapshotColorOptions({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold uppercase">{t(language, 'product.color')}:</label>
+      <label className="text-xs font-bold uppercase text-blue-600">{t(language, 'product.color')}</label>
       <div className="flex flex-wrap gap-1.5 items-center">
         {colors.map((color) => {
           const processedImageUrl = color.imageUrl ? processImageUrl(color.imageUrl) : null;
@@ -64,7 +64,7 @@ function SnapshotSizeOptions({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-bold uppercase">{t(language, 'product.size')}:</label>
+      <label className="text-xs font-bold uppercase text-blue-600">{t(language, 'product.size')}</label>
       <div className="flex flex-wrap gap-1.5">
         {sizes.map((size) => {
           const isUnavailable = size.inStock === false;

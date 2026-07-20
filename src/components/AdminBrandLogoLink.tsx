@@ -10,8 +10,8 @@ import {
 } from '../app/supersudo/admin-sidebar-classes';
 import { BRAND_ASSETS } from '../constants/brand';
 
-const LOGO_ADMIN_SIDEBAR_SOURCE_WIDTH_PX = 666;
-const LOGO_ADMIN_SIDEBAR_SOURCE_HEIGHT_PX = 375;
+const LOGO_ADMIN_SIDEBAR_SOURCE_WIDTH_PX = 931;
+const LOGO_ADMIN_SIDEBAR_SOURCE_HEIGHT_PX = 413;
 
 type AdminBrandLogoLinkProps = {
   className?: string;

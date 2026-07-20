@@ -201,7 +201,7 @@ export function useReviewForm({
       if (err.status === 401) {
         alert(t('common.reviews.loginRequired'));
       } else if (err.status === 403) {
-        alert('You can only update your own reviews');
+        alert(t('common.reviews.updateOwnOnly'));
       } else {
         alert(t('common.reviews.submitError'));
       }

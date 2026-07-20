@@ -249,10 +249,10 @@ function PartnerStoresSection() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                   {t('admin.stores.address')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                   {t('admin.stores.status')}
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                   {t('admin.products.actions')}
                 </th>
               </tr>
@@ -276,11 +276,11 @@ function PartnerStoresSection() {
                     </div>
                   </td>
                   <td className="max-w-xs px-4 py-3 text-sm text-gray-500">{store.address}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
+                  <td className="px-4 py-3 text-center text-sm text-gray-500">
                     {store.published ? t('admin.stores.published') : t('admin.stores.draft')}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-center gap-2">
                       <Button
                         type="button"
                         variant="ghost"

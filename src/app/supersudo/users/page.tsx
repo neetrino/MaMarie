@@ -28,6 +28,7 @@ import {
   ADMIN_TABLE_TD,
   ADMIN_TABLE_TD_CHECK,
   ADMIN_TABLE_TH,
+  ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_TH_CHECK,
   ADMIN_TABLE_THEAD,
 } from '../constants/admin-table-classes';
@@ -257,46 +258,49 @@ export default function UsersPage() {
 
   return (
     <>
-        <Card className="mb-6 p-4">
-          <form onSubmit={handleSearch} className="flex flex-col gap-4">
-            <div className="flex gap-4">
-              <Input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('admin.users.searchPlaceholder')}
-                className="flex-1"
-              />
-              <Button type="submit" variant="primary">
-                {t('admin.users.search')}
-              </Button>
-            </div>
+      <h1 className="mb-6 text-2xl font-semibold text-gray-900">
+        {t('admin.users.title')}
+      </h1>
 
-            {/* Admin / Customer filter */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                {t('admin.users.adminCustomer')}
-              </span>
-              <AdminSegmentedControl
-                ariaLabel={t('admin.users.adminCustomer')}
-                value={roleFilter}
-                onChange={(nextRole) => {
-                  setRoleFilter(nextRole);
-                  setPage(1);
-                  logger.debug(`👥 [ADMIN] Role filter changed to: ${nextRole}`);
-                }}
-                options={[
-                  { value: 'all', label: t('admin.users.all') },
-                  { value: 'admin', label: t('admin.users.admins') },
-                  { value: 'customer', label: t('admin.users.customers') },
-                ]}
-              />
-            </div>
-            <div className="border-t border-gray-200 pt-3 text-sm text-gray-700">
-              {t('admin.users.totalUsersCount').replace('{count}', totalUsersCount.toString())}
-            </div>
-          </form>
-        </Card>
+      <Card className="mb-6 p-4">
+        <form onSubmit={handleSearch} className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <Input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('admin.users.searchPlaceholder')}
+              className="flex-1"
+            />
+            <Button type="submit" variant="primary">
+              {t('admin.users.search')}
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+              {t('admin.users.adminCustomer')}
+            </span>
+            <AdminSegmentedControl
+              ariaLabel={t('admin.users.adminCustomer')}
+              value={roleFilter}
+              onChange={(nextRole) => {
+                setRoleFilter(nextRole);
+                setPage(1);
+                logger.debug(`👥 [ADMIN] Role filter changed to: ${nextRole}`);
+              }}
+              options={[
+                { value: 'all', label: t('admin.users.all') },
+                { value: 'admin', label: t('admin.users.admins') },
+                { value: 'customer', label: t('admin.users.customers') },
+              ]}
+            />
+          </div>
+          <div className="border-t border-gray-200 pt-3 text-sm text-gray-700">
+            {t('admin.users.totalUsersCount').replace('{count}', totalUsersCount.toString())}
+          </div>
+        </form>
+      </Card>
 
         {!loading && filteredUsers.length > 0 && (
           <Card className="mb-6 w-full min-w-0 p-4">
@@ -353,10 +357,10 @@ export default function UsersPage() {
                       </th>
                       <th className={ADMIN_TABLE_TH}>{t('admin.users.user')}</th>
                       <th className={ADMIN_TABLE_TH}>{t('admin.users.contact')}</th>
-                      <th className={ADMIN_TABLE_TH}>{t('admin.users.orders')}</th>
-                      <th className={ADMIN_TABLE_TH}>{t('admin.users.roles')}</th>
-                      <th className={ADMIN_TABLE_TH}>{t('admin.users.status')}</th>
-                      <th className={ADMIN_TABLE_TH}>{t('admin.users.created')}</th>
+                      <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.users.orders')}</th>
+                      <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.users.roles')}</th>
+                      <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.users.status')}</th>
+                      <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.users.created')}</th>
                     </tr>
                   </thead>
                   <tbody className={ADMIN_TABLE_TBODY}>
@@ -385,22 +389,22 @@ export default function UsersPage() {
                             <div className="text-xs text-gray-600">{user.phone}</div>
                           )}
                         </td>
-                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-left font-semibold tabular-nums text-gray-900`}>
+                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center font-semibold tabular-nums text-gray-900`}>
                           {user.ordersCount ?? 0}
                         </td>
-                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-left`}>
-                          <div className="flex gap-2">
+                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center`}>
+                          <div className="flex justify-center gap-2">
                             {user.roles?.map((role) => (
                               <span
                                 key={role}
-                                className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                                className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
                               >
                                 {role}
                               </span>
                             ))}
                           </div>
                         </td>
-                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-left`}>
+                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center`}>
                           <button
                             type="button"
                             onClick={() =>
@@ -426,7 +430,7 @@ export default function UsersPage() {
                             />
                           </button>
                         </td>
-                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-left tabular-nums text-gray-600`}>
+                        <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center tabular-nums text-gray-600`}>
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                       </tr>

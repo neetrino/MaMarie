@@ -16,7 +16,6 @@ import {
   ADMIN_TABLE_TBODY,
   ADMIN_TABLE_TD,
   ADMIN_TABLE_TD_CHECK,
-  ADMIN_TABLE_TH,
   ADMIN_TABLE_TH_CENTER,
   ADMIN_TABLE_TH_CHECK,
   ADMIN_TABLE_TH_SORTABLE,
@@ -216,7 +215,7 @@ function ProductsTableLoadedView({
                   <SortChevrons ascActive={sortBy === 'price-asc'} descActive={sortBy === 'price-desc'} />
                 </button>
               </th>
-              <th className={ADMIN_TABLE_TH}>{t('admin.products.category')}</th>
+              <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.products.category')}</th>
               <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.products.featured')}</th>
               <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.products.actions')}</th>
               <th className="p-0 align-middle">
@@ -301,7 +300,7 @@ function ProductsTableLoadedView({
                     ) : null}
                   </div>
                 </td>
-                <td className={`${ADMIN_TABLE_TD} min-w-0 max-w-[14rem] text-left text-gray-900`}>
+                <td className={`${ADMIN_TABLE_TD} min-w-0 max-w-[14rem] text-center text-gray-900`}>
                   {product.categorySummary ? (
                     <span className="block truncate" title={product.categorySummary}>
                       {product.categorySummary}
