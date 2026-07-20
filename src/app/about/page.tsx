@@ -31,27 +31,16 @@ export default function AboutPage() {
 
             {/* Текст справа */}
             <div className="space-y-6">
-              {/* Подзаголовок */}
-              <p className="text-sm md:text-base font-semibold uppercase tracking-wider text-[#7CB342]">
-                {t('about.subtitle')}
-              </p>
-
-              {/* Заголовок */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-4xl font-bold leading-tight text-brand-pink md:text-5xl lg:text-6xl">
                 {t('about.title')}
               </h1>
 
               {/* Текст */}
               <div className="space-y-4 text-gray-600 text-base md:text-lg leading-relaxed">
-                <p>
-                  {t('about.description.paragraph1')}
-                </p>
-                <p>
-                  {t('about.description.paragraph2')}
-                </p>
-                <p>
-                  {t('about.description.paragraph3')}
-                </p>
+                <p>{t('about.description.paragraph1')}</p>
+                <p>{t('about.description.paragraph2')}</p>
+                <p>{t('about.description.paragraph3')}</p>
+                <p>{t('about.description.paragraph4')}</p>
               </div>
             </div>
           </div>
