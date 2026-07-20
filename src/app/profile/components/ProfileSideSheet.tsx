@@ -23,10 +23,14 @@ interface ProfileSideSheetPanelProps {
   title: string;
   subtitle?: string;
   headerActions?: ReactNode;
+  footer?: ReactNode;
   closeLabel: string;
   onClose: () => void;
   panelRef: RefObject<HTMLDivElement>;
   scrollRef: RefObject<HTMLDivElement>;
+  desktopWidthPercent: number;
+  panelTransitionMs: number;
+  backdropTransitionMs: number;
   children: ReactNode;
 }
 
@@ -35,10 +39,14 @@ function ProfileSideSheetPanel({
   title,
   subtitle,
   headerActions,
+  footer,
   closeLabel,
   onClose,
   panelRef,
   scrollRef,
+  desktopWidthPercent,
+  panelTransitionMs,
+  backdropTransitionMs,
   children,
 }: ProfileSideSheetPanelProps) {
   return (
@@ -53,7 +61,7 @@ function ProfileSideSheetPanel({
         className={`fixed inset-0 rounded-none bg-black/40 backdrop-blur-sm transition-opacity ease-in-out motion-reduce:transition-none ${
           visible ? 'opacity-100' : 'opacity-0'
         }`}
-        style={{ transitionDuration: `${PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS}ms` }}
+        style={{ transitionDuration: `${backdropTransitionMs}ms` }}
         onClick={onClose}
       />
 
@@ -65,8 +73,8 @@ function ProfileSideSheetPanel({
         style={{
           ['--profile-side-sheet-mobile-width' as string]: `${CART_DRAWER_MOBILE_WIDTH_PERCENT}%`,
           ['--profile-side-sheet-mobile-max-width' as string]: `${CART_DRAWER_MAX_WIDTH_PX}px`,
-          ['--profile-side-sheet-desktop-width' as string]: `${PROFILE_SIDE_SHEET_WIDTH_PERCENT}%`,
-          transitionDuration: `${PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS}ms`,
+          ['--profile-side-sheet-desktop-width' as string]: `${desktopWidthPercent}%`,
+          transitionDuration: `${panelTransitionMs}ms`,
         }}
       >
         <DrawerCloseTab edge="start" onClose={onClose} closeLabel={closeLabel} />
@@ -95,8 +103,18 @@ function ProfileSideSheetPanel({
             ref={scrollRef}
             className="profile-scroll-area profile-side-sheet-scroll profile-mobile-tab-sheet-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 lg:px-4"
           >
-            <div className="max-lg:pb-[calc(28px+env(safe-area-inset-bottom,0px))]">{children}</div>
+            <div
+              className={
+                footer
+                  ? undefined
+                  : 'max-lg:pb-[calc(28px+env(safe-area-inset-bottom,0px))]'
+              }
+            >
+              {children}
+            </div>
           </div>
+
+          {footer ? <div className="shrink-0">{footer}</div> : null}
         </aside>
       </div>
     </div>
@@ -108,9 +126,15 @@ interface ProfileSideSheetProps {
   title: string;
   subtitle?: string;
   headerActions?: ReactNode;
+  /** Pinned below the scroll area (cart-drawer pattern). */
+  footer?: ReactNode;
   closeLabel: string;
   onClose: () => void;
   children: ReactNode;
+  /** Desktop panel width — default profile sheets use 50%. */
+  desktopWidthPercent?: number;
+  panelTransitionMs?: number;
+  backdropTransitionMs?: number;
 }
 
 /** Cart-style side sheet for profile overlays (order details, etc.). */
@@ -119,13 +143,17 @@ export function ProfileSideSheet({
   title,
   subtitle,
   headerActions,
+  footer,
   closeLabel,
   onClose,
   children,
+  desktopWidthPercent = PROFILE_SIDE_SHEET_WIDTH_PERCENT,
+  panelTransitionMs = PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS,
+  backdropTransitionMs = PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS,
 }: ProfileSideSheetProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { rendered, visible } = useDrawerTransition(isOpen, PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS);
+  const { rendered, visible } = useDrawerTransition(isOpen, panelTransitionMs);
 
   useEffect(() => {
     if (!rendered) {
@@ -174,10 +202,14 @@ export function ProfileSideSheet({
       title={title}
       subtitle={subtitle}
       headerActions={headerActions}
+      footer={footer}
       closeLabel={closeLabel}
       onClose={onClose}
       panelRef={panelRef}
       scrollRef={scrollRef}
+      desktopWidthPercent={desktopWidthPercent}
+      panelTransitionMs={panelTransitionMs}
+      backdropTransitionMs={backdropTransitionMs}
     >
       {children}
     </ProfileSideSheetPanel>,

@@ -1,4 +1,22 @@
 import { CHECKOUT_PRIMARY_BUTTON_HEIGHT_PX } from '../../../constants/checkout-page';
+import {
+  PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS,
+  PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS,
+} from '../../../constants/profile-desktop-page';
+
+/** Confirm-order / card-details sheet — narrower than default profile sheets (50%). */
+export const CHECKOUT_CONFIRM_SHEET_DESKTOP_WIDTH_PERCENT = 25;
+/** Panel open/close — 20% slower than default profile sheet. */
+export const CHECKOUT_CONFIRM_SHEET_PANEL_TRANSITION_MS = Math.round(
+  PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS * 1.2,
+);
+export const CHECKOUT_CONFIRM_SHEET_BACKDROP_TRANSITION_MS = Math.round(
+  PROFILE_SIDE_SHEET_BACKDROP_TRANSITION_MS * 1.2,
+);
+
+/** Pinned actions bar — matches cart drawer footer. */
+export const CHECKOUT_CONFIRM_SHEET_FOOTER_CLASS =
+  'shrink-0 border-t border-gray-100 bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]';
 
 /** Text inputs, option cards, alerts — 15px (`CHECKOUT_FORM_RADIUS_PX`). */
 export const CHECKOUT_FORM_INPUT_CLASS = '!rounded-[15px]';
