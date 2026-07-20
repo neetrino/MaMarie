@@ -1,6 +1,11 @@
 import { useRouter } from 'next/navigation';
+import { MOBILE_ORDER_ASSETS } from '../../../constants/mobile-orders';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import {
+  preloadOrderSuccessIllustration,
+  saveOrderSuccessPending,
+} from '../../orders/[number]/utils/order-success-pending';
 import { clearGuestCart } from '../checkoutUtils';
 import type { CheckoutFormData, Cart, CartItem } from '../types';
 
@@ -87,6 +92,14 @@ export function useOrderSubmission({
         window.location.href = response.payment.paymentUrl;
         return;
       }
+
+      preloadOrderSuccessIllustration(MOBILE_ORDER_ASSETS.readyBasket);
+      saveOrderSuccessPending({
+        number: response.order.number,
+        status: response.order.status,
+        paymentStatus: response.order.paymentStatus,
+        fulfillmentStatus: 'unfulfilled',
+      });
 
       router.push(`/orders/${response.order.number}`);
     } catch (err: unknown) {
