@@ -29,6 +29,7 @@ import { useTranslation } from '../../lib/i18n-client';
 import { apiClient } from '../../lib/api-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { logger } from '../../lib/utils/logger';
+import { showToast } from '../Toast';
 
 interface ContactFormFields {
   name: string;
@@ -184,11 +185,11 @@ export function ContactForm() {
       );
 
       setFormData(EMPTY_FORM);
-      alert(t('contact.form.submitSuccess') || 'Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց');
+      showToast(t('contact.form.submitSuccess') || 'Ձեր հաղորդագրությունը հաջողությամբ ուղարկվեց', 'success');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Չհաջողվեց ուղարկել հաղորդագրությունը';
       logger.error('Error submitting contact form', { error });
-      alert(t('contact.form.submitError') || `Սխալ: ${errorMessage}`);
+      showToast(t('contact.form.submitError') || `Սխալ: ${errorMessage}`, 'error');
     } finally {
       setSubmitting(false);
     }

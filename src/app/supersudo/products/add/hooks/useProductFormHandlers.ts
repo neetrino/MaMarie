@@ -14,7 +14,7 @@ import {
   validateProductForm,
 } from '../utils/product-form-field-errors';
 import { useTranslation } from '@/lib/i18n-client';
-
+import { showToast } from '../../../../../components/Toast';
 interface UseProductFormHandlersProps {
   formData: {
     title: string;
@@ -444,7 +444,13 @@ export function useProductFormHandlers({
         productId,
         creationMessages,
         setLoading,
-        router,
+        successMessage: isEditMode
+          ? t('admin.products.updatedSuccess')
+          : t('admin.products.createdSuccess'),
+        onSuccess: (message) => {
+          showToast(message, 'success');
+          router.push('/supersudo/products');
+        },
       });
     } catch (err: any) {
       console.error('❌ [ADMIN] Error saving product:', err);

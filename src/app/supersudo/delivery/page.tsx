@@ -10,6 +10,7 @@ import { ADMIN_QUERY_KEYS, ADMIN_RESOURCE_STALE_MS } from '@/lib/admin/admin-que
 import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
+import { showToast } from '../../../components/Toast';
 
 interface DeliveryLocation {
   id?: string;
@@ -72,14 +73,14 @@ export default function DeliveryPage() {
     try {
       logger.debug('🚚 [ADMIN] Saving delivery settings...', { locations });
       await apiClient.put('/api/v1/admin/delivery', { locations });
-      alert(t('admin.delivery.savedSuccess'));
+      showToast(t('admin.delivery.savedSuccess'), 'success');
       logger.debug('✅ [ADMIN] Delivery settings saved');
       setEditingId(null);
       await loadDeliverySettings(true);
     } catch (err: any) {
       console.error('❌ [ADMIN] Error saving delivery settings:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save delivery settings';
-      alert(t('admin.delivery.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.delivery.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setSaving(false);
     }

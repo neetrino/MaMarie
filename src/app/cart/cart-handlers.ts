@@ -9,6 +9,7 @@ import {
   writeGuestCartItems,
 } from '../../lib/guest-cart-storage';
 import type { Cart, CartItem, GuestCartItem } from './types';
+import { showToast } from '../../components/Toast';
 
 type SetCartState = Dispatch<SetStateAction<Cart | null>>;
 
@@ -148,9 +149,9 @@ async function syncLoggedInQuantity(
 
     const errorMessage = errorObj?.detail || errorObj?.message || t('common.messages.failedToUpdateQuantity');
     if (errorMessage.includes('stock') || errorMessage.includes('exceeds')) {
-      alert(t('common.alerts.stockInsufficient').replace('{message}', errorMessage));
+      showToast(t('common.alerts.stockInsufficient').replace('{message}', errorMessage), 'error');
     } else {
-      alert(errorMessage);
+      showToast(errorMessage, 'error');
     }
   }
 }
@@ -240,7 +241,7 @@ export function handleUpdateQuantity(
   }
 
   if (isQuantityAboveStock(cartItem.variant.stock, quantity)) {
-    alert(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`);
+    showToast(`Մատչելի քանակը ${cartItem.variant.stock} հատ է: Դուք չեք կարող ավելացնել ավելի շատ քանակ:`, 'warning');
     return;
   }
 

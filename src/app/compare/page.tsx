@@ -11,6 +11,7 @@ import { getStoredLanguage } from '../../lib/language';
 import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { CompareProductsTable, type CompareProduct } from './CompareProductsTable';
+import { showToast } from '../../components/Toast';
 
 interface CompareSection {
   sectionKey: string;
@@ -230,7 +231,7 @@ export default function ComparePage() {
       const productDetails = await apiClient.get<ProductDetails>(`/api/v1/products/${product.slug}`);
 
       if (!productDetails.variants || productDetails.variants.length === 0) {
-        alert(t('common.alerts.noVariantsAvailable'));
+        showToast(t('common.alerts.noVariantsAvailable'), 'warning');
         return;
       }
 

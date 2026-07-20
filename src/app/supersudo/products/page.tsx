@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
+import { showToast } from '../../../components/Toast';
 import { getStoredCurrency, initializeCurrencyRates, type CurrencyCode } from '../../../lib/currency';
 import {
   buildAdminListQueryKey,
@@ -183,7 +184,7 @@ export default function ProductsPage() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error fetching products:', err);
-      alert(t('admin.products.errorLoading').replace('{message}', message));
+      showToast(t('admin.products.errorLoading').replace('{message}', message), 'error');
     } finally {
       setLoading(false);
     }

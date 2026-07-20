@@ -35,6 +35,7 @@ import {
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { AdminSideSheet } from '../components/AdminSideSheet';
+import { showToast } from '../../../components/Toast';
 import {
   AdminSideSheetCancelButton,
   AdminSideSheetFooter,
@@ -240,10 +241,10 @@ export default function MessagesPage() {
       
       setSelectedIds(new Set());
       await refetchMessages();
-      alert(t('admin.messages.deletedSuccess'));
+      showToast(t('admin.messages.deletedSuccess'), 'success');
     } catch (err: any) {
       console.error('❌ [ADMIN] Bulk delete messages error:', err);
-      alert(t('admin.messages.failedToDelete') + ': ' + (err.message || 'Unknown error'));
+      showToast(t('admin.messages.failedToDelete') + ': ' + (err.message || 'Unknown error'), 'error');
     } finally {
       setBulkDeleting(false);
     }

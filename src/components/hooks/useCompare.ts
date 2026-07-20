@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
+import { showToast } from '../Toast';
 
 const COMPARE_KEY = 'shop_compare';
 const MAX_COMPARE_ITEMS = 4;
@@ -50,7 +51,7 @@ export function useCompare(productId: string) {
         setIsInCompare(false);
       } else {
         if (compare.length >= MAX_COMPARE_ITEMS) {
-          alert(t('common.alerts.compareMaxReached'));
+          showToast(t('common.alerts.compareMaxReached'), 'warning');
           return;
         }
         compare.push(productId);

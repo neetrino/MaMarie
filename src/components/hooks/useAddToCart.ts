@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { logger } from '../../lib/utils/logger';
 import { useTranslation } from '../../lib/i18n-client';
+import { showToast } from '../Toast';
 
 export interface AddToCartFlyContext {
   origin?: HTMLElement | null;
@@ -60,7 +61,7 @@ export function useAddToCart({
     // Validate product slug before making API call
     if (!productSlug || productSlug.trim() === '' || productSlug.includes(' ')) {
       logger.warn('[PRODUCT CARD] Invalid product slug', { productSlug });
-      alert(t('common.alerts.invalidProduct'));
+      showToast(t('common.alerts.invalidProduct'), 'error');
       return;
     }
 

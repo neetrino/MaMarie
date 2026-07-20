@@ -24,6 +24,7 @@ import {
 } from '../components/AdminSideSheetActions';
 import type { PartnerStoreFormData, PartnerStoreItem } from '@/lib/partner-stores/types';
 import { getStoredLanguage } from '@/lib/language';
+import { showToast } from '../../../components/Toast';
 
 const EMPTY_FORM: PartnerStoreFormData = {
   name: '',
@@ -85,10 +86,10 @@ function PartnerStoresSection() {
     try {
       await apiClient.delete(`/api/v1/admin/partner-stores/${storeId}`);
       await fetchStores();
-      alert(t('admin.stores.deletedSuccess'));
+      showToast(t('admin.stores.deletedSuccess'), 'success');
     } catch (error) {
       const message = error instanceof Error ? error.message : t('admin.stores.unknownError');
-      alert(`${t('admin.stores.errorDeleting')}\n\n${message}`);
+      showToast(`${t('admin.stores.errorDeleting')}\n\n${message}`, 'error');
     }
   };
 
@@ -123,7 +124,7 @@ function PartnerStoresSection() {
 
     const imageFile = files.find((file) => file.type.startsWith('image/'));
     if (!imageFile) {
-      alert(t('admin.attributes.valueModal.selectImageFile'));
+      showToast(t('admin.attributes.valueModal.selectImageFile'), 'warning');
       if (event.target) {
         event.target.value = '';
       }
@@ -137,7 +138,7 @@ function PartnerStoresSection() {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : t('admin.attributes.valueModal.failedToProcessImage');
-      alert(message);
+      showToast(message, 'error');
     } finally {
       setImageUploading(false);
       if (event.target) {
@@ -150,11 +151,11 @@ function PartnerStoresSection() {
     event.preventDefault();
 
     if (!formData.name.trim()) {
-      alert(t('admin.stores.nameRequired'));
+      showToast(t('admin.stores.nameRequired'), 'warning');
       return;
     }
     if (!formData.address.trim()) {
-      alert(t('admin.stores.addressRequired'));
+      showToast(t('admin.stores.addressRequired'), 'warning');
       return;
     }
 
@@ -170,17 +171,17 @@ function PartnerStoresSection() {
     try {
       if (editingStore) {
         await apiClient.put(`/api/v1/admin/partner-stores/${editingStore.id}`, payload);
-        alert(t('admin.stores.updatedSuccess'));
+        showToast(t('admin.stores.updatedSuccess'), 'success');
       } else {
         await apiClient.post('/api/v1/admin/partner-stores', payload);
-        alert(t('admin.stores.createdSuccess'));
+        showToast(t('admin.stores.createdSuccess'), 'success');
       }
 
       await fetchStores();
       handleCloseModal();
     } catch (error) {
       const message = error instanceof Error ? error.message : t('admin.stores.unknownError');
-      alert(`${t('admin.stores.errorSaving')}\n\n${message}`);
+      showToast(`${t('admin.stores.errorSaving')}\n\n${message}`, 'error');
     } finally {
       setSubmitting(false);
     }

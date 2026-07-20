@@ -9,6 +9,7 @@ import { fetchAdminResource, invalidateAdminQuery } from '@/lib/admin/admin-fetc
 import { ADMIN_QUERY_KEYS, ADMIN_RESOURCE_STALE_MS } from '@/lib/admin/admin-query-keys';
 import { useTranslation } from '../../../lib/i18n-client';
 import { logger } from "@/lib/utils/logger";
+import { showToast } from '../../../components/Toast';
 
 export default function PriceFilterSettingsPage() {
   const { t } = useTranslation();
@@ -164,18 +165,18 @@ export default function PriceFilterSettingsPage() {
     const stepValueGEL = stepSizeGEL.trim() ? parseFloat(stepSizeGEL) : null;
 
     if (minValue !== null && (isNaN(minValue) || minValue < 0)) {
-      alert(t('admin.priceFilter.minPriceInvalid'));
+      showToast(t('admin.priceFilter.minPriceInvalid'), 'warning');
       return;
     }
 
     if (maxValue !== null && (isNaN(maxValue) || maxValue < 0)) {
-      alert(t('admin.priceFilter.maxPriceInvalid'));
+      showToast(t('admin.priceFilter.maxPriceInvalid'), 'warning');
       return;
     }
 
     const validateStep = (value: number | null, label: string) => {
       if (value !== null && (isNaN(value) || value <= 0)) {
-        alert(t('admin.priceFilter.stepSizeInvalid').replace('{label}', label));
+        showToast(t('admin.priceFilter.stepSizeInvalid').replace('{label}', label), 'warning');
         return false;
       }
       return true;
@@ -187,7 +188,7 @@ export default function PriceFilterSettingsPage() {
     if (!validateStep(stepValueGEL, t('admin.priceFilter.stepSizeGel'))) return;
 
     if (minValue !== null && maxValue !== null && minValue >= maxValue) {
-      alert(t('admin.priceFilter.minMustBeLess'));
+      showToast(t('admin.priceFilter.minMustBeLess'), 'warning');
       return;
     }
 
@@ -222,12 +223,12 @@ export default function PriceFilterSettingsPage() {
 
       invalidateAdminQuery(ADMIN_QUERY_KEYS.priceFilter);
       
-      alert(t('admin.priceFilter.savedSuccess'));
+      showToast(t('admin.priceFilter.savedSuccess'), 'success');
       logger.debug('✅ [PRICE FILTER SETTINGS] Settings saved');
     } catch (err: any) {
       console.error('❌ [PRICE FILTER SETTINGS] Error saving settings:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to save';
-      alert(t('admin.priceFilter.errorSaving').replace('{message}', errorMessage));
+      showToast(t('admin.priceFilter.errorSaving').replace('{message}', errorMessage), 'error');
     } finally {
       setSaving(false);
     }

@@ -2,6 +2,7 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { FormEvent } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { showToast } from '../../../../components/Toast';
 import type { Product } from '../types';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../../context/AdminDialogsContext';
@@ -83,10 +84,15 @@ export function useProductHandlers({
       const failed = results.filter(r => r.status === 'rejected');
       setSelectedIds(new Set());
       await fetchProducts();
-      alert(t('admin.products.bulkDeleteFinished').replace('{success}', (ids.length - failed.length).toString()).replace('{total}', ids.length.toString()));
+      showToast(
+        t('admin.products.bulkDeleteFinished')
+          .replace('{success}', (ids.length - failed.length).toString())
+          .replace('{total}', ids.length.toString()),
+        failed.length > 0 ? 'warning' : 'success',
+      );
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete products error:', err);
-      alert(t('admin.products.failedToDelete'));
+      showToast(t('admin.products.failedToDelete'), 'error');
     } finally {
       setBulkDeleting(false);
     }
@@ -103,12 +109,12 @@ export function useProductHandlers({
         {}
       );
       await fetchProducts();
-      alert(t('admin.products.duplicateSuccess'));
+      showToast(t('admin.products.duplicateSuccess'), 'success');
     } catch (err: unknown) {
       console.error('❌ [ADMIN] Error duplicating product:', err);
       const message =
         err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
-      alert(t('admin.products.duplicateError').replace('{message}', message));
+      showToast(t('admin.products.duplicateError').replace('{message}', message), 'error');
     } finally {
       setDuplicatingProductId(null);
     }
@@ -129,11 +135,11 @@ export function useProductHandlers({
       await apiClient.delete(`/api/v1/admin/products/${productId}`);
       logger.debug('✅ [ADMIN] Product deleted successfully');
       fetchProducts();
-      alert(t('admin.products.deletedSuccess'));
+      showToast(t('admin.products.deletedSuccess'), 'success');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error deleting product:', err);
-      alert(t('admin.products.errorDeleting').replace('{message}', message));
+      showToast(t('admin.products.errorDeleting').replace('{message}', message), 'error');
     }
   };
 
@@ -153,14 +159,14 @@ export function useProductHandlers({
       fetchProducts();
 
       if (newStatus) {
-        alert(t('admin.products.productPublished').replace('{title}', productTitle));
+        showToast(t('admin.products.productPublished').replace('{title}', productTitle), 'success');
       } else {
-        alert(t('admin.products.productDraft').replace('{title}', productTitle));
+        showToast(t('admin.products.productDraft').replace('{title}', productTitle), 'success');
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product status:', err);
-      alert(t('admin.products.errorUpdatingStatus').replace('{message}', message));
+      showToast(t('admin.products.errorUpdatingStatus').replace('{message}', message), 'error');
     }
   };
 
@@ -183,7 +189,7 @@ export function useProductHandlers({
       setProducts(previousProducts);
       const message = err instanceof Error ? err.message : t('admin.common.unknownErrorFallback');
       console.error('❌ [ADMIN] Error updating product featured status:', err);
-      alert(t('admin.products.errorUpdatingFeatured').replace('{message}', message));
+      showToast(t('admin.products.errorUpdatingFeatured').replace('{message}', message), 'error');
     } finally {
       setTogglingFeaturedIds((prev) => {
         const next = new Set(prev);
@@ -217,12 +223,17 @@ export function useProductHandlers({
 
       if (failed.length > 0) {
         setProducts(previousProducts);
-        alert(t('admin.products.featuredToggleFinished').replace('{success}', successCount.toString()).replace('{total}', products.length.toString()));
+        showToast(
+          t('admin.products.featuredToggleFinished')
+            .replace('{success}', successCount.toString())
+            .replace('{total}', products.length.toString()),
+          'warning',
+        );
       }
     } catch (err) {
       setProducts(previousProducts);
       console.error('❌ [ADMIN] Toggle all featured error:', err);
-      alert(t('admin.products.failedToUpdateFeatured'));
+      showToast(t('admin.products.failedToUpdateFeatured'), 'error');
     } finally {
       setTogglingAllFeatured(false);
     }

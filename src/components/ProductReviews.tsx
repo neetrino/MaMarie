@@ -10,6 +10,7 @@ import { ReviewForm } from './ProductReviews/ReviewForm';
 import { ReviewList } from './ProductReviews/ReviewList';
 import { ProductReviewsLoading } from './ProductReviews/ProductReviewsLoading';
 import type { Review } from './ProductReviews/utils';
+import { showToast } from './Toast';
 
 interface ProductReviewsProps {
   productId?: string;
@@ -54,14 +55,14 @@ export function ProductReviews({ productId, productSlug, initialReviews }: Produ
 
   const handleShowForm = () => {
     if (!isLoggedIn) {
-      alert(t('common.reviews.loginRequired'));
+      showToast(t('common.reviews.loginRequired'), 'warning');
       return;
     }
     setShowForm(true);
   };
 
   const handleLoginRequired = () => {
-    alert(t('common.reviews.loginRequired'));
+    showToast(t('common.reviews.loginRequired'), 'warning');
   };
 
   return (

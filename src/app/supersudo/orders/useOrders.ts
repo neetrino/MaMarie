@@ -23,6 +23,7 @@ import { useTranslation } from '../../../lib/i18n-client';
 import { formatPriceInCurrency, convertPrice, getStoredCurrency, initializeCurrencyRates, CurrencyCode } from '../../../lib/currency';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
+import { showToast } from '../../../components/Toast';
 
 export interface Order {
   id: string;
@@ -275,7 +276,7 @@ export function useOrders() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t('admin.orders.orderDetails.failedToLoad');
       console.error('❌ [ADMIN] Failed to load order details:', err);
-      alert(message);
+      showToast(message, 'error');
       setSelectedOrderId(null);
       setOrderDetails(null);
     } finally {
@@ -369,13 +370,13 @@ export function useOrders() {
         const failedIds = failed.map(r => 
           r.status === 'fulfilled' ? r.value.id : 'unknown'
         );
-        alert(t('admin.orders.bulkDeleteFailed').replace('{success}', successful.length.toString()).replace('{total}', ids.length.toString()).replace('{failed}', failedIds.join(', ')));
+        showToast(t('admin.orders.bulkDeleteFailed').replace('{success}', successful.length.toString()).replace('{total}', ids.length.toString()).replace('{failed}', failedIds.join(', ')), 'error');
       } else {
-        alert(t('admin.orders.bulkDeleteFinished').replace('{success}', successful.length.toString()).replace('{total}', ids.length.toString()));
+        showToast(t('admin.orders.bulkDeleteFinished').replace('{success}', successful.length.toString()).replace('{total}', ids.length.toString()), 'success');
       }
     } catch (err) {
       console.error('❌ [ADMIN] Bulk delete orders error:', err);
-      alert(t('admin.orders.failedToDelete'));
+      showToast(t('admin.orders.failedToDelete'), 'error');
     } finally {
       setBulkDeleting(false);
     }
