@@ -147,11 +147,11 @@ export function OrdersTable({
                 <span className="block min-w-0 truncate">{t('admin.orders.customer')}</span>
               </th>
               <th
-                className={ADMIN_TABLE_TH_SORTABLE}
+                className={`${ADMIN_TABLE_TH_SORTABLE} text-center`}
                 title={t('admin.orders.total')}
                 onClick={() => onSort('total')}
               >
-                <div className="flex min-w-0 items-center justify-start gap-0.5">
+                <div className="flex min-w-0 items-center justify-center gap-0.5">
                   <span className="min-w-0 truncate">{t('admin.orders.total')}</span>
                   <SortChevrons active={sortBy === 'total'} direction={sortOrder} />
                 </div>
@@ -159,10 +159,10 @@ export function OrdersTable({
               <th className={ADMIN_TABLE_TH_CENTER} title={t('admin.orders.items')}>
                 <span className="whitespace-nowrap">{t('admin.orders.itemsQtyHeader')}</span>
               </th>
-              <th className={ADMIN_TABLE_TH} title={t('admin.orders.status')}>
+              <th className={ADMIN_TABLE_TH_CENTER} title={t('admin.orders.status')}>
                 <span className="whitespace-nowrap">{t('admin.orders.status')}</span>
               </th>
-              <th className={ADMIN_TABLE_TH} title={t('admin.orders.payment')}>
+              <th className={ADMIN_TABLE_TH_CENTER} title={t('admin.orders.payment')}>
                 <span className="whitespace-nowrap">{t('admin.orders.payment')}</span>
               </th>
               <th

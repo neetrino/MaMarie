@@ -69,8 +69,8 @@ export function CategoriesList({ categories, searchQuery, onEdit, onDelete }: Ca
           <thead className={ADMIN_TABLE_THEAD}>
             <tr>
               <th className={ADMIN_TABLE_TH}>{t('admin.categories.image')}</th>
-              <th className={ADMIN_TABLE_TH}>{t('admin.categories.categoryTitle')}</th>
-              <th className={ADMIN_TABLE_TH}>{t('admin.products.category')}</th>
+              <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.categories.categoryTitle')}</th>
+              <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.products.category')}</th>
               <th className={ADMIN_TABLE_TH_CENTER}>{t('admin.products.actions')}</th>
             </tr>
           </thead>
@@ -95,7 +95,7 @@ export function CategoriesList({ categories, searchQuery, onEdit, onDelete }: Ca
                       </div>
                     )}
                   </td>
-                  <td className={`${ADMIN_TABLE_TD} text-left text-gray-900`}>
+                  <td className={`${ADMIN_TABLE_TD} text-center text-gray-900`}>
                     <div
                       className="text-sm font-medium"
                       style={{ paddingLeft: `${category.level * 16}px` }}
@@ -104,7 +104,7 @@ export function CategoriesList({ categories, searchQuery, onEdit, onDelete }: Ca
                     </div>
                     <div className="text-xs text-gray-500">{category.slug}</div>
                   </td>
-                  <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-left text-gray-700`}>
+                  <td className={`${ADMIN_TABLE_TD} whitespace-nowrap text-center text-gray-700`}>
                     {parentTitles.length > 0
                       ? parentTitles.join(', ')
                       : t('admin.categories.rootCategory')}
