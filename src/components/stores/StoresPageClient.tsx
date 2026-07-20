@@ -115,7 +115,7 @@ export function StoresPageClient() {
   if (loading) {
     return (
       <div
-        className={`flex min-h-[50vh] items-center justify-center ${pageInsetClassName}`}
+        className={`mx-auto flex min-h-[50vh] w-full max-w-full items-center justify-center ${pageInsetClassName}`}
         style={pageInsetStyle}
       >
         <div className="text-center">
@@ -129,7 +129,7 @@ export function StoresPageClient() {
   if (stores.length === 0) {
     return (
       <div
-        className={`flex min-h-[50vh] items-center justify-center ${pageInsetClassName}`}
+        className={`mx-auto flex min-h-[50vh] w-full max-w-full items-center justify-center ${pageInsetClassName}`}
         style={pageInsetStyle}
       >
         <div className="max-w-lg rounded-3xl bg-white p-8 text-center shadow-lg">
