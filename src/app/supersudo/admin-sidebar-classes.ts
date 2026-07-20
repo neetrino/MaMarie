@@ -8,16 +8,16 @@ export const ADMIN_SIDEBAR_WIDTH_COLLAPSED_PX = 64;
  */
 export const ADMIN_SIDEBAR_HEIGHT = '100%';
 
-/** Header row — admin clay wordmark (666×375 source, transparent). */
-export const ADMIN_SIDEBAR_HEADER_LOGO_HEIGHT_PX = 56;
-export const ADMIN_SIDEBAR_HEADER_LOGO_WIDTH_PX = 100;
+/** Header row — admin clay wordmark (931×413 source, transparent). */
+export const ADMIN_SIDEBAR_HEADER_LOGO_HEIGHT_PX = 36;
+export const ADMIN_SIDEBAR_HEADER_LOGO_WIDTH_PX = 80;
 
 /** Collapsed header — expand control only, centered in the rail. */
 export const ADMIN_SIDEBAR_HEADER_COLLAPSED =
   'flex shrink-0 items-center justify-center border-b border-gray-100 px-2 py-2';
 
 export const ADMIN_SIDEBAR_HEADER =
-  'flex shrink-0 items-center border-b border-gray-100 px-3 py-0';
+  'flex shrink-0 items-center border-b border-gray-100 px-3 py-3';
 
 /** Centers logo in the space between the left edge and the collapse button. */
 export const ADMIN_SIDEBAR_HEADER_LOGO_WRAP =
