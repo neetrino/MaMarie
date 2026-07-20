@@ -173,7 +173,7 @@ export function AddProductFormContent({
   const shouldShowSimpleFields = productType === 'simple';
 
   return (
-    <Card className="p-6 pb-24 sm:pb-24">
+    <Card className="p-6">
       <form onSubmit={handleSubmit} className="space-y-14">
         {fieldErrors.formSummary ? (
           <div

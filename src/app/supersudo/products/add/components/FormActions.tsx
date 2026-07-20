@@ -14,33 +14,29 @@ export function FormActions({ loading, isEditMode }: FormActionsProps) {
   const router = useRouter();
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg -mx-6 -mb-6 px-6 py-4 mt-8 backdrop-blur-sm bg-white/95">
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-full">
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={loading}
-          className="flex-1 w-full sm:w-auto order-2 sm:order-1"
-        >
-          {loading
-            ? isEditMode
-              ? t('admin.products.add.updating')
-              : t('admin.products.add.creating')
-            : isEditMode
-              ? t('admin.products.add.updateProduct')
-              : t('admin.products.add.createProduct')}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/supersudo/products')}
-          className="w-full sm:w-auto order-1 sm:order-2"
-        >
-          {t('admin.common.cancel')}
-        </Button>
-      </div>
+    <div className="mt-10 flex flex-col gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:gap-4">
+      <Button
+        type="submit"
+        variant="primary"
+        disabled={loading}
+        className="order-2 w-full flex-1 sm:order-1 sm:w-auto"
+      >
+        {loading
+          ? isEditMode
+            ? t('admin.products.add.updating')
+            : t('admin.products.add.creating')
+          : isEditMode
+            ? t('admin.products.add.updateProduct')
+            : t('admin.products.add.createProduct')}
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => router.push('/supersudo/products')}
+        className="order-1 w-full sm:order-2 sm:w-auto"
+      >
+        {t('admin.common.cancel')}
+      </Button>
     </div>
   );
 }
-
-
