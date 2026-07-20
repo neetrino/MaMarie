@@ -170,13 +170,16 @@ export function useProductPage({
   useEffect(() => {
     const handleCurrencyUpdate = () => setCurrency(getStoredCurrency());
     const handleCurrencyRatesUpdate = () => setCurrency(getStoredCurrency());
-    
+    const handleLanguageUpdate = () => setLanguage(getStoredLanguage());
+
     window.addEventListener('currency-updated', handleCurrencyUpdate);
     window.addEventListener('currency-rates-updated', handleCurrencyRatesUpdate);
-    
+    window.addEventListener('language-updated', handleLanguageUpdate);
+
     return () => {
       window.removeEventListener('currency-updated', handleCurrencyUpdate);
       window.removeEventListener('currency-rates-updated', handleCurrencyRatesUpdate);
+      window.removeEventListener('language-updated', handleLanguageUpdate);
     };
   }, []);
 

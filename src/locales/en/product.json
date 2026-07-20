@@ -26,11 +26,11 @@
   "outOfStockLabel": "Out of Stock",
   "noRelatedProducts": "Related products not found",
   "sizeGuide": {
-    "title": "Size guide",
-    "subtitle": "All measurements are in centimeters (cm)",
+    "title": "Size Guide",
+    "subtitle": "All measurements are in centimeters (sm)",
     "open": "Size guide",
     "illustrationAlt": "Kids clothing measurement diagram",
-    "cmValue": "{value} cm",
+    "cmValue": "{value} sm",
     "tip": "If your child is between two sizes, we recommend choosing the larger size for a more comfortable fit.",
     "table": {
       "size": "Size"

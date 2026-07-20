@@ -205,7 +205,7 @@ export function ProductInfoAndActions({
         <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />
 
         {/* Attributes Section */}
-        <div className="mb-8">
+        <div className="mb-4">
           <ProductAttributesSelector
             product={product}
             attributeGroups={attributeGroups}

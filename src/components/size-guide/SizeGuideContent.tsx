@@ -4,6 +4,7 @@ import {
   SIZE_GUIDE_ILLUSTRATION_SRC,
   SIZE_GUIDE_ILLUSTRATION_WIDTH_PX,
   SIZE_GUIDE_MEASURE_KEYS,
+  SIZE_GUIDE_OVERLAY_LABEL_CLASS,
   SIZE_GUIDE_ROWS,
   type SizeGuideMeasureKey,
   type SizeGuideRow,
@@ -82,20 +83,39 @@ function SizeGuideMeasureTips({ language }: SizeGuideContentProps) {
   );
 }
 
+type SizeGuideIllustrationProps = {
+  language: LanguageCode;
+};
+
+/** Photo + crisp HTML labels over measurement lines (not baked into the image). */
+function SizeGuideIllustration({ language }: SizeGuideIllustrationProps) {
+  return (
+    <div className="relative w-full">
+      <Image
+        src={SIZE_GUIDE_ILLUSTRATION_SRC}
+        alt={t(language, 'product.sizeGuide.illustrationAlt')}
+        width={SIZE_GUIDE_ILLUSTRATION_WIDTH_PX}
+        height={SIZE_GUIDE_ILLUSTRATION_HEIGHT_PX}
+        className="h-auto w-full object-contain object-left"
+        priority
+      />
+
+      {SIZE_GUIDE_MEASURE_KEYS.map((key) => (
+        <span key={key} className={SIZE_GUIDE_OVERLAY_LABEL_CLASS[key]}>
+          {t(language, `product.sizeGuide.measures.${key}.label`)}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 /** Size guide — photo left; tips top-right, table aligned to photo bottom. */
 export function SizeGuideContent({ language }: SizeGuideContentProps) {
   return (
     <div className="flex flex-col gap-5 text-[#57423b]">
       <div className="flex flex-col items-stretch gap-5 min-[520px]:flex-row">
         <div className="w-full shrink-0 self-start min-[520px]:w-[42%] min-[520px]:max-w-[280px]">
-          <Image
-            src={SIZE_GUIDE_ILLUSTRATION_SRC}
-            alt={t(language, 'product.sizeGuide.illustrationAlt')}
-            width={SIZE_GUIDE_ILLUSTRATION_WIDTH_PX}
-            height={SIZE_GUIDE_ILLUSTRATION_HEIGHT_PX}
-            className="h-auto w-full object-contain object-left"
-            priority
-          />
+          <SizeGuideIllustration language={language} />
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-4 min-[520px]:self-stretch min-[520px]:justify-between">
