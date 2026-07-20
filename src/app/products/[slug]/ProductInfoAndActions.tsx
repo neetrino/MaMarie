@@ -280,7 +280,7 @@ export function ProductInfoAndActions({
             <button
               type="button"
               onClick={() => setIsSizeGuideOpen(true)}
-              className={`${CLAY_PRIMARY_BUTTON_CLASS} shrink-0 self-center lg:self-auto`}
+              className={`${CLAY_PRIMARY_BUTTON_CLASS} shrink-0 self-start`}
               style={{
                 ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_BOYS_BG_COLOR),
                 height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
