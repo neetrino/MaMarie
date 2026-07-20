@@ -1,14 +1,22 @@
 'use client';
 
-import { CheckoutPrimaryButton } from './CheckoutPrimaryButton';
-import { CHECKOUT_FORM_ALERT_CLASS, CHECKOUT_SECONDARY_BUTTON_CLASS } from '../constants/checkout-ui';
-import { UseFormRegister, UseFormSetValue, UseFormHandleSubmit, FieldErrors } from 'react-hook-form';
+import type { Dispatch, SetStateAction } from 'react';
+import type { FieldErrors, UseFormHandleSubmit, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import { ProfileSideSheet } from '../../profile/components/ProfileSideSheet';
 import { useTranslation } from '../../../lib/i18n-client';
-import { useBodyScrollLock } from '../../../lib/useBodyScrollLock';
-import { PaymentMethodLogo } from './PaymentMethodLogo';
+import {
+  CHECKOUT_CONFIRM_SHEET_BACKDROP_TRANSITION_MS,
+  CHECKOUT_CONFIRM_SHEET_DESKTOP_WIDTH_PERCENT,
+  CHECKOUT_CONFIRM_SHEET_FOOTER_CLASS,
+  CHECKOUT_CONFIRM_SHEET_PANEL_TRANSITION_MS,
+  CHECKOUT_FORM_ALERT_CLASS,
+  CHECKOUT_SECONDARY_BUTTON_CLASS,
+} from '../constants/checkout-ui';
+import type { Cart, CheckoutFormData } from '../types';
 import { CardInputFields } from './CardInputFields';
+import { CheckoutPrimaryButton } from './CheckoutPrimaryButton';
 import { OrderSummaryModal } from './OrderSummaryModal';
-import { CheckoutFormData, Cart } from '../types';
+import { PaymentMethodLogo } from './PaymentMethodLogo';
 
 interface CardDetailsModalProps {
   isOpen: boolean;
@@ -32,12 +40,24 @@ interface CardDetailsModalProps {
   loadingDeliveryPrice: boolean;
   deliveryPrice: number | null;
   logoErrors: Record<string, boolean>;
-  setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  setLogoErrors: Dispatch<SetStateAction<Record<string, boolean>>>;
   isLoggedIn: boolean;
   onShowShippingModal: () => void;
   onSubmit: (data: CheckoutFormData) => void;
 }
 
+function scrollToFirstFieldError(validationErrors: FieldErrors<CheckoutFormData>) {
+  const firstErrorField = Object.keys(validationErrors)[0];
+  if (!firstErrorField) {
+    return;
+  }
+  const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+  errorElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/**
+ * Card details sheet — same side-sheet chrome as profile / confirm-order.
+ */
 export function CardDetailsModal({
   isOpen,
   onClose,
@@ -61,132 +81,112 @@ export function CardDetailsModal({
   onSubmit,
 }: CardDetailsModalProps) {
   const { t } = useTranslation();
-  useBodyScrollLock(isOpen);
 
-  if (!isOpen) {
-    return null;
-  }
-
-  const handleValidationError = (validationErrors: FieldErrors<CheckoutFormData>) => {
-    const firstErrorField = Object.keys(validationErrors)[0];
-    if (firstErrorField) {
-      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-      if (errorElement) {
-        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  };
-
-  const handleLogoError = () => {
-    setLogoErrors((prev) => ({ ...prev, [paymentMethod]: true }));
-  };
+  const title = t('checkout.modals.cardDetails').replace(
+    '{method}',
+    paymentMethod === 'arca' ? t('checkout.payment.arca') : t('checkout.payment.idram'),
+  );
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black/50 p-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div 
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-gray-200/80"
-        onClick={(e) => e.stopPropagation()}
-        style={{ zIndex: 10000 }}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {t('checkout.modals.cardDetails').replace(
-              '{method}',
-              paymentMethod === 'arca' ? t('checkout.payment.arca') : t('checkout.payment.idram')
-            )}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label={t('checkout.modals.closeModal')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="space-y-4 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <PaymentMethodLogo
-              paymentMethod={paymentMethod}
-              logoErrors={logoErrors}
-              onError={handleLogoError}
-              size="medium"
-            />
-            <div>
-              <div className="font-semibold text-gray-900">
-                {paymentMethod === 'arca' ? t('checkout.payment.arca') : t('checkout.payment.idram')} {t('checkout.payment.paymentDetails')}
-              </div>
-              <div className="text-sm text-gray-600">{t('checkout.payment.enterCardDetails')}</div>
-            </div>
-          </div>
-
-          <CardInputFields
-            register={register}
-            setValue={setValue}
-            errors={errors}
-            isSubmitting={isSubmitting}
-          />
-        </div>
-
-        {(errors.cardNumber || errors.cardExpiry || errors.cardCvv || errors.cardHolderName) && (
-          <div className={`mb-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
-            <p className="text-sm text-red-600">
-              {errors.cardNumber?.message || 
-               errors.cardExpiry?.message || 
-               errors.cardCvv?.message || 
-               errors.cardHolderName?.message}
-            </p>
-          </div>
-        )}
-
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-900 mb-3">{t('checkout.orderSummary')}</h3>
-          <OrderSummaryModal
-            cart={cart}
-            orderSummary={orderSummary}
-            currency={currency}
-            shippingMethod={shippingMethod}
-            shippingCity={shippingCity}
-            loadingDeliveryPrice={loadingDeliveryPrice}
-            deliveryPrice={deliveryPrice}
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            type="button"
-            className={`${CHECKOUT_SECONDARY_BUTTON_CLASS} flex-1`}
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            {t('checkout.buttons.cancel')}
-          </button>
-          <CheckoutPrimaryButton
-            type="button"
-            className="flex-1"
-            onClick={handleSubmit(
-              (data) => {
+    <ProfileSideSheet
+      isOpen={isOpen}
+      title={title}
+      closeLabel={t('common.buttons.close')}
+      onClose={onClose}
+      desktopWidthPercent={CHECKOUT_CONFIRM_SHEET_DESKTOP_WIDTH_PERCENT}
+      panelTransitionMs={CHECKOUT_CONFIRM_SHEET_PANEL_TRANSITION_MS}
+      backdropTransitionMs={CHECKOUT_CONFIRM_SHEET_BACKDROP_TRANSITION_MS}
+      footer={
+        <div className={CHECKOUT_CONFIRM_SHEET_FOOTER_CLASS}>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              className={`${CHECKOUT_SECONDARY_BUTTON_CLASS} flex-1`}
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              {t('checkout.buttons.cancel')}
+            </button>
+            <CheckoutPrimaryButton
+              type="button"
+              className="flex-1"
+              onClick={handleSubmit((data) => {
                 onClose();
                 if (!isLoggedIn) {
                   onShowShippingModal();
                 } else {
                   onSubmit(data);
                 }
-              },
-              handleValidationError
-            )}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? t('checkout.buttons.processing') : t('checkout.buttons.continueToPayment')}
-          </CheckoutPrimaryButton>
+              }, scrollToFirstFieldError)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? t('checkout.buttons.processing')
+                : t('checkout.buttons.continueToPayment')}
+            </CheckoutPrimaryButton>
+          </div>
         </div>
+      }
+    >
+      <div className="flex flex-col gap-6">
+          <div className="space-y-4">
+            <div className="mb-4 flex items-center gap-3">
+              <PaymentMethodLogo
+                paymentMethod={paymentMethod}
+                logoErrors={logoErrors}
+                onError={() => {
+                  setLogoErrors((prev) => ({ ...prev, [paymentMethod]: true }));
+                }}
+                size="medium"
+              />
+              <div>
+                <div className="font-semibold text-gray-900">
+                  {paymentMethod === 'arca'
+                    ? t('checkout.payment.arca')
+                    : t('checkout.payment.idram')}{' '}
+                  {t('checkout.payment.paymentDetails')}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {t('checkout.payment.enterCardDetails')}
+                </div>
+              </div>
+            </div>
+
+            <CardInputFields
+              register={register}
+              setValue={setValue}
+              errors={errors}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+
+          {(errors.cardNumber ||
+            errors.cardExpiry ||
+            errors.cardCvv ||
+            errors.cardHolderName) && (
+            <div className={`border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
+              <p className="text-sm text-red-600">
+                {errors.cardNumber?.message ||
+                  errors.cardExpiry?.message ||
+                  errors.cardCvv?.message ||
+                  errors.cardHolderName?.message}
+              </p>
+            </div>
+          )}
+
+          <div>
+            <h3 className="mb-3 font-semibold text-gray-900">{t('checkout.orderSummary')}</h3>
+            <OrderSummaryModal
+              cart={cart}
+              orderSummary={orderSummary}
+              currency={currency}
+              shippingMethod={shippingMethod}
+              shippingCity={shippingCity}
+              loadingDeliveryPrice={loadingDeliveryPrice}
+              deliveryPrice={deliveryPrice}
+            />
+          </div>
       </div>
-    </div>
+    </ProfileSideSheet>
   );
 }
-

@@ -1,7 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { MOBILE_ORDER_ASSETS } from '../../constants/mobile-orders';
 import { useTranslation } from '../../lib/i18n-client';
+import { preloadOrderSuccessIllustration } from '../orders/[number]/utils/order-success-pending';
 import { CheckoutForm } from './CheckoutForm';
 import { CheckoutModals } from './CheckoutModals';
 import { CheckoutOrderItemsPreview } from './components/CheckoutOrderItemsPreview';
@@ -36,6 +39,10 @@ function CheckoutSkeleton() {
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    preloadOrderSuccessIllustration(MOBILE_ORDER_ASSETS.readyBasket);
+  }, []);
 
   const {
     cart,

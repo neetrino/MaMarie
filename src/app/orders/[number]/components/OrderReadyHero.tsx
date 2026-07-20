@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   MOBILE_ORDER_ACCENT_COLOR,
@@ -10,8 +11,6 @@ import {
   MOBILE_ORDER_HEADLINE_LINE_HEIGHT,
   MOBILE_ORDER_HEADLINE_TO_BUTTON_GAP_PX,
   MOBILE_ORDER_HEADLINE_TO_SUBTITLE_GAP_PX,
-  MOBILE_ORDER_PLACED_HEADLINE_FONT_SIZE_PX,
-  MOBILE_ORDER_PLACED_HEADLINE_MAX_WIDTH_PX,
   MOBILE_ORDER_HERO_BLOCK_GAP_PX,
   MOBILE_ORDER_HERO_ILLUSTRATION_HEIGHT_PX,
   MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_LEFT_PERCENT,
@@ -19,6 +18,8 @@ import {
   MOBILE_ORDER_HERO_ILLUSTRATION_SCALE_HEIGHT,
   MOBILE_ORDER_HERO_ILLUSTRATION_SCALE_WIDTH,
   MOBILE_ORDER_HERO_ILLUSTRATION_WIDTH_PX,
+  MOBILE_ORDER_PLACED_HEADLINE_FONT_SIZE_PX,
+  MOBILE_ORDER_PLACED_HEADLINE_MAX_WIDTH_PX,
   MOBILE_ORDER_SUBTITLE_COLOR,
   MOBILE_ORDER_SUBTITLE_FONT_SIZE_PX,
   MOBILE_ORDER_SUBTITLE_LINE_HEIGHT,
@@ -27,6 +28,8 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import type { Order } from '../types';
 import { resolveMobileOrderHeroCopy } from '../utils/resolve-mobile-order-hero-copy';
 import { OrderMoreButton } from './OrderMoreButton';
+
+const ORDER_HERO_IMAGE_QUALITY = 90;
 
 interface OrderReadyHeroProps {
   order: Order;
@@ -59,19 +62,26 @@ export function OrderReadyHero({ order }: OrderReadyHeroProps) {
         }}
         aria-hidden
       >
-        <img
-          alt=""
-          src={MOBILE_ORDER_ASSETS.readyBasket}
-          decoding="async"
-          draggable={false}
-          className="absolute max-w-none object-contain"
+        <div
+          className="absolute"
           style={{
             width: `${MOBILE_ORDER_HERO_ILLUSTRATION_SCALE_WIDTH * 100}%`,
             height: `${MOBILE_ORDER_HERO_ILLUSTRATION_SCALE_HEIGHT * 100}%`,
             left: `${MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_LEFT_PERCENT}%`,
             top: `${MOBILE_ORDER_HERO_ILLUSTRATION_OFFSET_TOP_PERCENT}%`,
           }}
-        />
+        >
+          <Image
+            src={MOBILE_ORDER_ASSETS.readyBasket}
+            alt=""
+            fill
+            priority
+            quality={ORDER_HERO_IMAGE_QUALITY}
+            sizes={`${MOBILE_ORDER_HERO_ILLUSTRATION_WIDTH_PX}px`}
+            className="object-contain"
+            draggable={false}
+          />
+        </div>
       </div>
 
       <div

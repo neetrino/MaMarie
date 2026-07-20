@@ -42,6 +42,6 @@ export const DESKTOP_ORDER_PAGE_MAX_WIDTH_PX = 640;
 export const DESKTOP_ORDER_PAGE_PADDING_X_PX = 24;
 
 export const MOBILE_ORDER_ASSETS = {
-  readyBasket: '/assets/orders/ready-basket.png',
+  readyBasket: '/assets/orders/ready-basket.webp',
   moreButtonArrow: '/assets/orders/more-button-arrow.svg',
 } as const;

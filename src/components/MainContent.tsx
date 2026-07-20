@@ -38,11 +38,13 @@ function wrapStorefrontContent(pathname: string, children: ReactNode): ReactNode
   }
 
   const fillViewport = needsViewportFillFrame(pathname);
+  const scaleOnTablet = pathname.startsWith('/about');
 
   return (
     <DesktopFluidFrame
       className={fillViewport ? 'min-h-0 flex-1' : ''}
       stageClassName={fillViewport ? 'flex h-full min-h-0 flex-col' : ''}
+      scaleOnTablet={scaleOnTablet}
     >
       {children}
     </DesktopFluidFrame>
@@ -142,7 +144,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/about')) {
     return (
       <main
-        className="home-main-surface w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        className="home-main-surface about-page-main w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden max-[743px]:bg-[#f5f5f5] min-[744px]:bg-white pt-[var(--header-clearance-mobile)] min-[744px]:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
         {content}
