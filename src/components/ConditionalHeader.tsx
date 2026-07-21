@@ -10,7 +10,7 @@ interface ConditionalHeaderProps {
 
 export function ConditionalHeader({ navLinks }: ConditionalHeaderProps) {
   const pathname = usePathname();
-  if (pathname?.startsWith('/supersudo')) {
+  if (pathname?.startsWith('/supersudo') || pathname?.startsWith('/admin')) {
     return null;
   }
   if (pathname?.startsWith('/profile')) {

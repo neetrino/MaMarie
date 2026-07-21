@@ -31,7 +31,15 @@ main.home-main-surface:has(.not-found-page) {
 
 /* Mobile shell uses gray for storefront; keep 404 white including navbar clearance. */
 @media (max-width: 1023px) {
-  .layout-shell-mobile-bottom-clearance:has(.not-found-page) {
+  .layout-shell-mobile-bottom-clearance:has(.not-found-page),
+  .layout-shell-mobile-bottom-clearance:has(.not-found-standalone-shell) {
+    background-color: #fff;
+  }
+
+  main.home-main-surface:has(.not-found-page),
+  main.home-main-surface:has(.not-found-standalone-shell),
+  main.admin-page-main:has(.not-found-page),
+  main.admin-page-main:has(.not-found-standalone-shell) {
     background-color: #fff;
   }
 }

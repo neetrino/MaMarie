@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { MobileBottomNavBar } from './mobile-bottom-nav/MobileBottomNavBar';
 
-const HIDDEN_PREFIXES = ['/supersudo'] as const;
+const HIDDEN_PREFIXES = ['/supersudo', '/admin'] as const;
 
 function shouldHideMobileBottomNav(pathname: string): boolean {
   return HIDDEN_PREFIXES.some((prefix) => pathname.startsWith(prefix));

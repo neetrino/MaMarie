@@ -9,7 +9,11 @@ import { LazyWhenVisible } from './LazyWhenVisible';
 
 export function ConditionalFooter() {
   const pathname = usePathname();
-  if (pathname?.startsWith('/profile') || pathname?.startsWith('/supersudo')) {
+  if (
+    pathname?.startsWith('/profile') ||
+    pathname?.startsWith('/supersudo') ||
+    pathname?.startsWith('/admin')
+  ) {
     return null;
   }
 
