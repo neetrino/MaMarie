@@ -117,8 +117,9 @@ export function MainContent({ children }: MainContentProps) {
   }
 
   if (pathname.startsWith('/supersudo') || pathname.startsWith('/admin')) {
+    // Admin chrome hides the public navbar; 404 still needs white surface (standalone shell).
     return (
-      <main className="admin-page-main home-main-surface flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden">
+      <main className="admin-page-main home-main-surface flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden has-[.not-found-page]:bg-white has-[.not-found-standalone-shell]:bg-white">
         {content}
       </main>
     );
@@ -171,7 +172,7 @@ export function MainContent({ children }: MainContentProps) {
 
   return (
     <main
-      className={`${mainBase} flex min-h-0 flex-col pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]`}
+      className={`${mainBase} home-main-surface flex min-h-0 flex-col bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)] has-[.not-found-page]:bg-white`}
       style={headerClearanceVars}
     >
       {content}
