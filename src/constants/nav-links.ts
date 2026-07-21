@@ -15,6 +15,13 @@ export const NAV_LINKS: readonly NavLinkItem[] = [
   { href: '/contact', labelKey: 'contact' },
 ] as const;
 
+/** Burger menu — Home & Shop are on the mobile bottom nav. */
+export const MOBILE_MENU_NAV_LINKS: readonly NavLinkItem[] = [
+  { href: '/about', labelKey: 'about' },
+  { href: '/stores', labelKey: 'stores' },
+  { href: '/contact', labelKey: 'contact' },
+] as const;
+
 /** Mobile menu bottom CTA — label from `common.buttons.shopNow`. */
 export const MOBILE_MENU_CTA = {
   href: '/products',

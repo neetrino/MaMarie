@@ -19,7 +19,7 @@ import {
   HEADER_PILL_APPEAR_DURATION_MS,
   HEADER_PILL_SHELL_HEIGHT_PX,
 } from '../constants/header';
-import type { NavLinkItem } from '../constants/nav-links';
+import { MOBILE_MENU_NAV_LINKS, type NavLinkItem } from '../constants/nav-links';
 import { BrandLogoLink } from './BrandLogoLink';
 import { DesktopFluidFrame } from './DesktopFluidFrame';
 import {
@@ -151,7 +151,7 @@ function MobileHeaderBar({
       <MobileMenuModal
         isOpen={menuOpen}
         onClose={onMenuClose}
-        navLinks={navLinks}
+        navLinks={MOBILE_MENU_NAV_LINKS}
         menuId={menuId}
       />
     </>

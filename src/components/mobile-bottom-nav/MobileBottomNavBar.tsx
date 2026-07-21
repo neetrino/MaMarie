@@ -15,6 +15,7 @@ import {
   MOBILE_BOTTOM_NAV_HOME_SLOT_HEIGHT_PX,
   MOBILE_BOTTOM_NAV_HOME_SLOT_WIDTH_PX,
   MOBILE_BOTTOM_NAV_INACTIVE_LAYOUTS,
+  MOBILE_BOTTOM_NAV_SHOP_ICON_SIZE_PX,
   MOBILE_BOTTOM_NAV_USER_ICON_HEIGHT_PX,
   MOBILE_BOTTOM_NAV_USER_ICON_WIDTH_PX,
   MOBILE_BOTTOM_NAV_WISHLIST_ICON_SIZE_PX,
@@ -115,7 +116,7 @@ function NavSlotIcon({
   );
 }
 
-/** Figma bottom navigation — home `74:875`, cart `109:579`, wishlist `109:600`, profile `109:621`. */
+/** Figma bottom navigation — home, shop, cart, wishlist, profile. */
 export function MobileBottomNavBar() {
   const pathname = usePathname() ?? '';
   const router = useRouter();
@@ -141,6 +142,20 @@ export function MobileBottomNavBar() {
           width={MOBILE_BOTTOM_NAV_HOME_SLOT_WIDTH_PX}
           height={MOBILE_BOTTOM_NAV_HOME_SLOT_HEIGHT_PX}
           fullSlot
+        />
+      ),
+    },
+    {
+      id: 'shop',
+      href: '/products',
+      labelKey: 'common.navigation.shop',
+      renderIcon: (isActive) => (
+        <NavSlotIcon
+          isActive={isActive}
+          inactiveSrc={MOBILE_BOTTOM_NAV_ASSETS.iconShop}
+          activeSrc={MOBILE_BOTTOM_NAV_ASSETS.shopActive}
+          width={MOBILE_BOTTOM_NAV_SHOP_ICON_SIZE_PX}
+          height={MOBILE_BOTTOM_NAV_SHOP_ICON_SIZE_PX}
         />
       ),
     },
@@ -204,6 +219,7 @@ export function MobileBottomNavBar() {
       setCartCount(cartDetail?.cartSummary?.itemsCount ?? getCartCount());
     };
 
+    router.prefetch('/products');
     router.prefetch('/wishlist');
     updateCounts();
     window.addEventListener('wishlist-updated', updateCounts);

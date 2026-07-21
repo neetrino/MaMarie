@@ -23,7 +23,7 @@
 }
 
 /**
- * Mobile bottom nav — Figma `74:875`, `109:579`, `109:600`, `109:621`.
+ * Mobile bottom nav — five tabs: home, shop, cart, wishlist, profile.
  */
 .shell {
   --bottom-nav-design-width: 375;
