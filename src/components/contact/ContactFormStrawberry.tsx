@@ -6,6 +6,7 @@ import {
   CONTACT_FORM_STRAWBERRY_SIZE_PX,
   CONTACT_FORM_STRAWBERRY_TOP_PX,
 } from '../../constants/contact-form';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 /** Figma contact form — strawberry decoration overlapping top-right card edge. */
 export function ContactFormStrawberry() {
@@ -20,18 +21,20 @@ export function ContactFormStrawberry() {
       }}
       aria-hidden
     >
-      <img
-        alt=""
-        src={CONTACT_FORM_ASSETS.strawberry}
-        decoding="async"
-        draggable={false}
-        className="max-w-none object-contain"
-        style={{
-          width: CONTACT_FORM_STRAWBERRY_SIZE_PX,
-          height: CONTACT_FORM_STRAWBERRY_SIZE_PX,
-          transform: `rotate(${CONTACT_FORM_STRAWBERRY_ROTATE_DEG}deg) scale(${CONTACT_FORM_STRAWBERRY_IMAGE_SCALE})`,
-        }}
-      />
+      <DecorationMotionShell motion="bounce" inline>
+        <img
+          alt=""
+          src={CONTACT_FORM_ASSETS.strawberry}
+          decoding="async"
+          draggable={false}
+          className="max-w-none object-contain"
+          style={{
+            width: CONTACT_FORM_STRAWBERRY_SIZE_PX,
+            height: CONTACT_FORM_STRAWBERRY_SIZE_PX,
+            transform: `rotate(${CONTACT_FORM_STRAWBERRY_ROTATE_DEG}deg) scale(${CONTACT_FORM_STRAWBERRY_IMAGE_SCALE})`,
+          }}
+        />
+      </DecorationMotionShell>
     </div>
   );
 }

@@ -1,0 +1,33 @@
+.pending {
+  opacity: 0;
+  transform: translateY(var(--soft-appear-rise, 18px));
+}
+
+.appear {
+  animation-name: soft-appear;
+  animation-duration: var(--soft-appear-duration, 1800ms);
+  animation-delay: var(--soft-appear-delay, 0ms);
+  animation-timing-function: cubic-bezier(0.14, 1, 0.28, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes soft-appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--soft-appear-rise, 18px));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending,
+  .appear {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+}

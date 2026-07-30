@@ -17,6 +17,10 @@ import {
   MOBILE_HOME_SECTION_TITLE_SIZE_PX,
   MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX,
 } from '../../../constants/mobile-home';
+import {
+  PRODUCT_APPEAR_CLASS,
+  productAppearStyle,
+} from '../../../constants/product-appear';
 import { useTranslation } from '../../../lib/i18n-client';
 import type { HomeProductCardData } from '../HomeProductCard';
 import { HomeProductCard } from '../HomeProductCard';
@@ -90,8 +94,12 @@ export function MobileHomeProductSection({
           paddingTop: MOBILE_HOME_PRODUCT_CARD_TOP_BLEED_PX,
         }}
       >
-        {products.map((product) => (
-          <div key={product.id} className="shrink-0 snap-start">
+        {products.map((product, index) => (
+          <div
+            key={product.id}
+            className={`shrink-0 snap-start ${PRODUCT_APPEAR_CLASS}`}
+            style={productAppearStyle(index)}
+          >
             <HomeProductCard
               product={product}
               layoutWidthPx={MOBILE_HOME_PRODUCT_CARD_WIDTH_PX}

@@ -39,6 +39,10 @@ import {
   MOBILE_PRODUCTS_CATALOG_CARD_TITLE_SIZE_PX,
   MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX,
 } from '../../constants/mobile-products-catalog';
+import {
+  PRODUCT_APPEAR_CLASS,
+  productAppearStyle,
+} from '../../constants/product-appear';
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCurrency } from '../hooks/useCurrency';
 import { useWishlist } from '../hooks/useWishlist';
@@ -60,6 +64,7 @@ interface MobileProductsCatalogProductCardProps {
   layoutWidthPx?: number;
   imagePriority?: boolean;
   addToCartLabel: string;
+  appearIndex?: number;
 }
 
 function MobileProductsCatalogProductCardComponent({
@@ -67,6 +72,7 @@ function MobileProductsCatalogProductCardComponent({
   layoutWidthPx = MOBILE_PRODUCTS_CATALOG_CARD_WIDTH_PX,
   imagePriority = false,
   addToCartLabel,
+  appearIndex,
 }: MobileProductsCatalogProductCardProps) {
   const currency = useCurrency();
   const { isInWishlist, toggleWishlist } = useWishlist(product.id);
@@ -143,11 +149,12 @@ function MobileProductsCatalogProductCardComponent({
   return (
     <article
       ref={cardRef}
-      className="relative w-full shrink-0 overflow-hidden"
+      className={`relative w-full shrink-0 overflow-hidden${appearIndex !== undefined ? ` ${PRODUCT_APPEAR_CLASS}` : ''}`}
       style={{
         height: cardHeightPx,
         borderRadius: lp(MOBILE_PRODUCTS_CATALOG_CARD_RADIUS_PX),
         backgroundColor: MOBILE_PRODUCTS_CATALOG_CARD_BG,
+        ...(appearIndex !== undefined ? productAppearStyle(appearIndex) : null),
       }}
     >
       <MobileProductsCatalogProductCardMedia

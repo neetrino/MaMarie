@@ -1,4 +1,5 @@
 import { BRAND_COLORS } from './brand';
+import { type DecorationMotion } from './decoration-motion';
 import {
   HOME_SECTION_MAX_WIDTH_PX,
   HOME_SECTION_PADDING_LEFT_PX,
@@ -77,6 +78,11 @@ export interface HeroRotatedPlacement {
   /** Default `cover` — use `contain` for layers that must not crop (e.g. blue arch). */
   objectFit?: 'contain' | 'cover';
   priority?: boolean;
+  /** Gentle float / sway — decorations and inscription arches. */
+  motion?: DecorationMotion;
+  /** Slow soft fade + rise once the hero scene is ready (inscription arches). */
+  appearEnter?: boolean;
+  appearDelayMs?: number;
 }
 
 export type HeroSceneLayer = HeroFlatPlacement | HeroRotatedPlacement;
@@ -92,6 +98,9 @@ export const HERO_SCENE_OVERFLOW_BOTTOM_PX = 115;
 /** Space above canvas for pink arch (Figma `51:332` sits at top: -27). */
 export const HERO_SCENE_OVERFLOW_TOP_PX = 72;
 
+/** «SHAPE YOUR» / «YOUR CHILDHOOD» arches — soft appear when scene is ready. */
+export const HERO_INSCRIPTION_APPEAR_DURATION_MS = 1800;
+
 /** Hero scene layers — paint order back → front (Figma frame `51:329`). */
 export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
   {
@@ -106,6 +115,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     rotateDeg: -153.94,
     flipY: true,
     zIndex: 1,
+    motion: 'floatSoft',
   },
   {
     kind: 'rotated',
@@ -118,6 +128,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     imageHeightPx: 248.831,
     rotateDeg: -64.25,
     zIndex: 2,
+    motion: 'float',
   },
   {
     /** Figma `51:332` — top pink «SHAPE YOUR» arch. */
@@ -134,6 +145,8 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     objectFit: 'contain',
     objectPosition: 'bottom',
     priority: true,
+    motion: 'archDrift',
+    appearEnter: true,
   },
   {
     /** Figma `51:333` — girl + ottomans + pink arch (893×538). */
@@ -159,6 +172,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     imageHeightPx: 124.147,
     rotateDeg: 28.09,
     zIndex: 5,
+    motion: 'bounce',
   },
   {
     kind: 'rotated',
@@ -171,6 +185,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     imageHeightPx: 137.966,
     rotateDeg: 71.1,
     zIndex: 6,
+    motion: 'sway',
   },
   {
     /** Figma `51:336` — blue «YOUR CHILDHOOD» arch; topmost scene layer. */
@@ -186,6 +201,8 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     zIndex: HERO_LEFT_WING_Z_INDEX,
     objectPosition: 'bottom',
     objectFit: 'contain',
+    motion: 'archDriftAlt',
+    appearEnter: true,
   },
 ];
 

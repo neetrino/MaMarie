@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react';
+import type { DecorationMotion } from '../../constants/decoration-motion';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 export interface AboutDecorationLayout {
   leftPx: number;
@@ -16,6 +18,7 @@ interface AboutDecorationProps {
   imageSrc: string;
   className?: string;
   style?: CSSProperties;
+  motion?: DecorationMotion;
 }
 
 /**
@@ -26,6 +29,7 @@ export function AboutDecoration({
   imageSrc,
   className = '',
   style,
+  motion = 'float',
 }: AboutDecorationProps) {
   const transform = [
     layout.flipX ? 'scaleX(-1)' : '',
@@ -48,24 +52,26 @@ export function AboutDecoration({
         ...style,
       }}
     >
-      <div
-        className="relative shrink-0"
-        style={{
-          width: layout.imageSizePx,
-          height: layout.imageSizePx,
-          transform: transform || undefined,
-        }}
-      >
-        <img
-          src={imageSrc}
-          alt=""
-          className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
-          width={layout.imageSizePx}
-          height={layout.imageSizePx}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      <DecorationMotionShell motion={motion}>
+        <div
+          className="relative shrink-0"
+          style={{
+            width: layout.imageSizePx,
+            height: layout.imageSizePx,
+            transform: transform || undefined,
+          }}
+        >
+          <img
+            src={imageSrc}
+            alt=""
+            className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
+            width={layout.imageSizePx}
+            height={layout.imageSizePx}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </DecorationMotionShell>
     </div>
   );
 }

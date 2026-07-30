@@ -55,6 +55,7 @@ import {
   ABOUT_PAGE_MOBILE_TITLE_WIDTH_PX,
 } from '../../constants/about-page';
 import { AboutDecoration } from './AboutDecoration';
+import { AboutPageTitle } from './AboutPageTitle';
 import type { AboutPageCopy } from './AboutPageDesktop';
 
 /**
@@ -76,25 +77,15 @@ export function AboutPageMobile({ copy }: { copy: AboutPageCopy }) {
         className="mx-auto w-full"
         style={{ maxWidth: ABOUT_PAGE_MOBILE_MAX_WIDTH_PX }}
       >
-        <div
+        <AboutPageTitle
+          src={ABOUT_PAGE_ASSETS.title}
+          alt={copy.titleAlt}
+          widthPx={ABOUT_PAGE_MOBILE_TITLE_WIDTH_PX}
+          heightPx={ABOUT_PAGE_MOBILE_TITLE_HEIGHT_PX}
+          quality={ABOUT_PAGE_IMAGE_QUALITY}
           className="relative mx-auto"
-          style={{
-            width: ABOUT_PAGE_MOBILE_TITLE_WIDTH_PX,
-            height: ABOUT_PAGE_MOBILE_TITLE_HEIGHT_PX,
-            maxWidth: contentMaxWidth,
-          }}
-        >
-          <Image
-            src={ABOUT_PAGE_ASSETS.title}
-            alt={copy.titleAlt}
-            fill
-            priority
-            quality={ABOUT_PAGE_IMAGE_QUALITY}
-            unoptimized
-            sizes={`${ABOUT_PAGE_MOBILE_TITLE_WIDTH_PX}px`}
-            className="object-contain"
-          />
-        </div>
+          style={{ maxWidth: contentMaxWidth }}
+        />
 
         <div
           className="relative left-1/2 overflow-hidden"
@@ -234,6 +225,7 @@ export function AboutPageMobile({ copy }: { copy: AboutPageCopy }) {
 
           <AboutDecoration
             imageSrc={ABOUT_PAGE_ASSETS.decoStrawberry}
+            motion="bounce"
             layout={{
               leftPx: ABOUT_PAGE_MOBILE_STRAWBERRY_LEFT_PX,
               topPx: ABOUT_PAGE_MOBILE_STRAWBERRY_TOP_PX,

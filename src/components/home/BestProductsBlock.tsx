@@ -11,9 +11,15 @@ import {
   HOME_PRODUCT_CARD_HEIGHT_PX,
   HOME_PRODUCT_CARD_WIDTH_PX,
 } from '../../constants/home-sections';
+import {
+  PRODUCT_APPEAR_CLASS,
+  PRODUCT_APPEAR_PENDING_CLASS,
+  productAppearStyle,
+} from '../../constants/product-appear';
 import { useTranslation } from '../../lib/i18n-client';
 import { LAZY_LOAD_ROOT_MARGIN_PX } from '../../constants/lazy-loading';
 import { resolveProductCardEagerMount, resolveProductCardImagePriority } from '../../lib/product-card-lazy';
+import { useAppearWhenInView } from '../../lib/use-appear-when-in-view';
 import { LazyWhenVisible } from '../LazyWhenVisible';
 import type { HomeProductCardData } from './HomeProductCard';
 import { HomeProductCard } from './HomeProductCard';
@@ -26,6 +32,10 @@ interface BestProductsBlockProps {
 
 export function BestProductsBlock({ products }: BestProductsBlockProps) {
   const { t } = useTranslation();
+  const { ref: rowRef, shouldAppear } = useAppearWhenInView({
+    bottomInsetPercent: 18,
+    minRatio: 0.15,
+  });
 
   return (
     <>
@@ -42,6 +52,7 @@ export function BestProductsBlock({ products }: BestProductsBlockProps) {
       />
 
       <div
+        ref={rowRef}
         className="flex w-full overflow-x-auto pb-8 lg:overflow-visible"
         style={{
           paddingTop: BEST_PRODUCTS_GRID_OFFSET_TOP_PX,
@@ -54,6 +65,7 @@ export function BestProductsBlock({ products }: BestProductsBlockProps) {
             eager={resolveProductCardEagerMount(index, 'grid-4')}
             minHeightPx={HOME_PRODUCT_CARD_HEIGHT_PX}
             prefetchHorizontalPx={LAZY_LOAD_ROOT_MARGIN_PX}
+            className="shrink-0"
             fallback={
               <ProductCardMountPlaceholder
                 variant="grid"
@@ -62,10 +74,15 @@ export function BestProductsBlock({ products }: BestProductsBlockProps) {
               />
             }
           >
-            <HomeProductCard
-              product={product}
-              imagePriority={resolveProductCardImagePriority(index, 'grid-4')}
-            />
+            <div
+              className={shouldAppear ? PRODUCT_APPEAR_CLASS : PRODUCT_APPEAR_PENDING_CLASS}
+              style={shouldAppear ? productAppearStyle(index) : undefined}
+            >
+              <HomeProductCard
+                product={product}
+                imagePriority={resolveProductCardImagePriority(index, 'grid-4')}
+              />
+            </div>
           </LazyWhenVisible>
         ))}
       </div>

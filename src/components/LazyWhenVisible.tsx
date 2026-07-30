@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { LAZY_LOAD_ROOT_MARGIN_PX } from '../constants/lazy-loading';
+import {
+  PRODUCT_APPEAR_CLASS,
+  productAppearStyle,
+} from '../constants/product-appear';
 
 interface LazyWhenVisibleProps {
   children: ReactNode;
@@ -13,6 +17,8 @@ interface LazyWhenVisibleProps {
   fallback?: ReactNode;
   /** Skip the observer and mount children immediately (above-the-fold slots). */
   eager?: boolean;
+  /** Sequential cascade when the card mounts / enters view. */
+  appearIndex?: number;
 }
 
 /**
@@ -27,6 +33,7 @@ export function LazyWhenVisible({
   className,
   fallback,
   eager = false,
+  appearIndex,
 }: LazyWhenVisibleProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(eager);
@@ -68,9 +75,20 @@ export function LazyWhenVisible({
 
   const style: CSSProperties | undefined = isVisible ? undefined : { minHeight: minHeightPx };
 
+  const content =
+    isVisible && appearIndex !== undefined ? (
+      <div className={PRODUCT_APPEAR_CLASS} style={productAppearStyle(appearIndex)}>
+        {children}
+      </div>
+    ) : isVisible ? (
+      children
+    ) : (
+      fallback
+    );
+
   return (
     <div ref={ref} className={className} style={style}>
-      {isVisible ? children : fallback}
+      {content}
     </div>
   );
 }

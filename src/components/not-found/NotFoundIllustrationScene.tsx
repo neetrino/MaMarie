@@ -12,6 +12,7 @@ import {
   NOT_FOUND_ILLUSTRATION_MAX_WIDTH_PX,
   NOT_FOUND_ILLUSTRATION_WIDTH_PX,
 } from '../../constants/not-found-page';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 function buildBunnyTransform(): string {
   return [
@@ -50,36 +51,44 @@ export function NotFoundIllustrationScene() {
           left: `${NOT_FOUND_DECO_RIGHT_LEFT_PERCENT}%`,
           top: `${NOT_FOUND_DECO_RIGHT_TOP_PERCENT}%`,
           width: `${NOT_FOUND_DECO_RIGHT_WIDTH_PERCENT}%`,
-          transform: `rotate(${NOT_FOUND_DECO_RIGHT_ROTATE_DEG}deg)`,
         }}
       >
-        <Image
-          src={NOT_FOUND_ASSETS.decoRight}
-          alt=""
-          fill
-          className="object-contain"
-          sizes="125px"
-        />
+        <DecorationMotionShell motion="bounce">
+          <div
+            className="relative h-full w-full"
+            style={{ transform: `rotate(${NOT_FOUND_DECO_RIGHT_ROTATE_DEG}deg)` }}
+          >
+            <Image
+              src={NOT_FOUND_ASSETS.decoRight}
+              alt=""
+              fill
+              className="object-contain"
+              sizes="125px"
+            />
+          </div>
+        </DecorationMotionShell>
       </div>
 
       <div
         aria-hidden
         className="not-found-deco-bunny-slot not-found-deco-bunny pointer-events-none absolute flex items-center justify-center"
       >
-        <div
-          className="not-found-deco-bunny relative shrink-0"
-          style={{
-            transform: buildBunnyTransform(),
-          }}
-        >
-          <Image
-            src={NOT_FOUND_ASSETS.decoBunny}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="(max-width: 1023px) 100px, 156px"
-          />
-        </div>
+        <DecorationMotionShell motion="floatSoft">
+          <div
+            className="not-found-deco-bunny relative shrink-0"
+            style={{
+              transform: buildBunnyTransform(),
+            }}
+          >
+            <Image
+              src={NOT_FOUND_ASSETS.decoBunny}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 1023px) 100px, 156px"
+            />
+          </div>
+        </DecorationMotionShell>
       </div>
     </div>
   );

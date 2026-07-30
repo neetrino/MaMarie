@@ -153,6 +153,7 @@ export function RelatedProducts({
                 eager={resolveProductCardEagerMount(index, 'grid-4')}
                 minHeightPx={MOBILE_PRODUCTS_CATALOG_CARD_HEIGHT_PX}
                 prefetchHorizontalPx={LAZY_LOAD_ROOT_MARGIN_PX}
+                appearIndex={index}
                 className="shrink-0 snap-start"
                 fallback={
                   <ProductCardMountPlaceholder
@@ -178,6 +179,7 @@ export function RelatedProducts({
                 eager={resolveProductCardEagerMount(index, 'grid-4')}
                 minHeightPx={PRODUCTS_CATALOG_CARD_HEIGHT_PX}
                 prefetchHorizontalPx={LAZY_LOAD_ROOT_MARGIN_PX}
+                appearIndex={index}
                 className="shrink-0 snap-start"
                 fallback={
                   <div className="shrink-0 snap-start" style={{ width: PRODUCTS_CATALOG_CARD_WIDTH_PX }}>

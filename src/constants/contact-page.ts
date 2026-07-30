@@ -16,6 +16,12 @@ export const CONTACT_INFO_HEADING_TO_BODY_GAP_PX = 12;
 /** Two-column contact page layout — equal width left/right. */
 export const CONTACT_PAGE_COLUMN_GAP_PX = 48;
 
+/** Smooth enter: info column from left, form from right. */
+export const CONTACT_PAGE_CONTENT_ENTER_STAGGER_MS = {
+  info: 0,
+  form: 220,
+} as const;
+
 /** Mobile — same horizontal track as navbar (`74:729`). */
 export const CONTACT_PAGE_MOBILE_HORIZONTAL_PADDING_PX = HEADER_MOBILE_PADDING_X_PX;
 /** Extra right inset on mobile — room for form strawberry overhang (`-20px` + scale). */

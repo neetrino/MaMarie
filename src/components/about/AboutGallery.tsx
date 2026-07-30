@@ -1,4 +1,9 @@
+'use client';
+
 import Image from 'next/image';
+import {
+  ABOUT_PAGE_GALLERY_ENTER_STAGGER_MS,
+} from '../../constants/about-us-enter';
 import {
   ABOUT_PAGE_ASSETS,
   ABOUT_PAGE_BIRD_IMAGE_SIZE_PX,
@@ -27,6 +32,8 @@ import {
   ABOUT_PAGE_STRAWBERRY_TOP_PX,
   ABOUT_PAGE_STRAWBERRY_WRAPPER_SIZE_PX,
 } from '../../constants/about-page';
+import { useAppearWhenInView } from '../../lib/use-appear-when-in-view';
+import { AboutUsEnterShell } from '../home/AboutUsEnterShell';
 import { AboutDecoration } from './AboutDecoration';
 
 interface AboutGalleryProps {
@@ -69,6 +76,7 @@ function GalleryPinkCard({ paragraphs }: { paragraphs: [string, string] }) {
     >
       <AboutDecoration
         imageSrc={ABOUT_PAGE_ASSETS.decoBird}
+        motion="sway"
         layout={{
           leftPx: ABOUT_PAGE_BIRD_LEFT_PX,
           topPx: ABOUT_PAGE_BIRD_TOP_PX,
@@ -97,10 +105,17 @@ function GalleryPinkCard({ paragraphs }: { paragraphs: [string, string] }) {
 
 /**
  * Four-panel gallery — Figma `307:626`.
+ * Outer pair slides from the sides; inner pair follows.
  */
 export function AboutGallery({ pinkParagraphs }: AboutGalleryProps) {
+  const { ref, shouldAppear } = useAppearWhenInView({
+    bottomInsetPercent: 18,
+    minRatio: 0.15,
+  });
+
   return (
     <div
+      ref={ref}
       className="absolute left-0 w-full overflow-visible"
       style={{
         top: 0,
@@ -115,14 +130,39 @@ export function AboutGallery({ pinkParagraphs }: AboutGalleryProps) {
           marginLeft: ABOUT_PAGE_GALLERY_ROW_OFFSET_X_PX,
         }}
       >
-        <GalleryPhotoCard src={ABOUT_PAGE_ASSETS.gallery1} alt="" />
-        <GalleryPhotoCard src={ABOUT_PAGE_ASSETS.gallery2} alt="" />
-        <GalleryPinkCard paragraphs={pinkParagraphs} />
-        <GalleryPhotoCard src={ABOUT_PAGE_ASSETS.gallery3} alt="" />
+        <AboutUsEnterShell
+          side="left"
+          delayMs={ABOUT_PAGE_GALLERY_ENTER_STAGGER_MS.leftOuter}
+          shouldEnter={shouldAppear}
+        >
+          <GalleryPhotoCard src={ABOUT_PAGE_ASSETS.gallery1} alt="" />
+        </AboutUsEnterShell>
+        <AboutUsEnterShell
+          side="left"
+          delayMs={ABOUT_PAGE_GALLERY_ENTER_STAGGER_MS.leftInner}
+          shouldEnter={shouldAppear}
+        >
+          <GalleryPhotoCard src={ABOUT_PAGE_ASSETS.gallery2} alt="" />
+        </AboutUsEnterShell>
+        <AboutUsEnterShell
+          side="right"
+          delayMs={ABOUT_PAGE_GALLERY_ENTER_STAGGER_MS.rightInner}
+          shouldEnter={shouldAppear}
+        >
+          <GalleryPinkCard paragraphs={pinkParagraphs} />
+        </AboutUsEnterShell>
+        <AboutUsEnterShell
+          side="right"
+          delayMs={ABOUT_PAGE_GALLERY_ENTER_STAGGER_MS.rightOuter}
+          shouldEnter={shouldAppear}
+        >
+          <GalleryPhotoCard src={ABOUT_PAGE_ASSETS.gallery3} alt="" />
+        </AboutUsEnterShell>
       </div>
 
       <AboutDecoration
         imageSrc={ABOUT_PAGE_ASSETS.decoStrawberry}
+        motion="float"
         layout={{
           leftPx: ABOUT_PAGE_STRAWBERRY_LEFT_PX,
           topPx: ABOUT_PAGE_STRAWBERRY_TOP_PX,

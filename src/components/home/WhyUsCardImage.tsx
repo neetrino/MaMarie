@@ -4,10 +4,13 @@ import {
   WHY_US_LAYOUT_SCALE,
   type WhyUsCardImageLayout,
 } from '../../constants/why-us-section';
+import type { DecorationMotion } from '../../constants/decoration-motion';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 interface WhyUsCardImageProps {
   src: string;
   layout: WhyUsCardImageLayout;
+  motion: DecorationMotion;
 }
 
 function scalePx(value: number): number {
@@ -107,19 +110,25 @@ function WhyUsCardImageRotated({
 }
 
 /** Figma `51:378`–`51:401` — card image areas. */
-export function WhyUsCardImage({ src, layout }: WhyUsCardImageProps) {
+export function WhyUsCardImage({ src, layout, motion }: WhyUsCardImageProps) {
   return (
     <div
       aria-hidden
-      className="relative shrink-0 overflow-hidden bg-white"
+      className="relative shrink-0 overflow-visible bg-white"
       style={{
         width: WHY_US_IMAGE_BOX_WIDTH_PX,
         height: WHY_US_IMAGE_BOX_HEIGHT_PX,
       }}
     >
-      {layout.kind === 'fill' ? <WhyUsCardImageFill src={src} layout={layout} /> : null}
-      {layout.kind === 'crop' ? <WhyUsCardImageCrop src={src} layout={layout} /> : null}
-      {layout.kind === 'rotated' ? <WhyUsCardImageRotated src={src} layout={layout} /> : null}
+      <DecorationMotionShell motion={motion} className="relative h-full w-full">
+        <div className="relative h-full w-full overflow-hidden">
+          {layout.kind === 'fill' ? <WhyUsCardImageFill src={src} layout={layout} /> : null}
+          {layout.kind === 'crop' ? <WhyUsCardImageCrop src={src} layout={layout} /> : null}
+          {layout.kind === 'rotated' ? (
+            <WhyUsCardImageRotated src={src} layout={layout} />
+          ) : null}
+        </div>
+      </DecorationMotionShell>
     </div>
   );
 }

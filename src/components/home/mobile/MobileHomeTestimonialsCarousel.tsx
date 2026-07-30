@@ -12,6 +12,7 @@ import {
   MOBILE_HOME_TESTIMONIAL_YELLOW_BG,
 } from '../../../constants/mobile-home';
 import { useTranslation } from '../../../lib/i18n-client';
+import { DecorationMotionShell } from '../../decoration-motion/DecorationMotionShell';
 import { MobileCarouselDots } from './MobileCarouselDots';
 import { useHorizontalScrollIndex } from './useHorizontalScrollIndex';
 
@@ -80,13 +81,15 @@ function PromoCard() {
         {t('home.mobile.testimonials.promoTitle')}
       </p>
 
-      <Image
-        src={MOBILE_HOME_ASSETS.promoImage}
-        alt=""
-        width={207}
-        height={262}
-        className="pointer-events-none absolute -top-14 right-0 rounded-br-[30px] object-cover"
-      />
+      <DecorationMotionShell motion="floatSoft" inline className="pointer-events-none absolute -top-14 right-0">
+        <Image
+          src={MOBILE_HOME_ASSETS.promoImage}
+          alt=""
+          width={207}
+          height={262}
+          className="rounded-br-[30px] object-cover"
+        />
+      </DecorationMotionShell>
 
       <Link
         href="/products"
