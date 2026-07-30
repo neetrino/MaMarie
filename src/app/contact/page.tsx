@@ -4,10 +4,12 @@ import type { CSSProperties } from 'react';
 import { ContactForm } from '../../components/contact/ContactForm';
 import { ContactInfoBlock } from '../../components/contact/ContactInfoBlock';
 import { ContactPageShell } from '../../components/contact/ContactPageShell';
+import { AboutUsEnterShell } from '../../components/home/AboutUsEnterShell';
 import { CONTACT_FORM_SECTION_BG } from '../../constants/contact-form';
 import {
   CONTACT_PAGE_ASSETS,
   CONTACT_PAGE_COLUMN_GAP_PX,
+  CONTACT_PAGE_CONTENT_ENTER_STAGGER_MS,
   CONTACT_PAGE_MOBILE_BG,
   CONTACT_PAGE_MOBILE_HORIZONTAL_PADDING_PX,
   CONTACT_PAGE_MOBILE_PADDING_BOTTOM_PX,
@@ -15,6 +17,7 @@ import {
   CONTACT_PAGE_MOBILE_PADDING_TOP_PX,
 } from '../../constants/contact-page';
 import { useTranslation } from '../../lib/i18n-client';
+import { useAppearWhenInView } from '../../lib/use-appear-when-in-view';
 
 const contactMobilePageStyle = {
   paddingTop: CONTACT_PAGE_MOBILE_PADDING_TOP_PX,
@@ -28,39 +31,55 @@ const contactGridStyle = { gap: CONTACT_PAGE_COLUMN_GAP_PX } as CSSProperties;
 
 function ContactPageContent() {
   const { t } = useTranslation();
+  const { ref, shouldAppear } = useAppearWhenInView({
+    bottomInsetPercent: 12,
+    minRatio: 0.1,
+  });
 
   return (
     <div
+      ref={ref}
       className="grid grid-cols-1 xl:grid-cols-2 xl:items-stretch"
       style={contactGridStyle}
     >
-      <div className="flex w-full min-w-0 flex-col gap-8 max-lg:translate-x-4 lg:mx-auto lg:max-w-2xl xl:mx-0 xl:max-w-none">
-        <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconPhone} title={t('contact.callToUs.title')}>
-          <p className="mb-2 text-gray-600">{t('contact.callToUs.description')}</p>
-          <a href={`tel:${t('contact.phone')}`} className="font-medium text-gray-700 hover:text-gray-900">
-            {t('contact.phone')}
-          </a>
-        </ContactInfoBlock>
+      <AboutUsEnterShell
+        side="left"
+        delayMs={CONTACT_PAGE_CONTENT_ENTER_STAGGER_MS.info}
+        shouldEnter={shouldAppear}
+      >
+        <div className="flex w-full min-w-0 flex-col gap-8 max-lg:translate-x-4 lg:mx-auto lg:max-w-2xl xl:mx-0 xl:max-w-none">
+          <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconPhone} title={t('contact.callToUs.title')}>
+            <p className="mb-2 text-gray-600">{t('contact.callToUs.description')}</p>
+            <a href={`tel:${t('contact.phone')}`} className="font-medium text-gray-700 hover:text-gray-900">
+              {t('contact.phone')}
+            </a>
+          </ContactInfoBlock>
 
-        <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconMail} title={t('contact.writeToUs.title')}>
-          <p className="mb-2 text-gray-600">{t('contact.writeToUs.description')}</p>
-          <a href={`mailto:${t('contact.email')}`} className="font-medium text-gray-700 hover:text-gray-900">
-            {t('contact.writeToUs.emailLabel')} {t('contact.email')}
-          </a>
-        </ContactInfoBlock>
+          <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconMail} title={t('contact.writeToUs.title')}>
+            <p className="mb-2 text-gray-600">{t('contact.writeToUs.description')}</p>
+            <a href={`mailto:${t('contact.email')}`} className="font-medium text-gray-700 hover:text-gray-900">
+              {t('contact.writeToUs.emailLabel')} {t('contact.email')}
+            </a>
+          </ContactInfoBlock>
 
-        <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconLocation} title={t('contact.headquarter.title')}>
-          <div className="mb-2 space-y-1 text-gray-600">
-            <p>{t('contact.headquarter.hours.weekdays')}</p>
-            <p>{t('contact.headquarter.hours.saturday')}</p>
-          </div>
-          <p className="font-medium text-gray-700">{t('contact.address')}</p>
-        </ContactInfoBlock>
-      </div>
+          <ContactInfoBlock iconSrc={CONTACT_PAGE_ASSETS.iconLocation} title={t('contact.headquarter.title')}>
+            <div className="mb-2 space-y-1 text-gray-600">
+              <p>{t('contact.headquarter.hours.weekdays')}</p>
+              <p>{t('contact.headquarter.hours.saturday')}</p>
+            </div>
+            <p className="font-medium text-gray-700">{t('contact.address')}</p>
+          </ContactInfoBlock>
+        </div>
+      </AboutUsEnterShell>
 
-      <div className="relative flex w-full min-w-0 overflow-visible max-lg:-mr-8 max-lg:w-[calc(100%+32px)] lg:mx-auto lg:max-w-2xl xl:mx-0 xl:max-w-none">
+      <AboutUsEnterShell
+        side="right"
+        delayMs={CONTACT_PAGE_CONTENT_ENTER_STAGGER_MS.form}
+        shouldEnter={shouldAppear}
+        className="relative flex w-full min-w-0 overflow-visible max-lg:-mr-8 max-lg:w-[calc(100%+32px)] lg:mx-auto lg:max-w-2xl xl:mx-0 xl:max-w-none"
+      >
         <ContactForm />
-      </div>
+      </AboutUsEnterShell>
     </div>
   );
 }
