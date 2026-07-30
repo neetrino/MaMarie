@@ -43,7 +43,12 @@ import {
   ABOUT_US_TEXT_SIZE_PX,
   type AboutUsDecorationLayout,
 } from '../../constants/about-us-section';
+import {
+  decorationMotionAt,
+  type DecorationMotion,
+} from '../../constants/decoration-motion';
 import { useTranslation } from '../../lib/i18n-client';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 const ABOUT_US_STORY_LOGO_INLINE_RAISE_PX = 10;
 const ABOUT_US_STORY_TEXT_BLOCK_RAISE_PX = 6;
@@ -80,9 +85,11 @@ function AboutUsBrandLogo({
 function AboutUsDecoration({
   layout,
   imageSrc,
+  motion,
 }: {
   layout: AboutUsDecorationLayout;
   imageSrc: string;
+  motion: DecorationMotion;
 }) {
   const transform = [
     layout.flipX ? 'scaleX(-1)' : '',
@@ -104,24 +111,26 @@ function AboutUsDecoration({
         zIndex: layout.zIndex,
       }}
     >
-      <div
-        className="relative shrink-0"
-        style={{
-          width: layout.imageSizePx,
-          height: layout.imageSizePx,
-          transform,
-        }}
-      >
-        <img
-          src={imageSrc}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="size-full object-cover"
-          width={layout.imageSizePx}
-          height={layout.imageSizePx}
-        />
-      </div>
+      <DecorationMotionShell motion={motion}>
+        <div
+          className="relative shrink-0"
+          style={{
+            width: layout.imageSizePx,
+            height: layout.imageSizePx,
+            transform,
+          }}
+        >
+          <img
+            src={imageSrc}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover"
+            width={layout.imageSizePx}
+            height={layout.imageSizePx}
+          />
+        </div>
+      </DecorationMotionShell>
     </div>
   );
 }
@@ -163,8 +172,13 @@ function AboutUsSideCard({
         {text}
       </p>
 
-      {decorations.map((deco) => (
-        <AboutUsDecoration key={deco.imageSrc} layout={deco} imageSrc={deco.imageSrc} />
+      {decorations.map((deco, index) => (
+        <AboutUsDecoration
+          key={deco.imageSrc}
+          layout={deco}
+          imageSrc={deco.imageSrc}
+          motion={decorationMotionAt(index)}
+        />
       ))}
     </article>
   );
@@ -236,8 +250,13 @@ function AboutUsStoryColumn({
         </div>
       </article>
 
-      {ABOUT_US_STORY_DECORATIONS.map((deco) => (
-        <AboutUsDecoration key={deco.imageSrc} layout={deco} imageSrc={deco.imageSrc} />
+      {ABOUT_US_STORY_DECORATIONS.map((deco, index) => (
+        <AboutUsDecoration
+          key={deco.imageSrc}
+          layout={deco}
+          imageSrc={deco.imageSrc}
+          motion={decorationMotionAt(index)}
+        />
       ))}
     </div>
   );

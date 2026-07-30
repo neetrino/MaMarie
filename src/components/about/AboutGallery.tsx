@@ -69,6 +69,7 @@ function GalleryPinkCard({ paragraphs }: { paragraphs: [string, string] }) {
     >
       <AboutDecoration
         imageSrc={ABOUT_PAGE_ASSETS.decoBird}
+        motion="sway"
         layout={{
           leftPx: ABOUT_PAGE_BIRD_LEFT_PX,
           topPx: ABOUT_PAGE_BIRD_TOP_PX,
@@ -123,6 +124,7 @@ export function AboutGallery({ pinkParagraphs }: AboutGalleryProps) {
 
       <AboutDecoration
         imageSrc={ABOUT_PAGE_ASSETS.decoStrawberry}
+        motion="float"
         layout={{
           leftPx: ABOUT_PAGE_STRAWBERRY_LEFT_PX,
           topPx: ABOUT_PAGE_STRAWBERRY_TOP_PX,

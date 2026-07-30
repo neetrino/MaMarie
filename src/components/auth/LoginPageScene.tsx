@@ -28,6 +28,7 @@ import {
   SIGN_IN_CARD_OFFSET_TOP_MOBILE_PX,
   SIGN_IN_CARD_OFFSET_TOP_PX,
 } from '../../constants/login-page';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 import { LoginPodFormBackground } from './LoginPodFormBackground';
 
 interface LoginPageSceneProps {
@@ -91,14 +92,18 @@ export function LoginPageScene({
             height: LOGIN_DECO_BOW_SIZE_PX,
           }}
         >
-          <Image
-            src={LOGIN_PAGE_ASSETS.bow}
-            alt=""
-            fill
-            className="object-contain"
-            sizes={`${LOGIN_DECO_BOW_SIZE_PX}px`}
-            aria-hidden
-          />
+          <DecorationMotionShell motion="sway">
+            <div className="relative h-full w-full">
+              <Image
+                src={LOGIN_PAGE_ASSETS.bow}
+                alt=""
+                fill
+                className="object-contain"
+                sizes={`${LOGIN_DECO_BOW_SIZE_PX}px`}
+                aria-hidden
+              />
+            </div>
+          </DecorationMotionShell>
         </div>
 
         <div

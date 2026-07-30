@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Image from 'next/image';
 import {
   HERO_ASSETS,
@@ -9,6 +10,8 @@ import {
   heroPctX,
   heroPctY,
 } from '../../constants/hero';
+import type { DecorationMotion } from '../../constants/decoration-motion';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 interface HeroSceneLayerProps {
   layer: HeroSceneLayer;
@@ -72,6 +75,20 @@ function rotatedImageClassName(layer: HeroRotatedPlacement): string {
   return layer.objectPosition === 'bottom' ? 'object-bottom object-cover' : 'object-cover';
 }
 
+function OptionalMotion({
+  motion,
+  children,
+}: {
+  motion: DecorationMotion | undefined;
+  children: ReactNode;
+}) {
+  if (!motion) {
+    return children;
+  }
+
+  return <DecorationMotionShell motion={motion}>{children}</DecorationMotionShell>;
+}
+
 function HeroRotatedLayer({ layer }: { layer: HeroRotatedPlacement }) {
   const innerTransform = [layer.flipY ? 'scaleY(-1)' : '', `rotate(${layer.rotateDeg}deg)`]
     .filter(Boolean)
@@ -88,25 +105,27 @@ function HeroRotatedLayer({ layer }: { layer: HeroRotatedPlacement }) {
         zIndex: layer.zIndex,
       }}
     >
-      <div
-        className="relative flex-none overflow-visible"
-        style={{
-          transform: innerTransform,
-          width: innerSizePercent(layer.containerWidthPx, layer.imageWidthPx),
-          height: innerSizePercent(layer.containerHeightPx, layer.imageHeightPx),
-        }}
-      >
-        <Image
-          src={HERO_ASSETS[layer.assetKey]}
-          alt=""
-          fill
-          priority
-          unoptimized
-          quality={100}
-          sizes={`${layer.imageWidthPx}px`}
-          className={`max-w-none ${rotatedImageClassName(layer)}`}
-        />
-      </div>
+      <OptionalMotion motion={layer.motion}>
+        <div
+          className="relative flex-none overflow-visible"
+          style={{
+            transform: innerTransform,
+            width: innerSizePercent(layer.containerWidthPx, layer.imageWidthPx),
+            height: innerSizePercent(layer.containerHeightPx, layer.imageHeightPx),
+          }}
+        >
+          <Image
+            src={HERO_ASSETS[layer.assetKey]}
+            alt=""
+            fill
+            priority
+            unoptimized
+            quality={100}
+            sizes={`${layer.imageWidthPx}px`}
+            className={`max-w-none ${rotatedImageClassName(layer)}`}
+          />
+        </div>
+      </OptionalMotion>
     </div>
   );
 }

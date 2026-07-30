@@ -1,5 +1,6 @@
 'use client';
 
+import type { DecorationMotion } from '../../constants/decoration-motion';
 import {
   WHY_US_CARD_DESCRIPTION_COLOR,
   WHY_US_CARD_DESCRIPTION_LINE_HEIGHT_PX,
@@ -22,13 +23,14 @@ export interface WhyUsCardContent {
 interface WhyUsCardProps {
   layout: WhyUsCardLayout;
   content: WhyUsCardContent;
+  motion: DecorationMotion;
 }
 
 function scalePx(value: number): number {
   return value * WHY_US_LAYOUT_SCALE;
 }
 
-export function WhyUsCard({ layout, content }: WhyUsCardProps) {
+export function WhyUsCard({ layout, content, motion }: WhyUsCardProps) {
   return (
     <article
       className="flex shrink-0 flex-col items-center"
@@ -37,7 +39,7 @@ export function WhyUsCard({ layout, content }: WhyUsCardProps) {
         gap: scalePx(layout.sectionGapPx),
       }}
     >
-      <WhyUsCardImage src={layout.imageSrc} layout={layout.imageLayout} />
+      <WhyUsCardImage src={layout.imageSrc} layout={layout.imageLayout} motion={motion} />
 
       <div
         className="flex shrink-0 flex-col items-center"

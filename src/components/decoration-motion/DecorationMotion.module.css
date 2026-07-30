@@ -1,0 +1,147 @@
+/**
+ * Idle float / sway for clay decorations.
+ * Applied on a wrapper outside Figma rotate so base orientation stays intact.
+ */
+
+.root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  animation-name: deco-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: var(--deco-motion-duration);
+  animation-delay: var(--deco-motion-delay);
+}
+
+.inline {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+}
+
+.float {
+  --deco-motion-x: 5px;
+  --deco-motion-y: 10px;
+  --deco-motion-rotate: 3deg;
+}
+
+.floatSoft {
+  --deco-motion-x: 4px;
+  --deco-motion-y: 7px;
+  --deco-motion-rotate: 2deg;
+  animation-name: deco-float;
+}
+
+.bounce {
+  --deco-motion-x: 4px;
+  --deco-motion-y: 12px;
+  --deco-motion-rotate: 3.5deg;
+  animation-name: deco-bounce;
+}
+
+.sway {
+  --deco-motion-x: 7px;
+  --deco-motion-y: 6px;
+  --deco-motion-rotate: 4deg;
+  animation-name: deco-sway;
+}
+
+.archDrift,
+.archDriftAlt {
+  --deco-motion-x: 3px;
+  --deco-motion-y: 5px;
+  --deco-motion-rotate: 0.8deg;
+  animation-name: deco-arch;
+}
+
+@keyframes deco-float {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(var(--deco-motion-x), calc(var(--deco-motion-y) * -0.55))
+      rotate(var(--deco-motion-rotate));
+  }
+
+  50% {
+    transform: translate(0, calc(var(--deco-motion-y) * -1)) rotate(0deg);
+  }
+
+  75% {
+    transform: translate(calc(var(--deco-motion-x) * -1), calc(var(--deco-motion-y) * -0.35))
+      rotate(calc(var(--deco-motion-rotate) * -1));
+  }
+}
+
+@keyframes deco-bounce {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  30% {
+    transform: translate(calc(var(--deco-motion-x) * 0.6), calc(var(--deco-motion-y) * -1))
+      rotate(calc(var(--deco-motion-rotate) * 0.7));
+  }
+
+  55% {
+    transform: translate(calc(var(--deco-motion-x) * -0.4), calc(var(--deco-motion-y) * -0.25))
+      rotate(calc(var(--deco-motion-rotate) * -0.5));
+  }
+
+  75% {
+    transform: translate(calc(var(--deco-motion-x) * 0.25), calc(var(--deco-motion-y) * -0.7))
+      rotate(calc(var(--deco-motion-rotate) * 0.35));
+  }
+}
+
+@keyframes deco-sway {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(var(--deco-motion-x), calc(var(--deco-motion-y) * -0.4))
+      rotate(var(--deco-motion-rotate));
+  }
+
+  50% {
+    transform: translate(0, calc(var(--deco-motion-y) * -0.85)) rotate(0deg);
+  }
+
+  75% {
+    transform: translate(calc(var(--deco-motion-x) * -1), calc(var(--deco-motion-y) * -0.3))
+      rotate(calc(var(--deco-motion-rotate) * -1));
+  }
+}
+
+@keyframes deco-arch {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(var(--deco-motion-x), calc(var(--deco-motion-y) * -0.7))
+      rotate(var(--deco-motion-rotate));
+  }
+
+  66% {
+    transform: translate(calc(var(--deco-motion-x) * -0.7), calc(var(--deco-motion-y) * -0.35))
+      rotate(calc(var(--deco-motion-rotate) * -1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: none;
+    will-change: auto;
+  }
+}

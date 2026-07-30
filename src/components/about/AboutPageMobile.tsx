@@ -234,6 +234,7 @@ export function AboutPageMobile({ copy }: { copy: AboutPageCopy }) {
 
           <AboutDecoration
             imageSrc={ABOUT_PAGE_ASSETS.decoStrawberry}
+            motion="bounce"
             layout={{
               leftPx: ABOUT_PAGE_MOBILE_STRAWBERRY_LEFT_PX,
               topPx: ABOUT_PAGE_MOBILE_STRAWBERRY_TOP_PX,

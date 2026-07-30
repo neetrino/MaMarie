@@ -187,6 +187,7 @@ export function AboutPageDesktop({ copy }: { copy: AboutPageCopy }) {
 
       <AboutDecoration
         imageSrc={ABOUT_PAGE_ASSETS.decoBunny}
+        motion="floatSoft"
         layout={{
           leftPx: ABOUT_PAGE_BUNNY_LEFT_PX,
           topPx: ABOUT_PAGE_BUNNY_TOP_PX,

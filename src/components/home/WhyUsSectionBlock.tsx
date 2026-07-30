@@ -10,6 +10,7 @@ import {
   WHY_US_HEADING_PADDING_Y_PX,
   WHY_US_TITLE_LINE_HEIGHT_PX,
 } from '../../constants/why-us-section';
+import { decorationMotionAt } from '../../constants/decoration-motion';
 import { useTranslation } from '../../lib/i18n-client';
 import { HomeSectionHeadingRow } from './HomeSectionHeading';
 import type { WhyUsCardContent } from './WhyUsCard';
@@ -36,7 +37,7 @@ function WhyUsCardItem({ index }: { index: number }) {
     return null;
   }
 
-  return <WhyUsCard layout={layout} content={content} />;
+  return <WhyUsCard layout={layout} content={content} motion={decorationMotionAt(index)} />;
 }
 
 export function WhyUsSectionBlock() {
