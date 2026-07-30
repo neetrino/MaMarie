@@ -1,0 +1,63 @@
+.pendingFromLeft,
+.pendingFromRight {
+  opacity: 0;
+}
+
+.pendingFromLeft {
+  transform: translateX(calc(var(--about-us-enter-distance, 48px) * -1));
+}
+
+.pendingFromRight {
+  transform: translateX(var(--about-us-enter-distance, 48px));
+}
+
+.fromLeft {
+  animation-name: about-us-enter-from-left;
+  animation-duration: var(--about-us-enter-duration, 1450ms);
+  animation-delay: var(--about-us-enter-delay, 0ms);
+  animation-timing-function: cubic-bezier(0.14, 1, 0.28, 1);
+  animation-fill-mode: both;
+}
+
+.fromRight {
+  animation-name: about-us-enter-from-right;
+  animation-duration: var(--about-us-enter-duration, 1450ms);
+  animation-delay: var(--about-us-enter-delay, 0ms);
+  animation-timing-function: cubic-bezier(0.14, 1, 0.28, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes about-us-enter-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--about-us-enter-distance, 48px) * -1));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes about-us-enter-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(var(--about-us-enter-distance, 48px));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pendingFromLeft,
+  .pendingFromRight,
+  .fromLeft,
+  .fromRight {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+}

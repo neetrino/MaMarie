@@ -2,6 +2,9 @@
 
 import type { CSSProperties } from 'react';
 import {
+  ABOUT_US_CARD_ENTER_STAGGER_MS,
+} from '../../constants/about-us-enter';
+import {
   ABOUT_US_ASSETS,
   ABOUT_US_CARD_LEFT_TEXT_WIDTH_PX,
   ABOUT_US_CARD_LEFT_WIDTH_PX,
@@ -43,12 +46,10 @@ import {
   ABOUT_US_TEXT_SIZE_PX,
   type AboutUsDecorationLayout,
 } from '../../constants/about-us-section';
-import {
-  decorationMotionAt,
-  type DecorationMotion,
-} from '../../constants/decoration-motion';
 import { useTranslation } from '../../lib/i18n-client';
-import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
+import { useAppearWhenInView } from '../../lib/use-appear-when-in-view';
+import { AboutUsEnterShell } from './AboutUsEnterShell';
+import { AboutUsHomeDecorations } from './AboutUsHomeDecoration';
 
 const ABOUT_US_STORY_LOGO_INLINE_RAISE_PX = 10;
 const ABOUT_US_STORY_TEXT_BLOCK_RAISE_PX = 6;
@@ -79,59 +80,6 @@ function AboutUsBrandLogo({
         }}
       />
     </span>
-  );
-}
-
-function AboutUsDecoration({
-  layout,
-  imageSrc,
-  motion,
-}: {
-  layout: AboutUsDecorationLayout;
-  imageSrc: string;
-  motion: DecorationMotion;
-}) {
-  const transform = [
-    layout.flipX ? 'scaleX(-1)' : '',
-    layout.flipY ? 'scaleY(-1)' : '',
-    layout.rotateDeg !== undefined ? `rotate(${layout.rotateDeg}deg)` : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute flex items-center justify-center"
-      style={{
-        left: layout.leftPx,
-        top: layout.topPx,
-        width: layout.wrapperSizePx,
-        height: layout.wrapperSizePx,
-        zIndex: layout.zIndex,
-      }}
-    >
-      <DecorationMotionShell motion={motion}>
-        <div
-          className="relative shrink-0"
-          style={{
-            width: layout.imageSizePx,
-            height: layout.imageSizePx,
-            transform,
-          }}
-        >
-          <img
-            src={imageSrc}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="size-full object-cover"
-            width={layout.imageSizePx}
-            height={layout.imageSizePx}
-          />
-        </div>
-      </DecorationMotionShell>
-    </div>
   );
 }
 
@@ -172,14 +120,7 @@ function AboutUsSideCard({
         {text}
       </p>
 
-      {decorations.map((deco, index) => (
-        <AboutUsDecoration
-          key={deco.imageSrc}
-          layout={deco}
-          imageSrc={deco.imageSrc}
-          motion={decorationMotionAt(index)}
-        />
-      ))}
+      <AboutUsHomeDecorations decorations={decorations} />
     </article>
   );
 }
@@ -250,23 +191,21 @@ function AboutUsStoryColumn({
         </div>
       </article>
 
-      {ABOUT_US_STORY_DECORATIONS.map((deco, index) => (
-        <AboutUsDecoration
-          key={deco.imageSrc}
-          layout={deco}
-          imageSrc={deco.imageSrc}
-          motion={decorationMotionAt(index)}
-        />
-      ))}
+      <AboutUsHomeDecorations decorations={ABOUT_US_STORY_DECORATIONS} />
     </div>
   );
 }
 
 export function AboutUsSectionBlock() {
   const { t } = useTranslation();
+  const { ref, shouldAppear } = useAppearWhenInView({
+    bottomInsetPercent: 18,
+    minRatio: 0.15,
+  });
 
   return (
     <div
+      ref={ref}
       className="relative w-full"
       style={{
         marginTop: -ABOUT_US_CONTENT_SHIFT_UP_PX,
@@ -280,19 +219,34 @@ export function AboutUsSectionBlock() {
           gap: ABOUT_US_CONTENT_GAP_PX,
         }}
       >
-        <AboutUsSideCard
-          text={t('home.aboutUs.introText')}
-          backgroundColor={ABOUT_US_CARD_WHITE_BG}
-          widthPx={ABOUT_US_CARD_LEFT_WIDTH_PX}
-          decorations={ABOUT_US_SIDE_CARD_DECORATIONS}
-        />
-        <AboutUsStoryColumn
-          storyLead={t('home.aboutUs.storyLead')}
-          storyBody={t('home.aboutUs.storyBody')}
-        />
+        <AboutUsEnterShell
+          side="left"
+          delayMs={ABOUT_US_CARD_ENTER_STAGGER_MS.left}
+          shouldEnter={shouldAppear}
+        >
+          <AboutUsSideCard
+            text={t('home.aboutUs.introText')}
+            backgroundColor={ABOUT_US_CARD_WHITE_BG}
+            widthPx={ABOUT_US_CARD_LEFT_WIDTH_PX}
+            decorations={ABOUT_US_SIDE_CARD_DECORATIONS}
+          />
+        </AboutUsEnterShell>
+        <AboutUsEnterShell
+          side="right"
+          delayMs={ABOUT_US_CARD_ENTER_STAGGER_MS.story}
+          shouldEnter={shouldAppear}
+        >
+          <AboutUsStoryColumn
+            storyLead={t('home.aboutUs.storyLead')}
+            storyBody={t('home.aboutUs.storyBody')}
+          />
+        </AboutUsEnterShell>
       </div>
 
-      <div
+      <AboutUsEnterShell
+        side="right"
+        delayMs={ABOUT_US_CARD_ENTER_STAGGER_MS.yellow}
+        shouldEnter={shouldAppear}
         className="absolute"
         style={{
           left: ABOUT_US_CARD_YELLOW_LEFT_PX,
@@ -305,7 +259,7 @@ export function AboutUsSectionBlock() {
           widthPx={ABOUT_US_CARD_YELLOW_WIDTH_PX}
           decorations={ABOUT_US_YELLOW_CARD_DECORATIONS}
         />
-      </div>
+      </AboutUsEnterShell>
     </div>
   );
 }
