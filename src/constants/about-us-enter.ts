@@ -1,11 +1,11 @@
 /** About Us / About page cards — slide in from sides when in view. */
-export const ABOUT_US_CARD_ENTER_DURATION_MS = 1450;
+export const ABOUT_US_CARD_ENTER_DURATION_MS = 1700;
 export const ABOUT_US_CARD_ENTER_DISTANCE_PX = 48;
 /** Home About Us: left intro, story, yellow. */
 export const ABOUT_US_CARD_ENTER_STAGGER_MS = {
   left: 0,
-  story: 200,
-  yellow: 380,
+  story: 240,
+  yellow: 460,
 } as const;
 
 /** /about gallery: 2 from left, 2 from right. */

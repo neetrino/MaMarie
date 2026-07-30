@@ -13,7 +13,7 @@
 
 .fromLeft {
   animation-name: about-us-enter-from-left;
-  animation-duration: var(--about-us-enter-duration, 1450ms);
+  animation-duration: var(--about-us-enter-duration, 1700ms);
   animation-delay: var(--about-us-enter-delay, 0ms);
   animation-timing-function: cubic-bezier(0.14, 1, 0.28, 1);
   animation-fill-mode: both;
@@ -21,7 +21,7 @@
 
 .fromRight {
   animation-name: about-us-enter-from-right;
-  animation-duration: var(--about-us-enter-duration, 1450ms);
+  animation-duration: var(--about-us-enter-duration, 1700ms);
   animation-delay: var(--about-us-enter-delay, 0ms);
   animation-timing-function: cubic-bezier(0.14, 1, 0.28, 1);
   animation-fill-mode: both;
