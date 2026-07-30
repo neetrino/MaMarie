@@ -170,6 +170,7 @@ export const ProductsGrid = memo(function ProductsGrid({
               key={product.id}
               eager={resolveProductCardEagerMount(index, viewMode)}
               minHeightPx={PRODUCTS_CATALOG_LIST_ROW_HEIGHT_PX}
+              appearIndex={index}
               fallback={<ProductCardMountPlaceholder variant="list" />}
             >
               <HomeProductCardListRow
@@ -204,6 +205,7 @@ export const ProductsGrid = memo(function ProductsGrid({
               key={product.id}
               eager={resolveProductCardEagerMount(index, viewMode)}
               minHeightPx={cardHeightPx}
+              appearIndex={index}
               fallback={
                 <ProductCardMountPlaceholder
                   variant="grid"

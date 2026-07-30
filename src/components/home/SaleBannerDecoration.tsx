@@ -15,6 +15,7 @@ import {
   SALE_BANNER_MAX_WIDTH_PX,
   SALE_SECTION_ASSETS,
 } from '../../constants/sale-section';
+import { DecorationMotionShell } from '../decoration-motion/DecorationMotionShell';
 
 function saleBannerPct(valuePx: number, basePx: number): string {
   return `${(valuePx / basePx) * 100}%`;
@@ -46,7 +47,7 @@ export function SaleBannerDecoration() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute flex items-center justify-center"
+      className="pointer-events-none absolute flex items-center justify-center overflow-visible"
       style={{
         left: saleBannerPct(SALE_BANNER_DECORATION_LEFT_PX, SALE_BANNER_MAX_WIDTH_PX),
         top: saleBannerPct(SALE_BANNER_DECORATION_TOP_PX, SALE_BANNER_HEIGHT_PX),
@@ -55,16 +56,18 @@ export function SaleBannerDecoration() {
         zIndex: SALE_BANNER_DECORATION_Z_INDEX,
       }}
     >
-      <div
-        className="flex-none"
-        style={{
-          transform: `rotate(${SALE_BANNER_DECORATION_ROTATE_DEG}deg)`,
-          width: `${SALE_BANNER_DECORATION_INNER_WIDTH_RATIO * 100}%`,
-          height: `${SALE_BANNER_DECORATION_INNER_HEIGHT_RATIO * 100}%`,
-        }}
-      >
-        <SaleBannerDecorationImage />
-      </div>
+      <DecorationMotionShell motion="sway">
+        <div
+          className="flex-none"
+          style={{
+            transform: `rotate(${SALE_BANNER_DECORATION_ROTATE_DEG}deg)`,
+            width: `${SALE_BANNER_DECORATION_INNER_WIDTH_RATIO * 100}%`,
+            height: `${SALE_BANNER_DECORATION_INNER_HEIGHT_RATIO * 100}%`,
+          }}
+        >
+          <SaleBannerDecorationImage />
+        </div>
+      </DecorationMotionShell>
     </div>
   );
 }

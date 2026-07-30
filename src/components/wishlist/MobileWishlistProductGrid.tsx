@@ -8,6 +8,10 @@ import {
   MOBILE_WISHLIST_CARD_WIDTH_PX,
   MOBILE_WISHLIST_TITLE_TO_GRID_GAP_PX,
 } from '../../constants/mobile-wishlist';
+import {
+  PRODUCT_APPEAR_CLASS,
+  productAppearStyle,
+} from '../../constants/product-appear';
 import type { HomeProductCardData } from '../home/HomeProductCard';
 import { ProductCardMountPlaceholder } from '../home/ProductCardMountPlaceholder';
 import { MobileWishlistProductCard } from './MobileWishlistProductCard';
@@ -36,13 +40,18 @@ export function MobileWishlistProductGrid({
       } as CSSProperties}
       aria-busy={loading}
     >
-      {products.map((product) => (
-        <MobileWishlistProductCard
+      {products.map((product, index) => (
+        <div
           key={product.id}
-          product={product}
-          imagePriority
-          addToCartLabel={addToCartLabel}
-        />
+          className={PRODUCT_APPEAR_CLASS}
+          style={productAppearStyle(index)}
+        >
+          <MobileWishlistProductCard
+            product={product}
+            imagePriority
+            addToCartLabel={addToCartLabel}
+          />
+        </div>
       ))}
 
       {loading && products.length === 0

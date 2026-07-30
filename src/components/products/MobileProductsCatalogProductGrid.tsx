@@ -30,6 +30,7 @@ export function MobileProductsCatalogProductGrid({
           key={product.id}
           product={product}
           imagePriority={index < 4}
+          appearIndex={index}
           addToCartLabel={addToCartLabel}
         />
       ))}

@@ -26,6 +26,10 @@ import {
   PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX,
 } from '../../constants/products-catalog';
 import {
+  PRODUCT_APPEAR_CLASS,
+  productAppearStyle,
+} from '../../constants/product-appear';
+import {
   WISHLIST_CARD_HEIGHT_PX,
   WISHLIST_CARD_ROW_GAP_PX,
   WISHLIST_CARD_WIDTH_PX,
@@ -139,14 +143,19 @@ export default function WishlistPage() {
                 rowGap: WISHLIST_CARD_ROW_GAP_PX,
               }}
             >
-              {cardProducts.map((product) => (
-                <HomeProductCard
+              {cardProducts.map((product, index) => (
+                <div
                   key={product.id}
-                  product={product}
-                  layoutWidthPx={WISHLIST_CARD_WIDTH_PX}
-                  layoutHeightPx={WISHLIST_CARD_HEIGHT_PX}
-                  imagePriority
-                />
+                  className={PRODUCT_APPEAR_CLASS}
+                  style={productAppearStyle(index)}
+                >
+                  <HomeProductCard
+                    product={product}
+                    layoutWidthPx={WISHLIST_CARD_WIDTH_PX}
+                    layoutHeightPx={WISHLIST_CARD_HEIGHT_PX}
+                    imagePriority
+                  />
+                </div>
               ))}
 
               {loading && cardProducts.length === 0
