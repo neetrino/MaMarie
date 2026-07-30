@@ -45,6 +45,7 @@ import {
 } from '../../constants/about-page';
 import { AboutDecoration } from './AboutDecoration';
 import { AboutGallery } from './AboutGallery';
+import { AboutPageTitle } from './AboutPageTitle';
 
 export interface AboutPageCopy {
   leadLine1: string;
@@ -166,19 +167,14 @@ export function AboutPageDesktop({ copy }: { copy: AboutPageCopy }) {
         className="absolute left-1/2 -translate-x-1/2"
         style={{
           top: ABOUT_PAGE_TITLE_TOP_PX,
-          width: ABOUT_PAGE_TITLE_WIDTH_PX,
-          height: ABOUT_PAGE_TITLE_HEIGHT_PX,
         }}
       >
-        <Image
+        <AboutPageTitle
           src={ABOUT_PAGE_ASSETS.title}
           alt={copy.titleAlt}
-          fill
-          priority
+          widthPx={ABOUT_PAGE_TITLE_WIDTH_PX}
+          heightPx={ABOUT_PAGE_TITLE_HEIGHT_PX}
           quality={ABOUT_PAGE_IMAGE_QUALITY}
-          unoptimized
-          sizes={`${ABOUT_PAGE_TITLE_WIDTH_PX}px`}
-          className="object-contain"
         />
       </div>
 

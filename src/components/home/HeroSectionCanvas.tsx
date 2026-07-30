@@ -84,6 +84,7 @@ export function HeroSectionCanvas() {
             <HeroSceneLayerView
               key={`${layer.kind}-${layer.assetKey}-${layer.zIndex}`}
               layer={layer}
+              sceneReady={isSceneReady}
             />
           ))}
         </div>

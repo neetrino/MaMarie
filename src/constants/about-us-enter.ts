@@ -1,3 +1,6 @@
+/** /about «ABOUT» title — slow soft fade + rise. */
+export const ABOUT_PAGE_TITLE_APPEAR_DURATION_MS = 1800;
+
 /** About Us / About page cards — slide in from sides when in view. */
 export const ABOUT_US_CARD_ENTER_DURATION_MS = 1700;
 export const ABOUT_US_CARD_ENTER_DISTANCE_PX = 48;

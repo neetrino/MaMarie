@@ -80,6 +80,9 @@ export interface HeroRotatedPlacement {
   priority?: boolean;
   /** Gentle float / sway — decorations and inscription arches. */
   motion?: DecorationMotion;
+  /** Slow soft fade + rise once the hero scene is ready (inscription arches). */
+  appearEnter?: boolean;
+  appearDelayMs?: number;
 }
 
 export type HeroSceneLayer = HeroFlatPlacement | HeroRotatedPlacement;
@@ -94,6 +97,9 @@ export const HERO_SCENE_OVERFLOW_BOTTOM_PX = 115;
 
 /** Space above canvas for pink arch (Figma `51:332` sits at top: -27). */
 export const HERO_SCENE_OVERFLOW_TOP_PX = 72;
+
+/** «SHAPE YOUR» / «YOUR CHILDHOOD» arches — soft appear when scene is ready. */
+export const HERO_INSCRIPTION_APPEAR_DURATION_MS = 1800;
 
 /** Hero scene layers — paint order back → front (Figma frame `51:329`). */
 export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
@@ -140,6 +146,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     objectPosition: 'bottom',
     priority: true,
     motion: 'archDrift',
+    appearEnter: true,
   },
   {
     /** Figma `51:333` — girl + ottomans + pink arch (893×538). */
@@ -195,6 +202,7 @@ export const HERO_SCENE_LAYERS: HeroSceneLayer[] = [
     objectPosition: 'bottom',
     objectFit: 'contain',
     motion: 'archDriftAlt',
+    appearEnter: true,
   },
 ];
 
