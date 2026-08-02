@@ -45,7 +45,11 @@ export function useProfilePage() {
   });
 
   // Tabs management
-  const { activeTab, handleTabChange: baseHandleTabChange } = useProfileTabs();
+  const {
+    activeTab,
+    handleTabChange: baseHandleTabChange,
+    resetToMenu: baseResetToMenu,
+  } = useProfileTabs();
 
   // Password hook
   const password = usePassword({
@@ -58,9 +62,7 @@ export function useProfilePage() {
     onError: setError,
   });
 
-  // Enhanced tab change with address form cleanup
-  const handleTabChange = (tab: typeof activeTab) => {
-    baseHandleTabChange(tab);
+  const clearProfileAlertsAndTransientForms = (tab: typeof activeTab) => {
     setError(null);
     setSuccess(null);
     if (tab !== 'addresses') {
@@ -70,6 +72,17 @@ export function useProfilePage() {
     if (tab !== 'deleteAccount') {
       deleteAccount.resetForm();
     }
+  };
+
+  // Enhanced tab change with address form cleanup
+  const handleTabChange = (tab: typeof activeTab) => {
+    baseHandleTabChange(tab);
+    clearProfileAlertsAndTransientForms(tab);
+  };
+
+  const resetToMenu = () => {
+    baseResetToMenu();
+    clearProfileAlertsAndTransientForms('dashboard');
   };
 
   // Dashboard hook
@@ -108,6 +121,7 @@ export function useProfilePage() {
     // Tabs
     activeTab,
     handleTabChange,
+    resetToMenu,
     
     // Personal info
     personalInfo: personalInfo.personalInfo,

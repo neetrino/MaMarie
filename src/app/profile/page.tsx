@@ -34,6 +34,7 @@ function ProfilePageContent() {
     profile,
     activeTab,
     handleTabChange,
+    resetToMenu,
     personalInfo,
     setPersonalInfo,
     savingPersonal,
@@ -269,7 +270,11 @@ function ProfilePageContent() {
         onLogout={logout}
         t={t}
         isSheetOpen={isMobileSheetOpen}
-        onCloseSheet={() => setIsMobileSheetOpen(false)}
+        onCloseSheet={() => {
+          setIsMobileSheetOpen(false);
+          // Drop ?tab=… so reopening /profile does not reopen the last section (e.g. password).
+          resetToMenu();
+        }}
       >
         {tabContent}
       </ProfileMobilePage>
