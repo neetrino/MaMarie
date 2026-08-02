@@ -113,6 +113,22 @@ export type { ProfileMobileIconTheme };
 export const PROFILE_DESKTOP_TAB_ICON_THEME: Record<ProfileTab, ProfileMobileIconTheme> =
   PROFILE_MOBILE_TAB_ICON_THEME;
 
+/** Sidebar order — used for desktop tab content slide direction. */
+export const PROFILE_DESKTOP_TAB_ORDER: readonly ProfileTab[] = [
+  'dashboard',
+  'orders',
+  'personal',
+  'addresses',
+  'password',
+  'deleteAccount',
+] as const;
+
+/** Desktop content panel enter — vertical slide + fade. */
+export const PROFILE_DESKTOP_TAB_TRANSITION_MS = 380;
+export const PROFILE_DESKTOP_TAB_TRANSITION_OFFSET_PX = 18;
+/** Sidebar active pill — keep in sync with content panel. */
+export const PROFILE_DESKTOP_TAB_NAV_TRANSITION_MS = PROFILE_DESKTOP_TAB_TRANSITION_MS;
+
 export const PROFILE_DESKTOP_PENDING_BADGE_CLASS =
   'inline-flex rounded-full bg-[#fef8e3] px-3 py-1 text-xs font-medium capitalize text-[#57423b]';
 

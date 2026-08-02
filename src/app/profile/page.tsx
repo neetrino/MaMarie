@@ -17,6 +17,7 @@ import { ProfileOrders } from './ProfileOrders';
 import { ProfilePassword } from './ProfilePassword';
 import { ProfileDeleteAccount } from './ProfileDeleteAccount';
 import { OrderDetailsModal } from './OrderDetailsModal';
+import { ProfileDesktopTabTransition } from './components/ProfileDesktopTabTransition';
 import type { ProfileTabConfig } from './types';
 import { PROFILE_MOBILE_LAYOUT_MEDIA_QUERY } from '../../constants/profile-mobile-page';
 
@@ -294,7 +295,9 @@ function ProfilePageContent() {
               className="profile-desktop-content profile-scroll-area min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain"
               style={{ paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX }}
             >
-              {tabContent}
+              <ProfileDesktopTabTransition activeTab={activeTab}>
+                {tabContent}
+              </ProfileDesktopTabTransition>
             </div>
           </div>
         </div>
