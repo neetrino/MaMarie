@@ -25,7 +25,7 @@ import {
 } from '../lib/clay-date-picker-utils';
 
 interface ClayDatePickerPanelProps {
-  panelRef: RefObject<HTMLDivElement | null>;
+  panelRef: RefObject<HTMLDivElement>;
   panelStyle: CSSProperties | undefined;
   mode: ClayDatePickerMode;
   lang: LanguageCode;
