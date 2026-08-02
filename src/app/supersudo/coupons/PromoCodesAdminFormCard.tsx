@@ -35,7 +35,7 @@ export function PromoCodesAdminFormCard({
     <Card className="p-6">
       <h2 className="mb-4 text-lg font-semibold text-gray-900">{title}</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="md:col-span-2">
+        <div>
           <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="pc-code">
             {labels.formCode}
           </label>
@@ -48,7 +48,7 @@ export function PromoCodesAdminFormCard({
           />
           <p className="mt-1 text-xs text-gray-500">{labels.formCodeHint}</p>
         </div>
-        <div className="md:col-span-2">
+        <div>
           <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="pc-desc">
             {labels.formDescription}
           </label>
