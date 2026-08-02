@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
-import { useClaySelectPortalPosition } from '../lib/use-clay-select-portal-position';
 import {
   CLAY_SELECT_BORDER_CLASS,
   CLAY_SELECT_BORDER_OPEN_CLASS,
@@ -18,6 +17,8 @@ import {
   CLAY_SELECT_TRIGGER_BASE_CLASS,
   CLAY_SELECT_TRIGGER_MIN_HEIGHT_PX,
 } from '../constants/clay-select';
+import { DRAWER_TOUCH_SCROLL_ROOT_ATTR } from '../lib/drawer-touch-scroll-guard';
+import { useClaySelectPortalPosition } from '../lib/use-clay-select-portal-position';
 
 export interface ClaySelectOption {
   value: string;
@@ -206,6 +207,7 @@ export function ClaySelect({
       ref={dropdownRef}
       id={listboxId}
       role="listbox"
+      {...(portal ? { [DRAWER_TOUCH_SCROLL_ROOT_ATTR]: '' } : {})}
       className={`${dropdownPanelClass} ${
         isDropdownExpanded
           ? 'pointer-events-auto translate-y-0 opacity-100'
