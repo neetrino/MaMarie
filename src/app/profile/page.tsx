@@ -8,6 +8,7 @@ import { useProfilePage } from './useProfilePage';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
+import { BRAND_LOADING_SPINNER_CLASS } from '../../constants/brand';
 import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX, PROFILE_DESKTOP_SHELL_PADDING_TOP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
 import { AutoDismissAlert } from '../../components/AutoDismissAlert';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
@@ -91,10 +92,9 @@ function ProfilePageContent() {
 
   if (authLoading || loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 md:min-h-[50vh]">
-        <div className="text-center">
-          <p className="text-gray-600">{t('profile.common.loadingProfile')}</p>
-        </div>
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-4 px-4 py-12 sm:px-6 lg:px-8 md:min-h-[50vh]">
+        <div className={`h-11 w-11 ${BRAND_LOADING_SPINNER_CLASS}`} />
+        <p className="text-sm text-gray-600">{t('profile.common.loadingProfile')}</p>
       </div>
     );
   }
@@ -314,15 +314,17 @@ function ProfilePageContent() {
   );
 }
 
+function ProfileLoadingFallback() {
+  return (
+    <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-4 px-4 py-12 sm:px-6 lg:px-8 md:min-h-[50vh]">
+      <div className={`h-11 w-11 ${BRAND_LOADING_SPINNER_CLASS}`} />
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   return (
-    <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<ProfileLoadingFallback />}>
       <ProfilePageContent />
     </Suspense>
   );

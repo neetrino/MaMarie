@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
+import { useConfirmDelete } from '../../../components/confirm-delete/ConfirmDeleteProvider';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
+import { resolveDeliveryCityFromProfile } from '../../checkout/utils/resolve-delivery-city';
 import type { Address, UserProfile } from '../types';
 
 interface UseAddressesProps {
@@ -17,7 +19,8 @@ export function useAddresses({
   onSuccess,
 }: UseAddressesProps) {
   const { t } = useTranslation();
-  
+  const { confirmDelete } = useConfirmDelete();
+
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [addressForm, setAddressForm] = useState<Address>({
@@ -37,9 +40,15 @@ export function useAddresses({
 
   const handleSaveAddress = async (e: FormEvent) => {
     e.preventDefault();
-    setSavingAddress(true);
     onError('');
     onSuccess('');
+
+    if (!addressForm.city.trim()) {
+      onError(t('checkout.shipping.selectCity'));
+      return;
+    }
+
+    setSavingAddress(true);
 
     try {
       const addressId = editingAddress?.id || editingAddress?._id;
@@ -64,7 +73,13 @@ export function useAddresses({
   };
 
   const handleDeleteAddress = async (addressId: string) => {
-    if (!confirm(t('profile.addresses.deleteConfirm'))) {
+    const accepted = await confirmDelete({
+      title: t('profile.addresses.delete'),
+      message: t('profile.addresses.deleteConfirm'),
+      confirmText: t('profile.addresses.delete'),
+      cancelText: t('common.buttons.cancel'),
+    });
+    if (!accepted) {
       return;
     }
 
@@ -97,7 +112,7 @@ export function useAddresses({
       company: address.company || '',
       addressLine1: address.addressLine1 || '',
       addressLine2: address.addressLine2 || '',
-      city: address.city || '',
+      city: resolveDeliveryCityFromProfile(address.city) || address.city || '',
       state: address.state || '',
       postalCode: address.postalCode || '',
       countryCode: address.countryCode || 'AM',

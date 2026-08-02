@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { BRAND_LOADING_SPINNER_CLASS } from '../../constants/brand';
 import {
   PROFILE_DESKTOP_DASHBOARD_CARD_CLASS,
   PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS,
@@ -96,7 +97,7 @@ export function ProfileDashboard({
           {t('profile.tabs.dashboard')}
         </h2>
         <div className="flex flex-col items-center justify-center gap-4 py-16">
-        <div className="h-11 w-11 animate-spin rounded-full border-2 border-[#fdeef2] border-t-brand-pink" />
+        <div className={`h-11 w-11 ${BRAND_LOADING_SPINNER_CLASS}`} />
         <p className="text-sm text-gray-600">{t('profile.dashboard.loading')}</p>
         </div>
       </div>

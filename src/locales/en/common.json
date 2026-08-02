@@ -15,7 +15,12 @@
     "search": "Search",
     "shopNow": "Shop Now",
     "viewMore": "View More",
-    "close": "Close"
+    "close": "Close",
+    "delete": "Delete"
+  },
+  "dialogs": {
+    "confirmDeleteTitle": "Confirm delete",
+    "confirmDelete": "Are you sure you want to delete this? This action cannot be undone."
   },
   "navigation": {
     "home": "Home",

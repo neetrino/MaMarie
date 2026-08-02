@@ -1,3 +1,5 @@
+import { BRAND_LOADING_SPINNER_CLASS } from '../../constants/brand';
+
 export default function CheckoutLoading() {
   return (
     <div
@@ -5,7 +7,7 @@ export default function CheckoutLoading() {
       aria-busy="true"
       aria-label="Loading checkout"
     >
-      <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-pink/30 border-t-brand-pink" />
+      <div className={`h-10 w-10 ${BRAND_LOADING_SPINNER_CLASS}`} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import type { PartnerStoreItem } from '@/lib/partner-stores/types';
 import { apiClient } from '@/lib/api-client';
 import { useTranslation } from '@/lib/i18n-client';
 import { getStoredLanguage } from '@/lib/language';
+import { BRAND_LOADING_SPINNER_CLASS } from '@/constants/brand';
 import {
   BEST_PRODUCTS_ASSETS,
   BEST_PRODUCTS_HEADING_COLOR,
@@ -119,7 +120,7 @@ export function StoresPageClient() {
         style={pageInsetStyle}
       >
         <div className="text-center">
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-b-2 border-brand-brown" />
+          <div className={`mx-auto mb-4 h-10 w-10 ${BRAND_LOADING_SPINNER_CLASS}`} />
           <p className="text-sm text-brand-muted">{t('stores.loading')}</p>
         </div>
       </div>

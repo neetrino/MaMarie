@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { BRAND_LOADING_SPINNER_CLASS } from '../constants/brand';
 import { apiClient } from '../lib/api-client';
 import { getStoredLanguage } from '../lib/language';
 
@@ -80,7 +81,7 @@ function CategoriesSidebarContent() {
     return (
       <div className="mb-6">
         <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto mb-2"></div>
+          <div className={`mx-auto mb-2 h-6 w-6 ${BRAND_LOADING_SPINNER_CLASS}`} />
           <p className="text-xs text-gray-500">Loading...</p>
         </div>
       </div>
@@ -144,7 +145,7 @@ export function CategoriesSidebar() {
     <Suspense fallback={
       <div className="mb-6">
         <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mx-auto mb-2"></div>
+          <div className={`mx-auto mb-2 h-6 w-6 ${BRAND_LOADING_SPINNER_CLASS}`} />
           <p className="text-xs text-gray-500">Loading...</p>
         </div>
       </div>

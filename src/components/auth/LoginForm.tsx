@@ -170,7 +170,7 @@ export function LoginForm({
               disabled={disabled}
               autoComplete="off"
               suppressHydrationWarning
-              className="rounded border-[#ededed] text-brand-pink focus:ring-brand-pink/35"
+              className="rounded border-[#ededed] text-brand-yellow accent-brand-yellow focus:outline-none focus:ring-0"
               style={{ width: LOGIN_CHECKBOX_SIZE_PX, height: LOGIN_CHECKBOX_SIZE_PX }}
             />
             <span className={LOGIN_SECONDARY_TEXT_CLASS}>{labels.rememberMe}</span>
