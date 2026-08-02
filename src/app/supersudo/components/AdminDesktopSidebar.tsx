@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import type { AdminMenuItem } from '../../../components/AdminMenuDrawer';
@@ -8,10 +7,6 @@ import { AdminBrandLogoLink } from '../../../components/AdminBrandLogoLink';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { useTranslation } from '../../../lib/i18n-client';
 import { prefetchAdminRoute } from '@/lib/admin/admin-route-prefetch';
-import {
-  ADMIN_MENU_ICON_THEME,
-  PROFILE_MOBILE_ICON_THEMES,
-} from '../../../constants/admin-desktop-page';
 import {
   ADMIN_SIDEBAR_ASIDE,
   ADMIN_SIDEBAR_FOOTER,
@@ -23,31 +18,13 @@ import {
   ADMIN_SIDEBAR_WIDTH_COLLAPSED_PX,
   ADMIN_SIDEBAR_WIDTH_EXPANDED_PX,
 } from '../admin-sidebar-classes';
-import { isAdminTabPathActive } from '../admin-nav-utils';
 import { useAdminSidebarCollapse } from '../context/AdminSidebarCollapseContext';
 import { useAdminProductsSubnavExpanded } from '../hooks/useAdminProductsSubnavExpanded';
+import { AdminDesktopNav } from './AdminDesktopNav';
 
 interface AdminDesktopSidebarProps {
   tabs: AdminMenuItem[];
   pathname: string;
-}
-
-function isProductsNestedTabVisible(
-  tab: AdminMenuItem,
-  pathname: string,
-  collapsed: boolean,
-  productsNestedExpanded: boolean,
-): boolean {
-  if (tab.parentGroupId !== 'products') {
-    return true;
-  }
-  if (collapsed) {
-    return true;
-  }
-  if (isAdminTabPathActive(tab.path, pathname)) {
-    return true;
-  }
-  return productsNestedExpanded;
 }
 
 function AdminSidebarToggleButton() {
@@ -76,156 +53,6 @@ function AdminSidebarToggleButton() {
   );
 }
 
-function AdminNavIcon({ icon, themeKey }: { icon: ReactNode; themeKey: keyof typeof PROFILE_MOBILE_ICON_THEMES }) {
-  const theme = PROFILE_MOBILE_ICON_THEMES[themeKey];
-
-  return (
-    <span
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:h-5 [&>svg]:w-5"
-      style={{
-        backgroundColor: theme.background,
-        color: theme.foreground,
-      }}
-    >
-      {icon}
-    </span>
-  );
-}
-
-function adminNavIntentHandlers(path: string) {
-  return {
-    onMouseEnter: () => prefetchAdminRoute(path),
-    onFocus: () => prefetchAdminRoute(path),
-  };
-}
-
-function AdminDesktopNav({
-  tabs,
-  pathname,
-  collapsed,
-  productsNestedExpanded,
-  onToggleProductsNested,
-}: {
-  tabs: AdminMenuItem[];
-  pathname: string;
-  collapsed: boolean;
-  productsNestedExpanded: boolean;
-  onToggleProductsNested: () => void;
-}) {
-  const { t } = useTranslation();
-
-  return (
-    <nav
-      className={`flex flex-col gap-1 ${collapsed ? 'px-1' : 'px-2'}`}
-      role="navigation"
-      aria-label={t('admin.menu.dashboard')}
-    >
-      {tabs.map((tab) => {
-        if (!isProductsNestedTabVisible(tab, pathname, collapsed, productsNestedExpanded)) {
-          return null;
-        }
-
-        const isActive = isAdminTabPathActive(tab.path, pathname);
-        const themeKey = ADMIN_MENU_ICON_THEME[tab.id] ?? 'pink';
-        const theme = PROFILE_MOBILE_ICON_THEMES[themeKey];
-        const isSubCategory = Boolean(tab.isSubCategory);
-
-        if (tab.id === 'products' && !collapsed) {
-          return (
-            <div
-              key={tab.id}
-              className={`flex w-full min-w-0 overflow-hidden rounded-[15px] ${
-                isActive ? '' : 'border-transparent'
-              }`}
-            >
-              <Link
-                href={tab.path}
-                prefetch
-                title={tab.label}
-                {...adminNavIntentHandlers(tab.path)}
-                className={`flex min-w-0 flex-1 items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-                  isActive ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-[#faf8f5]'
-                }`}
-                style={
-                  isActive
-                    ? {
-                        borderLeftColor: theme.foreground,
-                        backgroundColor: theme.background,
-                        color: theme.foreground,
-                      }
-                    : undefined
-                }
-              >
-                <AdminNavIcon icon={tab.icon} themeKey={themeKey} />
-                <span className="min-w-0 flex-1 truncate font-semibold">{tab.label}</span>
-              </Link>
-              <button
-                type="button"
-                aria-expanded={productsNestedExpanded}
-                aria-label={t('admin.sidebar.toggleProductsNested')}
-                onClick={(event) => {
-                  event.preventDefault();
-                  onToggleProductsNested();
-                }}
-                className="flex shrink-0 items-center rounded-[15px] px-2 py-2.5 text-gray-600 transition-colors hover:bg-[#faf8f5]"
-              >
-                <svg
-                  className={`h-5 w-5 transition-transform ${productsNestedExpanded ? '' : '-rotate-90'}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
-          );
-        }
-
-        const rowClasses = `flex w-full items-center rounded-[15px] border-l-4 text-sm font-medium transition-colors ${
-          collapsed ? 'justify-center border-transparent px-0 py-3' : 'gap-3 py-2.5'
-        } ${!collapsed && isSubCategory ? 'pl-8 pr-3' : !collapsed ? 'px-3' : ''} ${
-          isActive && !collapsed ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-[#faf8f5]'
-        } ${isSubCategory && isActive && !collapsed ? 'pl-[calc(2rem-4px)]' : ''}`;
-
-        return (
-          <Link
-            key={tab.id}
-            href={tab.path}
-            prefetch
-            title={tab.label}
-            {...adminNavIntentHandlers(tab.path)}
-            className={rowClasses}
-            style={
-              isActive && !collapsed
-                ? {
-                    borderLeftColor: theme.foreground,
-                    backgroundColor: theme.background,
-                  }
-                : isActive && collapsed
-                  ? { backgroundColor: theme.background }
-                  : undefined
-            }
-          >
-            <AdminNavIcon icon={tab.icon} themeKey={themeKey} />
-            {!collapsed ? (
-              <span
-                className={`min-w-0 flex-1 truncate text-left ${
-                  isActive ? 'font-semibold' : 'font-medium text-gray-800'
-                }`}
-                style={isActive ? { color: theme.foreground } : undefined}
-              >
-                {tab.label}
-              </span>
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
-
 export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -235,6 +62,7 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
   useEffect(() => {
     prefetchAdminRoute(pathname);
   }, [pathname]);
+
   const adminTitle = t('admin.dashboard.title');
   const displayName =
     user?.firstName && user?.lastName
@@ -274,7 +102,7 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
         </div>
       ) : null}
 
-      <div className={ADMIN_SIDEBAR_NAV}>
+      <div className={`${ADMIN_SIDEBAR_NAV} ${collapsed ? 'px-1' : 'px-2'}`}>
         <AdminDesktopNav
           tabs={tabs}
           pathname={pathname}

@@ -72,3 +72,8 @@ export const ADMIN_MENU_ICON_THEME: Record<string, ProfileMobileIconTheme> = {
 };
 
 export const ADMIN_DESKTOP_CARD_CLASS = PROFILE_DESKTOP_CARD_CLASS;
+
+/** Desktop admin nav/content — match profile tab slide timing. */
+export const ADMIN_DESKTOP_NAV_TRANSITION_MS = 380;
+export const ADMIN_DESKTOP_PAGE_TRANSITION_MS = ADMIN_DESKTOP_NAV_TRANSITION_MS;
+export const ADMIN_DESKTOP_PAGE_TRANSITION_OFFSET_PX = 18;

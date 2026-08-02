@@ -14,6 +14,7 @@ import { ADMIN_THEMED_CONTENT_CLASS } from '../../../constants/admin-ui-classes'
 import { AdminReferenceDataProvider } from '../providers/AdminReferenceDataProvider';
 import { AdminDialogsProvider } from '../context/AdminDialogsContext';
 import { AdminSidebarCollapseProvider } from '../context/AdminSidebarCollapseContext';
+import { AdminDesktopPageTransition } from './AdminDesktopPageTransition';
 import { AdminDesktopSidebar } from './AdminDesktopSidebar';
 import { AdminSidebar } from './AdminSidebar';
 
@@ -34,7 +35,11 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
             <AdminSidebar />
             <AdminDesktopSidebar tabs={adminTabs} pathname={pathname} />
             <div className={ADMIN_MAIN_COLUMN}>
-              <div className={`${ADMIN_MAIN_INNER} ${ADMIN_THEMED_CONTENT_CLASS}`}>{children}</div>
+              <div className={`${ADMIN_MAIN_INNER} ${ADMIN_THEMED_CONTENT_CLASS}`}>
+                <AdminDesktopPageTransition pathname={pathname} tabs={adminTabs}>
+                  {children}
+                </AdminDesktopPageTransition>
+              </div>
             </div>
           </div>
         </AdminReferenceDataProvider>
