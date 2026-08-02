@@ -265,5 +265,13 @@
     "title": "Էջը չի գտնվել :(",
     "goHome": "Գլխավոր էջ",
     "continueShopping": "Շարունակել գնումները"
+  },
+  "calendar": {
+    "title": "Ընտրել ամսաթիվ",
+    "placeholder": "Ընտրեք ամսաթիվ",
+    "clear": "Մաքրել",
+    "today": "Այսօր",
+    "previousMonth": "Նախորդ ամիս",
+    "nextMonth": "Հաջորդ ամիս"
   }
 }

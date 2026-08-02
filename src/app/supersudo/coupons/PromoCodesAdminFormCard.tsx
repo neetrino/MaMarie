@@ -2,6 +2,7 @@
 
 import type { Dispatch, SetStateAction } from 'react';
 import { Card, Button } from '@shop/ui';
+import { ClayDatePicker } from '../../../components/ClayDatePicker';
 import { ClaySelect } from '../../../components/ClaySelect';
 import type { PromoFormFields } from './coupons-admin-types';
 
@@ -144,30 +145,20 @@ export function PromoCodesAdminFormCard({
             {labels.formActive}
           </label>
         </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="pc-from">
-            {labels.formValidFrom}
-          </label>
-          <input
-            id="pc-from"
-            type="datetime-local"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={form.validFrom}
-            onChange={(e) => setForm((f) => ({ ...f, validFrom: e.target.value }))}
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="pc-until">
-            {labels.formValidUntil}
-          </label>
-          <input
-            id="pc-until"
-            type="datetime-local"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={form.validUntil}
-            onChange={(e) => setForm((f) => ({ ...f, validUntil: e.target.value }))}
-          />
-        </div>
+        <ClayDatePicker
+          id="pc-from"
+          label={labels.formValidFrom}
+          mode="datetime"
+          value={form.validFrom}
+          onChange={(validFrom) => setForm((f) => ({ ...f, validFrom }))}
+        />
+        <ClayDatePicker
+          id="pc-until"
+          label={labels.formValidUntil}
+          mode="datetime"
+          value={form.validUntil}
+          onChange={(validUntil) => setForm((f) => ({ ...f, validUntil }))}
+        />
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <Button variant="primary" type="button" onClick={onSave} disabled={saving}>

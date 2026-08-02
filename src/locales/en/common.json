@@ -265,6 +265,14 @@
     "title": "Page Not Found :(",
     "goHome": "Homepage",
     "continueShopping": "Continue Shopping"
+  },
+  "calendar": {
+    "title": "Choose date",
+    "placeholder": "Select date",
+    "clear": "Clear",
+    "today": "Today",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
   }
 }
 
