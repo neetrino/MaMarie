@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   PROFILE_DESKTOP_TAB_ORDER,
   PROFILE_DESKTOP_TAB_TRANSITION_MS,
@@ -27,15 +27,19 @@ function resolveSlideDirection(previousTab: ProfileTab, nextTab: ProfileTab): Sl
 }
 
 function useDesktopTabSlideDirection(activeTab: ProfileTab): SlideDirection {
-  const previousTabRef = useRef(activeTab);
-  const directionRef = useRef<SlideDirection>('none');
+  const [slide, setSlide] = useState<{ tab: ProfileTab; direction: SlideDirection }>({
+    tab: activeTab,
+    direction: 'none',
+  });
 
-  if (previousTabRef.current !== activeTab) {
-    directionRef.current = resolveSlideDirection(previousTabRef.current, activeTab);
-    previousTabRef.current = activeTab;
+  if (slide.tab !== activeTab) {
+    setSlide({
+      tab: activeTab,
+      direction: resolveSlideDirection(slide.tab, activeTab),
+    });
   }
 
-  return directionRef.current;
+  return slide.tab === activeTab ? slide.direction : resolveSlideDirection(slide.tab, activeTab);
 }
 
 /** Vertical enter animation for desktop profile tab panels. */

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   ADMIN_DESKTOP_PAGE_TRANSITION_MS,
   ADMIN_DESKTOP_PAGE_TRANSITION_OFFSET_PX,
@@ -34,17 +34,30 @@ function useAdminPageSlideDirection(pathname: string, tabs: readonly AdminMenuPa
 } {
   const menuIndex = resolveAdminMenuIndex(pathname, tabs);
   const transitionKey = menuIndex >= 0 ? tabs[menuIndex].id : pathname;
-  const previousKeyRef = useRef(transitionKey);
-  const previousIndexRef = useRef(menuIndex);
-  const directionRef = useRef<SlideDirection>('none');
+  const [slide, setSlide] = useState<{
+    key: string;
+    index: number;
+    direction: SlideDirection;
+  }>({
+    key: transitionKey,
+    index: menuIndex,
+    direction: 'none',
+  });
 
-  if (previousKeyRef.current !== transitionKey) {
-    directionRef.current = resolveSlideDirection(previousIndexRef.current, menuIndex);
-    previousKeyRef.current = transitionKey;
-    previousIndexRef.current = menuIndex;
+  if (slide.key !== transitionKey) {
+    setSlide({
+      key: transitionKey,
+      index: menuIndex,
+      direction: resolveSlideDirection(slide.index, menuIndex),
+    });
   }
 
-  return { direction: directionRef.current, transitionKey };
+  const direction =
+    slide.key === transitionKey
+      ? slide.direction
+      : resolveSlideDirection(slide.index, menuIndex);
+
+  return { direction, transitionKey };
 }
 
 /** Vertical enter animation for desktop admin page content. */

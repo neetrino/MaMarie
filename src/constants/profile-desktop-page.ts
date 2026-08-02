@@ -39,6 +39,13 @@ export const PROFILE_ORDER_DETAILS_SHEET_CARD_CLASS =
 /** Dashboard stat panels and sections — flat clay, no drop shadow. */
 export const PROFILE_DESKTOP_DASHBOARD_CARD_CLASS = PROFILE_DESKTOP_CARD_BASE_CLASS;
 
+/** Stat card hover lift — profile + admin dashboards. */
+export const PROFILE_DESKTOP_STAT_CARD_HOVER_CLASS =
+  'transition-transform duration-200 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+
+/** Profile dashboard stats are not clickable. */
+export const PROFILE_DESKTOP_STAT_CARD_CURSOR_CLASS = 'cursor-default';
+
 export const PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS = '!shadow-none';
 
 export const PROFILE_DESKTOP_ASSETS = {

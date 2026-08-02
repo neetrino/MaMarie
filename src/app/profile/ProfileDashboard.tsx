@@ -9,6 +9,8 @@ import {
   PROFILE_DESKTOP_PRIMARY_BUTTON_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
+  PROFILE_DESKTOP_STAT_CARD_CURSOR_CLASS,
+  PROFILE_DESKTOP_STAT_CARD_HOVER_CLASS,
   PROFILE_DESKTOP_STAT_CONFIG,
   PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX,
   PROFILE_DESKTOP_STAT_THEMES,
@@ -46,7 +48,7 @@ function ProfileDesktopStatCard({
   const decorationSizePx = PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX;
 
   return (
-    <div className={`relative flex items-center overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}>
+    <div className={`relative flex items-center overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS} ${PROFILE_DESKTOP_STAT_CARD_HOVER_CLASS} ${PROFILE_DESKTOP_STAT_CARD_CURSOR_CLASS}`}>
       <div className="flex w-full items-center gap-3">
         <div
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${palette.iconInnerClass}`}

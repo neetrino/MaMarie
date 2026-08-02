@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { DecorationMotionShell } from '../../../components/decoration-motion/DecorationMotionShell';
 import {
   PROFILE_DESKTOP_DASHBOARD_CARD_CLASS,
+  PROFILE_DESKTOP_STAT_CARD_CURSOR_CLASS,
+  PROFILE_DESKTOP_STAT_CARD_HOVER_CLASS,
   PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX,
   PROFILE_DESKTOP_STAT_THEMES,
   type ProfileDesktopStatTheme,
@@ -27,7 +29,7 @@ export function AdminStatCard({ label, value, icon, theme, onClick }: AdminStatC
       type="button"
       onClick={onClick}
       disabled={!onClick}
-      className={`relative flex w-full items-center overflow-hidden p-6 text-left transition-transform duration-200 ease-out hover:-translate-y-1 disabled:cursor-default disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}
+      className={`relative flex w-full items-center overflow-hidden p-6 text-left disabled:hover:translate-y-0 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS} ${PROFILE_DESKTOP_STAT_CARD_HOVER_CLASS} ${PROFILE_DESKTOP_STAT_CARD_CURSOR_CLASS}`}
     >
       <div className="flex w-full items-center gap-3">
         <div
