@@ -9,10 +9,12 @@ import {
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_SPACING_CLASS,
   PROFILE_DESKTOP_STAT_CONFIG,
+  PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX,
   PROFILE_DESKTOP_STAT_THEMES,
   type ProfileDesktopStatTheme,
 } from '../../constants/profile-desktop-page';
 import { PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS, PROFILE_MOBILE_PAGE_TITLE_SIZE_CLASS } from '../../constants/profile-mobile-page';
+import { DecorationMotionShell } from '../../components/decoration-motion/DecorationMotionShell';
 import { formatPriceInCurrency, type CurrencyCode } from '../../lib/currency';
 import type { OrderDetailsClickPreview } from './order-details-preview';
 import type { DashboardData, ProfileTab } from './types';
@@ -40,36 +42,38 @@ function ProfileDesktopStatCard({
   theme: ProfileDesktopStatTheme;
 }) {
   const palette = PROFILE_DESKTOP_STAT_THEMES[theme];
-  const isSvgDecoration = palette.decoration.endsWith('.svg');
+  const decorationSizePx = PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX;
 
   return (
-    <div className={`relative overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}>
-      <div
-        className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${palette.iconInnerClass}`}
-        style={{
-          backgroundColor: palette.iconBackground,
-          color: palette.iconForeground,
-        }}
-      >
-        {icon}
+    <div className={`relative flex items-center overflow-hidden p-6 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}>
+      <div className="flex w-full items-center gap-3">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${palette.iconInnerClass}`}
+          style={{
+            backgroundColor: palette.iconBackground,
+            color: palette.iconForeground,
+          }}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium leading-snug text-gray-600">{label}</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight" style={{ color: palette.valueColor }}>
+            {value}
+          </p>
+        </div>
       </div>
-      <p className="text-sm font-medium text-gray-600">{label}</p>
-      <p className="mt-1 text-3xl font-bold tracking-tight" style={{ color: palette.valueColor }}>
-        {value}
-      </p>
-      <div className="pointer-events-none absolute bottom-3 right-3 opacity-90">
-        {isSvgDecoration ? (
-          <Image src={palette.decoration} alt="" width={28} height={28} aria-hidden className="h-7 w-7" />
-        ) : (
+      <div className="pointer-events-none absolute bottom-2 right-2 opacity-90">
+        <DecorationMotionShell motion={palette.motion} inline>
           <Image
             src={palette.decoration}
             alt=""
-            width={40}
-            height={40}
+            width={decorationSizePx}
+            height={decorationSizePx}
             aria-hidden
-            className="h-10 w-10 object-contain"
+            className="h-14 w-14 object-contain"
           />
-        )}
+        </DecorationMotionShell>
       </div>
     </div>
   );
@@ -158,7 +162,7 @@ export function ProfileDashboard({
       >
         {t('profile.tabs.dashboard')}
       </h2>
-      <div className="grid grid-cols-2 gap-3 lg:gap-4 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4">
         {PROFILE_DESKTOP_STAT_CONFIG.map(({ key, theme }) => (
           <ProfileDesktopStatCard
             key={key}

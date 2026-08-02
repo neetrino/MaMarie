@@ -57,12 +57,16 @@ export const PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS =
 export const PROFILE_DESKTOP_STAT_ICON_INNER_LARGE_CLASS =
   '[&>svg]:block [&>svg]:h-7 [&>svg]:w-7 [&>svg]:shrink-0 [&>svg]:translate-y-0.5';
 
+/** Corner clay decorations on dashboard stat cards (px). */
+export const PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX = 56;
+
 export const PROFILE_DESKTOP_STAT_THEMES = {
   pink: {
     iconBackground: '#fdeef2',
     iconForeground: BRAND_COLORS.pink,
     valueColor: BRAND_COLORS.pink,
     decoration: PROFILE_DESKTOP_ASSETS.decoBow,
+    motion: 'float' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   yellow: {
@@ -70,6 +74,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconForeground: '#e8b84a',
     valueColor: '#d4a017',
     decoration: PROFILE_DESKTOP_ASSETS.decoStrawberry,
+    motion: 'bounce' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   blue: {
@@ -77,6 +82,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconForeground: '#5281e1',
     valueColor: '#5281e1',
     decoration: PROFILE_DESKTOP_ASSETS.decoHeadphones,
+    motion: 'sway' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   green: {
@@ -84,6 +90,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconForeground: '#5cb176',
     valueColor: '#5cb176',
     decoration: PROFILE_DESKTOP_ASSETS.decoStar,
+    motion: 'floatSoft' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_LARGE_CLASS,
   },
 } as const;
