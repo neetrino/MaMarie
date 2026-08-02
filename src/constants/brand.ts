@@ -8,6 +8,15 @@ export const BRAND_COLORS = {
   sky: '#c2ddf9',
 } as const;
 
+/** Storefront loading spinner — solid pink tip on light pink track (no opacity tokens). */
+export const BRAND_LOADING_SPINNER_CLASS =
+  'animate-spin rounded-full border-2 border-[#fdeef2] border-t-[#ef95aa]';
+
+/** Native + custom checkbox checked fill. */
+export const BRAND_CHECKBOX_ACCENT = BRAND_COLORS.yellow;
+export const BRAND_CHECKBOX_CLASS =
+  'rounded border-gray-300 text-brand-yellow accent-brand-yellow focus:outline-none focus:ring-0';
+
 /** Static brand assets exported from Figma. */
 export const BRAND_ASSETS = {
   /** Figma MAMARIE-DEV node `1:162` — navbar clay wordmark. */

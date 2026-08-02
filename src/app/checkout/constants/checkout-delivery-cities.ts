@@ -1,6 +1,9 @@
+/** Always first in city lists and address sorting. */
+export const CHECKOUT_DELIVERY_CITY_PRIMARY = 'Yerevan';
+
 /** Stable keys for checkout delivery city select — values sent to delivery price API. */
 export const CHECKOUT_DELIVERY_CITY_VALUES = [
-  'Yerevan',
+  CHECKOUT_DELIVERY_CITY_PRIMARY,
   'Aragatsotn',
   'Ararat',
   'Armavir',

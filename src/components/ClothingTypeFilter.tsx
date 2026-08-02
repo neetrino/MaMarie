@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { PRODUCTS_CATALOG_CLOTHING_TYPE_OPTIONS } from '../constants/products-catalog-clothing-types';
+import { BRAND_CHECKBOX_ACCENT } from '../constants/brand';
 import {
-  PRODUCTS_CATALOG_FILTER_ACCENT,
   PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX,
   PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
   PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
@@ -30,15 +30,15 @@ function CheckboxIndicator({ selected }: { selected: boolean }) {
           width: PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
           height: PRODUCTS_CATALOG_FILTER_CHECKBOX_SIZE_PX,
           borderRadius: PRODUCTS_CATALOG_FILTER_CHECKBOX_RADIUS_PX,
-          borderColor: PRODUCTS_CATALOG_FILTER_ACCENT,
-          backgroundColor: PRODUCTS_CATALOG_FILTER_ACCENT,
+          borderColor: BRAND_CHECKBOX_ACCENT,
+          backgroundColor: BRAND_CHECKBOX_ACCENT,
         }}
         aria-hidden
       >
         <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
           <path
             d="M1 4L3.5 6.5L9 1"
-            stroke="white"
+            stroke="#57423b"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"

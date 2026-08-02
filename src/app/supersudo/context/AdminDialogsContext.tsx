@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useTranslation } from '../../../lib/i18n-client';
-import { AdminDeleteModal } from '../components/AdminDeleteModal';
+import { ConfirmDeleteModal } from '../../../components/confirm-delete/ConfirmDeleteModal';
 
 type DialogType = 'confirm' | 'alert';
 
@@ -114,13 +114,17 @@ export function AdminDialogsProvider({ children }: { children: ReactNode }) {
     <AdminDialogsContext.Provider value={contextValue}>
       {children}
 
-      <AdminDeleteModal
+      <ConfirmDeleteModal
         isOpen={Boolean(activeDialog)}
         title={activeDialog?.options.title ?? t('admin.common.confirm')}
         message={activeDialog?.options.message ?? ''}
         confirmText={
           activeDialog?.options.confirmText ??
-          (activeDialog?.type === 'confirm' ? t('admin.common.confirm') : t('admin.common.close'))
+          (activeDialog?.type === 'confirm'
+            ? activeDialog.options.destructive
+              ? t('admin.common.delete')
+              : t('admin.common.confirm')
+            : t('admin.common.close'))
         }
         cancelText={activeDialog?.options.cancelText ?? t('admin.common.cancel')}
         showCancel={activeDialog?.type === 'confirm'}

@@ -86,7 +86,7 @@ export function ProfileDeleteAccount({
         <label className="flex cursor-pointer items-start gap-3">
           <input
             type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-yellow accent-brand-yellow focus:outline-none focus:ring-0"
             checked={acknowledged}
             onChange={(e) => setAcknowledged(e.target.checked)}
           />

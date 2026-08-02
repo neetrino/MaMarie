@@ -6,10 +6,9 @@ import {
   PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
-  PROFILE_DESKTOP_TAB_ICON_THEME,
-  PROFILE_MOBILE_ICON_THEMES,
 } from '../../constants/profile-desktop-page';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
+import { ProfileDesktopTabNav } from './components/ProfileDesktopTabNav';
 import { ProfileMobileAvatar } from './components/ProfileMobileAvatar';
 
 interface ProfileHeaderProps {
@@ -51,65 +50,6 @@ function ProfileDesktopContactRow({
       </span>
       <p className="min-w-0 break-all text-sm font-medium text-gray-700">{value}</p>
     </div>
-  );
-}
-
-function ProfileDesktopTabNav({
-  tabs,
-  activeTab,
-  onTabChange,
-}: {
-  tabs: ProfileTabConfig[];
-  activeTab: ProfileTab;
-  onTabChange: (tab: ProfileTab) => void;
-}) {
-  return (
-    <nav className="flex flex-col gap-1" role="tablist" aria-label="Profile sections">
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-        const theme = PROFILE_MOBILE_ICON_THEMES[PROFILE_DESKTOP_TAB_ICON_THEME[tab.id]];
-        const isMultilineLabel = tab.label.includes('\n');
-
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={isActive}
-            onClick={() => onTabChange(tab.id)}
-            className={`flex w-full items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left transition-colors ${
-              isActive ? 'pl-[calc(0.75rem-4px)]' : 'border-transparent hover:bg-white/70'
-            }`}
-            style={
-              isActive
-                ? {
-                    borderLeftColor: theme.foreground,
-                    backgroundColor: theme.background,
-                  }
-                : undefined
-            }
-          >
-            <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:h-5 [&>svg]:w-5"
-              style={{
-                backgroundColor: theme.background,
-                color: theme.foreground,
-              }}
-            >
-              {tab.icon}
-            </span>
-            <span
-              className={`min-w-0 flex-1 text-sm font-medium ${
-                isActive ? 'font-semibold' : 'text-gray-800'
-              } ${isMultilineLabel ? 'whitespace-pre-line leading-snug' : ''}`}
-              style={isActive ? { color: theme.foreground } : undefined}
-            >
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
-    </nav>
   );
 }
 

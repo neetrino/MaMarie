@@ -39,6 +39,13 @@ export const PROFILE_ORDER_DETAILS_SHEET_CARD_CLASS =
 /** Dashboard stat panels and sections — flat clay, no drop shadow. */
 export const PROFILE_DESKTOP_DASHBOARD_CARD_CLASS = PROFILE_DESKTOP_CARD_BASE_CLASS;
 
+/** Stat card hover lift — profile + admin dashboards. */
+export const PROFILE_DESKTOP_STAT_CARD_HOVER_CLASS =
+  'transition-transform duration-200 ease-out hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+
+/** Profile dashboard stats are not clickable. */
+export const PROFILE_DESKTOP_STAT_CARD_CURSOR_CLASS = 'cursor-default';
+
 export const PROFILE_DESKTOP_DASHBOARD_SECTION_CARD_CLASS = '!shadow-none';
 
 export const PROFILE_DESKTOP_ASSETS = {
@@ -57,12 +64,16 @@ export const PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS =
 export const PROFILE_DESKTOP_STAT_ICON_INNER_LARGE_CLASS =
   '[&>svg]:block [&>svg]:h-7 [&>svg]:w-7 [&>svg]:shrink-0 [&>svg]:translate-y-0.5';
 
+/** Corner clay decorations on dashboard stat cards (px). */
+export const PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX = 56;
+
 export const PROFILE_DESKTOP_STAT_THEMES = {
   pink: {
     iconBackground: '#fdeef2',
     iconForeground: BRAND_COLORS.pink,
     valueColor: BRAND_COLORS.pink,
     decoration: PROFILE_DESKTOP_ASSETS.decoBow,
+    motion: 'float' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   yellow: {
@@ -70,6 +81,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconForeground: '#e8b84a',
     valueColor: '#d4a017',
     decoration: PROFILE_DESKTOP_ASSETS.decoStrawberry,
+    motion: 'bounce' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   blue: {
@@ -77,6 +89,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconForeground: '#5281e1',
     valueColor: '#5281e1',
     decoration: PROFILE_DESKTOP_ASSETS.decoHeadphones,
+    motion: 'sway' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_DEFAULT_CLASS,
   },
   green: {
@@ -84,6 +97,7 @@ export const PROFILE_DESKTOP_STAT_THEMES = {
     iconForeground: '#5cb176',
     valueColor: '#5cb176',
     decoration: PROFILE_DESKTOP_ASSETS.decoStar,
+    motion: 'floatSoft' as const,
     iconInnerClass: PROFILE_DESKTOP_STAT_ICON_INNER_LARGE_CLASS,
   },
 } as const;
@@ -105,6 +119,22 @@ export type { ProfileMobileIconTheme };
 
 export const PROFILE_DESKTOP_TAB_ICON_THEME: Record<ProfileTab, ProfileMobileIconTheme> =
   PROFILE_MOBILE_TAB_ICON_THEME;
+
+/** Sidebar order — used for desktop tab content slide direction. */
+export const PROFILE_DESKTOP_TAB_ORDER: readonly ProfileTab[] = [
+  'dashboard',
+  'orders',
+  'personal',
+  'addresses',
+  'password',
+  'deleteAccount',
+] as const;
+
+/** Desktop content panel enter — vertical slide + fade. */
+export const PROFILE_DESKTOP_TAB_TRANSITION_MS = 380;
+export const PROFILE_DESKTOP_TAB_TRANSITION_OFFSET_PX = 18;
+/** Sidebar active pill — keep in sync with content panel. */
+export const PROFILE_DESKTOP_TAB_NAV_TRANSITION_MS = PROFILE_DESKTOP_TAB_TRANSITION_MS;
 
 export const PROFILE_DESKTOP_PENDING_BADGE_CLASS =
   'inline-flex rounded-full bg-[#fef8e3] px-3 py-1 text-xs font-medium capitalize text-[#57423b]';

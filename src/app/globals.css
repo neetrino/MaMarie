@@ -44,6 +44,58 @@
     user-select: text;
   }
 
+  /* Custom yellow checkbox — locks look on hover (no browser fade). */
+  input[type='checkbox'] {
+    --checkbox-border: #d0d0d0;
+    --checkbox-bg: #ffffff;
+    --checkbox-mark: none;
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-grid;
+    flex-shrink: 0;
+    place-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    cursor: pointer;
+    border: 2px solid var(--checkbox-border);
+    border-radius: 0.25rem;
+    background-color: var(--checkbox-bg);
+    background-image: var(--checkbox-mark);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 0.65rem 0.55rem;
+    opacity: 1;
+    filter: none;
+    outline: none;
+    box-shadow: none;
+    transition: none;
+  }
+
+  input[type='checkbox']:checked {
+    --checkbox-border: #f9e490;
+    --checkbox-bg: #f9e490;
+    --checkbox-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8' fill='none'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%2357423b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  input[type='checkbox']:hover,
+  input[type='checkbox']:focus,
+  input[type='checkbox']:focus-visible,
+  input[type='checkbox']:active {
+    border-color: var(--checkbox-border);
+    background-color: var(--checkbox-bg);
+    background-image: var(--checkbox-mark);
+    opacity: 1;
+    filter: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  input[type='checkbox']:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
   /* Auth inputs — neutralize browser autofill blue highlight. */
   .auth-page-form input:-webkit-autofill,
   .auth-page-form input:-webkit-autofill:hover,

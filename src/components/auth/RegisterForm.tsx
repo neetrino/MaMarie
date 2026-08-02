@@ -279,7 +279,7 @@ export function RegisterForm({
           disabled={disabled}
           autoComplete="off"
           suppressHydrationWarning
-          className="mt-0.5 rounded border-[#ededed] text-brand-pink focus:ring-brand-pink/35"
+          className="mt-0.5 rounded border-[#ededed] text-brand-yellow accent-brand-yellow focus:outline-none focus:ring-0"
           style={{ width: LOGIN_CHECKBOX_SIZE_PX, height: LOGIN_CHECKBOX_SIZE_PX }}
         />
         <span style={{ fontSize: LOGIN_SECONDARY_TEXT_FONT_SIZE_PX }}>

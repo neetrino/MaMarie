@@ -2,6 +2,7 @@
 
 import { Card } from '@shop/ui';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { ClayDatePicker } from '../../../../components/ClayDatePicker';
 import { ClaySelect } from '../../../../components/ClaySelect';
 import { formatDate } from '../utils';
 import type { AnalyticsData } from '../types';
@@ -61,26 +62,20 @@ export function PeriodSelector({
         </div>
         {period === 'custom' && (
           <>
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.analytics.startDate')}
-              </label>
-              <input
-                type="date"
+            <div className="min-w-[200px] flex-1">
+              <ClayDatePicker
+                label={t('admin.analytics.startDate')}
+                mode="date"
                 value={startDate}
-                onChange={(e) => onStartDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
+                onChange={onStartDateChange}
               />
             </div>
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.analytics.endDate')}
-              </label>
-              <input
-                type="date"
+            <div className="min-w-[200px] flex-1">
+              <ClayDatePicker
+                label={t('admin.analytics.endDate')}
+                mode="date"
                 value={endDate}
-                onChange={(e) => onEndDateChange(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
+                onChange={onEndDateChange}
               />
             </div>
           </>

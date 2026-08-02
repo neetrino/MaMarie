@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { BRAND_LOADING_SPINNER_CLASS } from '../../constants/brand';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
 import { StatsGrid } from './components/StatsGrid';
@@ -51,7 +52,7 @@ export default function AdminPanel() {
     return (
       <div className="flex min-h-[50vh] items-center justify-center py-12">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-11 w-11 animate-spin rounded-full border-2 border-[#fdeef2] border-t-brand-pink" />
+          <div className={`mx-auto mb-4 h-11 w-11 ${BRAND_LOADING_SPINNER_CLASS}`} />
           <p className="text-sm text-gray-600">{t('admin.common.loading')}</p>
         </div>
       </div>

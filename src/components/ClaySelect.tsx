@@ -9,6 +9,7 @@ import {
   CLAY_SELECT_CHEVRON_SIZE_PX,
   CLAY_SELECT_DROPDOWN_ANIMATION_MS,
   CLAY_SELECT_DROPDOWN_GAP_PX,
+  CLAY_SELECT_DROPDOWN_MAX_HEIGHT_PX,
   CLAY_SELECT_DROPDOWN_PANEL_CLASS,
   CLAY_SELECT_FORM_INPUT_CLASS,
   CLAY_SELECT_OPTION_CLASS,
@@ -189,9 +190,14 @@ export function ClaySelect({
     : `${CLAY_SELECT_DROPDOWN_PANEL_CLASS} ${CLAY_SELECT_FORM_INPUT_CLASS}`;
 
   const dropdownStyle: CSSProperties = portal
-    ? { ...portalPosition, transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms` }
+    ? {
+        ...portalPosition,
+        maxHeight: CLAY_SELECT_DROPDOWN_MAX_HEIGHT_PX,
+        transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
+      }
     : {
         top: `calc(100% + ${CLAY_SELECT_DROPDOWN_GAP_PX}px)`,
+        maxHeight: CLAY_SELECT_DROPDOWN_MAX_HEIGHT_PX,
         transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms`,
       };
 
