@@ -104,7 +104,7 @@ export function StatsGrid({ stats, statsLoading }: StatsGridProps) {
   const router = useRouter();
 
   return (
-    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-6">
+    <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:gap-4">
       {ADMIN_DASHBOARD_STAT_CONFIG.map(({ key, theme }) => (
         <AdminStatCard
           key={key}

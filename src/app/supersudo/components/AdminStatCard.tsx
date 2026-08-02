@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
+import { DecorationMotionShell } from '../../../components/decoration-motion/DecorationMotionShell';
 import {
   PROFILE_DESKTOP_DASHBOARD_CARD_CLASS,
+  PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX,
   PROFILE_DESKTOP_STAT_THEMES,
   type ProfileDesktopStatTheme,
 } from '../../../constants/admin-desktop-page';
@@ -15,44 +17,46 @@ interface AdminStatCardProps {
   onClick?: () => void;
 }
 
-/** Dashboard stat tile — matches profile dashboard clay cards. */
+/** Dashboard stat tile — same clay layout as profile dashboard cards. */
 export function AdminStatCard({ label, value, icon, theme, onClick }: AdminStatCardProps) {
   const palette = PROFILE_DESKTOP_STAT_THEMES[theme];
-  const isSvgDecoration = palette.decoration.endsWith('.svg');
+  const decorationSizePx = PROFILE_DESKTOP_STAT_DECORATION_SIZE_PX;
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={!onClick}
-      className={`relative w-full overflow-hidden p-6 text-left transition-transform duration-200 ease-out hover:-translate-y-1 disabled:cursor-default disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}
+      className={`relative flex w-full items-center overflow-hidden p-6 text-left transition-transform duration-200 ease-out hover:-translate-y-1 disabled:cursor-default disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${PROFILE_DESKTOP_DASHBOARD_CARD_CLASS} ${PROFILE_MOBILE_ORDER_CARD_SHADOW_CLASS}`}
     >
-      <div
-        className={`mb-4 flex h-11 w-11 items-center justify-center rounded-full ${palette.iconInnerClass}`}
-        style={{
-          backgroundColor: palette.iconBackground,
-          color: palette.iconForeground,
-        }}
-      >
-        {icon}
+      <div className="flex w-full items-center gap-3">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${palette.iconInnerClass}`}
+          style={{
+            backgroundColor: palette.iconBackground,
+            color: palette.iconForeground,
+          }}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium leading-snug text-gray-600">{label}</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight" style={{ color: palette.valueColor }}>
+            {value}
+          </p>
+        </div>
       </div>
-      <p className="text-sm font-medium text-gray-600">{label}</p>
-      <p className="mt-1 text-3xl font-bold tracking-tight" style={{ color: palette.valueColor }}>
-        {value}
-      </p>
-      <div className="pointer-events-none absolute bottom-3 right-3 opacity-90">
-        {isSvgDecoration ? (
-          <Image src={palette.decoration} alt="" width={28} height={28} aria-hidden className="h-7 w-7" />
-        ) : (
+      <div className="pointer-events-none absolute bottom-2 right-2 opacity-90">
+        <DecorationMotionShell motion={palette.motion} inline>
           <Image
             src={palette.decoration}
             alt=""
-            width={40}
-            height={40}
+            width={decorationSizePx}
+            height={decorationSizePx}
             aria-hidden
-            className="h-10 w-10 object-contain"
+            className="h-14 w-14 object-contain"
           />
-        )}
+        </DecorationMotionShell>
       </div>
     </button>
   );
