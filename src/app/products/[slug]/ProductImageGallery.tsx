@@ -25,6 +25,7 @@ import {
   PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT,
   PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
 } from "./constants";
+import { ProductImageZoomOverlay } from "./ProductImageZoomOverlay";
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -238,25 +239,16 @@ export function ProductImageGallery({
         ) : null}
       </div>
 
-      {showZoom && renderedSrc && !failedSources.has(renderedSrc) ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
-          onClick={() => setShowZoom(false)}
-        >
-          <img src={renderedSrc} alt="" className="max-h-full max-w-full object-contain" />
-          <button
-            type="button"
-            className="absolute top-4 right-4 text-2xl text-white"
-            aria-label={t(language, 'common.buttons.close')}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowZoom(false);
-            }}
-          >
-            {t(language, 'common.buttons.close')}
-          </button>
-        </div>
-      ) : null}
+      <ProductImageZoomOverlay
+        isOpen={showZoom && Boolean(renderedSrc) && !failedSources.has(renderedSrc ?? '')}
+        src={renderedSrc ?? ''}
+        alt={product.title}
+        language={language}
+        onClose={() => setShowZoom(false)}
+        showNavigation={hasMultipleImages}
+        onPrevious={showPreviousImage}
+        onNext={showNextImage}
+      />
     </>
   );
 }

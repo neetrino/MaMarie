@@ -69,3 +69,27 @@ export const PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS =
   'flex h-full w-9 items-center justify-center text-sm font-bold text-white';
 export const PRODUCT_QUANTITY_STEPPER_VALUE_CLASS =
   'min-w-[1.5rem] text-center text-sm font-bold text-white';
+
+/**
+ * PDP image zoom modal — above header (80), bottom nav (70), cart (90),
+ * and clay select portals (110).
+ */
+export const PRODUCT_PDP_IMAGE_ZOOM_Z_INDEX = 120;
+
+/** Gap between the viewport edge and the zoom modal panel. */
+export const PRODUCT_PDP_IMAGE_ZOOM_INSET_PX = 40;
+
+/** Inner padding around the image inside the zoom modal. */
+export const PRODUCT_PDP_IMAGE_ZOOM_PANEL_PADDING_PX = 8;
+
+export const PRODUCT_PDP_IMAGE_ZOOM_PANEL_RADIUS_CLASS = 'rounded-2xl';
+
+export const PRODUCT_PDP_IMAGE_ZOOM_CLOSE_BUTTON_CLASS =
+  'absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors hover:bg-brand-pink hover:text-white';
+
+export const PRODUCT_PDP_IMAGE_ZOOM_NAV_BUTTON_CLASS =
+  'absolute top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow-sm transition-colors hover:bg-brand-pink hover:text-white';
+
+export const PRODUCT_PDP_IMAGE_ZOOM_NAV_BUTTON_LEFT_CLASS = 'left-3';
+export const PRODUCT_PDP_IMAGE_ZOOM_NAV_BUTTON_RIGHT_CLASS = 'right-3';
+export const PRODUCT_PDP_IMAGE_ZOOM_NAV_ICON_CLASS = 'h-6 w-6 shrink-0';
