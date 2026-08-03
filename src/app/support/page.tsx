@@ -2,6 +2,7 @@
 
 import { Card, Button, Input } from '@shop/ui';
 import Link from 'next/link';
+import { STORE_EMAIL, STORE_EMAIL_HREF, STORE_PHONE, STORE_PHONE_HREF } from '@/constants/store-contact';
 import { useTranslation } from '../../lib/i18n-client';
 
 /**
@@ -23,19 +24,19 @@ export default function SupportPage() {
             <div>
               <p className="text-sm font-medium text-gray-700 mb-1">{t('support.contactUs.email')}</p>
               <a
-                href="mailto:support@whiteshop.com"
+                href={STORE_EMAIL_HREF}
                 className="text-blue-600 hover:underline"
               >
-                support@whiteshop.com
+                {STORE_EMAIL}
               </a>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700 mb-1">{t('support.contactUs.phone')}</p>
               <a
-                href="tel:+1234567890"
+                href={STORE_PHONE_HREF}
                 className="text-blue-600 hover:underline"
               >
-                +1 (234) 567-890
+                {STORE_PHONE}
               </a>
             </div>
             <div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@shop/ui';
+import { STORE_EMAIL, STORE_EMAIL_HREF } from '@/constants/store-contact';
 import { useTranslation } from '../../lib/i18n-client';
 
 /**
@@ -67,8 +68,8 @@ export default function DeliveryTermsPage() {
             <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.contact.title')}</h2>
             <p className="text-gray-600">
               {t('delivery-terms.contact.description')}{' '}
-              <a href="mailto:shipping@whiteshop.com" className="text-blue-600 hover:underline">
-                shipping@whiteshop.com
+              <a href={STORE_EMAIL_HREF} className="text-blue-600 hover:underline">
+                {STORE_EMAIL}
               </a>
               .
             </p>

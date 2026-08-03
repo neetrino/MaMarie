@@ -1,5 +1,6 @@
 import { BRAND_COLORS } from './brand';
 import { HOME_SECTION_MAX_WIDTH_PX } from './home-sections';
+import { STORE_EMAIL_HREF, STORE_INSTAGRAM_HREF, STORE_PHONE_HREF } from './store-contact';
 
 /** Figma node `51:428` — site footer. */
 export const FOOTER_MAX_WIDTH_PX = HOME_SECTION_MAX_WIDTH_PX;
@@ -194,7 +195,7 @@ export const FOOTER_SOCIAL_LINKS: FooterSocialLink[] = [
     heightPx: FOOTER_SOCIAL_ICON_FACEBOOK_HEIGHT_PX,
   },
   {
-    href: 'https://instagram.com',
+    href: STORE_INSTAGRAM_HREF,
     labelKey: 'common.footer.social.instagram',
     iconSrc: FOOTER_ASSETS.iconInstagram,
     widthPx: FOOTER_SOCIAL_ICON_SIZE_PX,
@@ -216,6 +217,6 @@ export const FOOTER_SOCIAL_LINKS: FooterSocialLink[] = [
   },
 ];
 
-export const FOOTER_PHONE_HREF = 'tel:+37410000000';
-export const FOOTER_EMAIL_HREF = 'mailto:info@marco.am';
+export const FOOTER_PHONE_HREF = STORE_PHONE_HREF;
+export const FOOTER_EMAIL_HREF = STORE_EMAIL_HREF;
 export const FOOTER_COPYRIGHT_COMPANY_HREF = 'https://neetrino.com';
