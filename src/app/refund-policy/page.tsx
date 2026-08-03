@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@shop/ui';
+import { STORE_EMAIL, STORE_EMAIL_HREF } from '@/constants/store-contact';
 import { useTranslation } from '../../lib/i18n-client';
 
 /**
@@ -63,8 +64,8 @@ export default function RefundPolicyPage() {
             <h2 className="text-2xl font-semibold text-gray-900">{t('refund-policy.contact.title')}</h2>
             <p className="text-gray-600">
               {t('refund-policy.contact.description')}{' '}
-              <a href="mailto:support@whiteshop.com" className="text-blue-600 hover:underline">
-                support@whiteshop.com
+              <a href={STORE_EMAIL_HREF} className="text-blue-600 hover:underline">
+                {STORE_EMAIL}
               </a>
               .
             </p>

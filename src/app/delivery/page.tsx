@@ -2,6 +2,7 @@
 
 import { Card } from '@shop/ui';
 import { useEffect, useState } from 'react';
+import { STORE_EMAIL, STORE_EMAIL_HREF, STORE_PHONE, STORE_PHONE_HREF } from '@/constants/store-contact';
 import { useTranslation } from '../../lib/i18n-client';
 import { getStoredLanguage } from '../../lib/language';
 import { loadTranslation } from '../../lib/i18n';
@@ -158,14 +159,14 @@ export default function DeliveryPage() {
           <div className="space-y-2 text-gray-700">
             <p>
               <span className="font-semibold">{t('delivery.contact.email')}</span>{' '}
-              <a href="mailto:support@whiteshop.com" className="text-blue-600 hover:underline">
-                support@whiteshop.com
+              <a href={STORE_EMAIL_HREF} className="text-blue-600 hover:underline">
+                {STORE_EMAIL}
               </a>
             </p>
             <p>
               <span className="font-semibold">{t('delivery.contact.phone')}</span>{' '}
-              <a href="tel:+1234567890" className="text-blue-600 hover:underline">
-                +1 (234) 567-890
+              <a href={STORE_PHONE_HREF} className="text-blue-600 hover:underline">
+                {STORE_PHONE}
               </a>
             </p>
             <p>
