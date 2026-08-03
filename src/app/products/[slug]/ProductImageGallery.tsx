@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import NextImage from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
-import { ProductLabels } from "../../../components/ProductLabels";
-import { ProductImagePlaceholder } from "../../../components/ProductImagePlaceholder";
-import { t } from "../../../lib/i18n";
-import type { LanguageCode } from "../../../lib/language";
-import { readProductPageSnapshot } from "../../../lib/product-page-snapshot";
-import type { Product } from "./types";
+import NextImage from 'next/image';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { ProductLabels } from '../../../components/ProductLabels';
+import { ProductImagePlaceholder } from '../../../components/ProductImagePlaceholder';
+import { t } from '../../../lib/i18n';
+import type { LanguageCode } from '../../../lib/language';
+import { readProductPageSnapshot } from '../../../lib/product-page-snapshot';
+import type { Product } from './types';
 import {
   PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS,
@@ -24,7 +24,9 @@ import {
   PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS,
   PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT,
   PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
-} from "./constants";
+} from './constants';
+import { ProductImageZoomOverlay } from './ProductImageZoomOverlay';
+import { ProductMainImageCarousel } from './ProductMainImageCarousel';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -37,7 +39,7 @@ interface ProductImageGalleryProps {
   mainImagePriority?: boolean;
 }
 
-const PDP_MAIN_IMAGE_SIZES = "(max-width: 1024px) 100vw, 55vw";
+const PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 55vw';
 
 interface ProductThumbnailRailProps {
   images: string[];
@@ -153,7 +155,18 @@ export function ProductImageGallery({
       <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
         <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
           <div data-product-fly-origin className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}>
-            {canShowMainImage || canShowSnapshot ? (
+            {hasMultipleImages ? (
+              <ProductMainImageCarousel
+                images={images}
+                alt={product.title}
+                currentImageIndex={currentImageIndex}
+                failedSources={failedSources}
+                mainImagePriority={mainImagePriority}
+                onImageIndexChange={onImageIndexChange}
+                onImageError={markFailed}
+                onImageLoad={(src) => setSnapshotSrc(src)}
+              />
+            ) : canShowMainImage || canShowSnapshot ? (
               <>
                 {snapshotSrc && snapshotSrc !== currentSrc && !snapshotFailed ? (
                   <img
@@ -171,7 +184,7 @@ export function ProductImageGallery({
                     fill
                     className="object-contain transition-transform duration-500 group-hover:scale-105"
                     sizes={PDP_MAIN_IMAGE_SIZES}
-                    loading={mainImagePriority && currentSrc === images[0] ? "eager" : "lazy"}
+                    loading={mainImagePriority ? 'eager' : 'lazy'}
                     unoptimized
                     onLoad={() => setSnapshotSrc(currentSrc)}
                     onError={() => markFailed(currentSrc)}
@@ -181,12 +194,12 @@ export function ProductImageGallery({
             ) : (
               <ProductImagePlaceholder
                 className="h-full w-full"
-                aria-label={t(language, "common.messages.noImage")}
+                aria-label={t(language, 'common.messages.noImage')}
               />
             )}
 
             {discountPercent ? (
-              <div className="absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
+              <div className="pointer-events-none absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
                 -{discountPercent}%
               </div>
             ) : null}
@@ -238,25 +251,16 @@ export function ProductImageGallery({
         ) : null}
       </div>
 
-      {showZoom && renderedSrc && !failedSources.has(renderedSrc) ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
-          onClick={() => setShowZoom(false)}
-        >
-          <img src={renderedSrc} alt="" className="max-h-full max-w-full object-contain" />
-          <button
-            type="button"
-            className="absolute top-4 right-4 text-2xl text-white"
-            aria-label={t(language, 'common.buttons.close')}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowZoom(false);
-            }}
-          >
-            {t(language, 'common.buttons.close')}
-          </button>
-        </div>
-      ) : null}
+      <ProductImageZoomOverlay
+        isOpen={showZoom && Boolean(renderedSrc) && !failedSources.has(renderedSrc ?? '')}
+        src={renderedSrc ?? ''}
+        alt={product.title}
+        language={language}
+        onClose={() => setShowZoom(false)}
+        showNavigation={hasMultipleImages}
+        onPrevious={showPreviousImage}
+        onNext={showNextImage}
+      />
     </>
   );
 }
