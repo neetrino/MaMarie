@@ -82,10 +82,13 @@ export function ProductImageZoomOverlay({
   const onNextRef = useRef(onNext);
   const showNavigationRef = useRef(showNavigation);
   const touchStartRef = useRef<TouchPoint | null>(null);
-  onCloseRef.current = onClose;
-  onPreviousRef.current = onPrevious;
-  onNextRef.current = onNext;
-  showNavigationRef.current = showNavigation;
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    onPreviousRef.current = onPrevious;
+    onNextRef.current = onNext;
+    showNavigationRef.current = showNavigation;
+  }, [onClose, onPrevious, onNext, showNavigation]);
 
   const {
     isVisible,
