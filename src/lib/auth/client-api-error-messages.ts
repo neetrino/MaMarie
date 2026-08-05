@@ -21,6 +21,9 @@ export function resolveRegisterApiError(
   if (low.includes("at least 6 characters")) {
     return translate("register.errors.passwordMinLength");
   }
+  if (low.includes("phone is required") || low.includes("phone:")) {
+    return translate("register.errors.phoneRequired");
+  }
   if (low.includes("either email or phone")) {
     return translate("register.errors.emailOrPhoneRequired");
   }

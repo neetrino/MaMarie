@@ -6,7 +6,7 @@ import { usersService } from "./users.service";
 
 export interface RegisterData {
   email?: string;
-  phone?: string;
+  phone: string;
   password: string;
   firstName?: string;
   lastName?: string;
@@ -41,12 +41,12 @@ class AuthService {
       hasLastName: !!data.lastName,
     });
 
-    if (!data.email && !data.phone) {
+    if (!data.phone?.trim()) {
       throw {
         status: 400,
         type: "https://api.shop.am/problems/validation-error",
         title: "Validation failed",
-        detail: "Either email or phone is required",
+        detail: "Phone is required",
       };
     }
 
