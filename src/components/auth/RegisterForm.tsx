@@ -209,6 +209,7 @@ export function RegisterForm({
           value={phone}
           placeholder={labels.placeholders.phone}
           autoComplete="tel"
+          required
           disabled={disabled}
           hasError={Boolean(fieldErrors.phone)}
           onChange={onPhoneChange}

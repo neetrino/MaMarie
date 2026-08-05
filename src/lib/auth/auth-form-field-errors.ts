@@ -59,10 +59,12 @@ export function validateRegisterFields(
     errors.lastName = t('register.errors.lastNameRequired');
   }
 
-  if (!values.email.trim() && !values.phone.trim()) {
-    const message = t('register.errors.emailOrPhoneRequired');
-    errors.email = message;
-    errors.phone = message;
+  if (!values.email.trim()) {
+    errors.email = t('register.errors.emailRequired');
+  }
+
+  if (!values.phone.trim()) {
+    errors.phone = t('register.errors.phoneRequired');
   }
 
   if (!values.password) {
