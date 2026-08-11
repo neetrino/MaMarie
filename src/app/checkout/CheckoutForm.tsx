@@ -191,43 +191,44 @@ export function CheckoutForm({
         )}
         <div className="space-y-3">
           {paymentMethods.map((method) => (
-            <CheckoutPaymentMethodOption
-              key={method.id}
-              method={method}
-              isSelected={paymentMethod === method.id}
-              isSubmitting={isSubmitting}
-              logoErrors={logoErrors}
-              onLogoError={(methodId) => {
-                setLogoErrors((prev) => ({ ...prev, [methodId]: true }));
-              }}
-              register={register}
-              onSelect={(methodId) => {
-                setValue('paymentMethod', methodId);
-                if (methodId === 'cash_on_delivery' && !cashChangeFor) {
-                  setValue('cashChangeFor', DEFAULT_CASH_CHANGE_FOR);
-                }
-              }}
-            />
+            <div key={method.id} className="space-y-3">
+              <CheckoutPaymentMethodOption
+                method={method}
+                isSelected={paymentMethod === method.id}
+                isSubmitting={isSubmitting}
+                logoErrors={logoErrors}
+                onLogoError={(methodId) => {
+                  setLogoErrors((prev) => ({ ...prev, [methodId]: true }));
+                }}
+                register={register}
+                onSelect={(methodId) => {
+                  setValue('paymentMethod', methodId);
+                  if (methodId === 'cash_on_delivery' && !cashChangeFor) {
+                    setValue('cashChangeFor', DEFAULT_CASH_CHANGE_FOR);
+                  }
+                }}
+              />
+
+              {method.id === 'cash_on_delivery' && paymentMethod === 'cash_on_delivery' && (
+                <>
+                  {errors.cashChangeFor && (
+                    <div className={`border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
+                      <p className="text-sm text-red-600">{errors.cashChangeFor.message}</p>
+                    </div>
+                  )}
+                  <CheckoutCashChangeSelector
+                    value={cashChangeFor ?? DEFAULT_CASH_CHANGE_FOR}
+                    disabled={isSubmitting}
+                    title={t('checkout.payment.cashChange.title')}
+                    hint={t('checkout.payment.cashChange.hint')}
+                    noneLabel={t('checkout.payment.cashChange.none')}
+                    onChange={(next) => setValue('cashChangeFor', next, { shouldValidate: true })}
+                  />
+                </>
+              )}
+            </div>
           ))}
         </div>
-
-        {paymentMethod === 'cash_on_delivery' && (
-          <>
-            {errors.cashChangeFor && (
-              <div className={`mt-4 border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
-                <p className="text-sm text-red-600">{errors.cashChangeFor.message}</p>
-              </div>
-            )}
-            <CheckoutCashChangeSelector
-              value={cashChangeFor ?? DEFAULT_CASH_CHANGE_FOR}
-              disabled={isSubmitting}
-              title={t('checkout.payment.cashChange.title')}
-              hint={t('checkout.payment.cashChange.hint')}
-              noneLabel={t('checkout.payment.cashChange.none')}
-              onChange={(next) => setValue('cashChangeFor', next, { shouldValidate: true })}
-            />
-          </>
-        )}
       </section>
     </div>
   );

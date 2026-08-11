@@ -30,7 +30,7 @@ export const CASH_CHANGE_BANKNOTE_SRC: Record<CashChangeDenominationAmd, string>
 };
 
 export const CHECKOUT_CASH_CHANGE_SECTION_CLASS =
-  'mt-4 rounded-[18px] border border-gray-200 bg-white p-4 sm:p-5';
+  'rounded-[18px] border border-gray-200 bg-white p-4 sm:p-5';
 
 export const CHECKOUT_CASH_CHANGE_TITLE_CLASS =
   'text-base font-bold tracking-wide text-gray-900';
