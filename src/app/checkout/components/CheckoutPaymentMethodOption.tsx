@@ -90,11 +90,20 @@ export function CheckoutPaymentMethodOption({
       <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
         <div className="flex shrink-0 items-center">{icons}</div>
         <div className="min-w-0">
-          <span className="font-medium text-gray-900 lg:hidden">{method.shortName}</span>
-          <div className="hidden lg:block">
-            <div className="font-medium text-gray-900">{method.name}</div>
-            <div className="text-sm text-gray-600">{method.description}</div>
-          </div>
+          {method.id === 'cash_on_delivery' ? (
+            <>
+              <div className="font-medium text-gray-900">{method.name}</div>
+              <div className="text-sm text-gray-600">{method.description}</div>
+            </>
+          ) : (
+            <>
+              <span className="font-medium text-gray-900 lg:hidden">{method.shortName}</span>
+              <div className="hidden lg:block">
+                <div className="font-medium text-gray-900">{method.name}</div>
+                <div className="text-sm text-gray-600">{method.description}</div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </label>

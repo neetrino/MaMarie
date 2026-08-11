@@ -56,9 +56,9 @@
     "vayotsDzor": "Վայոց Ձոր"
   },
   "payment": {
-    "cashOnDelivery": "Կանխիկ առաքման ժամանակ",
+    "cashOnDelivery": "Կանխիկ առաքման պահին",
     "cashShort": "Կանխիկ",
-    "cashOnDeliveryDescription": "Վճարեք կանխիկ, երբ ստանաք ձեր պատվերը",
+    "cashOnDeliveryDescription": "Վճարեք պատվերը ստանալիս:",
     "idram": "Idram",
     "idramDescription": "Վճարեք Idram դրամապանակով կամ քարտով",
     "card": "Քարտով",
@@ -66,7 +66,14 @@
     "arca": "ArCa",
     "arcaDescription": "Վճարեք ArCa քարտով",
     "paymentDetails": "Վճարման մանրամասներ",
-    "enterCardDetails": "Մուտքագրեք ձեր քարտի տվյալները՝ վճարումն ավարտելու համար"
+    "enterCardDetails": "Մուտքագրեք ձեր քարտի տվյալները՝ վճարումն ավարտելու համար",
+    "cashChange": {
+      "title": "ՄԱՆՐ",
+      "hint": "Սեղմեք այն թղթադրամին, որը կվճարեք, որպեսզի պատրաստենք մանրը:",
+      "none": "Մանր պետք չէ",
+      "orderNoteNone": "Մանր պետք չէ",
+      "orderNoteChangeFor": "Մանր՝ {amount} դրամ"
+    }
   },
   "summary": {
     "items": "Ապրանքներ",
@@ -102,6 +109,7 @@
     "invalidPhone": "Անվավեր հեռախոսահամար",
     "selectShippingMethod": "Խնդրում ենք ընտրել առաքման եղանակ",
     "selectPaymentMethod": "Խնդրում ենք ընտրել վճարման եղանակ",
+    "selectCashChange": "Խնդրում ենք ընտրել մանրի տարբերակը",
     "addressRequired": "Հասցեն պարտադիր է առաքման համար",
     "cityRequired": "Քաղաքը պարտադիր է առաքման համար",
     "postalCodeRequired": "Փոստային կոդը պարտադիր է առաքման համար",

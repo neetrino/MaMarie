@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { useTranslation } from '../../../lib/i18n-client';
-import type { CheckoutFormData } from '../types';
 
 export function useCheckoutSchema() {
   const { t } = useTranslation();
@@ -16,6 +15,9 @@ export function useCheckoutSchema() {
     paymentMethod: z.enum(['idram', 'arca', 'cash_on_delivery'], {
       message: t('checkout.errors.selectPaymentMethod'),
     }),
+    cashChangeFor: z
+      .enum(['none', '2000', '5000', '10000', '20000', '50000', '100000'])
+      .optional(),
     shippingAddress: z.string().optional(),
     shippingCity: z.string().optional(),
     cardNumber: z.string().optional(),
@@ -38,6 +40,14 @@ export function useCheckoutSchema() {
   }, {
     message: t('checkout.errors.cityRequired'),
     path: ['shippingCity'],
+  }).refine((data) => {
+    if (data.paymentMethod === 'cash_on_delivery') {
+      return Boolean(data.cashChangeFor);
+    }
+    return true;
+  }, {
+    message: t('checkout.errors.selectCashChange'),
+    path: ['cashChangeFor'],
   }).refine((data) => {
     if (data.paymentMethod === 'arca' || data.paymentMethod === 'idram') {
       return data.cardNumber && data.cardNumber.replace(/\s/g, '').length >= 13;
@@ -72,7 +82,3 @@ export function useCheckoutSchema() {
     path: ['cardHolderName'],
   });
 }
-
-
-
-

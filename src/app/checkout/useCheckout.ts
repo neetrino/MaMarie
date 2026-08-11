@@ -7,6 +7,7 @@ import { getStoredCurrency, DEFAULT_CURRENCY } from '../../lib/currency';
 import { getStoredLanguage, DEFAULT_LANGUAGE } from '../../lib/language';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
+import { DEFAULT_CASH_CHANGE_FOR } from './constants/checkout-cash-change';
 import { usePaymentMethods } from './utils/payment-methods';
 import { useCheckoutSchema } from './utils/validation-schema';
 import { useDeliveryPrice } from './hooks/useDeliveryPrice';
@@ -45,6 +46,7 @@ export function useCheckout() {
       phone: '',
       shippingMethod: 'pickup',
       paymentMethod: 'cash_on_delivery',
+      cashChangeFor: DEFAULT_CASH_CHANGE_FOR,
       shippingAddress: '',
       shippingCity: '',
       cardNumber: '',
@@ -55,6 +57,7 @@ export function useCheckout() {
   });
 
   const paymentMethod = watch('paymentMethod');
+  const cashChangeFor = watch('cashChangeFor');
   const shippingMethod = watch('shippingMethod');
   const shippingCity = watch('shippingCity');
 
@@ -171,6 +174,7 @@ export function useCheckout() {
     watch,
     // Computed
     paymentMethod,
+    cashChangeFor,
     shippingMethod,
     shippingCity,
     paymentMethods,

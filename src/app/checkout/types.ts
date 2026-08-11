@@ -1,3 +1,5 @@
+import type { CashChangeFor } from './constants/checkout-cash-change';
+
 export type CheckoutFormData = {
   firstName: string;
   lastName: string;
@@ -5,6 +7,8 @@ export type CheckoutFormData = {
   phone: string;
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  /** Required when paymentMethod is cash_on_delivery. */
+  cashChangeFor?: CashChangeFor;
   shippingAddress?: string;
   shippingCity?: string;
   cardNumber?: string;

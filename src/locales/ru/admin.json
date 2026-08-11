@@ -738,6 +738,7 @@
       "method": "Метод:",
       "amount": "Сумма:",
       "card": "Карта:",
+      "cashChange": "Сдача:",
       "noPaymentInfo": "Нет информации об оплате",
       "items": "Товары",
       "product": "Товар",

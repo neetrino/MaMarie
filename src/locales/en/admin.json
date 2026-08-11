@@ -743,6 +743,7 @@
       "method": "Method:",
       "amount": "Amount:",
       "card": "Card:",
+      "cashChange": "Change:",
       "noPaymentInfo": "No payment info",
       "items": "Items",
       "product": "Product",
