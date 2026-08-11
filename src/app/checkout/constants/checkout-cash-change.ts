@@ -37,8 +37,9 @@ export const CHECKOUT_CASH_CHANGE_TITLE_CLASS =
 
 export const CHECKOUT_CASH_CHANGE_HINT_CLASS = 'mt-2 text-sm leading-snug text-gray-600';
 
-/** Grill.am: equal 3-column grid, notes scale to cell width. */
-export const CHECKOUT_CASH_CHANGE_GRID_CLASS = 'mt-4 grid grid-cols-3 gap-2.5 sm:gap-3';
+/** Mobile: 2 columns; sm+: 3 columns (notes scale to cell width). */
+export const CHECKOUT_CASH_CHANGE_GRID_CLASS =
+  'mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3';
 
 export const CHECKOUT_CASH_CHANGE_OPTION_BASE_CLASS =
   'flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-[18px] border-2 outline-none transition-all [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink disabled:cursor-not-allowed disabled:opacity-50';
