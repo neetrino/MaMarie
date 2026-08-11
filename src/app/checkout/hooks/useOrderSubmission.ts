@@ -7,6 +7,11 @@ import {
   saveOrderSuccessPending,
 } from '../../orders/[number]/utils/order-success-pending';
 import { clearGuestCart } from '../checkoutUtils';
+import {
+  DEFAULT_CASH_CHANGE_FOR,
+  type CashChangeFor,
+} from '../constants/checkout-cash-change';
+import { formatCashChangeOrderNote, isCashChangeFor } from '../utils/cash-change';
 import type { CheckoutFormData, Cart, CartItem } from '../types';
 
 interface UseOrderSubmissionProps {
@@ -56,6 +61,22 @@ export function useOrderSubmission({
 
       const shippingAmount = data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
 
+      const cashChangeFor: CashChangeFor | undefined =
+        data.paymentMethod === 'cash_on_delivery'
+          ? data.cashChangeFor && isCashChangeFor(data.cashChangeFor)
+            ? data.cashChangeFor
+            : DEFAULT_CASH_CHANGE_FOR
+          : undefined;
+
+      const cashChangeNote =
+        cashChangeFor === undefined
+          ? undefined
+          : formatCashChangeOrderNote(cashChangeFor, {
+              none: t('checkout.payment.cashChange.orderNoteNone'),
+              changeFor: (amount) =>
+                t('checkout.payment.cashChange.orderNoteChangeFor').replace('{amount}', amount),
+            });
+
       const response = await apiClient.post<{
         order: {
           id: string;
@@ -82,6 +103,8 @@ export function useOrderSubmission({
         ...(shippingAddress ? { shippingAddress } : {}),
         shippingAmount: shippingAmount,
         paymentMethod: data.paymentMethod,
+        ...(cashChangeFor !== undefined ? { cashChangeFor } : {}),
+        ...(cashChangeNote ? { notes: cashChangeNote } : {}),
       });
 
       if (!isLoggedIn) {

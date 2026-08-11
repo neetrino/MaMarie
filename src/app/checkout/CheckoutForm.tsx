@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckoutCashChangeSelector } from './components/CheckoutCashChangeSelector';
 import { CheckoutDeliveryCitySelect } from './components/CheckoutDeliveryCitySelect';
 import { CheckoutInput } from './components/CheckoutInput';
 import { CheckoutPaymentMethodOption } from './components/CheckoutPaymentMethodOption';
@@ -7,6 +8,10 @@ import { CheckoutRadio } from './components/CheckoutRadio';
 import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { useTranslation } from '../../lib/i18n-client';
 import { checkoutPageShellStyles } from './components/CheckoutPageShell';
+import {
+  DEFAULT_CASH_CHANGE_FOR,
+  type CashChangeFor,
+} from './constants/checkout-cash-change';
 import {
   CHECKOUT_FORM_ALERT_CLASS,
   CHECKOUT_OPTION_BASE_CLASS,
@@ -26,6 +31,7 @@ interface CheckoutFormProps {
   isSubmitting: boolean;
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
+  cashChangeFor: CashChangeFor | undefined;
   paymentMethods: PaymentMethod[];
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
@@ -47,6 +53,7 @@ export function CheckoutForm({
   isSubmitting,
   shippingMethod,
   paymentMethod,
+  cashChangeFor,
   paymentMethods,
   logoErrors,
   setLogoErrors,
@@ -184,18 +191,42 @@ export function CheckoutForm({
         )}
         <div className="space-y-3">
           {paymentMethods.map((method) => (
-            <CheckoutPaymentMethodOption
-              key={method.id}
-              method={method}
-              isSelected={paymentMethod === method.id}
-              isSubmitting={isSubmitting}
-              logoErrors={logoErrors}
-              onLogoError={(methodId) => {
-                setLogoErrors((prev) => ({ ...prev, [methodId]: true }));
-              }}
-              register={register}
-              onSelect={(methodId) => setValue('paymentMethod', methodId)}
-            />
+            <div key={method.id} className="space-y-3">
+              <CheckoutPaymentMethodOption
+                method={method}
+                isSelected={paymentMethod === method.id}
+                isSubmitting={isSubmitting}
+                logoErrors={logoErrors}
+                onLogoError={(methodId) => {
+                  setLogoErrors((prev) => ({ ...prev, [methodId]: true }));
+                }}
+                register={register}
+                onSelect={(methodId) => {
+                  setValue('paymentMethod', methodId);
+                  if (methodId === 'cash_on_delivery' && !cashChangeFor) {
+                    setValue('cashChangeFor', DEFAULT_CASH_CHANGE_FOR);
+                  }
+                }}
+              />
+
+              {method.id === 'cash_on_delivery' && paymentMethod === 'cash_on_delivery' && (
+                <>
+                  {errors.cashChangeFor && (
+                    <div className={`border border-red-200 bg-red-50 p-3 ${CHECKOUT_FORM_ALERT_CLASS}`}>
+                      <p className="text-sm text-red-600">{errors.cashChangeFor.message}</p>
+                    </div>
+                  )}
+                  <CheckoutCashChangeSelector
+                    value={cashChangeFor ?? DEFAULT_CASH_CHANGE_FOR}
+                    disabled={isSubmitting}
+                    title={t('checkout.payment.cashChange.title')}
+                    hint={t('checkout.payment.cashChange.hint')}
+                    noneLabel={t('checkout.payment.cashChange.none')}
+                    onChange={(next) => setValue('cashChangeFor', next, { shouldValidate: true })}
+                  />
+                </>
+              )}
+            </div>
           ))}
         </div>
       </section>

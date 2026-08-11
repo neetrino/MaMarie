@@ -62,6 +62,7 @@ export default function CheckoutPage() {
     isSubmitting,
     setValue,
     paymentMethod,
+    cashChangeFor,
     shippingMethod,
     shippingCity,
     paymentMethods,
@@ -108,6 +109,7 @@ export default function CheckoutPage() {
             isSubmitting={isSubmitting}
             shippingMethod={shippingMethod}
             paymentMethod={paymentMethod}
+            cashChangeFor={cashChangeFor}
             paymentMethods={paymentMethods}
             logoErrors={logoErrors}
             setLogoErrors={setLogoErrors}

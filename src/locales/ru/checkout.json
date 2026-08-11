@@ -56,9 +56,9 @@
     "vayotsDzor": "Вайоц Дзор"
   },
   "payment": {
-    "cashOnDelivery": "Наложенный платеж",
+    "cashOnDelivery": "Наличными при доставке",
     "cashShort": "Наличные",
-    "cashOnDeliveryDescription": "Оплатите наличными при получении заказа",
+    "cashOnDeliveryDescription": "Оплатите при получении заказа",
     "idram": "Idram",
     "idramDescription": "Оплатите кошельком Idram или картой",
     "card": "Картой",
@@ -66,7 +66,14 @@
     "arca": "ArCa",
     "arcaDescription": "Оплатите картой ArCa",
     "paymentDetails": "Детали оплаты",
-    "enterCardDetails": "Введите данные вашей карты для завершения оплаты"
+    "enterCardDetails": "Введите данные вашей карты для завершения оплаты",
+    "cashChange": {
+      "title": "Сдача",
+      "hint": "Нажмите на купюру, которой будете платить, чтобы мы подготовили сдачу",
+      "none": "Сдача не нужна",
+      "orderNoteNone": "Сдача не нужна",
+      "orderNoteChangeFor": "Сдача с {amount} AMD"
+    }
   },
   "summary": {
     "items": "Товары",
@@ -102,6 +109,7 @@
     "invalidPhone": "Неверный номер телефона",
     "selectShippingMethod": "Пожалуйста, выберите способ доставки",
     "selectPaymentMethod": "Пожалуйста, выберите способ оплаты",
+    "selectCashChange": "Пожалуйста, выберите вариант сдачи",
     "addressRequired": "Адрес обязателен для доставки",
     "cityRequired": "Город обязателен для доставки",
     "postalCodeRequired": "Почтовый индекс обязателен для доставки",

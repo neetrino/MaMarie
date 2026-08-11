@@ -25,7 +25,7 @@ export const STORES_PAGE_COLUMN_GAP_PX = 24;
 export const STORES_PAGE_CARD_RADIUS_PX = 24;
 export const STORES_PAGE_CARD_SHADOW = '0 8px 32px rgba(87, 66, 59, 0.08)';
 
-/** Same title scale as wishlist page (`Իմ նախընտրածներ`). */
+/** Same title scale as wishlist page (`Իմ նախընտրածները`). */
 export const STORES_PAGE_TITLE_FONT_SIZE_PX = WISHLIST_PAGE_TITLE_FONT_SIZE_PX;
 export const STORES_PAGE_TITLE_LINE_HEIGHT_PX = WISHLIST_PAGE_TITLE_LINE_HEIGHT_PX;
 export const STORES_PAGE_MOBILE_TITLE_FONT_SIZE_PX = WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX;

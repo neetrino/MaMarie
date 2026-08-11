@@ -103,6 +103,8 @@ class OrdersService {
         shippingMethod = 'pickup',
         shippingAddress,
         paymentMethod = 'idram',
+        cashChangeFor,
+        notes,
       } = data;
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
@@ -113,6 +115,29 @@ class OrdersService {
           type: "https://api.shop.am/problems/validation-error",
           title: "Validation Error",
           detail: "Email and phone are required",
+        };
+      }
+
+      const allowedCashChangeFor = new Set([
+        'none',
+        '2000',
+        '5000',
+        '10000',
+        '20000',
+        '50000',
+        '100000',
+      ]);
+
+      if (
+        paymentMethod === 'cash_on_delivery' &&
+        cashChangeFor !== undefined &&
+        !allowedCashChangeFor.has(cashChangeFor)
+      ) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          detail: "Invalid cash change option",
         };
       }
 
@@ -358,6 +383,7 @@ class OrdersService {
             shippingMethod,
             shippingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
             billingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
+            notes: notes ?? null,
             items: {
               create: cartItems.map((item) => ({
                 variantId: item.variantId,
@@ -377,6 +403,9 @@ class OrdersService {
                   source: userId ? 'user' : 'guest',
                   paymentMethod,
                   shippingMethod,
+                  ...(paymentMethod === 'cash_on_delivery' && cashChangeFor
+                    ? { cashChangeFor }
+                    : {}),
                 },
               },
             },
@@ -443,6 +472,13 @@ class OrdersService {
             amount: total,
             currency: 'AMD',
             status: 'pending',
+            ...(paymentMethod === 'cash_on_delivery' && cashChangeFor
+              ? {
+                  providerResponse: {
+                    cashChangeFor,
+                  },
+                }
+              : {}),
           },
         });
 

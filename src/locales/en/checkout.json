@@ -58,7 +58,7 @@
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
     "cashShort": "Cash",
-    "cashOnDeliveryDescription": "Pay cash when you receive your order",
+    "cashOnDeliveryDescription": "Pay when you receive the order",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
     "card": "By card",
@@ -66,7 +66,14 @@
     "arca": "ArCa",
     "arcaDescription": "Pay with ArCa card",
     "paymentDetails": "Payment Details",
-    "enterCardDetails": "Enter your card details to complete payment"
+    "enterCardDetails": "Enter your card details to complete payment",
+    "cashChange": {
+      "title": "Change",
+      "hint": "Tap the banknote you will pay with so we can prepare the change",
+      "none": "No change needed",
+      "orderNoteNone": "No change needed",
+      "orderNoteChangeFor": "Change for {amount} AMD"
+    }
   },
   "summary": {
     "items": "Items",
@@ -102,6 +109,7 @@
     "invalidPhone": "Invalid phone number",
     "selectShippingMethod": "Please select a shipping method",
     "selectPaymentMethod": "Please select a payment method",
+    "selectCashChange": "Please select a change option",
     "addressRequired": "Address is required for delivery",
     "cityRequired": "City is required for delivery",
     "postalCodeRequired": "Postal code is required for delivery",

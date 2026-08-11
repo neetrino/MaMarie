@@ -121,6 +121,14 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
                 </dd>
               </>
             )}
+            {orderDetails.notes && (
+              <>
+                <dt className="font-medium text-gray-500 whitespace-nowrap">
+                  {t('admin.orders.orderDetails.cashChange')}
+                </dt>
+                <dd className="text-gray-900">{orderDetails.notes}</dd>
+              </>
+            )}
           </dl>
         ) : (
           <div className="text-sm text-gray-500">{t('admin.orders.orderDetails.noPaymentInfo')}</div>
