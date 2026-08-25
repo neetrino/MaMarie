@@ -1,5 +1,7 @@
+import { isLegalPolicyPath } from './legal-policy-links';
+
 /** i18n keys under `common.navigation.*` */
-export type NavLinkKey = 'home' | 'catalog' | 'about' | 'stores' | 'contact';
+export type NavLinkKey = 'home' | 'catalog' | 'about' | 'stores' | 'contact' | 'policy';
 
 export interface NavLinkItem {
   href: string;
@@ -20,6 +22,7 @@ export const MOBILE_MENU_NAV_LINKS: readonly NavLinkItem[] = [
   { href: '/about', labelKey: 'about' },
   { href: '/stores', labelKey: 'stores' },
   { href: '/contact', labelKey: 'contact' },
+  { href: '/legal', labelKey: 'policy' },
 ] as const;
 
 /** Mobile menu bottom CTA — label from `common.buttons.shopNow`. */
@@ -49,6 +52,9 @@ export function isNavLinkActive(labelKey: NavLinkKey, pathname: string): boolean
   }
   if (labelKey === 'contact') {
     return pathname.startsWith('/contact');
+  }
+  if (labelKey === 'policy') {
+    return isLegalPolicyPath(pathname);
   }
   return false;
 }

@@ -37,6 +37,12 @@ export const CHECKOUT_CASH_CHANGE_TITLE_CLASS =
 
 export const CHECKOUT_CASH_CHANGE_HINT_CLASS = 'mt-2 text-sm leading-snug text-gray-600';
 
+/** Shown after a banknote is selected — change the courier must prepare. */
+export const CHECKOUT_CASH_CHANGE_RETURN_CLASS =
+  'mt-3 text-sm font-medium leading-snug text-gray-800';
+
+export const CHECKOUT_CASH_CHANGE_NO_ELIGIBLE_CLASS = 'mt-4 text-sm text-gray-600';
+
 /** Mobile: 2 columns; sm+: 3 columns (notes scale to cell width). */
 export const CHECKOUT_CASH_CHANGE_GRID_CLASS =
   'mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3';

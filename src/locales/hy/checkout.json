@@ -71,8 +71,11 @@
       "title": "ՄԱՆՐ",
       "hint": "Սեղմեք այն թղթադրամին, որը կվճարեք, որպեսզի պատրաստենք մանրը:",
       "none": "Մանր պետք չէ",
+      "changeReturn": "Առաքիչը պետք է տա մանր՝ {amount}",
+      "noEligible": "Պատվերի գումարը գերազանցում է հասանելի թղթադրամները՝ վճարեք առանց մանրի",
       "orderNoteNone": "Մանր պետք չէ",
-      "orderNoteChangeFor": "Մանր՝ {amount} դրամ"
+      "orderNoteChangeFor": "Մանր՝ {amount} դրամ",
+      "orderNoteChangeReturn": "վերադարձ՝ {amount} դրամ"
     }
   },
   "summary": {

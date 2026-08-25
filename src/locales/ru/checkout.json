@@ -71,8 +71,11 @@
       "title": "Сдача",
       "hint": "Нажмите на купюру, которой будете платить, чтобы мы подготовили сдачу",
       "none": "Сдача не нужна",
+      "changeReturn": "Курьеру нужно приготовить сдачу {amount}",
+      "noEligible": "Сумма заказа больше доступных купюр — оплатите без сдачи",
       "orderNoteNone": "Сдача не нужна",
-      "orderNoteChangeFor": "Сдача с {amount} AMD"
+      "orderNoteChangeFor": "Сдача с {amount} AMD",
+      "orderNoteChangeReturn": "к выдаче {amount} AMD"
     }
   },
   "summary": {

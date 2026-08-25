@@ -159,6 +159,17 @@ export function MainContent({ children }: MainContentProps) {
     );
   }
 
+  if (pathname.startsWith('/legal')) {
+    return (
+      <main
+        className="home-main-surface flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden max-lg:bg-[#f1f1f3] lg:bg-white pt-[var(--header-clearance-mobile)] lg:pt-[var(--header-clearance-desktop)]"
+        style={headerClearanceVars}
+      >
+        {content}
+      </main>
+    );
+  }
+
   if (pathname === '/login' || pathname === '/register') {
     return (
       <main

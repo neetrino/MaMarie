@@ -71,8 +71,11 @@
       "title": "Change",
       "hint": "Tap the banknote you will pay with so we can prepare the change",
       "none": "No change needed",
+      "changeReturn": "Courier should bring {amount} in change",
+      "noEligible": "Order total exceeds available banknotes — pay the exact amount",
       "orderNoteNone": "No change needed",
-      "orderNoteChangeFor": "Change for {amount} AMD"
+      "orderNoteChangeFor": "Change for {amount} AMD",
+      "orderNoteChangeReturn": "return {amount} AMD"
     }
   },
   "summary": {
