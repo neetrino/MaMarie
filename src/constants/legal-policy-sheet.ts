@@ -3,6 +3,14 @@
 /** Match Grill.am legal sheet — ~40% of desktop viewport. */
 export const LEGAL_POLICY_SHEET_DESKTOP_WIDTH_PERCENT = 40;
 
+export const LEGAL_POLICY_HUB_PAGE_CLASS =
+  'mobile-legal-page flex min-h-full flex-1 flex-col max-lg:bg-[#f1f1f3] lg:bg-white';
+
+export const LEGAL_POLICY_HUB_TITLE_CLASS =
+  'w-full text-center text-3xl font-bold text-gray-900 sm:text-4xl';
+
+export const LEGAL_POLICY_HUB_LIST_CLASS = 'mt-8 flex w-full flex-col items-center gap-3';
+
 export const LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS =
   'text-lg font-semibold text-gray-900';
 
