@@ -6,12 +6,17 @@ import {
   preloadOrderSuccessIllustration,
   saveOrderSuccessPending,
 } from '../../orders/[number]/utils/order-success-pending';
+import { convertPrice } from '../../../lib/currency';
 import { clearGuestCart } from '../checkoutUtils';
 import {
   DEFAULT_CASH_CHANGE_FOR,
   type CashChangeFor,
 } from '../constants/checkout-cash-change';
-import { formatCashChangeOrderNote, isCashChangeFor } from '../utils/cash-change';
+import {
+  formatCashChangeOrderNote,
+  isCashChangeFor,
+  isEligibleCashChangeFor,
+} from '../utils/cash-change';
 import type { CheckoutFormData, Cart, CartItem } from '../types';
 
 interface UseOrderSubmissionProps {
@@ -60,10 +65,15 @@ export function useOrderSubmission({
         : undefined;
 
       const shippingAmount = data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
+      const subtotalAmd = convertPrice(cart.totals.subtotal, 'USD', 'AMD');
+      const taxAmd = convertPrice(cart.totals.tax, 'USD', 'AMD');
+      const orderTotalAmd = subtotalAmd + taxAmd + shippingAmount;
 
       const cashChangeFor: CashChangeFor | undefined =
         data.paymentMethod === 'cash_on_delivery'
-          ? data.cashChangeFor && isCashChangeFor(data.cashChangeFor)
+          ? data.cashChangeFor &&
+              isCashChangeFor(data.cashChangeFor) &&
+              isEligibleCashChangeFor(data.cashChangeFor, orderTotalAmd)
             ? data.cashChangeFor
             : DEFAULT_CASH_CHANGE_FOR
           : undefined;
@@ -71,11 +81,17 @@ export function useOrderSubmission({
       const cashChangeNote =
         cashChangeFor === undefined
           ? undefined
-          : formatCashChangeOrderNote(cashChangeFor, {
-              none: t('checkout.payment.cashChange.orderNoteNone'),
-              changeFor: (amount) =>
-                t('checkout.payment.cashChange.orderNoteChangeFor').replace('{amount}', amount),
-            });
+          : formatCashChangeOrderNote(
+              cashChangeFor,
+              {
+                none: t('checkout.payment.cashChange.orderNoteNone'),
+                changeFor: (amount) =>
+                  t('checkout.payment.cashChange.orderNoteChangeFor').replace('{amount}', amount),
+                changeReturn: (amount) =>
+                  t('checkout.payment.cashChange.orderNoteChangeReturn').replace('{amount}', amount),
+              },
+              orderTotalAmd,
+            );
 
       const response = await apiClient.post<{
         order: {

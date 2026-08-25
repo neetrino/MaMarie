@@ -110,6 +110,7 @@ export default function CheckoutPage() {
             shippingMethod={shippingMethod}
             paymentMethod={paymentMethod}
             cashChangeFor={cashChangeFor}
+            orderTotalAmd={orderSummary.totalAMD}
             paymentMethods={paymentMethods}
             logoErrors={logoErrors}
             setLogoErrors={setLogoErrors}

@@ -1,13 +1,15 @@
 'use client';
 
+import { useCallback } from 'react';
+import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
+import { formatPriceInCurrency } from '../../lib/currency';
+import { useTranslation } from '../../lib/i18n-client';
 import { CheckoutCashChangeSelector } from './components/CheckoutCashChangeSelector';
 import { CheckoutDeliveryCitySelect } from './components/CheckoutDeliveryCitySelect';
 import { CheckoutInput } from './components/CheckoutInput';
 import { CheckoutPaymentMethodOption } from './components/CheckoutPaymentMethodOption';
-import { CheckoutRadio } from './components/CheckoutRadio';
-import { UseFormRegister, UseFormSetValue, FieldErrors } from 'react-hook-form';
-import { useTranslation } from '../../lib/i18n-client';
 import { checkoutPageShellStyles } from './components/CheckoutPageShell';
+import { CheckoutRadio } from './components/CheckoutRadio';
 import {
   DEFAULT_CASH_CHANGE_FOR,
   type CashChangeFor,
@@ -32,6 +34,7 @@ interface CheckoutFormProps {
   shippingMethod: 'pickup' | 'delivery';
   paymentMethod: 'idram' | 'arca' | 'cash_on_delivery';
   cashChangeFor: CashChangeFor | undefined;
+  orderTotalAmd: number;
   paymentMethods: PaymentMethod[];
   logoErrors: Record<string, boolean>;
   setLogoErrors: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
@@ -54,6 +57,7 @@ export function CheckoutForm({
   shippingMethod,
   paymentMethod,
   cashChangeFor,
+  orderTotalAmd,
   paymentMethods,
   logoErrors,
   setLogoErrors,
@@ -61,6 +65,13 @@ export function CheckoutForm({
   setError,
 }: CheckoutFormProps) {
   const { t } = useTranslation();
+
+  const handleCashChangeFor = useCallback(
+    (next: CashChangeFor) => {
+      setValue('cashChangeFor', next, { shouldValidate: true });
+    },
+    [setValue],
+  );
 
   return (
     <div className={`lg:col-span-2 flex flex-col ${checkoutPageShellStyles.formSections}`}>
@@ -218,11 +229,15 @@ export function CheckoutForm({
                   )}
                   <CheckoutCashChangeSelector
                     value={cashChangeFor ?? DEFAULT_CASH_CHANGE_FOR}
+                    orderTotalAmd={orderTotalAmd}
+                    formatMoney={(amountAmd) => formatPriceInCurrency(amountAmd, 'AMD')}
                     disabled={isSubmitting}
                     title={t('checkout.payment.cashChange.title')}
                     hint={t('checkout.payment.cashChange.hint')}
                     noneLabel={t('checkout.payment.cashChange.none')}
-                    onChange={(next) => setValue('cashChangeFor', next, { shouldValidate: true })}
+                    changeReturnLabel={t('checkout.payment.cashChange.changeReturn')}
+                    noEligibleLabel={t('checkout.payment.cashChange.noEligible')}
+                    onChange={handleCashChangeFor}
                   />
                 </>
               )}
