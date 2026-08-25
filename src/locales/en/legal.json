@@ -1,0 +1,11 @@
+{
+  "hubTitle": "Policies",
+  "hubIntro": "Read our store policies. Tap a policy to view the full text.",
+  "links": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "refund": "Refund Policy",
+    "delivery": "Delivery Terms",
+    "returns": "Delivery & Returns"
+  }
+}
