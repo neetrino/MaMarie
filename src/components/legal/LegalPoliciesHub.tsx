@@ -28,7 +28,7 @@ export function LegalPoliciesHub() {
   return (
     <>
       <div className={LEGAL_POLICY_HUB_PAGE_CLASS}>
-        <div className="mx-auto flex w-full max-w-lg flex-col items-center px-4 pb-10 pt-12 sm:px-6 md:pt-16">
+        <div className="mx-auto flex w-full min-w-0 max-w-lg flex-col items-stretch overflow-x-hidden px-4 pb-10 pt-12 sm:px-6 md:pt-16">
           <h1 className={LEGAL_POLICY_HUB_TITLE_CLASS}>{t('legal.hubTitle')}</h1>
 
           <ul className={LEGAL_POLICY_HUB_LIST_CLASS}>
