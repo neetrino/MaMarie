@@ -93,7 +93,7 @@ export const translations = {
   hy: {
     stock: {
       inStock: 'Պահեստում',
-      outOfStock: 'Արտադրված',
+      outOfStock: 'Առկա չէ',
     },
     cart: {
       title: 'Գնումների զամբյուղ',

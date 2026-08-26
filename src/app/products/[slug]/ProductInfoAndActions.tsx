@@ -261,20 +261,6 @@ export function ProductInfoAndActions({
       
       {/* Action buttons — bottom-aligned with gallery image on desktop */}
       <div className="mt-auto lg:pt-0 pt-6">
-        {/* Show unavailable attributes message if needed */}
-        {hasUnavailableAttributes && !isVariationRequired && (
-          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-800 font-medium">
-              {Array.from(unavailableAttributes.entries()).map(([attrKey]) => {
-                const productAttr = product?.productAttributes?.find((pa: any) => pa.attribute?.key === attrKey);
-                const attributeName = productAttr?.attribute?.name || attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
-                return attrKey === 'color' ? t(language, 'product.color') : 
-                       attrKey === 'size' ? t(language, 'product.size') : 
-                       attributeName;
-              }).join(', ')} {t(language, 'product.outOfStock')}
-            </p>
-          </div>
-        )}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           {showSizeGuide ? (
             <button

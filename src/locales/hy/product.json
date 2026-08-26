@@ -9,7 +9,7 @@
   "quantity": "Քանակ",
   "addToCart": "Ավելացնել զամբյուղ",
   "relatedAddToCart": "Ավելացնել",
-  "outOfStock": "Արտադրված",
+  "outOfStock": "Առկա չէ",
   "selectColor": "Խնդրում ենք ընտրել գույն",
   "selectSize": "Խնդրում ենք ընտրել չափ",
   "selectColorAndSize": "Խնդրում ենք ընտրել գույն և չափ",
@@ -23,7 +23,7 @@
   "compareListFull": "Համեմատման ցուցակը լի է",
   "errorAddingToCart": "Սխալ ավելացնելիս",
   "pcs": "հատ",
-  "outOfStockLabel": "Արտադրված",
+  "outOfStockLabel": "Առկա չէ",
   "noRelatedProducts": "Նմանատիպ ապրանքներ չգտնվեցին",
   "sizeGuide": {
     "title": "Չափերի սանդղակ",
