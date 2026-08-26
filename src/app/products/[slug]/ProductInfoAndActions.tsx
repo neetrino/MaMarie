@@ -25,6 +25,7 @@ import {
   PRODUCT_QUANTITY_STEPPER_VALUE_CLASS,
 } from './constants';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
+import { ProductRatingSummary } from './ProductRatingSummary';
 import type { Product, ProductVariant } from './types';
 
 interface ProductInfoAndActionsProps {
@@ -189,29 +190,37 @@ export function ProductInfoAndActions({
             <p className="text-sm text-gray-500">{product.brand.name}</p>
           </div>
         )}
-        <div className="mb-4 flex items-start justify-between gap-4 lg:mb-6">
-          <h1 className="min-w-0 flex-1 text-4xl font-bold text-gray-900">
+        <div className="mb-4 lg:mb-6">
+          <h1 className="min-w-0 text-4xl font-bold text-gray-900">
             {getProductText(language, product.id, 'title') || product.title}
           </h1>
         </div>
-        <div className="mb-6">
-          <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-            <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
-            {showRegularPrice && (
-              <p className="text-xl text-gray-500 line-through decoration-gray-400">
-                {formatPrice(regularPriceValue, currency as CurrencyCode)}
-              </p>
-            )}
-            {discountPercent && discountPercent > 0 && (
-              <span className="text-lg font-semibold text-blue-600">
-                -{discountPercent}%
-              </span>
-            )}
+        <div className="mb-6 w-full">
+          <div className="grid w-full grid-cols-[1fr_auto] items-center gap-4">
+            <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+              <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
+              {showRegularPrice && (
+                <p className="text-xl text-gray-500 line-through decoration-gray-400">
+                  {formatPrice(regularPriceValue, currency as CurrencyCode)}
+                </p>
+              )}
+              {discountPercent && discountPercent > 0 && (
+                <span className="text-lg font-semibold text-blue-600">
+                  -{discountPercent}%
+                </span>
+              )}
+            </div>
+            <ProductRatingSummary
+              averageRating={averageRating}
+              reviewsCount={reviewsCount}
+              onReviewsClick={onScrollToReviews}
+              language={language}
+              className="mb-0 shrink-0 justify-self-end"
+            />
           </div>
         </div>
         <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />
 
-        {/* Attributes Section */}
         <div className="mb-4">
           <ProductAttributesSelector
             product={product}

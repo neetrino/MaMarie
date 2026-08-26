@@ -18,6 +18,7 @@ import {
   PRODUCT_QUANTITY_STEPPER_VALUE_CLASS,
 } from './constants';
 import { ProductPageSnapshotAttributes } from './ProductPageSnapshotAttributes';
+import { ProductRatingSummary } from './ProductRatingSummary';
 
 interface ProductPageSnapshotInfoProps {
   snapshot: ProductPageSnapshot;
@@ -106,21 +107,30 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
           <h1 className="min-w-0 text-4xl font-bold text-gray-900">{snapshot.title}</h1>
         </div>
 
-        <div className="mb-6">
-          <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-            <p className="text-3xl font-bold text-gray-900">
-              {formatPrice(snapshot.price, currency)}
-            </p>
-            {showRegularPrice ? (
-              <p className="text-xl text-gray-500 line-through decoration-gray-400">
-                {formatPrice(regularPriceValue, currency)}
+        <div className="mb-6 w-full">
+          <div className="grid w-full grid-cols-[1fr_auto] items-center gap-4">
+            <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+              <p className="text-3xl font-bold text-gray-900">
+                {formatPrice(snapshot.price, currency)}
               </p>
-            ) : null}
-            {snapshot.discountPercent && snapshot.discountPercent > 0 ? (
-              <span className="text-lg font-semibold text-blue-600">
-                -{snapshot.discountPercent}%
-              </span>
-            ) : null}
+              {showRegularPrice ? (
+                <p className="text-xl text-gray-500 line-through decoration-gray-400">
+                  {formatPrice(regularPriceValue, currency)}
+                </p>
+              ) : null}
+              {snapshot.discountPercent && snapshot.discountPercent > 0 ? (
+                <span className="text-lg font-semibold text-blue-600">
+                  -{snapshot.discountPercent}%
+                </span>
+              ) : null}
+            </div>
+            <ProductRatingSummary
+              averageRating={snapshot.averageRating ?? 0}
+              reviewsCount={snapshot.reviewsCount ?? 0}
+              onReviewsClick={() => {}}
+              language={language}
+              className="mb-0 shrink-0 justify-self-end pointer-events-none"
+            />
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { getEffectiveProductRating } from '../../../lib/product-rating';
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 
@@ -21,7 +22,7 @@ export function ProductRatingSummary({
   language,
   className = 'mb-5',
 }: ProductRatingSummaryProps) {
-  const effectiveRating = reviewsCount > 0 ? averageRating : 5;
+  const effectiveRating = getEffectiveProductRating(averageRating, reviewsCount);
   const fillPercent = Math.min(100, Math.max(0, (effectiveRating / 5) * 100));
   const reviewLabel =
     reviewsCount === 1
@@ -54,14 +55,16 @@ export function ProductRatingSummary({
       <span className="text-sm font-semibold text-gray-900 tabular-nums">
         {effectiveRating.toFixed(1)}
       </span>
-      <button
-        type="button"
-        onClick={onReviewsClick}
-        className="text-sm text-gray-600 hover:text-gray-900 hover:underline transition-colors"
-        aria-label={`${reviewsCount} ${reviewLabel}`}
-      >
-        ({reviewsCount} {reviewLabel})
-      </button>
+      {reviewsCount > 0 ? (
+        <button
+          type="button"
+          onClick={onReviewsClick}
+          className="text-sm text-gray-600 hover:text-gray-900 hover:underline transition-colors"
+          aria-label={`${reviewsCount} ${reviewLabel}`}
+        >
+          ({reviewsCount} {reviewLabel})
+        </button>
+      ) : null}
     </div>
   );
 }
