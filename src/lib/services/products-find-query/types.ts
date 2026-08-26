@@ -5,6 +5,7 @@ import { Prisma } from "@white-shop/db";
  */
 export interface ProductFilters {
   category?: string;
+  categoryScope?: string;
   search?: string;
   ids?: string[];
   filter?: string;
@@ -14,6 +15,7 @@ export interface ProductFilters {
   sizes?: string;
   brand?: string;
   clothingTypes?: string;
+  attrs?: string;
   sort?: string;
   page?: number;
   limit?: number;

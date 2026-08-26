@@ -86,6 +86,8 @@ const PRODUCT_DATA_PARAM_KEYS: ReadonlyArray<keyof ProductsCatalogParams> = [
   'sizes',
   'brand',
   'clothingTypes',
+  'categoryScope',
+  'attrs',
 ];
 
 interface ProductsCatalogProviderProps {

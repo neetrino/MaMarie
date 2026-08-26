@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@white-shop/db';
 import { db } from '@white-shop/db';
 import { extractMediaUrl } from '@/lib/utils/extractMediaUrl';
-import { processImageUrl } from '@/lib/utils/image-utils';
+import { toVariantStorefrontImageUrl } from '@/lib/utils/storefront-image-url';
+import { pickProductContentTranslation } from '@/constants/product-content-locales';
 
 const DEFAULT_LIMIT = 8;
 const MAX_LIMIT = 20;
@@ -98,8 +99,7 @@ export async function GET(req: NextRequest) {
 
     const results: InstantSearchResult[] = products.map((product) => {
       const translations = Array.isArray(product.translations) ? product.translations : [];
-      const translation =
-        translations.find((t: { locale: string }) => t.locale === lang) || translations[0];
+      const translation = pickProductContentTranslation(translations, lang);
       const slug = translation?.slug ?? '';
       const title = translation?.title ?? '';
 
@@ -108,9 +108,9 @@ export async function GET(req: NextRequest) {
       const price = firstVariant?.price ?? 0;
       const compareAtPrice = firstVariant?.compareAtPrice ?? null;
 
-      let image: string | null = extractMediaUrl(product.media);
+      let image: string | null = extractMediaUrl(product.media, product.id);
       if (!image && firstVariant?.imageUrl) {
-        image = processImageUrl(firstVariant.imageUrl);
+        image = toVariantStorefrontImageUrl(firstVariant.id, firstVariant.imageUrl);
       }
 
       const categories = Array.isArray(product.categories) ? product.categories : [];

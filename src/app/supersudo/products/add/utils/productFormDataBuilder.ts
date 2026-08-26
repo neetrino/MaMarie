@@ -3,11 +3,22 @@
  */
 
 import type { ProductData, Variant, ProductLabel } from '../types';
+import {
+  createEmptyTranslationsByLocale,
+  pickPrimaryFormFields,
+  type ProductTranslationsByLocale,
+} from './product-locale-fields';
+import {
+  isProductContentLocale,
+  pickProductContentTranslation,
+  type ProductContentLocale,
+} from '@/constants/product-content-locales';
 
 interface FormData {
   title: string;
   slug: string;
   descriptionHtml: string;
+  translations: ProductTranslationsByLocale;
   brandIds: string[];
   primaryCategoryId: string;
   categoryIds: string[];
@@ -18,6 +29,37 @@ interface FormData {
   mainProductImage: string;
   variants: Variant[];
   labels: ProductLabel[];
+}
+
+function translationsFromProduct(product: ProductData): ProductTranslationsByLocale {
+  const translations = createEmptyTranslationsByLocale();
+  const rows = product.translations ?? [];
+
+  for (const row of rows) {
+    if (!isProductContentLocale(row.locale)) {
+      continue;
+    }
+    const locale: ProductContentLocale = row.locale;
+    translations[locale] = {
+      title: row.title || '',
+      descriptionHtml: row.descriptionHtml || '',
+    };
+  }
+
+  if (!rows.some((row) => isProductContentLocale(row.locale))) {
+    translations.hy = {
+      title: product.title || '',
+      descriptionHtml: product.descriptionHtml || '',
+    };
+  }
+
+  return translations;
+}
+
+function sharedSlugFromProduct(product: ProductData): string {
+  const rows = product.translations ?? [];
+  const picked = pickProductContentTranslation(rows, 'hy');
+  return picked?.slug || product.slug || '';
 }
 
 /**
@@ -31,11 +73,14 @@ export function buildFormData(
   mergedVariant: Variant
 ): FormData {
   const brandIds = product.brandId ? [product.brandId] : [];
+  const translations = translationsFromProduct(product);
+  const primary = pickPrimaryFormFields(translations);
 
   return {
-    title: product.title || '',
-    slug: product.slug || '',
-    descriptionHtml: product.descriptionHtml || '',
+    title: primary.title,
+    slug: sharedSlugFromProduct(product),
+    descriptionHtml: primary.descriptionHtml,
+    translations,
     brandIds: brandIds,
     primaryCategoryId: product.primaryCategoryId || '',
     categoryIds: product.categoryIds || [],
@@ -52,7 +97,7 @@ export function buildFormData(
         ? normalizedMedia[featuredIndexFromApi >= 0 && featuredIndexFromApi < normalizedMedia.length ? featuredIndexFromApi : 0]
         : mainProductImage || '',
     variants: [mergedVariant],
-    labels: (product.labels || []).map((label: any) => ({
+    labels: (product.labels || []).map((label) => ({
       id: label.id || '',
       type: label.type || 'text',
       value: label.value || '',
@@ -61,4 +106,3 @@ export function buildFormData(
     })),
   };
 }
-

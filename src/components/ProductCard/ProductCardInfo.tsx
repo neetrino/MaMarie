@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '../../lib/currency';
+import { useTranslation } from '../../lib/i18n-client';
 import { ProductColors } from './ProductColors';
 import type { CurrencyCode } from '../../lib/currency';
 
@@ -40,6 +41,7 @@ export function ProductCardInfo({
   isCompact = false,
   onBeforeNavigate,
 }: ProductCardInfoProps) {
+  const { t } = useTranslation();
   return (
     <div className={isCompact ? 'p-2.5' : 'p-4'}>
       <Link
@@ -59,7 +61,7 @@ export function ProductCardInfo({
             <div className={`relative ${isCompact ? 'h-4 w-4' : 'h-6 w-6'}`}>
               <Image
                 src={brandLogoUrl}
-                alt={brandName || 'Brand logo'}
+                alt={brandName || t('common.compare.brand')}
                 fill
                 className="object-contain"
                 sizes={isCompact ? '16px' : '24px'}

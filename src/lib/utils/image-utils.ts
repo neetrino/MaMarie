@@ -39,6 +39,10 @@ export function isValidImageUrl(url: ImageUrlInput): boolean {
  * Processes and normalizes an image URL from various formats
  * Returns null if invalid
  */
+function pickImageUrlField(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
 export function processImageUrl(url: ImageUrlInput): string | null {
   if (!url) return null;
   
@@ -46,7 +50,7 @@ export function processImageUrl(url: ImageUrlInput): string | null {
   if (typeof url === 'string') {
     finalUrl = url.trim();
   } else if (typeof url === 'object' && url !== null) {
-    finalUrl = (url.url || url.src || url.value || '').trim();
+    finalUrl = pickImageUrlField(url.url) || pickImageUrlField(url.src) || pickImageUrlField(url.value);
   }
   
   if (!finalUrl) return null;

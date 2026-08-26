@@ -6,6 +6,7 @@ import { executeProductListQuery, executeProductDetailQuery } from "./query-exec
 import { formatProductForList } from "./product-formatter";
 import { formatVariantForAdmin } from "./variant-formatter";
 import { withAdminProductsListCache } from "./list-cache";
+import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
 async function fetchProductsFromDb(filters: ProductFilters) {
   const page = filters.page || 1;
@@ -68,7 +69,7 @@ export async function getProductById(productId: string) {
     variants?: Array<unknown>;
   };
   const translations = Array.isArray(productWithRelations.translations) ? productWithRelations.translations : [];
-  const translation = translations.find((t: { locale: string }) => t.locale === "en") || translations[0] || null;
+  const translation = pickProductContentTranslation(translations, "hy") || null;
 
   // Безопасное получение labels с проверкой на существование массива
   const labels = Array.isArray(productWithRelations.labels) ? productWithRelations.labels : [];
@@ -98,11 +99,19 @@ export async function getProductById(productId: string) {
     slug: translation?.slug || "",
     subtitle: translation?.subtitle || null,
     descriptionHtml: translation?.descriptionHtml || null,
+    translations: translations.map((row) => ({
+      locale: row.locale,
+      title: row.title || "",
+      slug: row.slug || "",
+      subtitle: row.subtitle ?? null,
+      descriptionHtml: row.descriptionHtml ?? null,
+    })),
     brandId: product.brandId || null,
     primaryCategoryId: product.primaryCategoryId || null,
     categoryIds: product.categoryIds || [],
     attributeIds: allAttributeIds, // All attribute IDs that this product has
     published: product.published,
+    featured: product.featured,
     media: Array.isArray(product.media) ? product.media : [],
     labels: labels.map((label: { id: string; type: string; value: string; position: string; color: string | null }) => ({
       id: label.id,

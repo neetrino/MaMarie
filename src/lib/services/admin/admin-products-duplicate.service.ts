@@ -2,16 +2,19 @@ import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
 import { adminProductsCreateService } from "./admin-products-create.service";
 import { getProductById } from "./admin-products-read/product-operations";
+import { isProductContentLocale, type ProductContentLocale } from "@/constants/product-content-locales";
+import { pickPrimaryTranslation } from "./product-translation-input";
 
 const COPY_TITLE_SUFFIX = " (Copy)";
 
-async function ensureUniqueSlugForLocale(slugBase: string, locale: string): Promise<string> {
+async function ensureUniqueSharedSlug(slugBase: string): Promise<string> {
   const base = slugBase.trim() || "product";
   let candidate = `${base}-copy`;
   let i = 0;
   for (;;) {
     const clash = await db.productTranslation.findFirst({
-      where: { slug: candidate, locale },
+      where: { slug: candidate },
+      select: { id: true },
     });
     if (!clash) {
       return candidate;
@@ -44,8 +47,27 @@ export async function duplicateProductAsDraft(sourceProductId: string): Promise<
     };
   }
 
-  const primary = allTranslations.find((tr) => tr.locale === "en") ?? allTranslations[0];
-  const newSlug = await ensureUniqueSlugForLocale(primary.slug, primary.locale);
+  const translationInputs = allTranslations
+    .filter((tr): tr is typeof tr & { locale: ProductContentLocale } => isProductContentLocale(tr.locale))
+    .map((tr) => ({
+      locale: tr.locale,
+      title: `${tr.title}${COPY_TITLE_SUFFIX}`,
+      slug: tr.slug,
+      subtitle: tr.subtitle ?? undefined,
+      descriptionHtml: tr.descriptionHtml ?? undefined,
+    }));
+
+  if (translationInputs.length === 0) {
+    throw {
+      status: 400,
+      type: "https://api.shop.am/problems/bad-request",
+      title: "Bad Request",
+      detail: "Product has no translations to duplicate",
+    };
+  }
+
+  const primary = pickPrimaryTranslation(translationInputs);
+  const newSlug = await ensureUniqueSharedSlug(primary.slug);
 
   const variantsPayload = source.variants.map((v) => {
     const opts: VariantOptionInput[] = [];
@@ -81,16 +103,17 @@ export async function duplicateProductAsDraft(sourceProductId: string): Promise<
   }
 
   const created = await adminProductsCreateService.createProduct({
-    title: `${primary.title}${COPY_TITLE_SUFFIX}`,
+    title: primary.title,
     slug: newSlug,
-    subtitle: primary.subtitle ?? undefined,
-    descriptionHtml: primary.descriptionHtml ?? undefined,
+    subtitle: primary.subtitle,
+    descriptionHtml: primary.descriptionHtml,
     brandId: source.brandId ?? undefined,
     primaryCategoryId: source.primaryCategoryId ?? undefined,
     categoryIds: source.categoryIds ?? [],
     published: false,
     featured: false,
     locale: primary.locale,
+    translations: translationInputs.map((row) => ({ ...row, slug: newSlug })),
     media: source.media as unknown[],
     labels: source.labels.map((l) => ({
       type: l.type,
@@ -111,31 +134,10 @@ export async function duplicateProductAsDraft(sourceProductId: string): Promise<
     };
   }
 
-  const newProductId = created.id;
-
-  for (const tr of allTranslations) {
-    if (tr.locale === primary.locale) {
-      continue;
-    }
-    const slug = await ensureUniqueSlugForLocale(tr.slug, tr.locale);
-    await db.productTranslation.create({
-      data: {
-        productId: newProductId,
-        locale: tr.locale,
-        title: `${tr.title}${COPY_TITLE_SUFFIX}`,
-        slug,
-        subtitle: tr.subtitle,
-        descriptionHtml: tr.descriptionHtml,
-        seoTitle: tr.seoTitle,
-        seoDescription: tr.seoDescription,
-      },
-    });
-  }
-
   logger.debug("[ADMIN PRODUCTS DUPLICATE] Draft duplicate created", {
     sourceId: sourceProductId,
-    newId: newProductId,
+    newId: created.id,
   });
 
-  return { id: newProductId };
+  return { id: created.id };
 }

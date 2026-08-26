@@ -1,4 +1,5 @@
 import { revalidatePath, revalidateTag } from "next/cache";
+import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
 import {
   invalidateProductPageCaches,
   invalidateStorefrontProductRelatedCaches,
@@ -20,6 +21,7 @@ export async function revalidateProductCache(
     }
     revalidatePath('/');
     revalidatePath('/products');
+    invalidateHomeFeaturedProductsCache();
     // @ts-expect-error - revalidateTag type issue in Next.js
     revalidateTag('products');
     // @ts-expect-error - revalidateTag type issue in Next.js

@@ -1,5 +1,4 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import type { FormEvent } from 'react';
 import { apiClient } from '../../../../lib/api-client';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { showToast } from '../../../../components/Toast';
@@ -13,7 +12,6 @@ interface UseProductHandlersProps {
   fetchProducts: () => Promise<void>;
   selectedIds: Set<string>;
   setSelectedIds: (ids: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
-  setPage: (page: number | ((prev: number) => number)) => void;
   setBulkDeleting: (deleting: boolean) => void;
   setTogglingAllFeatured: (toggling: boolean) => void;
 }
@@ -44,7 +42,6 @@ export function useProductHandlers({
   fetchProducts,
   selectedIds,
   setSelectedIds,
-  setPage,
   setBulkDeleting,
   setTogglingAllFeatured,
 }: UseProductHandlersProps) {
@@ -53,12 +50,6 @@ export function useProductHandlers({
   const [duplicatingProductId, setDuplicatingProductId] = useState<string | null>(null);
   const [togglingFeaturedIds, setTogglingFeaturedIds] = useState<Set<string>>(new Set());
   const [togglingPublishedIds, setTogglingPublishedIds] = useState<Set<string>>(new Set());
-
-  const handleSearch = (e: FormEvent) => {
-    e.preventDefault();
-    setPage(1);
-    fetchProducts();
-  };
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -264,7 +255,6 @@ export function useProductHandlers({
   };
 
   return {
-    handleSearch,
     toggleSelect,
     toggleSelectAll,
     handleBulkDelete,

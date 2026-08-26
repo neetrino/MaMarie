@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
+import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
 import { invalidateAdminProductsListCache } from "./admin-products-read/list-cache";
 
 class AdminProductsDeleteService {
@@ -29,6 +30,7 @@ class AdminProductsDeleteService {
     });
 
     invalidateAdminProductsListCache();
+    invalidateHomeFeaturedProductsCache();
 
     return { success: true };
   }

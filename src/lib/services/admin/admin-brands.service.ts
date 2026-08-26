@@ -141,8 +141,8 @@ class AdminBrandsService {
       throw {
         status: 404,
         type: "https://api.shop.am/problems/not-found",
-        title: "Brand not found",
-        detail: `Brand with id '${brandId}' does not exist`,
+        title: "Collection not found",
+        detail: `Collection with id '${brandId}' does not exist`,
       };
     }
 
@@ -234,8 +234,8 @@ class AdminBrandsService {
       throw {
         status: 404,
         type: "https://api.shop.am/problems/not-found",
-        title: "Brand not found",
-        detail: `Brand with id '${brandId}' does not exist`,
+        title: "Collection not found",
+        detail: `Collection with id '${brandId}' does not exist`,
       };
     }
 

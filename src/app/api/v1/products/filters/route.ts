@@ -13,6 +13,7 @@ import { logger } from "@/lib/utils/logger";
 function parseFiltersInput(searchParams: URLSearchParams): StorefrontProductsFiltersInput {
   return {
     category: searchParams.get("category") || undefined,
+    categoryScope: searchParams.get("categoryScope") || undefined,
     search: searchParams.get("search") || undefined,
     minPrice: searchParams.get("minPrice")
       ? parseFloat(searchParams.get("minPrice")!)

@@ -111,7 +111,7 @@ export function ProductCardList({
                 <div className="relative h-6 w-6">
                   <Image
                     src={product.brand.logoUrl}
-                    alt={product.brand?.name || 'Brand logo'}
+                    alt={product.brand?.name || t('common.compare.brand')}
                     fill
                     className="object-contain"
                     sizes="24px"

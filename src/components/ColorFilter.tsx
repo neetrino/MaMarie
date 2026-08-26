@@ -95,6 +95,7 @@ export function ColorFilter({
           colors: response.colors || [],
           sizes: response.sizes || existing?.sizes || [],
           brands: existing?.brands || [],
+          attributes: existing?.attributes || [],
           priceRange: existing?.priceRange || {
             min: 0,
             max: 100000,

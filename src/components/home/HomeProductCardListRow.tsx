@@ -31,6 +31,7 @@ import {
   PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
 } from '../../constants/products-catalog';
 import { formatPrice } from '../../lib/currency';
+import { ProductImagePlaceholder } from '../ProductImagePlaceholder';
 import { homeProductCardLayoutPx, resolveHomeProductCardTypography } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
@@ -64,12 +65,11 @@ function HomeProductCardListRowComponent({
     originalPrice: product.originalPrice ?? product.compareAtPrice,
   });
   const [imageError, setImageError] = useState(false);
+  const showProductImage = Boolean(product.image) && !imageError;
 
   const layoutWidthPx = PRODUCTS_CATALOG_CARD_WIDTH_PX;
   const lp = (value: number) => homeProductCardLayoutPx(value, layoutWidthPx);
   const typography = resolveHomeProductCardTypography(layoutWidthPx, false);
-  const imageSrc =
-    product.image && !imageError ? product.image : HOME_PRODUCT_CARD_ASSETS.placeholderImage;
   const comparePrice = resolveComparePrice(product);
   const subtitle = product.subtitle?.trim() || product.title;
   const ratingLabel = formatProductRatingLabel(
@@ -186,16 +186,21 @@ function HomeProductCardListRowComponent({
             href={`/products/${product.slug}`}
             className="relative block h-full w-full overflow-hidden"
           >
-            <Image
-              src={imageSrc}
-              alt={product.title}
-              fill
-              priority={imagePriority}
-              loading={imagePriority ? 'eager' : 'lazy'}
-              sizes={`${PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX}px`}
-              className="object-contain"
-              onError={() => setImageError(true)}
-            />
+            {showProductImage && product.image ? (
+              <Image
+                src={product.image}
+                alt={product.title}
+                fill
+                priority={imagePriority}
+                loading={imagePriority ? 'eager' : 'lazy'}
+                sizes={`${PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX}px`}
+                className="object-contain"
+                unoptimized
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
+            )}
           </Link>
 
           <button

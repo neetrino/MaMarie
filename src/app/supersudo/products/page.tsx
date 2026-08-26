@@ -37,7 +37,6 @@ export default function ProductsPage() {
   const { categories: sharedCategories, loading: categoriesLoading } = useAdminCategories();
   const categories = sharedCategories as Category[];
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
-  const [skuSearch, setSkuSearch] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'inStock' | 'outOfStock'>('all');
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<ProductsResponse['meta'] | null>(null);
@@ -115,12 +114,11 @@ export default function ProductsPage() {
         page,
         search,
         category: selectedCategories.size > 0 ? Array.from(selectedCategories).join(',') : undefined,
-        sku: skuSearch,
         minPrice,
         maxPrice,
         sort: sortBy.startsWith('createdAt') ? sortBy : undefined,
       }),
-    [page, search, categoryFilterKey, skuSearch, minPrice, maxPrice, sortBy]
+    [page, search, categoryFilterKey, minPrice, maxPrice, sortBy]
   );
 
   const productListCacheKey = useMemo(
@@ -311,7 +309,6 @@ export default function ProductsPage() {
     fetchProducts: refetchProducts,
     selectedIds,
     setSelectedIds,
-    setPage,
     setBulkDeleting,
     setTogglingAllFeatured,
   });
@@ -319,7 +316,6 @@ export default function ProductsPage() {
   const handleClearFilters = () => {
     setSearch('');
     setSelectedCategories(new Set());
-    setSkuSearch('');
     setStockFilter('all');
     setPage(1);
   };
@@ -343,7 +339,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      {(search || selectedCategories.size > 0 || skuSearch || stockFilter !== 'all') && (
+      {(search || selectedCategories.size > 0 || stockFilter !== 'all') && (
         <div className="mb-6 flex justify-end">
           <button
             type="button"
@@ -361,8 +357,6 @@ export default function ProductsPage() {
             <ProductFilters
               search={search}
               setSearch={setSearch}
-              skuSearch={skuSearch}
-              setSkuSearch={setSkuSearch}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
               categories={categories}
@@ -375,7 +369,6 @@ export default function ProductsPage() {
               setMinPrice={setMinPrice}
               maxPrice={maxPrice}
               setMaxPrice={setMaxPrice}
-              handleSearch={handlers.handleSearch}
               setPage={setPage}
             />
 

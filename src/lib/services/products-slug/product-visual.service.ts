@@ -63,7 +63,11 @@ function mapRowToPayload(
   if (!tr) {
     return null;
   }
-  const galleryImages = computeProductGalleryUrls(row.media as unknown[], row.variants);
+  const galleryImages = computeProductGalleryUrls(
+    row.id,
+    row.media as unknown[],
+    row.variants,
+  );
   const mainImage = galleryImages[0] ?? null;
   return {
     id: row.id,

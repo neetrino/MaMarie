@@ -7,6 +7,7 @@ export function buildStorefrontFindQueryCacheKey(filters: ProductFilters): strin
     limit: filters.limit ?? 12,
     lang: filters.lang ?? 'en',
     category: filters.category?.trim() || undefined,
+    categoryScope: filters.categoryScope?.trim() || undefined,
     search: filters.search?.trim() || undefined,
     filter: filters.filter?.trim() || undefined,
     minPrice: filters.minPrice,
@@ -15,6 +16,7 @@ export function buildStorefrontFindQueryCacheKey(filters: ProductFilters): strin
     sizes: filters.sizes?.trim() || undefined,
     brand: filters.brand?.trim() || undefined,
     clothingTypes: filters.clothingTypes?.trim() || undefined,
+    attrs: filters.attrs?.trim() || undefined,
     sort: filters.sort?.trim() || undefined,
     ids: filters.ids?.length ? [...filters.ids].sort() : undefined,
   };

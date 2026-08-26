@@ -30,6 +30,7 @@ import { useAddToCart } from '../hooks/useAddToCart';
 import { useCurrency } from '../hooks/useCurrency';
 import { useWishlist } from '../hooks/useWishlist';
 import { formatPrice } from '../../lib/currency';
+import { ProductImagePlaceholder } from '../ProductImagePlaceholder';
 import {
   homeProductCardLayoutPx,
   HOME_PRODUCT_CARD_COMPACT_DESCRIPTION_TO_SWATCHES_GAP_PX,
@@ -130,9 +131,7 @@ function HomeProductCardComponent({
     originalPrice: product.originalPrice ?? product.compareAtPrice,
   });
   const [imageError, setImageError] = useState(false);
-
-  const imageSrc =
-    product.image && !imageError ? product.image : HOME_PRODUCT_CARD_ASSETS.placeholderImage;
+  const showProductImage = Boolean(product.image) && !imageError;
   const comparePrice = resolveComparePrice(product);
   const subtitle = product.subtitle?.trim() || product.title;
   const ratingLabel = formatProductRatingLabel(
@@ -372,16 +371,21 @@ function HomeProductCardComponent({
               top: '-21.48%',
             }}
           >
-            <Image
-              src={imageSrc}
-              alt={product.title}
-              fill
-              priority={imagePriority}
-              loading={imagePriority ? 'eager' : 'lazy'}
-              sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
-              className="object-contain"
-              onError={() => setImageError(true)}
-            />
+            {showProductImage && product.image ? (
+              <Image
+                src={product.image}
+                alt={product.title}
+                fill
+                priority={imagePriority}
+                loading={imagePriority ? 'eager' : 'lazy'}
+                sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
+                className="object-contain"
+                unoptimized
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
+            )}
           </div>
         </Link>
 

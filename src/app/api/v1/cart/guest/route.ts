@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@white-shop/db";
 import { extractMediaUrl } from "@/lib/utils/extractMediaUrl";
 import { logger } from "@/lib/utils/logger";
+import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
 interface GuestCartItemInput {
   productId: string;
@@ -63,8 +64,8 @@ interface GuestCartResponse {
   normalizedItems: GuestCartItemInput[];
 }
 
-function pickFirstImage(media: unknown): string | null {
-  return extractMediaUrl(media);
+function pickFirstImage(productId: string, media: unknown): string | null {
+  return extractMediaUrl(media, productId);
 }
 
 function sanitizeItems(items: GuestCartItemInput[] | undefined): GuestCartItemInput[] {
@@ -197,8 +198,7 @@ export async function POST(req: NextRequest) {
         return;
       }
 
-      const preferredTranslation =
-        product.translations.find((translation) => translation.locale === lang) ?? product.translations[0];
+      const preferredTranslation = pickProductContentTranslation(product.translations, lang);
 
       const productSlug =
         (preferredTranslation?.slug && preferredTranslation.slug.trim()) ||
@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
             id: product.id,
             title: preferredTranslation?.title || "Product",
             slug: productSlug,
-            image: pickFirstImage(product.media),
+            image: pickFirstImage(product.id, product.media),
           },
         },
         quantity: item.quantity,

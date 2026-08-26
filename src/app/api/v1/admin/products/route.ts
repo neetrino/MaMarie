@@ -5,6 +5,7 @@ import { authenticateToken, requireAdmin } from "@/lib/middleware/auth";
 import { adminService } from "@/lib/services/admin.service";
 import { toApiError } from "@/lib/types/errors";
 import { logger } from "@/lib/utils/logger";
+import { normalizeProductTranslationInputs, pickPrimaryTranslation } from "@/lib/services/admin/product-translation-input";
 
 /**
  * Валидация и нормализация параметров запроса для GET /api/v1/admin/products
@@ -128,9 +129,9 @@ function validateAndNormalizeFilters(searchParams: URLSearchParams): {
  * Query parameters:
  * - page: number (default: 1, min: 1)
  * - limit: number (default: 20, min: 1, max: 100)
- * - search: string (optional)
+ * - search: string (optional) — matches title, slug, or SKU
  * - category: string (comma-separated, optional)
- * - sku: string (optional)
+ * - sku: string (optional, also matches SKU; prefer `search`)
  * - minPrice: number (optional, non-negative)
  * - maxPrice: number (optional, non-negative)
  * - sort: string (optional)
@@ -250,32 +251,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Базовая валидация обязательных полей
-    if (!body.title || typeof body.title !== 'string' || body.title.trim().length === 0) {
+    const translationInputs = normalizeProductTranslationInputs(body);
+    if (translationInputs.length === 0) {
       return NextResponse.json(
         {
           type: "https://api.shop.am/problems/validation-error",
           title: "Validation Error",
           status: 400,
-          detail: "Field 'title' is required and must be a non-empty string",
+          detail: "Provide translations with title, plus a shared slug",
           instance: req.url,
         },
         { status: 400 }
       );
     }
 
-    if (!body.slug || typeof body.slug !== 'string' || body.slug.trim().length === 0) {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: "Field 'slug' is required and must be a non-empty string",
-          instance: req.url,
-        },
-        { status: 400 }
-      );
-    }
+    const primaryTranslation = pickPrimaryTranslation(translationInputs);
+    body.translations = translationInputs;
+    body.title = primaryTranslation.title;
+    body.slug = primaryTranslation.slug;
+    body.locale = primaryTranslation.locale;
 
     if (typeof body.published !== 'boolean') {
       return NextResponse.json(
@@ -284,19 +278,6 @@ export async function POST(req: NextRequest) {
           title: "Validation Error",
           status: 400,
           detail: "Field 'published' is required and must be a boolean",
-          instance: req.url,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!body.locale || typeof body.locale !== 'string') {
-      return NextResponse.json(
-        {
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          status: 400,
-          detail: "Field 'locale' is required and must be a string",
           instance: req.url,
         },
         { status: 400 }

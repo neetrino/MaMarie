@@ -54,6 +54,8 @@ export function useProductsCatalogFilterNavigation() {
       'sizes',
       'brand',
       'clothingTypes',
+      'categoryScope',
+      'attrs',
     ];
     filterKeys.forEach((key) => params.delete(key));
     params.delete('page');

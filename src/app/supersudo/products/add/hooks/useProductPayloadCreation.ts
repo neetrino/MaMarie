@@ -1,18 +1,23 @@
 import { apiClient } from '@/lib/api-client';
 import { logger } from '@/lib/utils/logger';
+import { PRIMARY_PRODUCT_CONTENT_LOCALE } from '@/constants/product-content-locales';
+import { pickPrimaryFormFields, translationsPayloadFromForm } from '../utils/product-locale-fields';
+import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
+import type { ProductLabel } from '../types';
 
 interface CreateAndSubmitPayloadProps {
   formData: {
     title: string;
     slug: string;
     descriptionHtml: string;
+    translations: ProductTranslationsByLocale;
     categoryIds: string[];
     published: boolean;
     featured: boolean;
     imageUrls: string[];
     featuredImageIndex: number;
     mainProductImage: string;
-    labels: any[];
+    labels: ProductLabel[];
   };
   finalBrandIds: string[];
   finalPrimaryCategoryId: string;
@@ -43,16 +48,40 @@ export async function createAndSubmitPayload({
   successMessage,
   onSuccess,
 }: CreateAndSubmitPayloadProps): Promise<void> {
-  const payload: any = {
-    title: formData.title,
-    slug: formData.slug,
-    descriptionHtml: formData.descriptionHtml || undefined,
+  const translations = translationsPayloadFromForm(formData.translations, formData.slug);
+  const primary = pickPrimaryFormFields(formData.translations);
+  const payload: {
+    title: string;
+    slug: string;
+    descriptionHtml: string;
+    brandId?: string;
+    primaryCategoryId?: string;
+    categoryIds?: string[];
+    published: boolean;
+    featured: boolean;
+    locale: string;
+    translations: ReturnType<typeof translationsPayloadFromForm>;
+    variants: unknown[];
+    attributeIds?: string[];
+    media?: string[];
+    mainProductImage?: string;
+    labels?: Array<{
+      type: string;
+      value: string;
+      position: string;
+      color: string | null;
+    }>;
+  } = {
+    title: primary.title,
+    slug: formData.slug.trim(),
+    descriptionHtml: primary.descriptionHtml.trim(),
     brandId: finalBrandIds.length > 0 ? finalBrandIds[0] : undefined,
     primaryCategoryId: finalPrimaryCategoryId || undefined,
     categoryIds: formData.categoryIds.length > 0 ? formData.categoryIds : undefined,
     published: isEditMode ? formData.published : true,
     featured: formData.featured,
-    locale: 'en',
+    locale: PRIMARY_PRODUCT_CONTENT_LOCALE,
+    translations,
     variants: variants,
     attributeIds: attributeIds.length > 0 ? attributeIds : undefined,
   };

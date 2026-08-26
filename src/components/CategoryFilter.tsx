@@ -2,18 +2,23 @@
 
 import { useTranslation } from '../lib/i18n-client';
 import { useCategories } from './CategoryNavigation/hooks/useCategories';
+import { CategoryHierarchyLabel } from './category-tree/CategoryHierarchyLabel';
+import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
 import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
+import { getCategoryTreeIndentClass } from '../constants/category-tree-ui';
 import {
   PRODUCTS_CATALOG_FILTER_ACCENT,
   PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX,
   PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
-  PRODUCTS_CATALOG_TEXT_DARK,
 } from '../constants/products-catalog';
+import { getCategoryTreeParentId } from '../lib/categories/category-tree-parent';
+import type { Category } from './CategoryNavigation/utils';
 
 type CategoryFilterVariant = 'default' | 'catalog';
 
 interface CategoryFilterProps {
   currentCategory?: string;
+  categoryScope?: string;
   variant?: CategoryFilterVariant;
 }
 
@@ -43,26 +48,63 @@ function RadioIndicator({ selected }: { selected: boolean }) {
   );
 }
 
-export function CategoryFilter({ currentCategory, variant = 'default' }: CategoryFilterProps) {
+function countCategoryIds(categories: Category[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const category of categories) {
+    counts.set(category.id, (counts.get(category.id) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function isCategoryOptionSelected(
+  category: Category,
+  currentCategory: string | undefined,
+  categoryScope: string | undefined,
+  idCounts: Map<string, number>
+): boolean {
+  if (!currentCategory) {
+    return false;
+  }
+  if (currentCategory === category.id) {
+    const shared = (idCounts.get(category.id) ?? 0) > 1;
+    if (!shared) {
+      return true;
+    }
+    return (categoryScope ?? '') === (getCategoryTreeParentId(category.treeKey) ?? '');
+  }
+  return currentCategory === category.slug;
+}
+
+export function CategoryFilter({
+  currentCategory,
+  categoryScope,
+  variant = 'default',
+}: CategoryFilterProps) {
   const { applyPatch } = useProductsCatalogFilterNavigation();
+  const catalog = useOptionalProductsCatalog();
   const { t } = useTranslation();
   const { categories, loading } = useCategories();
+  const idCounts = countCategoryIds(categories);
+  const activeCategory = catalog?.params.category ?? currentCategory;
+  const activeScope = catalog?.params.categoryScope ?? categoryScope;
 
-  const handleSelect = (slug: string | null) => {
-    applyPatch({ category: slug ?? undefined });
+  const handleSelect = (category: Category | null) => {
+    if (!category) {
+      applyPatch({ category: undefined, categoryScope: undefined });
+      return;
+    }
+
+    const parentId = getCategoryTreeParentId(category.treeKey);
+    const isSharedNode = (idCounts.get(category.id) ?? 0) > 1 && Boolean(parentId);
+    applyPatch({
+      category: category.id,
+      categoryScope: isSharedNode ? parentId : undefined,
+    });
   };
 
   if (variant !== 'catalog') {
     return null;
   }
-
-  const options = [
-    { slug: null, label: t('products.catalog.filters.all') },
-    ...categories.slice(0, 2).map((category) => ({
-      slug: category.slug,
-      label: category.title,
-    })),
-  ];
 
   if (loading && categories.length === 0) {
     return (
@@ -79,30 +121,58 @@ export function CategoryFilter({ currentCategory, variant = 'default' }: Categor
   }
 
   return (
-    <div className="flex flex-col gap-2.5">
-      {options.map((option) => {
-        const selected = option.slug ? currentCategory === option.slug : !currentCategory;
-        return (
-          <button
-            key={option.slug ?? 'all'}
-            type="button"
-            onClick={() => handleSelect(option.slug)}
-            className="flex w-full items-center gap-3 text-left"
-          >
-            <RadioIndicator selected={selected} />
-            <span
-              className={selected ? 'font-semibold' : 'font-medium text-[#555]'}
-              style={{
-                fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
-                lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
-                color: selected ? PRODUCTS_CATALOG_TEXT_DARK : undefined,
-              }}
-            >
-              {option.label}
-            </span>
-          </button>
-        );
-      })}
+    <div className="flex max-h-80 flex-col gap-2.5 overflow-y-auto">
+      <CategoryFilterOption
+        selected={!activeCategory}
+        level={0}
+        label={t('products.catalog.filters.all')}
+        onSelect={() => handleSelect(null)}
+      />
+      {categories.map((category) => (
+        <CategoryFilterOption
+          key={category.treeKey}
+          selected={isCategoryOptionSelected(category, activeCategory, activeScope, idCounts)}
+          level={category.level}
+          label={category.title}
+          onSelect={() => handleSelect(category)}
+        />
+      ))}
     </div>
+  );
+}
+
+function CategoryFilterOption({
+  selected,
+  level,
+  label,
+  onSelect,
+}: {
+  selected: boolean;
+  level: number;
+  label: string;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex w-full items-center gap-3 text-left ${getCategoryTreeIndentClass(level)}`}
+    >
+      <RadioIndicator selected={selected} />
+      <span
+        style={{
+          fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+          lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+        }}
+      >
+        <CategoryHierarchyLabel
+          title={label}
+          level={level}
+          selected={selected}
+          tone="catalog"
+          indented={false}
+        />
+      </span>
+    </button>
   );
 }

@@ -48,6 +48,7 @@ const relatedProductSelect = {
       stock: true,
       sku: true,
       attributes: true,
+      imageUrl: true,
     },
   },
   categories: {

@@ -48,9 +48,17 @@ function buildSearchFilter(search: string): Prisma.ProductWhereInput {
 /**
  * Build category filter for where clause
  */
+function buildCategoryIdConditions(categoryIds: string[]): Prisma.ProductWhereInput[] {
+  return categoryIds.flatMap((catId) => [
+    { primaryCategoryId: catId },
+    { categoryIds: { has: catId } },
+  ]);
+}
+
 async function buildCategoryFilter(
   category: string,
-  existingWhere: Prisma.ProductWhereInput
+  existingWhere: Prisma.ProductWhereInput,
+  categoryScope?: string
 ): Promise<Prisma.ProductWhereInput | null> {
   const allCategoryIds = await resolveCategoryFilterIds(category);
 
@@ -61,28 +69,34 @@ async function buildCategoryFilter(
   logger.debug('Category IDs to include', {
     slug: category,
     total: allCategoryIds.length,
+    categoryScope,
   });
-  
-  // Build OR conditions for all categories (parent + children)
-  const categoryConditions = allCategoryIds.flatMap((catId: string) => [
-    { primaryCategoryId: catId },
-    { categoryIds: { has: catId } },
-  ]);
-  
-  if (existingWhere.OR) {
-    return {
-      AND: [
-        { OR: existingWhere.OR },
-        {
-          OR: categoryConditions,
-        },
-      ],
-    };
+
+  const parts: Prisma.ProductWhereInput[] = [
+    { OR: buildCategoryIdConditions(allCategoryIds) },
+  ];
+
+  if (categoryScope?.trim()) {
+    const scopeCategory = await resolveCategoryFilterIds(categoryScope.trim());
+    if (scopeCategory && scopeCategory.length > 0) {
+      parts.push({
+        OR: [
+          { primaryCategoryId: scopeCategory[0] },
+          { categoryIds: { has: scopeCategory[0] } },
+        ],
+      });
+    }
   }
-  
-  return {
-    OR: categoryConditions,
-  };
+
+  if (existingWhere.OR) {
+    parts.unshift({ OR: existingWhere.OR });
+  }
+
+  if (parts.length === 1) {
+    return parts[0];
+  }
+
+  return { AND: parts };
 }
 
 /**
@@ -200,6 +214,7 @@ export async function buildWhereClause(
 }> {
   const {
     category,
+    categoryScope,
     search,
     ids,
     filter,
@@ -207,6 +222,7 @@ export async function buildWhereClause(
     sizes,
     brand,
     clothingTypes,
+    attrs,
     minPrice,
     maxPrice,
     lang = "en",
@@ -234,7 +250,7 @@ export async function buildWhereClause(
 
   // Add category filter
   if (category) {
-    const categoryWhere = await buildCategoryFilter(category, where);
+    const categoryWhere = await buildCategoryFilter(category, where, categoryScope);
     if (categoryWhere === null) {
       // Category not found - return empty result
       return {
@@ -255,6 +271,7 @@ export async function buildWhereClause(
     sizes,
     brand,
     clothingTypes,
+    attrs,
     minPrice,
     maxPrice,
   });

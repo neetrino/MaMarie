@@ -1,5 +1,5 @@
 import { db } from "@white-shop/db";
-import { processImageUrl } from "../../utils/image-utils";
+import { resolveCatalogProductCardImage } from "../catalog-product-card-image";
 import {
   collectProductColors,
   collectProductSizes,
@@ -8,6 +8,7 @@ import {
 } from "../product-variant-attributes";
 import type { ProductWithRelations } from "../products-find-query/types";
 import { reviewsService } from "../reviews.service";
+import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
 /** Prisma `select` shape for related carousel (minimal joins). */
 export interface RelatedProductRow {
@@ -27,6 +28,7 @@ export interface RelatedProductRow {
     compareAtPrice: number | null;
     stock: number;
     sku: string | null;
+    imageUrl?: string | null;
     attributes: unknown;
     options?: Array<{
       value: string | null;
@@ -123,7 +125,7 @@ function pickAppliedDiscount(
 }
 
 function pickTranslation<T extends { locale: string }>(rows: T[], lang: string): T | null {
-  return rows.find((t) => t.locale === lang) ?? rows[0] ?? null;
+  return pickProductContentTranslation(rows, lang) ?? null;
 }
 
 /**
@@ -172,10 +174,11 @@ export async function transformRelatedProductRows(
       };
     });
 
-    let image: string | null = null;
-    if (Array.isArray(product.media) && product.media.length > 0) {
-      image = processImageUrl(product.media[0] as string | { url?: string; src?: string; value?: string }) || null;
-    }
+    const image = resolveCatalogProductCardImage(
+      product.id,
+      Array.isArray(product.media) ? product.media : [],
+      product.variants,
+    );
 
     const productForAttributes = product as unknown as ProductWithRelations;
     const reviewStats = reviewStatsByProductId.get(product.id) ?? {

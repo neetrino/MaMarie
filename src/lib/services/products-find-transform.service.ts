@@ -4,6 +4,7 @@ import { resolveCatalogProductCardImage } from "./catalog-product-card-image";
 import { collectProductColors, collectProductSizes } from "./product-variant-attributes";
 import { reviewsService } from "./reviews.service";
 import { ProductWithRelations } from "./products-find-query.service";
+import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
 const DISCOUNT_SETTINGS_CACHE_TTL_MS = 60_000;
 
@@ -86,7 +87,7 @@ class ProductsFindTransformService {
     const data = products.map((product: ProductWithRelations) => {
       // Безопасное получение translation с проверкой на существование массива
       const translations = Array.isArray(product.translations) ? product.translations : [];
-      const translation = translations.find((t: { locale: string }) => t.locale === lang) || translations[0] || null;
+      const translation = pickProductContentTranslation(translations, lang) || null;
       
       // Безопасное получение brand translation
       const brandTranslations = product.brand && Array.isArray(product.brand.translations)
@@ -166,9 +167,9 @@ class ProductsFindTransformService {
         compareAtPrice: variant?.compareAtPrice || null,
         discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
         image: resolveCatalogProductCardImage(
+          product.id,
           Array.isArray(product.media) ? product.media : [],
           variants,
-          variant?.id ?? null
         ),
         inStock: (variant?.stock || 0) > 0,
         labels: (() => {
