@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import type { Prisma } from "@white-shop/db";
 import { revalidatePath } from "next/cache";
+import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
 import { logger } from "../../../utils/logger";
 import { invalidateAdminProductsListCache } from "../admin-products-read/list-cache";
 import type { UpdateProductData } from "./types";
@@ -62,6 +63,7 @@ export async function updateProductFlagsOnly(productId: string, data: UpdateProd
   });
 
   invalidateAdminProductsListCache();
+  invalidateHomeFeaturedProductsCache();
 
   try {
     revalidatePath("/");

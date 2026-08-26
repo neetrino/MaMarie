@@ -9,8 +9,14 @@ import {
   separateMainAndVariantImages,
 } from "../../utils/image-utils";
 import { logger } from "@/lib/utils/logger";
-import { ensureUniqueProductSlug } from "./product-slug-utils";
+import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
 import { invalidateAdminProductsListCache } from "./admin-products-read/list-cache";
+import {
+  normalizeProductTranslationInputs,
+  pickPrimaryTranslation,
+  type ProductTranslationInput,
+} from "./product-translation-input";
+import { buildUniqueTranslationCreates } from "./product-translation-persist";
 
 const PRODUCT_CREATE_TX_TIMEOUT_MS = 30000;
 const PRODUCT_CREATE_TX_MAX_WAIT_MS = 5000;
@@ -102,6 +108,7 @@ class AdminProductsCreateService {
     published: boolean;
     featured?: boolean;
     locale: string;
+    translations?: ProductTranslationInput[];
     media?: any[];
     mainProductImage?: string;
     labels?: Array<{
@@ -135,11 +142,19 @@ class AdminProductsCreateService {
       }
 
       const result = await db.$transaction(async (tx: any) => {
-        const uniqueSlug = await ensureUniqueProductSlug({
-          tx,
-          slug: data.slug,
-          locale: data.locale || "en",
-        });
+        const translationInputs = normalizeProductTranslationInputs(data);
+        if (translationInputs.length === 0) {
+          throw {
+            status: 400,
+            type: "https://api.shop.am/problems/validation-error",
+            title: "Validation Error",
+            detail: "At least one product translation with title and slug is required",
+          };
+        }
+
+        const primaryTranslation = pickPrimaryTranslation(translationInputs);
+        const translationCreates = await buildUniqueTranslationCreates(tx, translationInputs);
+        const uniqueSlug = translationCreates[0]?.slug ?? primaryTranslation.slug;
 
         // Track used SKUs within this transaction to ensure uniqueness
         const usedSkus = new Set<string>();
@@ -358,17 +373,11 @@ class AdminProductsCreateService {
             primaryCategoryId: data.primaryCategoryId || undefined,
             categoryIds: data.categoryIds || [],
             media: finalMedia,
-            published: data.published,
+            published: data.published !== false,
             featured: data.featured ?? false,
-            publishedAt: data.published ? new Date() : undefined,
+            publishedAt: data.published !== false ? new Date() : undefined,
             translations: {
-              create: {
-                locale: data.locale || "en",
-                title: data.title,
-                slug: uniqueSlug,
-                subtitle: data.subtitle || undefined,
-                descriptionHtml: data.descriptionHtml || undefined,
-              },
+              create: translationCreates,
             },
             variants: {
               create: variantsData,
@@ -434,6 +443,7 @@ class AdminProductsCreateService {
         // @ts-expect-error - revalidateTag type issue in Next.js
         revalidateTag('products');
         invalidateAdminProductsListCache();
+        invalidateHomeFeaturedProductsCache();
       } catch (e) {
         console.warn('⚠️ [ADMIN PRODUCTS CREATE SERVICE] Revalidation failed:', e);
       }

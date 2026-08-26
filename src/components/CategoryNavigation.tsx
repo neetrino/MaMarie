@@ -80,7 +80,7 @@ function CategoryNavigationContent() {
 
               return (
                 <CategoryItem
-                  key={category.id}
+                  key={category.treeKey}
                   category={category}
                   product={product}
                   isActive={isActive}

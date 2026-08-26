@@ -1,20 +1,15 @@
-import { Suspense } from 'react';
 import { cookies } from 'next/headers';
 import { getServerLanguage } from '../../lib/language-server';
-import { t } from '../../lib/i18n';
-import { BrandFilter } from '../../components/BrandFilter';
-import { ColorFilter } from '../../components/ColorFilter';
 import { MobileFiltersDrawer } from '../../components/MobileFiltersDrawer';
-import { PriceFilter } from '../../components/PriceFilter';
 import { ProductsFiltersProviderBridge } from '../../components/products/ProductsFiltersProviderBridge';
 import { ProductsHeader } from '../../components/ProductsHeader';
-import { SizeFilter } from '../../components/SizeFilter';
 import { ProductsBreadcrumb } from '../../components/products/ProductsBreadcrumb';
 import { ProductsCatalogMobileTitle } from '../../components/products/ProductsCatalogMobileTitle';
 import { ProductsCatalogGridSection } from '../../components/products/ProductsCatalogGridSection';
 import { MobileProductsCatalogTrack } from '../../components/products/MobileProductsCatalogTrack';
 import { ProductsCatalogProvider } from '../../components/products/ProductsCatalogProvider';
 import { ProductsFilterSidebar } from '../../components/products/ProductsFilterSidebar';
+import { MobileCatalogFilters } from '../../components/products/MobileCatalogFilters';
 import {
   HomeContentHorizontalFrame,
   HomeSectionContent,
@@ -67,6 +62,7 @@ function toInitialFilters(
     colors: result.colors ?? [],
     sizes: result.sizes ?? [],
     brands: result.brands ?? [],
+    attributes: result.attributes ?? [],
     priceRange: result.priceRange ?? {
       min: 0,
       max: 100000,
@@ -151,6 +147,7 @@ export async function ProductsCatalog({
   const filtersInput = {
     lang: language,
     category: catalogParams.category,
+    categoryScope: catalogParams.categoryScope,
     search: catalogParams.search,
     minPrice: parseOptionalPrice(catalogParams.minPrice),
     maxPrice: parseOptionalPrice(catalogParams.maxPrice),
@@ -199,14 +196,7 @@ export async function ProductsCatalog({
             </div>
 
             <MobileFiltersDrawer openEventName={MOBILE_FILTERS_EVENT}>
-              <div className="space-y-6 p-4">
-                <Suspense fallback={<div>{t(language, 'common.messages.loadingFilters')}</div>}>
-                  <PriceFilter variant="catalog" />
-                  <ColorFilter variant="catalog" />
-                  <SizeFilter variant="catalog" />
-                  <BrandFilter variant="catalog" />
-                </Suspense>
-              </div>
+              <MobileCatalogFilters />
             </MobileFiltersDrawer>
           </ProductsFiltersProviderBridge>
         </ProductsCatalogProvider>

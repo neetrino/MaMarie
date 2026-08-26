@@ -3,7 +3,6 @@ import Link from 'next/link';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import {
-  MOBILE_PRODUCTS_CATALOG_CARD_ASSETS,
   MOBILE_PRODUCTS_CATALOG_CARD_HEART_HEIGHT_PX,
   MOBILE_PRODUCTS_CATALOG_CARD_HEART_RIGHT_PX,
   MOBILE_PRODUCTS_CATALOG_CARD_HEART_TOP_PX,
@@ -20,11 +19,12 @@ import {
 } from '../../constants/mobile-products-catalog';
 import { mobileProductsCatalogCardLayoutPx } from '../../lib/mobile-products-catalog-card-layout';
 import { WishlistIcon } from '../icons/WishlistIcon';
+import { ProductImagePlaceholder } from '../ProductImagePlaceholder';
 
 interface MobileProductsCatalogProductCardMediaProps {
   slug: string;
   title: string;
-  imageSrc: string;
+  imageSrc: string | null;
   imagePriority: boolean;
   layoutWidthPx: number;
   isInWishlist: boolean;
@@ -45,8 +45,7 @@ export function MobileProductsCatalogProductCardMedia({
 }: MobileProductsCatalogProductCardMediaProps) {
   const [imageError, setImageError] = useState(false);
   const lp = (value: number) => mobileProductsCatalogCardLayoutPx(value, layoutWidthPx);
-  const resolvedImageSrc =
-    imageSrc && !imageError ? imageSrc : MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.placeholderImage;
+  const showProductImage = Boolean(imageSrc) && !imageError;
 
   return (
     <div
@@ -80,16 +79,21 @@ export function MobileProductsCatalogProductCardMedia({
             top: '-26.24%',
           }}
         >
-          <Image
-            src={resolvedImageSrc}
-            alt={title}
-            fill
-            priority={imagePriority}
-            loading={imagePriority ? 'eager' : 'lazy'}
-            sizes={`${lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_WIDTH_PX)}px`}
-            className="object-contain"
-            onError={() => setImageError(true)}
-          />
+          {showProductImage && imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={title}
+              fill
+              priority={imagePriority}
+              loading={imagePriority ? 'eager' : 'lazy'}
+              sizes={`${lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_WIDTH_PX)}px`}
+              className="object-contain"
+              unoptimized
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <ProductImagePlaceholder className="h-full w-full" aria-label={title} />
+          )}
         </div>
       </Link>
 

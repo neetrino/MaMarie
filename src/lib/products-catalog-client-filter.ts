@@ -74,7 +74,7 @@ export function canPreviewCatalogClientSide(params: ProductsCatalogParams): bool
 
 /** Filters that require a server round-trip (no reliable client pool preview). */
 export function usesServerOnlyCatalogFilters(params: ProductsCatalogParams): boolean {
-  return Boolean(params.clothingTypes);
+  return Boolean(params.clothingTypes || params.attrs || params.categoryScope);
 }
 
 /** Filters and paginates catalog products locally for instant filter preview. */

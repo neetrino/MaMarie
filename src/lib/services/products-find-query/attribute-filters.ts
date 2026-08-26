@@ -1,4 +1,7 @@
 import { Prisma } from "@white-shop/db";
+import { parseCatalogAttrsParam } from "@/lib/products-catalog-attrs";
+
+const BUILTIN_VARIANT_ATTRIBUTE_KEYS = new Set(["color", "size"]);
 
 function parseCsv(value?: string): string[] {
   if (!value?.trim()) {
@@ -52,17 +55,48 @@ function buildVariantOptionAttributeFilter(
   };
 }
 
+function buildExtraAttributeOptionClauses(
+  extras: Record<string, string[]>
+): Prisma.ProductVariantWhereInput[] {
+  return Object.entries(extras)
+    .filter(([key, values]) => !BUILTIN_VARIANT_ATTRIBUTE_KEYS.has(key) && values.length > 0)
+    .map(([key, values]) => ({
+      options: {
+        some: {
+          OR: [
+            { attributeKey: key, value: { in: buildOptionMatchValues(values) } },
+            {
+              attributeValue: {
+                attribute: { key },
+                OR: [
+                  { value: { in: buildOptionMatchValues(values) } },
+                  {
+                    translations: {
+                      some: { label: { in: values, mode: "insensitive" } },
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    }));
+}
+
 function buildPublishedVariantFilter(
   colors?: string,
   sizes?: string,
   minPrice?: number,
-  maxPrice?: number
+  maxPrice?: number,
+  extraAttrs?: Record<string, string[]>
 ): Prisma.ProductVariantWhereInput | null {
   const colorList = parseCsv(colors).map((value) => value.toLowerCase());
   const sizeList = parseCsv(sizes).map((value) => value.toUpperCase());
+  const extraClauses = buildExtraAttributeOptionClauses(extraAttrs ?? {});
   const hasPrice = minPrice != null || maxPrice != null;
 
-  if (colorList.length === 0 && sizeList.length === 0 && !hasPrice) {
+  if (colorList.length === 0 && sizeList.length === 0 && extraClauses.length === 0 && !hasPrice) {
     return null;
   }
 
@@ -77,7 +111,7 @@ function buildPublishedVariantFilter(
     };
   }
 
-  const optionClauses: Prisma.ProductVariantWhereInput[] = [];
+  const optionClauses: Prisma.ProductVariantWhereInput[] = [...extraClauses];
   if (colorList.length > 0) {
     optionClauses.push({
       options: {
@@ -108,6 +142,7 @@ export function buildCatalogAttributeWhere(filters: {
   sizes?: string;
   brand?: string;
   clothingTypes?: string;
+  attrs?: string;
   minPrice?: number;
   maxPrice?: number;
 }): Prisma.ProductWhereInput {
@@ -138,7 +173,8 @@ export function buildCatalogAttributeWhere(filters: {
     filters.colors,
     filters.sizes,
     filters.minPrice,
-    filters.maxPrice
+    filters.maxPrice,
+    parseCatalogAttrsParam(filters.attrs)
   );
   if (variantFilter) {
     andClauses.push({
@@ -163,6 +199,7 @@ export function hasCatalogAttributeFilters(filters: {
   sizes?: string;
   brand?: string;
   clothingTypes?: string;
+  attrs?: string;
   minPrice?: number;
   maxPrice?: number;
 }): boolean {
@@ -171,6 +208,7 @@ export function hasCatalogAttributeFilters(filters: {
       filters.sizes ||
       filters.brand ||
       filters.clothingTypes ||
+      filters.attrs ||
       filters.minPrice != null ||
       filters.maxPrice != null
   );

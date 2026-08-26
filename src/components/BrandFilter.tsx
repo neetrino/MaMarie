@@ -148,6 +148,7 @@ export function BrandFilter({
           colors: existing?.colors || [],
           sizes: existing?.sizes || [],
           brands: list,
+          attributes: existing?.attributes || [],
           priceRange: existing?.priceRange || {
             min: 0,
             max: 100000,

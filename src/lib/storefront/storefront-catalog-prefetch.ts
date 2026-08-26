@@ -53,6 +53,7 @@ function buildFiltersCacheKey(params: ReturnType<typeof parseProductsCatalogPara
   return buildCatalogClientCacheKey(PRODUCTS_FILTERS_SCOPE, {
     lang: getStoredLanguage(),
     category: params.category,
+    categoryScope: params.categoryScope,
     search: params.search,
     minPrice: params.minPrice,
     maxPrice: params.maxPrice,
@@ -87,6 +88,7 @@ function warmProductsFilters(params: ReturnType<typeof parseProductsCatalogParam
 
   const requestParams: Record<string, string> = { lang: getStoredLanguage() };
   if (params.category) requestParams.category = params.category;
+  if (params.categoryScope) requestParams.categoryScope = params.categoryScope;
   if (params.search) requestParams.search = params.search;
   if (params.minPrice) requestParams.minPrice = params.minPrice;
   if (params.maxPrice) requestParams.maxPrice = params.maxPrice;

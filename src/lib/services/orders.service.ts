@@ -228,7 +228,7 @@ class OrdersService {
               .join(', ') || undefined;
 
             // Get image URL
-            const imageUrl = extractMediaUrl(product.media) ?? undefined;
+            const imageUrl = extractMediaUrl(product.media, product.id) ?? undefined;
 
             // Check stock availability
             if (variant.stock < item.quantity) {
@@ -313,7 +313,7 @@ class OrdersService {
           const variantTitle = variant.options
             ?.map((opt: { attributeKey?: string | null; value?: string | null }) => `${opt.attributeKey ?? ""}: ${opt.value ?? ""}`)
             .join(", ") ?? undefined;
-          const imageUrl = extractMediaUrl(variant.product.media) ?? undefined;
+          const imageUrl = extractMediaUrl(variant.product.media, variant.product.id) ?? undefined;
           return {
             variantId: variant.id,
             productId: variant.product.id,

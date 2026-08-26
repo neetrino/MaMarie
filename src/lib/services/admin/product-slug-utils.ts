@@ -7,7 +7,6 @@ const MAX_SLUG_ATTEMPTS = 1000;
 interface EnsureUniqueProductSlugParams {
   tx: Prisma.TransactionClient;
   slug: string;
-  locale: string;
   excludeProductId?: string;
 }
 
@@ -15,10 +14,12 @@ function buildSlugCandidate(baseSlug: string, attempt: number): string {
   return attempt === 0 ? baseSlug : `${baseSlug}-${attempt}`;
 }
 
+/**
+ * One storefront slug per product — unique across all locales and products.
+ */
 export async function ensureUniqueProductSlug({
   tx,
   slug,
-  locale,
   excludeProductId,
 }: EnsureUniqueProductSlugParams): Promise<string> {
   const baseSlug = slug.trim() || FALLBACK_PRODUCT_SLUG;
@@ -28,7 +29,6 @@ export async function ensureUniqueProductSlug({
     const existingTranslation = await tx.productTranslation.findFirst({
       where: {
         slug: candidate,
-        locale,
         ...(excludeProductId ? { productId: { not: excludeProductId } } : {}),
       },
       select: { id: true },
@@ -39,7 +39,5 @@ export async function ensureUniqueProductSlug({
     }
   }
 
-  throw new Error(
-    `Unable to generate unique product slug for '${baseSlug}' in locale '${locale}'`
-  );
+  throw new Error(`Unable to generate unique product slug for '${baseSlug}'`);
 }

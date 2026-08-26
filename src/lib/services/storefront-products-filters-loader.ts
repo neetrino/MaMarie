@@ -17,6 +17,7 @@ const UNSTABLE_REVALIDATE_SECONDS = 60;
 export interface StorefrontProductsFiltersInput {
   lang: string;
   category?: string;
+  categoryScope?: string;
   search?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -31,6 +32,9 @@ function buildFiltersSearchParams(input: StorefrontProductsFiltersInput): URLSea
   params.set('lang', input.lang);
   if (input.category) {
     params.set('category', input.category);
+  }
+  if (input.categoryScope) {
+    params.set('categoryScope', input.categoryScope);
   }
   if (input.search) {
     params.set('search', input.search);
@@ -75,7 +79,7 @@ const fetchFiltersByStableKey = unstable_cache(
       () => fetchFiltersPayload(input)
     );
   },
-  ['storefront-products-filters-v1'],
+  ['storefront-products-filters-v2'],
   { revalidate: UNSTABLE_REVALIDATE_SECONDS }
 );
 

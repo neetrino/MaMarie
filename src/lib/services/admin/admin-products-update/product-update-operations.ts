@@ -2,11 +2,10 @@ import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
 import type { UpdateProductData } from "./types";
-import { collectVariantImages, buildProductUpdateData, updateProductTranslation, updateProductLabels, updateProductAttributes } from "./product-updater";
+import { collectVariantImages, buildProductUpdateData, upsertProductTranslations, updateProductLabels, updateProductAttributes } from "./product-updater";
 import { updateOrCreateVariant } from "./variant-updater";
 import { updateAttributeValueImageUrls } from "./attribute-value-updater";
 import { buildAttributeValueLookupCache } from "./variant-processor";
-import { ensureUniqueProductSlug } from "../product-slug-utils";
 import { invalidateAdminProductsListCache } from "../admin-products-read/list-cache";
 import { isProductFlagOnlyUpdate, updateProductFlagsOnly } from "./product-flag-update";
 
@@ -47,23 +46,9 @@ export async function updateProduct(
     // Execute everything in a transaction for atomicity and speed
     const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       const dataToPersist: UpdateProductData = { ...data };
-      if (data.slug && data.slug.trim()) {
-        dataToPersist.slug = await ensureUniqueProductSlug({
-          tx,
-          slug: data.slug,
-          locale: data.locale || "en",
-          excludeProductId: productId,
-        });
-      }
-
-      // Collect all variant images to exclude from main media (if media is being updated)
       const allVariantImages = await collectVariantImages(dataToPersist.variants, productId, tx);
-
-      // 1. Update product base data
       const updateData = buildProductUpdateData(dataToPersist, allVariantImages, existing);
-
-      // 2. Update translation
-      await updateProductTranslation(productId, dataToPersist, tx);
+      await upsertProductTranslations(productId, dataToPersist, tx);
 
       // 3. Update labels
       await updateProductLabels(productId, dataToPersist.labels, tx);

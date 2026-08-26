@@ -1,4 +1,6 @@
 import type { GeneratedVariant, ProductLabel } from '../types';
+import { PRODUCT_CONTENT_LOCALES, productContentLocaleLabel } from '@/constants/product-content-locales';
+import { type ProductTranslationsByLocale } from './product-locale-fields';
 
 export type ProductFormFieldErrors = Partial<Record<string, string>>;
 
@@ -17,7 +19,7 @@ export function clearProductFieldError(
 
 interface ValidateProductFormInput {
   productType: 'simple' | 'variable';
-  title: string;
+  translations: ProductTranslationsByLocale;
   slug: string;
   labels: ProductLabel[];
   simpleProductData: {
@@ -31,13 +33,20 @@ interface ValidateProductFormInput {
 }
 
 function validateBasicFields(
-  title: string,
+  translations: ProductTranslationsByLocale,
   slug: string,
   t: (key: string) => string,
   errors: ProductFormFieldErrors,
 ): void {
-  if (!title.trim()) {
-    errors.title = t('admin.products.add.titleRequired');
+  const filledLocales = PRODUCT_CONTENT_LOCALES.filter(
+    (locale) => translations[locale].title.trim().length > 0,
+  );
+
+  if (filledLocales.length === 0) {
+    errors['title.hy'] = t('admin.products.add.titleRequired').replace(
+      '{language}',
+      productContentLocaleLabel('hy'),
+    );
   }
 
   if (!slug.trim()) {
@@ -111,7 +120,7 @@ export function validateProductForm(
 ): ProductFormFieldErrors {
   const errors: ProductFormFieldErrors = {};
 
-  validateBasicFields(input.title, input.slug, t, errors);
+  validateBasicFields(input.translations, input.slug, t, errors);
   validateLabels(input.labels, t, errors);
 
   if (input.productType === 'simple') {

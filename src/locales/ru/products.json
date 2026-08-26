@@ -15,9 +15,9 @@
       "loading": "Загрузка..."
     },
     "brand": {
-      "title": "Фильтр по бренду",
-      "searchPlaceholder": "Найти бренд",
-      "noBrands": "Бренды не найдены",
+      "title": "Фильтр по коллекции",
+      "searchPlaceholder": "Найти коллекцию",
+      "noBrands": "Коллекции не найдены",
       "loading": "Загрузка..."
     }
   },
@@ -56,6 +56,7 @@
       "price": "Цена",
       "color": "Цвет",
       "clothingType": "Тип одежды",
+      "brand": "Коллекция",
       "all": "Все",
       "sizeNote": "Европейская размерная сетка",
       "clothingTypes": {

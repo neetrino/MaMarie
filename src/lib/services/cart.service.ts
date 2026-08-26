@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import { logger } from "../utils/logger";
 import { extractMediaUrl } from "../utils/extractMediaUrl";
+import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
 class CartService {
   private extractSelectedOption(
@@ -171,11 +172,12 @@ class CartService {
       }) => {
         const product = item.product;
         const variant = item.variant;
-        const translation =
-          product?.translations?.find((t: { locale: string }) => t.locale === locale) ||
-          product?.translations?.[0];
+        const translation = pickProductContentTranslation(
+          product?.translations ?? [],
+          locale,
+        );
 
-        const imageUrl = extractMediaUrl(product?.media);
+        const imageUrl = extractMediaUrl(product?.media, product?.id);
 
         const productDiscount = product?.discountPercent ?? 0;
         let appliedDiscount = 0;

@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import type { Brand, Category, Attribute, Variant, ProductLabel, GeneratedVariant } from '../types';
 import type { CurrencyCode } from '@/lib/currency';
 import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
+import { DEFAULT_PRODUCT_CONTENT_LOCALE } from '@/constants/product-content-locales';
+import { createEmptyTranslationsByLocale } from '../utils/product-locale-fields';
 
 export function useProductFormState() {
   const [loading, setLoading] = useState(false);
@@ -9,14 +11,16 @@ export function useProductFormState() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [contentLocale, setContentLocale] = useState(DEFAULT_PRODUCT_CONTENT_LOCALE);
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
     descriptionHtml: '',
+    translations: createEmptyTranslationsByLocale(),
     brandIds: [] as string[],
     primaryCategoryId: '',
     categoryIds: [] as string[],
-    published: false,
+    published: true,
     featured: false,
     imageUrls: [] as string[],
     featuredImageIndex: 0,
@@ -74,6 +78,8 @@ export function useProductFormState() {
     // Form data
     formData,
     setFormData,
+    contentLocale,
+    setContentLocale,
     // UI states
     categoriesExpanded,
     setCategoriesExpanded,

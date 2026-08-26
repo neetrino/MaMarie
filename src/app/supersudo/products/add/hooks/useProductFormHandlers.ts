@@ -2,6 +2,7 @@ import type { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { convertPrice, type CurrencyCode } from '@/lib/currency';
 import type { Attribute, Variant, GeneratedVariant } from '../types';
+import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
 import { useBrandAndCategoryCreation } from './useBrandAndCategoryCreation';
 import { useVariantConversionToFormData } from './useVariantConversionToFormData';
 import { useVariantValidation } from './useVariantValidation';
@@ -15,11 +16,13 @@ import {
 } from '../utils/product-form-field-errors';
 import { useTranslation } from '@/lib/i18n-client';
 import { showToast } from '../../../../../components/Toast';
+import { PRODUCT_CONTENT_LOCALES, type ProductContentLocale } from '@/constants/product-content-locales';
 interface UseProductFormHandlersProps {
   formData: {
     title: string;
     slug: string;
     descriptionHtml: string;
+    translations: ProductTranslationsByLocale;
     brandIds: string[];
     primaryCategoryId: string;
     categoryIds: string[];
@@ -57,6 +60,7 @@ interface UseProductFormHandlersProps {
   getColorAttribute: () => Attribute | undefined;
   getSizeAttribute: () => Attribute | undefined;
   isClothingCategory: () => boolean;
+  setContentLocale: (locale: ProductContentLocale) => void;
 }
 
 export function useProductFormHandlers({
@@ -82,6 +86,7 @@ export function useProductFormHandlers({
   getColorAttribute,
   getSizeAttribute,
   isClothingCategory,
+  setContentLocale,
 }: UseProductFormHandlersProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -128,7 +133,7 @@ export function useProductFormHandlers({
     const validationErrors = validateProductForm(
       {
         productType,
-        title: formData.title,
+        translations: formData.translations,
         slug: formData.slug,
         labels: formData.labels,
         simpleProductData,
@@ -142,6 +147,12 @@ export function useProductFormHandlers({
 
     if (Object.keys(validationErrors).length > 0) {
       setFieldErrors(validationErrors);
+      const localeWithError = PRODUCT_CONTENT_LOCALES.find(
+        (locale) => validationErrors[`title.${locale}`] || validationErrors[`slug.${locale}`],
+      );
+      if (localeWithError) {
+        setContentLocale(localeWithError);
+      }
       scrollToFirstProductFormError();
       return;
     }

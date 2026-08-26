@@ -3,6 +3,7 @@ export interface AdminReferenceCategory {
   title: string;
   slug?: string;
   parentId?: string | null;
+  parentIds?: string[];
   requiresSizes?: boolean;
   published?: boolean;
 }

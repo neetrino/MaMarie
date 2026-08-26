@@ -3,12 +3,15 @@
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import { ClaySelectChevron } from '../../../../../components/ClaySelect';
+import { CategoryHierarchyLabel } from '../../../../../components/category-tree/CategoryHierarchyLabel';
 import {
   CLAY_SELECT_DROPDOWN_ANIMATION_MS,
   CLAY_SELECT_DROPDOWN_GAP_PX,
   CLAY_SELECT_MULTI_PANEL_CLASS,
   getClaySelectTriggerClass,
 } from '../../../../../constants/clay-select';
+import { getCategoryTreeIndentClass } from '../../../../../constants/category-tree-ui';
+import { buildFlatCategoryTree } from '../../../../../lib/categories/build-flat-category-tree';
 import type { Category, Brand } from '../types';
 
 interface CategoriesBrandsProps {
@@ -59,48 +62,7 @@ export function CategoriesBrands({
   onVariantsUpdate,
 }: CategoriesBrandsProps) {
   const { t } = useTranslation();
-
-  // Build category tree structure
-  const buildCategoryTree = () => {
-    const categoryMap = new Map<string, Category & { children: Category[] }>();
-    const rootCategories: (Category & { children: Category[] })[] = [];
-
-    // First pass: create map and identify root categories
-    categories.forEach((category) => {
-      categoryMap.set(category.id, { ...category, children: [] });
-    });
-
-    // Second pass: build tree structure
-    categories.forEach((category) => {
-      if (category.parentId && categoryMap.has(category.parentId)) {
-        const parent = categoryMap.get(category.parentId)!;
-        const child = categoryMap.get(category.id)!;
-        parent.children.push(child);
-      } else {
-        rootCategories.push(categoryMap.get(category.id)!);
-      }
-    });
-
-    // Flatten tree for display (parent first, then children)
-    const flattenTree = (
-      nodes: (Category & { children: Category[] })[],
-      result: (Category & { isSubcategory: boolean })[] = []
-    ): (Category & { isSubcategory: boolean })[] => {
-      nodes.forEach((node) => {
-        result.push({ ...node, isSubcategory: false });
-        if (node.children && node.children.length > 0) {
-          node.children.forEach((child) => {
-            result.push({ ...child, isSubcategory: true });
-          });
-        }
-      });
-      return result;
-    };
-
-    return flattenTree(rootCategories);
-  };
-
-  const displayCategories = buildCategoryTree();
+  const displayCategories = buildFlatCategoryTree(categories);
 
   const handleCategoryChange = (categoryId: string, checked: boolean) => {
     const newCategoryIds = checked
@@ -202,10 +164,8 @@ export function CategoriesBrands({
                       <div className="space-y-1">
                         {displayCategories.map((category) => (
                           <label
-                            key={category.id}
-                            className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded ${
-                              category.isSubcategory ? 'pl-6' : ''
-                            }`}
+                            key={category.treeKey}
+                            className={`flex cursor-pointer items-center space-x-2 rounded p-2 hover:bg-gray-50 ${getCategoryTreeIndentClass(category.level)}`}
                           >
                             <input
                               type="checkbox"
@@ -213,13 +173,11 @@ export function CategoriesBrands({
                               onChange={(e) => handleCategoryChange(category.id, e.target.checked)}
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
-                            <span
-                              className={`text-gray-700 ${
-                                category.isSubcategory ? 'text-xs' : 'text-sm font-semibold'
-                              }`}
-                            >
-                              {category.title}
-                            </span>
+                            <CategoryHierarchyLabel
+                              title={category.title}
+                              level={category.level}
+                              indented={false}
+                            />
                           </label>
                         ))}
                       </div>

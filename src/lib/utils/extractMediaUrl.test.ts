@@ -17,9 +17,15 @@ describe("extractMediaUrl", () => {
     expect(extractMediaUrl([])).toBe(null);
   });
 
-  it("returns first element when it is a string", () => {
+  it("returns first element when it is a valid URL string", () => {
     expect(extractMediaUrl(["https://example.com/img.jpg"])).toBe("https://example.com/img.jpg");
-    expect(extractMediaUrl(["a", "b"])).toBe("a");
+  });
+
+  it('rewrites data URLs when productId is provided', () => {
+    const dataUrl = 'data:image/png;base64,abc';
+    expect(extractMediaUrl([dataUrl], 'prod_1')).toBe(
+      '/api/v1/products/media/prod_1/0/image',
+    );
   });
 
   it("returns url when first element is object with url", () => {

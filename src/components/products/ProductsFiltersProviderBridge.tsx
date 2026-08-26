@@ -19,6 +19,7 @@ export function ProductsFiltersProviderBridge({
   return (
     <ProductsFiltersProvider
       category={params.category}
+      categoryScope={params.categoryScope}
       search={params.search}
       minPrice={params.minPrice}
       maxPrice={params.maxPrice}

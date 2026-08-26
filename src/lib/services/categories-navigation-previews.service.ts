@@ -1,7 +1,8 @@
 import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
 import { flattenCategoryTree, type CategoryTreeNode } from "@/lib/categories/category-tree";
-import { processImageUrl } from "@/lib/utils/image-utils";
+import { toProductMediaStorefrontUrl } from "@/lib/utils/storefront-image-url";
+import type { ImageUrlInput } from "@/lib/utils/image-utils";
 import { categoriesService } from "./categories.service";
 
 const NAV_DISPLAY_LIMIT = 10;
@@ -23,11 +24,11 @@ function pickTranslation(rows: TranslationRow[], lang: string): TranslationRow |
   return rows[0] ?? null;
 }
 
-function extractProductImage(media: unknown): string | null {
+function extractProductImage(productId: string, media: unknown): string | null {
   if (!Array.isArray(media) || media.length === 0) {
     return null;
   }
-  return processImageUrl(media[0] as Parameters<typeof processImageUrl>[0]);
+  return toProductMediaStorefrontUrl(productId, 0, media[0] as ImageUrlInput);
 }
 
 /**
@@ -64,7 +65,7 @@ export async function getCategoryNavigationPreviews(
 
   if (allProduct) {
     const tr = pickTranslation(allProduct.translations, lang);
-    const image = extractProductImage(allProduct.media);
+    const image = extractProductImage(allProduct.id, allProduct.media);
     if (tr) {
       result.all = {
         id: allProduct.id,
@@ -130,7 +131,7 @@ export async function getCategoryNavigationPreviews(
       id: row.id,
       slug: tr.slug,
       title: tr.title,
-      image: extractProductImage(row.media),
+      image: extractProductImage(row.id, row.media),
     };
   }
 

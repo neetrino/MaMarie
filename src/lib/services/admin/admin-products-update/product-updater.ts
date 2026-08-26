@@ -2,6 +2,8 @@ import { Prisma } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
 import { cleanImageUrls, separateMainAndVariantImages, smartSplitUrls } from "../../../utils/image-utils";
 import type { UpdateProductData } from "./types";
+import { normalizeProductTranslationInputs } from "../product-translation-input";
+import { buildUniqueTranslationCreates } from "../product-translation-persist";
 
 /**
  * Collect variant images from data or existing variants
@@ -90,35 +92,41 @@ export function buildProductUpdateData(
 }
 
 /**
- * Update product translation
+ * Upsert product translations for all locales in the payload.
  */
-export async function updateProductTranslation(
+export async function upsertProductTranslations(
   productId: string,
   data: UpdateProductData,
   tx: Prisma.TransactionClient
 ) {
-  if (data.title || data.slug || data.subtitle !== undefined || data.descriptionHtml !== undefined) {
-    const locale = data.locale || "en";
+  const translations = normalizeProductTranslationInputs(data);
+  if (translations.length === 0) {
+    return;
+  }
+
+  const uniqueRows = await buildUniqueTranslationCreates(tx, translations, productId);
+
+  for (const row of uniqueRows) {
     await tx.productTranslation.upsert({
       where: {
         productId_locale: {
           productId,
-          locale,
+          locale: row.locale,
         },
       },
       update: {
-        ...(data.title && { title: data.title }),
-        ...(data.slug && { slug: data.slug }),
-        ...(data.subtitle !== undefined && { subtitle: data.subtitle || null }),
-        ...(data.descriptionHtml !== undefined && { descriptionHtml: data.descriptionHtml || null }),
+        title: row.title,
+        slug: row.slug,
+        subtitle: row.subtitle ?? null,
+        descriptionHtml: row.descriptionHtml ?? null,
       },
       create: {
         productId,
-        locale,
-        title: data.title || "",
-        slug: data.slug || "",
-        subtitle: data.subtitle || null,
-        descriptionHtml: data.descriptionHtml || null,
+        locale: row.locale,
+        title: row.title,
+        slug: row.slug,
+        subtitle: row.subtitle ?? null,
+        descriptionHtml: row.descriptionHtml ?? null,
       },
     });
   }

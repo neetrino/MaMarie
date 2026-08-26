@@ -160,7 +160,7 @@ function MobileProductsCatalogProductCardComponent({
       <MobileProductsCatalogProductCardMedia
         slug={product.slug}
         title={product.title}
-        imageSrc={product.image ?? ''}
+        imageSrc={product.image}
         imagePriority={imagePriority}
         layoutWidthPx={cardWidthPx}
         isInWishlist={isInWishlist}

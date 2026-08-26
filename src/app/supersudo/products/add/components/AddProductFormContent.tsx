@@ -21,12 +21,15 @@ import { ProductLabels } from './ProductLabels';
 import { Publishing } from './Publishing';
 import { FormActions } from './FormActions';
 import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
+import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
+import type { ProductContentLocale } from '@/constants/product-content-locales';
 
 interface AddProductFormContentProps {
   formData: {
     title: string;
     slug: string;
     descriptionHtml: string;
+    translations: ProductTranslationsByLocale;
     brandIds: string[];
     categoryIds: string[];
     primaryCategoryId: string;
@@ -69,6 +72,8 @@ interface AddProductFormContentProps {
   onTitleChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSlugChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  contentLocale: ProductContentLocale;
+  onContentLocaleChange: (locale: ProductContentLocale) => void;
   onProductTypeChange: (type: 'simple' | 'variable') => void;
   onUploadImages: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onRemoveImage: (index: number) => void;
@@ -135,6 +140,8 @@ export function AddProductFormContent({
   onTitleChange,
   onSlugChange,
   onDescriptionChange,
+  contentLocale,
+  onContentLocaleChange,
   onProductTypeChange,
   onUploadImages,
   onRemoveImage,
@@ -187,9 +194,10 @@ export function AddProductFormContent({
         <BasicInformation
           productType={productType}
           setProductType={onProductTypeChange}
-          title={formData.title}
+          contentLocale={contentLocale}
+          onContentLocaleChange={onContentLocaleChange}
+          translations={formData.translations}
           slug={formData.slug}
-          descriptionHtml={formData.descriptionHtml}
           fieldErrors={fieldErrors}
           onTitleChange={onTitleChange}
           onSlugChange={onSlugChange}

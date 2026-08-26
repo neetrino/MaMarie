@@ -4,16 +4,17 @@ import { withServerReadCache } from "@/lib/cache/server-read-cache";
 import {
   processImageUrl,
   smartSplitUrls,
-  cleanImageUrls,
   separateMainAndVariantImages,
+  normalizeUrlForComparison,
+  type ImageUrlInput,
 } from "../../utils/image-utils";
 import {
-  stripInlineDataImages,
   toAttributeValueStorefrontImageUrl,
+  toProductMediaStorefrontUrl,
   toVariantStorefrontImageUrl,
 } from "../../utils/storefront-image-url";
 import { logger } from "../../utils/logger";
-import { getOutOfStockLabel } from "./utils";
+import { getOutOfStockLabel, pickTranslationByLocale } from "./utils";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
 
 const DISCOUNT_SETTINGS_CACHE_TTL_MS = 30_000;
@@ -127,11 +128,24 @@ function transformMedia(
     return String(item);
   });
   const { main } = separateMainAndVariantImages(mediaAsStrings, variantImages);
-  
-  // Clean and validate final main images (never inline base64 in storefront JSON)
-  const cleanedMain = stripInlineDataImages(cleanImageUrls(main));
+  const mainSet = new Set(main.map((url) => normalizeUrlForComparison(url)));
+  const storefrontMain: string[] = [];
+  const seen = new Set<string>();
 
-  return cleanedMain;
+  product.media.forEach((item: unknown, index: number) => {
+    const processed = processImageUrl(item as ImageUrlInput);
+    if (!processed || !mainSet.has(normalizeUrlForComparison(processed))) {
+      return;
+    }
+    const storefront = toProductMediaStorefrontUrl(product.id, index, processed);
+    if (!storefront || seen.has(storefront)) {
+      return;
+    }
+    seen.add(storefront);
+    storefrontMain.push(storefront);
+  });
+
+  return storefrontMain;
 }
 
 /**
@@ -328,7 +342,7 @@ export async function transformProduct(
 ) {
   // Get translations
   const translations = Array.isArray(product.translations) ? product.translations : [];
-  const translation = translations.find((t: { locale: string }) => t.locale === lang) || translations[0] || null;
+  const translation = pickTranslationByLocale(translations, lang) || null;
   
   // Get brand translation
   const brandTranslations = product.brand && Array.isArray(product.brand.translations)

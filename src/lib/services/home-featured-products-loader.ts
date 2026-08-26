@@ -97,7 +97,7 @@ export async function fetchHomeFeaturedProductCards(
   const baseProducts = await db.product.findMany({
     where: { published: true, deletedAt: null, featured: true },
     take: BEST_PRODUCTS_CARD_COUNT,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { updatedAt: 'desc' },
     select: {
       id: true,
       brandId: true,

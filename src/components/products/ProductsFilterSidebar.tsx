@@ -2,11 +2,6 @@
 
 import { Suspense } from 'react';
 import { useTranslation } from '../../lib/i18n-client';
-import { CategoryFilter } from '../CategoryFilter';
-import { BrandFilter } from '../BrandFilter';
-import { ColorFilter } from '../ColorFilter';
-import { PriceFilter } from '../PriceFilter';
-import { SizeFilter } from '../SizeFilter';
 import {
   PRODUCTS_CATALOG_CTA_BG,
   PRODUCTS_CATALOG_CTA_HEIGHT_PX,
@@ -15,12 +10,10 @@ import {
   PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
   PRODUCTS_CATALOG_SIDEBAR_WIDTH_PX,
 } from '../../constants/products-catalog';
-import { useProductsCatalog } from './ProductsCatalogProvider';
 import { useProductsCatalogFilterNavigation } from './useProductsCatalogFilterNavigation';
-import { ProductsFilterSection } from './ProductsFilterSection';
+import { ProductsCatalogFilterFields } from './ProductsCatalogFilterFields';
 
 function ProductsFilterSidebarContent() {
-  const { params } = useProductsCatalog();
   const { clearFilters } = useProductsCatalogFilterNavigation();
   const { t } = useTranslation();
 
@@ -31,49 +24,7 @@ function ProductsFilterSidebarContent() {
     >
       <div className="flex flex-col items-center gap-[18px]">
         <div className="flex w-full flex-col gap-5">
-          <ProductsFilterSection title={t('products.catalog.filters.category')}>
-            <CategoryFilter currentCategory={params.category} variant="catalog" />
-          </ProductsFilterSection>
-
-          <ProductsFilterSection title={t('products.catalog.filters.size')}>
-            <SizeFilter
-              category={params.category}
-              search={params.search}
-              minPrice={params.minPrice}
-              maxPrice={params.maxPrice}
-              variant="catalog"
-            />
-          </ProductsFilterSection>
-
-          <ProductsFilterSection title={t('products.catalog.filters.brand')}>
-            <BrandFilter
-              category={params.category}
-              search={params.search}
-              minPrice={params.minPrice}
-              maxPrice={params.maxPrice}
-              variant="catalog"
-            />
-          </ProductsFilterSection>
-
-          <ProductsFilterSection title={t('products.catalog.filters.price')}>
-            <PriceFilter
-              currentMinPrice={params.minPrice}
-              currentMaxPrice={params.maxPrice}
-              category={params.category}
-              search={params.search}
-              variant="catalog"
-            />
-          </ProductsFilterSection>
-
-          <ProductsFilterSection title={t('products.catalog.filters.color')}>
-            <ColorFilter
-              category={params.category}
-              search={params.search}
-              minPrice={params.minPrice}
-              maxPrice={params.maxPrice}
-              variant="catalog"
-            />
-          </ProductsFilterSection>
+          <ProductsCatalogFilterFields />
         </div>
 
         <button

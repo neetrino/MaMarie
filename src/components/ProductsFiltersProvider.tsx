@@ -48,7 +48,14 @@ export interface ProductsFiltersData {
   colors: ColorOption[];
   sizes: SizeOption[];
   brands: BrandOption[];
+  attributes: CatalogAttributeGroup[];
   priceRange: PriceRangeOption;
+}
+
+export interface CatalogAttributeGroup {
+  key: string;
+  name: string;
+  values: Array<{ value: string; label: string; count: number }>;
 }
 
 interface ProductsFiltersContextValue {
@@ -64,6 +71,7 @@ const DEFAULT_FILTERS: ProductsFiltersData = {
   colors: [],
   sizes: [],
   brands: [],
+  attributes: [],
   priceRange: { min: 0, max: 100000, stepSize: null, stepSizePerCurrency: null },
 };
 
@@ -71,6 +79,7 @@ const PRODUCTS_FILTERS_CACHE_SCOPE = 'filters';
 
 interface ProductsFiltersProviderProps {
   category?: string;
+  categoryScope?: string;
   search?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -80,6 +89,7 @@ interface ProductsFiltersProviderProps {
 
 function buildFiltersCacheKey(input: {
   category?: string;
+  categoryScope?: string;
   search?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -87,6 +97,7 @@ function buildFiltersCacheKey(input: {
   return buildCatalogClientCacheKey(PRODUCTS_FILTERS_CACHE_SCOPE, {
     lang: getStoredLanguage(),
     category: input.category,
+    categoryScope: input.categoryScope,
     search: input.search,
     minPrice: input.minPrice,
     maxPrice: input.maxPrice,
@@ -95,13 +106,14 @@ function buildFiltersCacheKey(input: {
 
 export function ProductsFiltersProvider({
   category,
+  categoryScope,
   search,
   minPrice,
   maxPrice,
   initialData = null,
   children,
 }: ProductsFiltersProviderProps) {
-  const cacheKey = buildFiltersCacheKey({ category, search, minPrice, maxPrice });
+  const cacheKey = buildFiltersCacheKey({ category, categoryScope, search, minPrice, maxPrice });
   const cachedFilters = initialData ?? readCatalogClientCache<ProductsFiltersData>(cacheKey);
   const [data, setData] = useState<ProductsFiltersData | null>(cachedFilters);
   const [loading, setLoading] = useState(!cachedFilters);
@@ -117,7 +129,7 @@ export function ProductsFiltersProvider({
 
   const fetchFilters = useCallback(async () => {
     const requestId = ++requestSeqRef.current;
-    const activeCacheKey = buildFiltersCacheKey({ category, search, minPrice, maxPrice });
+    const activeCacheKey = buildFiltersCacheKey({ category, categoryScope, search, minPrice, maxPrice });
     const cached = readCatalogClientCache<ProductsFiltersData>(activeCacheKey);
 
     if (cached) {
@@ -134,6 +146,7 @@ export function ProductsFiltersProvider({
       const lang = getStoredLanguage();
       const params: Record<string, string> = { lang };
       if (category) params.category = category;
+      if (categoryScope) params.categoryScope = categoryScope;
       if (search) params.search = search;
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
@@ -147,6 +160,7 @@ export function ProductsFiltersProvider({
         colors: res.colors ?? [],
         sizes: res.sizes ?? [],
         brands: res.brands ?? [],
+        attributes: res.attributes ?? [],
         priceRange: res.priceRange ?? DEFAULT_FILTERS.priceRange,
       };
       writeCatalogClientCache(activeCacheKey, nextData);
@@ -162,7 +176,7 @@ export function ProductsFiltersProvider({
         setLoading(false);
       }
     }
-  }, [category, search, minPrice, maxPrice]);
+  }, [category, categoryScope, search, minPrice, maxPrice]);
 
   useEffect(() => {
     if (skipInitialFetchRef.current) {
@@ -191,6 +205,7 @@ export function useProductsFilters(): ProductsFiltersContextValue | null {
 /** Reads cached sidebar filter options (colors/sizes/brands) for standalone filter components. */
 export function readCachedProductsFilters(input: {
   category?: string;
+  categoryScope?: string;
   search?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -202,6 +217,7 @@ export function readCachedProductsFilters(input: {
 export function writeCachedProductsFilters(
   input: {
     category?: string;
+    categoryScope?: string;
     search?: string;
     minPrice?: string;
     maxPrice?: string;

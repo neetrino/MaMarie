@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import type { CategoryTreeNode } from '../../lib/categories/category-tree';
+import type { FlatCategoryTreeNode } from '../../lib/categories/category-tree';
 import { flattenCategoryTree } from '../../lib/categories/category-tree';
 
-export type Category = CategoryTreeNode;
+export type Category = FlatCategoryTreeNode;
 
 /** Depth-first flatten (shared with server preview builder). */
 export const flattenCategories = flattenCategoryTree;

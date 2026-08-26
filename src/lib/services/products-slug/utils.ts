@@ -1,11 +1,12 @@
 import { translations } from "../../translations";
+import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
-/** Pick translation for locale, falling back to the first available row. */
+/** Pick product copy: requested locale → hy → en → first row. */
 export function pickTranslationByLocale<T extends { locale: string }>(
   rows: T[],
   lang: string,
 ): T | undefined {
-  return rows.find((row) => row.locale === lang) ?? rows[0];
+  return pickProductContentTranslation(rows, lang);
 }
 
 /**

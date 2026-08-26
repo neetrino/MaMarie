@@ -7,13 +7,18 @@ import type { ChangeEvent } from 'react';
 import type { Brand, Category, Attribute, GeneratedVariant } from '../types';
 import { generateSlug } from '../utils/productUtils';
 import { ensureOneMainVariant } from '../utils/variantMainHelpers';
+import { pickPrimaryFormFields, resolveSharedSlug } from '../utils/product-locale-fields';
+import type { ProductContentLocale } from '@/constants/product-content-locales';
+import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
 
 interface UseProductFormCallbacksProps {
   formData: {
     title: string;
     slug: string;
     primaryCategoryId: string;
+    translations: ProductTranslationsByLocale;
   };
+  contentLocale: ProductContentLocale;
   categories: Category[];
   selectedAttributesForVariants: Set<string>;
   selectedAttributeValueIds: Record<string, string[]>;
@@ -28,6 +33,7 @@ interface UseProductFormCallbacksProps {
 
 export function useProductFormCallbacks({
   formData,
+  contentLocale,
   categories,
   selectedAttributesForVariants,
   selectedAttributeValueIds,
@@ -41,11 +47,43 @@ export function useProductFormCallbacks({
 }: UseProductFormCallbacksProps) {
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value;
+    setFormData((prev) => {
+      const translations = {
+        ...prev.translations,
+        [contentLocale]: { ...prev.translations[contentLocale], title },
+      };
+      const primary = pickPrimaryFormFields(translations);
+      return {
+        ...prev,
+        translations,
+        title: primary.title,
+        slug: resolveSharedSlug(prev.slug, title),
+      };
+    });
+  };
+
+  const handleSlugChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const slug = e.target.value;
     setFormData((prev) => ({
       ...prev,
-      title,
-      slug: generateSlug(title),
+      slug,
     }));
+  };
+
+  const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const descriptionHtml = e.target.value;
+    setFormData((prev) => {
+      const translations = {
+        ...prev.translations,
+        [contentLocale]: { ...prev.translations[contentLocale], descriptionHtml },
+      };
+      const primary = pickPrimaryFormFields(translations);
+      return {
+        ...prev,
+        translations,
+        descriptionHtml: primary.descriptionHtml,
+      };
+    });
   };
 
   const isClothingCategory = () => checkIsClothingCategory(formData.primaryCategoryId, categories);
@@ -109,6 +147,8 @@ export function useProductFormCallbacks({
 
   return {
     handleTitleChange,
+    handleSlugChange,
+    handleDescriptionChange,
     isClothingCategory,
     handleAttributeToggle,
     handleAttributeRemove,

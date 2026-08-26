@@ -42,12 +42,14 @@ export function catalogParamsToProductFilters(
     lang,
     search: params.search,
     category: params.category,
+    categoryScope: params.categoryScope,
     minPrice: parseOptionalPrice(params.minPrice),
     maxPrice: parseOptionalPrice(params.maxPrice),
     colors: params.colors,
     sizes: params.sizes,
     brand: params.brand,
     clothingTypes: params.clothingTypes,
+    attrs: params.attrs,
     sort: params.sort ?? 'createdAt',
   };
 }
@@ -81,12 +83,14 @@ function buildSearchParamsFromFilters(filters: ProductFilters): URLSearchParams 
     limit: filters.limit ?? 12,
     search: filters.search,
     category: filters.category,
+    categoryScope: filters.categoryScope,
     minPrice: filters.minPrice?.toString(),
     maxPrice: filters.maxPrice?.toString(),
     colors: filters.colors,
     sizes: filters.sizes,
     brand: filters.brand,
     clothingTypes: filters.clothingTypes,
+    attrs: filters.attrs,
     sort: filters.sort,
   });
 

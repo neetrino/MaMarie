@@ -88,6 +88,8 @@ function AddProductPageContent() {
 
   const {
     handleTitleChange,
+    handleSlugChange,
+    handleDescriptionChange,
     isClothingCategory,
     handleAttributeToggle,
     handleAttributeRemove,
@@ -95,6 +97,7 @@ function AddProductPageContent() {
     handleVariantAdd,
   } = useProductFormCallbacks({
     formData: formState.formData,
+    contentLocale: formState.contentLocale,
     categories: formState.categories,
     selectedAttributesForVariants: formState.selectedAttributesForVariants,
     selectedAttributeValueIds: formState.selectedAttributeValueIds,
@@ -169,6 +172,7 @@ function AddProductPageContent() {
     getColorAttribute,
     getSizeAttribute,
     isClothingCategory,
+    setContentLocale: formState.setContentLocale,
   });
 
   if (isLoading || formState.loadingProduct) {
@@ -193,6 +197,8 @@ function AddProductPageContent() {
           <AddProductFormContent
             formData={formState.formData}
             fieldErrors={formState.fieldErrors}
+            contentLocale={formState.contentLocale}
+            onContentLocaleChange={formState.setContentLocale}
             productType={formState.productType}
             simpleProductData={formState.simpleProductData}
             categories={formState.categories}
@@ -218,14 +224,18 @@ function AddProductPageContent() {
             attributesDropdownRef={formState.attributesDropdownRef}
             variantImageInputRefs={formState.variantImageInputRefs}
             onTitleChange={(e) => {
-              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'title'));
+              formState.setFieldErrors((prev) =>
+                clearProductFieldError(clearProductFieldError(prev, 'title'), `title.${formState.contentLocale}`),
+              );
               handleTitleChange(e);
             }}
             onSlugChange={(e) => {
-              formState.setFieldErrors((prev) => clearProductFieldError(prev, 'slug'));
-              formState.setFormData((prev) => ({ ...prev, slug: e.target.value }));
+              formState.setFieldErrors((prev) =>
+                clearProductFieldError(clearProductFieldError(prev, 'slug'), `slug.${formState.contentLocale}`),
+              );
+              handleSlugChange(e);
             }}
-            onDescriptionChange={(e) => formState.setFormData((prev) => ({ ...prev, descriptionHtml: e.target.value }))}
+            onDescriptionChange={handleDescriptionChange}
             onProductTypeChange={(type) => {
               formState.setFieldErrors({});
               formState.setProductType(type);

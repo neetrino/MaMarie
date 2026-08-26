@@ -1,31 +1,35 @@
 import { withServerReadCache } from '@/lib/cache/server-read-cache';
-import { Prisma } from '@white-shop/db';
-import { db } from '@white-shop/db';
 import { adminService } from './admin.service';
-import { aggregateCatalogFilters } from './products-filters-aggregate';
+import { loadCatalogFilterFacets } from './products-filters-facets';
 import { buildStorefrontFiltersCacheKey } from './products-filters-cache-key';
 import { buildWhereClause } from './products-find-query/query-builder';
-import { fetchStorefrontCatalogFilterProducts } from './products-find-query/storefront-catalog-filters-batcher';
 import { logger } from '../utils/logger';
 
-const FILTERS_PRODUCTS_LIMIT = 500;
 const FILTERS_PROCESS_CACHE_TTL_MS = 60_000;
 
 const EMPTY_FILTERS = {
   colors: [] as Array<{ value: string; label: string; count: number; imageUrl?: string | null; colors?: string[] | null }>,
   sizes: [] as Array<{ value: string; count: number }>,
   brands: [] as Array<{ id: string; name: string; count: number }>,
+  attributes: [] as Array<{
+    key: string;
+    name: string;
+    values: Array<{ value: string; label: string; count: number }>;
+  }>,
   priceRange: { min: 0, max: 100000, stepSize: null as number | null, stepSizePerCurrency: null as Record<string, number> | null },
 };
 
+type StorefrontFiltersInput = {
+  category?: string;
+  categoryScope?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  lang?: string;
+};
+
 class ProductsFiltersService {
-  async getFilters(filters: {
-    category?: string;
-    search?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    lang?: string;
-  }) {
+  async getFilters(filters: StorefrontFiltersInput) {
     return withServerReadCache(
       buildStorefrontFiltersCacheKey(filters),
       FILTERS_PROCESS_CACHE_TTL_MS,
@@ -33,39 +37,34 @@ class ProductsFiltersService {
     );
   }
 
-  private async fetchFiltersUncached(filters: {
-    category?: string;
-    search?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    lang?: string;
-  }) {
+  private async fetchFiltersUncached(filters: StorefrontFiltersInput) {
     try {
       const lang = filters.lang || 'en';
       const { where } = await buildWhereClause({
         category: filters.category,
+        categoryScope: filters.categoryScope,
         search: filters.search,
         minPrice: filters.minPrice,
         maxPrice: filters.maxPrice,
         lang,
         page: 1,
-        limit: FILTERS_PRODUCTS_LIMIT,
+        limit: 1,
       });
 
       if (where === null) {
         return EMPTY_FILTERS;
       }
 
-      const [products, priceSettings] = await Promise.all([
-        fetchStorefrontCatalogFilterProducts(where, FILTERS_PRODUCTS_LIMIT),
+      const [aggregated, priceSettings] = await Promise.all([
+        loadCatalogFilterFacets(where, lang),
         this.loadPriceFilterSettings(),
       ]);
-      const aggregated = aggregateCatalogFilters(products, lang);
 
       return {
         colors: aggregated.colors,
         sizes: aggregated.sizes,
         brands: aggregated.brands,
+        attributes: aggregated.attributes,
         priceRange: {
           min: aggregated.priceMin,
           max: aggregated.priceMax,
@@ -104,70 +103,12 @@ class ProductsFiltersService {
     }
   }
 
-  /**
-   * Get price range
-   */
   async getPriceRange(filters: { category?: string; lang?: string }) {
-    const where: Prisma.ProductWhereInput = {
-      published: true,
-      deletedAt: null,
-    };
-
-    if (filters.category) {
-      const categoryDoc = await db.category.findFirst({
-        where: {
-          translations: {
-            some: {
-              slug: filters.category,
-              locale: filters.lang || 'en',
-            },
-          },
-        },
-      });
-
-      if (categoryDoc) {
-        where.OR = [
-          { primaryCategoryId: categoryDoc.id },
-          { categoryIds: { has: categoryDoc.id } },
-        ];
-      }
-    }
-
-    const products = await db.product.findMany({
-      where,
-      include: {
-        variants: {
-          where: {
-            published: true,
-          },
-        },
-      },
+    const result = await this.getFilters({
+      category: filters.category,
+      lang: filters.lang,
     });
-
-    let minPrice = Infinity;
-    let maxPrice = 0;
-
-    products.forEach((product: { variants: Array<{ price: number }> }) => {
-      if (product.variants.length > 0) {
-        const prices = product.variants.map((v: { price: number }) => v.price);
-        const productMin = Math.min(...prices);
-        const productMax = Math.max(...prices);
-        if (productMin < minPrice) minPrice = productMin;
-        if (productMax > maxPrice) maxPrice = productMax;
-      }
-    });
-
-    minPrice = minPrice === Infinity ? 0 : Math.floor(minPrice / 1000) * 1000;
-    maxPrice = maxPrice === 0 ? 100000 : Math.ceil(maxPrice / 1000) * 1000;
-
-    const priceSettings = await this.loadPriceFilterSettings();
-
-    return {
-      min: minPrice,
-      max: maxPrice,
-      stepSize: priceSettings.stepSize,
-      stepSizePerCurrency: priceSettings.stepSizePerCurrency,
-    };
+    return result.priceRange;
   }
 }
 

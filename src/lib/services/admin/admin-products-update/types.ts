@@ -1,3 +1,5 @@
+import type { ProductTranslationInput } from "../product-translation-input";
+
 /**
  * Update product data interface
  */
@@ -12,6 +14,7 @@ export interface UpdateProductData {
   published?: boolean;
   featured?: boolean;
   locale?: string;
+  translations?: ProductTranslationInput[];
   media?: unknown[];
   labels?: Array<{
     id?: string;

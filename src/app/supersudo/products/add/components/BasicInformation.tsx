@@ -4,37 +4,54 @@ import type { ChangeEvent } from 'react';
 import { Input } from '@shop/ui';
 import { useTranslation } from '../../../../../lib/i18n-client';
 import type { ProductFormFieldErrors } from '../utils/product-form-field-errors';
+import { AdminSegmentedControl } from '../../../components/AdminSegmentedControl';
+import {
+  PRODUCT_CONTENT_LOCALE_TABS,
+  type ProductContentLocale,
+} from '@/constants/product-content-locales';
+import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
 
 interface BasicInformationProps {
   productType: 'simple' | 'variable';
   setProductType: (type: 'simple' | 'variable') => void;
-  title: string;
+  contentLocale: ProductContentLocale;
+  onContentLocaleChange: (locale: ProductContentLocale) => void;
+  translations: ProductTranslationsByLocale;
   slug: string;
-  descriptionHtml: string;
   fieldErrors: ProductFormFieldErrors;
   onTitleChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSlugChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
+function localeHasError(
+  fieldErrors: ProductFormFieldErrors,
+  locale: ProductContentLocale,
+): boolean {
+  return Boolean(fieldErrors[`title.${locale}`]);
+}
+
 export function BasicInformation({
   productType,
   setProductType,
-  title,
+  contentLocale,
+  onContentLocaleChange,
+  translations,
   slug,
-  descriptionHtml,
   fieldErrors,
   onTitleChange,
   onSlugChange,
   onDescriptionChange,
 }: BasicInformationProps) {
   const { t } = useTranslation();
+  const localeFields = translations[contentLocale];
+  const titleError = fieldErrors[`title.${contentLocale}`] ?? fieldErrors.title;
+  const slugError = fieldErrors.slug;
 
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('admin.products.add.basicInformation')}</h2>
       <div className="space-y-4">
-        {/* Product Type Selector */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {t('admin.products.add.productType')} *
@@ -68,20 +85,7 @@ export function BasicInformation({
           </div>
         </div>
 
-        <div data-field-error={fieldErrors.title ? 'true' : undefined}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t('admin.products.add.title')} *
-          </label>
-          <Input
-            type="text"
-            value={title}
-            onChange={onTitleChange}
-            placeholder={t('admin.products.add.productTitlePlaceholder')}
-            error={fieldErrors.title}
-          />
-        </div>
-
-        <div data-field-error={fieldErrors.slug ? 'true' : undefined}>
+        <div data-field-error={slugError ? 'true' : undefined}>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t('admin.products.add.slug')} *
           </label>
@@ -90,7 +94,36 @@ export function BasicInformation({
             value={slug}
             onChange={onSlugChange}
             placeholder={t('admin.products.add.productSlugPlaceholder')}
-            error={fieldErrors.slug}
+            error={slugError}
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            {t('admin.products.add.contentLanguage')}
+          </label>
+          <AdminSegmentedControl
+            options={PRODUCT_CONTENT_LOCALE_TABS.map((tab) => ({
+              value: tab.code,
+              label: localeHasError(fieldErrors, tab.code) ? `${tab.label} *` : tab.label,
+            }))}
+            value={contentLocale}
+            onChange={onContentLocaleChange}
+            ariaLabel={t('admin.products.add.contentLanguage')}
+          />
+          <p className="mt-2 text-xs text-gray-500">{t('admin.products.add.contentLanguageHint')}</p>
+        </div>
+
+        <div data-field-error={titleError ? 'true' : undefined}>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('admin.products.add.title')} *
+          </label>
+          <Input
+            type="text"
+            value={localeFields.title}
+            onChange={onTitleChange}
+            placeholder={t('admin.products.add.productTitlePlaceholder')}
+            error={titleError}
           />
         </div>
 
@@ -101,7 +134,7 @@ export function BasicInformation({
           <textarea
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={6}
-            value={descriptionHtml}
+            value={localeFields.descriptionHtml}
             onChange={onDescriptionChange}
             placeholder={t('admin.products.add.productDescriptionPlaceholder')}
           />
@@ -110,5 +143,3 @@ export function BasicInformation({
     </div>
   );
 }
-
-

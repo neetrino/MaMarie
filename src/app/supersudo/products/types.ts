@@ -33,6 +33,7 @@ export interface Category {
   title: string;
   slug: string;
   parentId: string | null;
+  parentIds?: string[];
   requiresSizes: boolean;
 }
 

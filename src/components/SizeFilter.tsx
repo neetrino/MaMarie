@@ -95,6 +95,7 @@ export function SizeFilter({
           colors: existing?.colors || response.colors || [],
           sizes: response.sizes || [],
           brands: existing?.brands || [],
+          attributes: existing?.attributes || [],
           priceRange: existing?.priceRange || {
             min: 0,
             max: 100000,

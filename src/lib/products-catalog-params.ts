@@ -1,4 +1,5 @@
 import { PRODUCTS_CATALOG_PAGE_LIMIT_GRID3 } from '../constants/products-catalog';
+import { parseCatalogAttrsParam, serializeCatalogAttrsParam } from './products-catalog-attrs';
 
 export const PRODUCTS_CATALOG_DEFAULT_LIMIT = PRODUCTS_CATALOG_PAGE_LIMIT_GRID3;
 
@@ -11,6 +12,8 @@ export const PRODUCTS_CATALOG_FILTER_PARAM_KEYS = [
   'sizes',
   'brand',
   'clothingTypes',
+  'categoryScope',
+  'attrs',
   'sort',
 ] as const;
 
@@ -25,6 +28,8 @@ export interface ProductsCatalogParams {
   sizes?: string;
   brand?: string;
   clothingTypes?: string;
+  categoryScope?: string;
+  attrs?: string;
   sort?: string;
 }
 
@@ -82,6 +87,8 @@ export function parseProductsCatalogParams(
   const sizes = readString(get('sizes'));
   const brand = readString(get('brand'));
   const clothingTypes = readString(get('clothingTypes'));
+  const categoryScope = readString(get('categoryScope'));
+  const attrs = readString(get('attrs'));
   const sort = readString(get('sort'));
 
   if (search) params.search = search;
@@ -92,6 +99,8 @@ export function parseProductsCatalogParams(
   if (sizes) params.sizes = sizes;
   if (brand) params.brand = brand;
   if (clothingTypes) params.clothingTypes = clothingTypes;
+  if (categoryScope) params.categoryScope = categoryScope;
+  if (attrs) params.attrs = attrs;
   if (sort) params.sort = sort;
 
   return normalizeProductsCatalogParams(params);
@@ -137,6 +146,15 @@ export function normalizeProductsCatalogParams(params: ProductsCatalogParams): P
   if (params.maxPrice?.trim()) {
     normalized.maxPrice = params.maxPrice.trim();
   }
+  if (params.categoryScope?.trim()) {
+    normalized.categoryScope = params.categoryScope.trim();
+  }
+  if (params.attrs?.trim()) {
+    const canonicalAttrs = serializeCatalogAttrsParam(parseCatalogAttrsParam(params.attrs));
+    if (canonicalAttrs) {
+      normalized.attrs = canonicalAttrs;
+    }
+  }
   if (params.sort?.trim()) {
     normalized.sort = params.sort.trim();
   }
@@ -172,6 +190,8 @@ export function serializeProductsCatalogParams(params: ProductsCatalogParams): U
   if (canonical.sizes) query.set('sizes', canonical.sizes);
   if (canonical.brand) query.set('brand', canonical.brand);
   if (canonical.clothingTypes) query.set('clothingTypes', canonical.clothingTypes);
+  if (canonical.categoryScope) query.set('categoryScope', canonical.categoryScope);
+  if (canonical.attrs) query.set('attrs', canonical.attrs);
   if (canonical.sort) query.set('sort', canonical.sort);
 
   return query;

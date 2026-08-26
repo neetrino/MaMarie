@@ -9,6 +9,7 @@ export interface Category {
   title: string;
   slug: string;
   parentId: string | null;
+  parentIds?: string[];
   requiresSizes?: boolean;
 }
 
@@ -64,12 +65,21 @@ export interface ProductLabel {
   color?: string | null;
 }
 
+export interface ProductTranslationRow {
+  locale: string;
+  title: string;
+  slug: string;
+  subtitle?: string | null;
+  descriptionHtml?: string | null;
+}
+
 export interface ProductData {
   id: string;
   title: string;
   slug: string;
   subtitle?: string;
   descriptionHtml?: string;
+  translations?: ProductTranslationRow[];
   brandId?: string | null;
   primaryCategoryId?: string | null;
   categoryIds?: string[];

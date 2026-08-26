@@ -27,10 +27,25 @@ export interface CatalogFilterBrandOption {
   count: number;
 }
 
+export interface CatalogFilterAttributeValueOption {
+  value: string;
+  label: string;
+  count: number;
+  imageUrl?: string | null;
+  colors?: string[] | null;
+}
+
+export interface CatalogFilterAttributeGroup {
+  key: string;
+  name: string;
+  values: CatalogFilterAttributeValueOption[];
+}
+
 export interface CatalogFilterAggregation {
   colors: CatalogFilterColorOption[];
   sizes: CatalogFilterSizeOption[];
   brands: CatalogFilterBrandOption[];
+  attributes: CatalogFilterAttributeGroup[];
   priceMin: number;
   priceMax: number;
 }
@@ -56,10 +71,10 @@ function upsertColor(
 
 function upsertSize(sizeMap: Map<string, number>, value: string): void {
   const trimmed = value.trim();
-  if (!trimmed || !isLikelySizeToken(trimmed)) {
+  if (!trimmed) {
     return;
   }
-  const normalized = trimmed.toUpperCase();
+  const normalized = isLikelySizeToken(trimmed) ? trimmed.toUpperCase() : trimmed;
   sizeMap.set(normalized, (sizeMap.get(normalized) ?? 0) + 1);
 }
 
@@ -129,6 +144,7 @@ export function aggregateCatalogFilters(
     colors,
     sizes,
     brands,
+    attributes: [],
     priceMin: rangeMin === Infinity ? 0 : Math.floor(rangeMin / 1000) * 1000,
     priceMax: rangeMax === 0 ? 100000 : Math.ceil(rangeMax / 1000) * 1000,
   };

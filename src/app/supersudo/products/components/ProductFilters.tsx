@@ -1,21 +1,21 @@
 'use client';
 
-import type { FormEvent } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import { ClaySelect, ClaySelectChevron } from '../../../../components/ClaySelect';
+import { CategoryHierarchyLabel } from '../../../../components/category-tree/CategoryHierarchyLabel';
+import { buildFlatCategoryTree } from '../../../../lib/categories/build-flat-category-tree';
 import {
   CLAY_SELECT_DROPDOWN_ANIMATION_MS,
   CLAY_SELECT_DROPDOWN_GAP_PX,
   CLAY_SELECT_MULTI_PANEL_CLASS,
   getClaySelectTriggerClass,
 } from '../../../../constants/clay-select';
+import { getCategoryTreeIndentClass } from '../../../../constants/category-tree-ui';
 import type { Category } from '../types';
 
 interface ProductFiltersProps {
   search: string;
   setSearch: (search: string) => void;
-  skuSearch: string;
-  setSkuSearch: (sku: string) => void;
   selectedCategories: Set<string>;
   setSelectedCategories: (categories: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   categories: Category[];
@@ -28,15 +28,12 @@ interface ProductFiltersProps {
   setMinPrice: (price: string) => void;
   maxPrice: string;
   setMaxPrice: (price: string) => void;
-  handleSearch: (e: FormEvent) => void;
   setPage: (page: number | ((prev: number) => number)) => void;
 }
 
 export function ProductFilters({
   search,
   setSearch,
-  skuSearch,
-  setSkuSearch,
   selectedCategories,
   setSelectedCategories,
   categories,
@@ -49,49 +46,32 @@ export function ProductFilters({
   setMinPrice,
   maxPrice,
   setMaxPrice,
-  handleSearch,
   setPage,
 }: ProductFiltersProps) {
   const { t } = useTranslation();
+  const displayCategories = buildFlatCategoryTree(categories);
 
   return (
     <div className="space-y-4 mb-6">
-      {/* Search Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            {t('admin.products.searchByTitleOrSlug')}
-          </label>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSearch(e as any);
-              }
-            }}
-            placeholder={t('admin.products.searchPlaceholder')}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            {t('admin.products.searchBySku')}
-          </label>
-          <input
-            type="text"
-            value={skuSearch}
-            onChange={(e) => {
-              setSkuSearch(e.target.value);
-              setPage(1);
-            }}
-            placeholder={t('admin.products.skuPlaceholder')}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          {t('admin.products.searchByTitleOrSlug')}
+        </label>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+            }
+          }}
+          placeholder={t('admin.products.searchPlaceholder')}
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+        />
       </div>
 
       {/* Filters */}
@@ -132,10 +112,10 @@ export function ProductFilters({
                 ) : (
                   <div className="p-2">
                     <div className="space-y-1">
-                      {categories.map((category) => (
+                      {displayCategories.map((category) => (
                         <label
-                          key={category.id}
-                          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                          key={category.treeKey}
+                          className={`flex cursor-pointer items-center space-x-2 rounded p-2 hover:bg-gray-50 ${getCategoryTreeIndentClass(category.level)}`}
                         >
                           <input
                             type="checkbox"
@@ -152,7 +132,11 @@ export function ProductFilters({
                             }}
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                           />
-                          <span className="text-sm text-gray-700">{category.title}</span>
+                          <CategoryHierarchyLabel
+                            title={category.title}
+                            level={category.level}
+                            indented={false}
+                          />
                         </label>
                       ))}
                     </div>
