@@ -1,8 +1,14 @@
 'use client';
 
+import {
+  CLAY_PRIMARY_BUTTON_CLASS,
+  getClayPrimaryButtonCompactStyle,
+} from '../../../constants/clay-primary-button';
+import { HERO_GENDER_BUTTON_BOYS_BG_COLOR } from '../../../constants/hero';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t, getAttributeLabel } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
+import { PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX } from './constants';
 import type { Product, ProductVariant } from './types';
 import { logger } from "@/lib/utils/logger";
 
@@ -26,6 +32,8 @@ interface ProductAttributesSelectorProps {
   colorGroups: Array<{ color: string; stock: number; variants: ProductVariant[] }>;
   sizeGroups: Array<{ size: string; stock: number; variants: ProductVariant[] }>;
   language: LanguageCode;
+  showSizeGuide?: boolean;
+  onOpenSizeGuide?: () => void;
   quantity: number;
   maxQuantity: number;
   isOutOfStock: boolean;
@@ -57,6 +65,58 @@ const getColorValue = (colorName: string): string => {
   return colorMap[normalizedName] || '#CCCCCC';
 };
 
+function getSizeCircleDimensionClass(totalValues: number): string {
+  if (totalValues > 6) return 'h-9 w-9 text-[10px]';
+  if (totalValues > 3) return 'h-10 w-10 text-xs';
+  return 'h-11 w-11 text-sm';
+}
+
+function getSizeCircleButtonClass({
+  isSelected,
+  isDisabled,
+  isLowStock = false,
+  dimensionClass,
+}: {
+  isSelected: boolean;
+  isDisabled: boolean;
+  isLowStock?: boolean;
+  dimensionClass: string;
+}): string {
+  return [
+    dimensionClass,
+    'flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 font-medium transition-all',
+    isSelected
+      ? 'scale-110 border-[3px] border-green-500 bg-gray-50'
+      : isDisabled
+        ? 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
+        : isLowStock
+          ? 'border-gray-200 opacity-60 hover:opacity-80'
+          : 'border-gray-300 hover:scale-105 hover:border-gray-400',
+  ].join(' ');
+}
+
+function SizeGuideButton({
+  language,
+  onOpenSizeGuide,
+}: {
+  language: LanguageCode;
+  onOpenSizeGuide: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpenSizeGuide}
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} ml-auto shrink-0 self-center`}
+      style={{
+        ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_BOYS_BG_COLOR),
+        height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+      }}
+    >
+      {t(language, 'product.sizeGuide.open')}
+    </button>
+  );
+}
+
 export function ProductAttributesSelector({
   product,
   attributeGroups,
@@ -67,6 +127,8 @@ export function ProductAttributesSelector({
   colorGroups,
   sizeGroups,
   language,
+  showSizeGuide,
+  onOpenSizeGuide,
   onColorSelect,
   onSizeSelect,
   onAttributeValueSelect,
@@ -115,19 +177,27 @@ export function ProductAttributesSelector({
                 !isColor && !isSize ? 'min-[744px]:max-[1023px]:col-span-2' : ''
               }`}
             >
-              <label
-                className={`text-xs font-bold uppercase ${
-                  isUnavailable
-                    ? 'text-red-600'
-                    : isColor || isSize
-                      ? 'text-blue-600'
-                      : ''
-                }`}
-              >
-                {attrKey === 'color' ? t(language, 'product.color') :
-                 attrKey === 'size' ? t(language, 'product.size') :
-                 `${attributeName}:`}
-              </label>
+              {isSize ? (
+                <label
+                  className={`text-xs font-bold uppercase ${
+                    isUnavailable ? 'text-red-600' : 'text-blue-600'
+                  }`}
+                >
+                  {t(language, 'product.size')}
+                </label>
+              ) : (
+                <label
+                  className={`text-xs font-bold uppercase ${
+                    isUnavailable
+                      ? 'text-red-600'
+                      : isColor
+                        ? 'text-blue-600'
+                        : ''
+                  }`}
+                >
+                  {attrKey === 'color' ? t(language, 'product.color') : `${attributeName}:`}
+                </label>
+              )}
               {isColor ? (
                 <div className="flex flex-wrap gap-1.5 items-center">
                   {attrGroups.map((g) => {
@@ -163,7 +233,7 @@ export function ProductAttributesSelector({
                                 : 'border-2 border-gray-300 hover:scale-105'
                           }`}
                           style={hasImage ? {} : { backgroundColor: colorHex }}
-                          title={`${getAttributeLabel(language, attrKey, g.value)}${g.stock > 0 ? ` (${g.stock} ${t(language, 'product.pcs')})` : ` (${t(language, 'product.outOfStock')})`}`} 
+                          title={getAttributeLabel(language, attrKey, g.value)}
                         >
                           {hasImage && processedImageUrl ? (
                             <img 
@@ -180,18 +250,13 @@ export function ProductAttributesSelector({
                             />
                           ) : null}
                         </button>
-                        {g.stock > 0 && (
-                          <span className={`${totalValues > 8 ? 'text-[10px]' : 'text-xs'} text-gray-500`}>{g.stock}</span>
-                        )}
-                        {g.stock <= 0 && (
-                          <span className={`${totalValues > 8 ? 'text-[10px]' : 'text-xs'} text-gray-400`}>0</span>
-                        )}
                       </div>
                     );
                   })}
                 </div>
               ) : isSize ? (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                   {attrGroups.map((g) => {
                     // Use stock from groups (already calculated with compatibility)
                     const displayStock = g.stock;
@@ -207,38 +272,26 @@ export function ProductAttributesSelector({
                     // Dynamic sizing based on number of values
                     // Keep size consistent for 2 values, reduce for more
                     const totalValues = attrGroups.length;
-                    const paddingClass = totalValues > 6 
-                      ? 'px-2 py-1' 
-                      : totalValues > 3 
-                      ? 'px-2.5 py-1.5' 
-                      : 'px-3 py-2';
-                    const textSizeClass = totalValues > 6 
-                      ? 'text-xs' 
-                      : 'text-sm';
-                    const imageSizeClass = totalValues > 6 
-                      ? 'w-4 h-4' 
-                      : 'w-5 h-5';
-                    const minWidthClass = totalValues > 6 
-                      ? 'min-w-[40px]' 
-                      : 'min-w-[50px]';
+                    const dimensionClass = getSizeCircleDimensionClass(totalValues);
+                    const sizeLabel = getAttributeLabel(language, attrKey, g.value);
 
                     return (
                       <button 
                         key={g.valueId || g.value}
                         onClick={() => onSizeSelect(g.value)}
-                        className={`${minWidthClass} ${paddingClass} rounded-lg border-2 transition-all flex items-center gap-1.5 ${
-                          isSelected 
-                            ? 'border-green-500 bg-gray-50' 
-                            : displayStock <= 0
-                              ? 'border-gray-200 opacity-60 hover:opacity-80' 
-                              : 'border-gray-200 hover:border-gray-400'
-                        }`}
+                        className={getSizeCircleButtonClass({
+                          isSelected,
+                          isDisabled,
+                          isLowStock: displayStock <= 0,
+                          dimensionClass,
+                        })}
+                        title={sizeLabel}
                       >
-                        {hasImage && processedImageUrl && (
+                        {hasImage && processedImageUrl ? (
                           <img 
                             src={processedImageUrl} 
                             alt={g.label}
-                            className={`${imageSizeClass} object-cover rounded border border-gray-300 flex-shrink-0`}
+                            className="h-full w-full object-cover"
                             onError={(e) => {
                               console.error(`❌ [SIZE IMAGE] Failed to load image for size "${g.value}":`, processedImageUrl);
                               (e.target as HTMLImageElement).style.display = 'none';
@@ -247,14 +300,16 @@ export function ProductAttributesSelector({
                               logger.debug(`✅ [SIZE IMAGE] Successfully loaded image for size "${g.value}":`, processedImageUrl);
                             }}
                           />
+                        ) : (
+                          <span>{sizeLabel}</span>
                         )}
-                        <div className="flex flex-col text-center">
-                          <span className={`${textSizeClass} font-medium`}>{getAttributeLabel(language, attrKey, g.value)}</span>
-                          <span className={`${totalValues > 10 ? 'text-[10px]' : 'text-xs'} ${displayStock > 0 ? 'text-gray-500' : 'text-gray-400'}`}>({displayStock})</span>
-                        </div>
                       </button>
                     );
                   })}
+                  </div>
+                  {showSizeGuide && onOpenSizeGuide ? (
+                    <SizeGuideButton language={language} onOpenSizeGuide={onOpenSizeGuide} />
+                  ) : null}
                 </div>
               ) : (
                 // Generic attribute selector
@@ -335,10 +390,7 @@ export function ProductAttributesSelector({
                             style={{ backgroundColor: colorHex }}
                           />
                         ) : null}
-                        <div className="flex flex-col text-center">
-                          <span className={textSizeClass}>{getAttributeLabel(language, attrKey, g.value)}</span>
-                          <span className={`${totalValues > 10 ? 'text-[10px]' : 'text-xs'} ${g.stock > 0 ? 'text-gray-500' : 'text-gray-400'}`}>({g.stock})</span>
-                        </div>
+                        <span className={textSizeClass}>{getAttributeLabel(language, attrKey, g.value)}</span>
                       </button>
                     );
                   })}
@@ -371,11 +423,8 @@ export function ProductAttributesSelector({
                               : 'border-2 border-gray-300 hover:scale-105'
                         }`}
                         style={{ backgroundColor: getColorValue(g.color) }} 
-                        title={isDisabled ? `${getAttributeLabel(language, 'color', g.color)} (${t(language, 'product.outOfStock')})` : `${getAttributeLabel(language, 'color', g.color)}${g.stock > 0 ? ` (${g.stock} ${t(language, 'product.pcs')})` : ''}`} 
+                        title={getAttributeLabel(language, 'color', g.color)}
                       />
-                      {g.stock > 0 && (
-                        <span className="text-xs text-gray-500">{g.stock}</span>
-                      )}
                     </div>
                   );
                 })}
@@ -389,7 +438,8 @@ export function ProductAttributesSelector({
       {!product?.productAttributes && sizeGroups.length > 0 && (
         <div className="space-y-2">
           <label className="text-sm font-bold uppercase text-blue-600">{t(language, 'product.size')}</label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+            <div className="flex flex-wrap items-center gap-2">
             {sizeGroups.map((g) => {
               let displayStock = g.stock;
               if (selectedColor) {
@@ -401,29 +451,29 @@ export function ProductAttributesSelector({
               }
               const isSelected = selectedSize === g.size;
               const isDisabled = displayStock <= 0;
+              const sizeLabel = getAttributeLabel(language, 'size', g.size);
+              const dimensionClass = getSizeCircleDimensionClass(sizeGroups.length);
 
               return (
                 <button 
                   key={g.size} 
                   onClick={() => !isDisabled && onSizeSelect(g.size)}
                   disabled={isDisabled}
-                  className={`min-w-[50px] px-3 py-2 rounded-lg border-2 transition-all ${
-                    isSelected 
-                      ? 'border-green-500 bg-gray-50' 
-                      : isDisabled 
-                        ? 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed' 
-                        : 'border-gray-200 hover:border-gray-400'
-                  }`}
+                  className={getSizeCircleButtonClass({
+                    isSelected,
+                    isDisabled,
+                    dimensionClass,
+                  })}
+                  title={sizeLabel}
                 >
-                  <div className="flex flex-col text-center">
-                    <span className={`text-sm font-medium ${isDisabled ? 'text-gray-400' : 'text-gray-900'}`}>{getAttributeLabel(language, 'size', g.size)}</span>
-                    {displayStock > 0 && (
-                      <span className={`text-xs ${isDisabled ? 'text-gray-300' : 'text-gray-500'}`}>{displayStock} {t(language, 'product.pcs')}</span>
-                    )}
-                  </div>
+                  <span>{sizeLabel}</span>
                 </button>
               );
             })}
+            </div>
+            {showSizeGuide && onOpenSizeGuide ? (
+              <SizeGuideButton language={language} onOpenSizeGuide={onOpenSizeGuide} />
+            ) : null}
           </div>
         </div>
       )}

@@ -215,6 +215,7 @@
     "description": "Armenia's leading online platform for premium electronics and home appliances since 2010. Quality you can trust.",
     "companyTitle": "Company",
     "supportTitle": "Support",
+    "policyTitle": "Policy",
     "contactsTitle": "Contacts",
     "company": {
       "shop": "Catalog",
@@ -247,8 +248,8 @@
     "legal": "Legal",
     "contactInfo": "Contact Information",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "refundPolicy": "Refund Policy",
+    "termsOfService": "Terms and Conditions",
+    "refundPolicy": "Return Policy",
     "deliveryTerms": "Delivery Terms",
     "copyright": "© {year} Shop. All rights reserved.",
     "paymentMethods": "Payment Methods:"

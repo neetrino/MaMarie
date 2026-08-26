@@ -8,8 +8,8 @@ import {
   FOOTER_CONTENT_MAX_WIDTH_PX,
   FOOTER_COPYRIGHT_COMPANY_HREF,
   FOOTER_COPYRIGHT_OFFSET_X_PX,
-  FOOTER_SUPPORT_COLUMN_WIDTH_PX,
-  FOOTER_SUPPORT_LINKS,
+  FOOTER_POLICY_COLUMN_WIDTH_PX,
+  FOOTER_POLICY_LINKS,
   FOOTER_TEXT_COLOR,
   FOOTER_TEXT_LINE_HEIGHT_PX,
   FOOTER_TEXT_SIZE_PX,
@@ -33,9 +33,9 @@ export function FooterSiteContent() {
           widthPx={FOOTER_COMPANY_COLUMN_WIDTH_PX}
         />
         <FooterLinksColumn
-          titleKey="common.footer.supportTitle"
-          links={FOOTER_SUPPORT_LINKS}
-          widthPx={FOOTER_SUPPORT_COLUMN_WIDTH_PX}
+          titleKey="common.footer.policyTitle"
+          links={FOOTER_POLICY_LINKS}
+          widthPx={FOOTER_POLICY_COLUMN_WIDTH_PX}
         />
         <FooterContactColumn />
       </div>

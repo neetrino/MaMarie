@@ -37,7 +37,7 @@ export const FOOTER_BRAND_COLUMN_GAP_PX = 20;
 export const FOOTER_LINKS_COLUMN_GAP_PX = 24;
 export const FOOTER_LINKS_ITEM_GAP_PX = 16;
 export const FOOTER_COMPANY_COLUMN_WIDTH_PX = 164;
-export const FOOTER_SUPPORT_COLUMN_WIDTH_PX = 277;
+export const FOOTER_POLICY_COLUMN_WIDTH_PX = 277;
 export const FOOTER_CONTACT_COLUMN_WIDTH_PX = 242.706;
 
 export const FOOTER_TEXT_COLOR = BRAND_COLORS.brown;
@@ -170,12 +170,11 @@ export const FOOTER_COMPANY_LINKS: FooterNavLink[] = [
   { labelKey: 'common.footer.company.contact', href: '/contact' },
 ];
 
-export const FOOTER_SUPPORT_LINKS: FooterNavLink[] = [
-  { labelKey: 'common.footer.support.deliveryReturns', href: '/returns' },
-  { labelKey: 'common.footer.support.installment', href: '/delivery-terms' },
-  { labelKey: 'common.footer.support.warranty', href: '/support' },
-  { labelKey: 'common.footer.support.privacy', href: '/privacy' },
-  { labelKey: 'common.footer.support.faq', href: '/faq' },
+export const FOOTER_POLICY_LINKS: FooterNavLink[] = [
+  { labelKey: 'common.footer.privacyPolicy', href: '/privacy' },
+  { labelKey: 'common.footer.termsOfService', href: '/terms' },
+  { labelKey: 'common.footer.refundPolicy', href: '/refund-policy' },
+  { labelKey: 'common.footer.deliveryTerms', href: '/delivery-terms' },
 ];
 
 export interface FooterSocialLink {

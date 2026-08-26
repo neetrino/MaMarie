@@ -70,12 +70,12 @@ export const PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX = 280;
 export const PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX = 48;
 
 /** Pink clay −/+ quantity stepper — slightly under compact CTA. */
-export const PRODUCT_QUANTITY_STEPPER_HEIGHT_PX = 40;
-export const PRODUCT_QUANTITY_STEPPER_SHELL_CLASS = 'gap-0 overflow-hidden !px-0';
+export const PRODUCT_QUANTITY_STEPPER_HEIGHT_PX = 44;
+export const PRODUCT_QUANTITY_STEPPER_SHELL_CLASS = 'min-w-[7.5rem] gap-0 overflow-hidden !px-0';
 export const PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS =
-  'flex h-full w-9 items-center justify-center text-sm font-bold text-white';
+  'flex h-full w-10 items-center justify-center text-base font-bold text-white';
 export const PRODUCT_QUANTITY_STEPPER_VALUE_CLASS =
-  'min-w-[1.5rem] text-center text-sm font-bold text-white';
+  'min-w-[2rem] text-center text-base font-bold text-white';
 
 /**
  * PDP image zoom modal — above header (80), bottom nav (70), cart (90),

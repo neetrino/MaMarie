@@ -1,8 +1,8 @@
 'use client';
 
-import { formatPrice } from '../../../lib/currency';
+import { getEffectiveProductRating } from '../../../lib/product-rating';
+import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import Image from 'next/image';
-import type { CurrencyCode } from '../../../lib/currency';
 import { getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
@@ -88,7 +88,7 @@ export function ProductInfo({
                   <svg
                     key={star}
                     className={`w-5 h-5 ${
-                      star <= Math.round(averageRating)
+                      star <= Math.round(getEffectiveProductRating(averageRating, reviewsCount))
                         ? 'text-yellow-400'
                         : 'text-gray-300'
                     }`}
@@ -100,7 +100,7 @@ export function ProductInfo({
                 ))}
               </div>
               <span className="text-sm font-semibold text-gray-900">
-                {averageRating > 0 ? averageRating.toFixed(1) : '0.0'}
+                {getEffectiveProductRating(averageRating, reviewsCount).toFixed(1)}
               </span>
             </div>
             <span 

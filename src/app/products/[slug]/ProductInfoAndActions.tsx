@@ -10,7 +10,6 @@ import {
   getClayPrimaryButtonCompactStyle,
 } from '../../../constants/clay-primary-button';
 import {
-  HERO_GENDER_BUTTON_BOYS_BG_COLOR,
   HERO_GENDER_BUTTON_GIRLS_BG_COLOR,
 } from '../../../constants/hero';
 import { MOBILE_PRODUCTS_CATALOG_CARD_ASSETS } from '../../../constants/mobile-products-catalog';
@@ -78,15 +77,16 @@ function ProductQuantityStepper({
   quantity,
   maxQuantity,
   onQuantityAdjust,
-}: ProductQuantityStepperProps) {
+  heightPx = PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+}: ProductQuantityStepperProps & { heightPx?: number }) {
   return (
     <div
-      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_QUANTITY_STEPPER_SHELL_CLASS}`}
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_QUANTITY_STEPPER_SHELL_CLASS} shrink-0`}
       style={{
         ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_GIRLS_BG_COLOR),
         paddingLeft: 0,
         paddingRight: 0,
-        height: PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+        height: heightPx,
       }}
     >
       <button
@@ -190,20 +190,13 @@ export function ProductInfoAndActions({
             <p className="text-sm text-gray-500">{product.brand.name}</p>
           </div>
         )}
-        <div className="mb-4 flex items-start justify-between gap-4 lg:mb-6">
-          <h1 className="min-w-0 flex-1 text-4xl font-bold text-gray-900">
+        <div className="mb-4 lg:mb-6">
+          <h1 className="min-w-0 text-4xl font-bold text-gray-900">
             {getProductText(language, product.id, 'title') || product.title}
           </h1>
-          <ProductRatingSummary
-            averageRating={averageRating}
-            reviewsCount={reviewsCount}
-            onReviewsClick={onScrollToReviews}
-            language={language}
-            className="mb-0 shrink-0 justify-end"
-          />
         </div>
-        <div className="mb-6">
-          <div className="flex items-center justify-between gap-3">
+        <div className="mb-6 w-full">
+          <div className="grid w-full grid-cols-[1fr_auto] items-center gap-4">
             <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
               <p className="text-3xl font-bold text-gray-900">{formatPrice(price, currency as CurrencyCode)}</p>
               {showRegularPrice && (
@@ -217,18 +210,17 @@ export function ProductInfoAndActions({
                 </span>
               )}
             </div>
-            <div className="shrink-0">
-              <ProductQuantityStepper
-                quantity={quantity}
-                maxQuantity={maxQuantity}
-                onQuantityAdjust={onQuantityAdjust}
-              />
-            </div>
+            <ProductRatingSummary
+              averageRating={averageRating}
+              reviewsCount={reviewsCount}
+              onReviewsClick={onScrollToReviews}
+              language={language}
+              className="mb-0 shrink-0 justify-self-end"
+            />
           </div>
         </div>
         <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />
 
-        {/* Attributes Section */}
         <div className="mb-4">
           <ProductAttributesSelector
             product={product}
@@ -240,6 +232,8 @@ export function ProductInfoAndActions({
             colorGroups={colorGroups}
             sizeGroups={sizeGroups}
             language={language}
+            showSizeGuide={showSizeGuide}
+            onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
             quantity={quantity}
             maxQuantity={maxQuantity}
             isOutOfStock={isOutOfStock}
@@ -261,67 +255,44 @@ export function ProductInfoAndActions({
       
       {/* Action buttons — bottom-aligned with gallery image on desktop */}
       <div className="mt-auto lg:pt-0 pt-6">
-        {/* Show unavailable attributes message if needed */}
-        {hasUnavailableAttributes && !isVariationRequired && (
-          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-800 font-medium">
-              {Array.from(unavailableAttributes.entries()).map(([attrKey]) => {
-                const productAttr = product?.productAttributes?.find((pa: any) => pa.attribute?.key === attrKey);
-                const attributeName = productAttr?.attribute?.name || attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
-                return attrKey === 'color' ? t(language, 'product.color') : 
-                       attrKey === 'size' ? t(language, 'product.size') : 
-                       attributeName;
-              }).join(', ')} {t(language, 'product.outOfStock')}
-            </p>
-          </div>
-        )}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          {showSizeGuide ? (
-            <button
-              type="button"
-              onClick={() => setIsSizeGuideOpen(true)}
-              className={`${CLAY_PRIMARY_BUTTON_CLASS} shrink-0 self-start`}
-              style={{
-                ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_BOYS_BG_COLOR),
-                height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
-              }}
-            >
-              {t(language, 'product.sizeGuide.open')}
-            </button>
-          ) : null}
-          <div className="flex flex-1 items-center gap-3">
-            <button 
-              disabled={!canAddToCart || isAddingToCart} 
-              className="flex-1 rounded-full bg-brand-cart font-bold text-gray-900 transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
-              style={{ height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX }}
-              onClick={onAddToCart}
-            >
-              <span className="relative block h-full w-full">
-                <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
-                  {mobileFormattedActionLabel}
-                </span>
-                <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
-                  <Image
-                    src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
-                    alt=""
-                    width={20}
-                    height={20}
-                    aria-hidden
-                  />
-                </span>
+        <div className="flex items-center gap-3">
+          <ProductQuantityStepper
+            quantity={quantity}
+            maxQuantity={maxQuantity}
+            onQuantityAdjust={onQuantityAdjust}
+            heightPx={PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX}
+          />
+          <button 
+            disabled={!canAddToCart || isAddingToCart} 
+            className="flex-1 rounded-full bg-brand-cart font-bold text-gray-900 transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+            style={{ height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX }}
+            onClick={onAddToCart}
+          >
+            <span className="relative block h-full w-full">
+              <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
+                {mobileFormattedActionLabel}
               </span>
-            </button>
-            <button 
-              onClick={onAddToWishlist} 
-              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                isInWishlist
-                  ? 'border-gray-200 text-brand-pink'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <Heart fill={isInWishlist ? 'currentColor' : 'none'} />
-            </button>
-          </div>
+              <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
+                <Image
+                  src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
+                  alt=""
+                  width={20}
+                  height={20}
+                  aria-hidden
+                />
+              </span>
+            </span>
+          </button>
+          <button 
+            onClick={onAddToWishlist} 
+            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+              isInWishlist
+                ? 'border-gray-200 text-brand-pink'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <Heart fill={isInWishlist ? 'currentColor' : 'none'} />
+          </button>
         </div>
       </div>
       {showMessage && <div className="mt-4 p-4 bg-gray-900 text-white rounded-md shadow-lg">{showMessage}</div>}

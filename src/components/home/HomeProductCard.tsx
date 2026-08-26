@@ -198,11 +198,10 @@ function HomeProductCardComponent({
     </div>
   );
 
-  const ratingRow = compactPanel ? (
+  const ratingRow = (
     <div
-      className="flex items-center justify-end whitespace-nowrap"
+      className="flex items-center whitespace-nowrap"
       style={{
-        height: typography.ratingLineHeightPx,
         gap: lp(HOME_PRODUCT_CARD_RATING_STAR_TEXT_GAP_PX),
         color: HOME_PRODUCT_CARD_RATING_COLOR,
         fontSize: typography.ratingSizePx,
@@ -217,29 +216,6 @@ function HomeProductCardComponent({
         className="shrink-0"
       />
       <span className="font-normal">{ratingLabel}</span>
-    </div>
-  ) : (
-    <div className="relative shrink-0" style={{ width: lp(71), height: typography.ratingLineHeightPx }}>
-      <Image
-        src={HOME_PRODUCT_CARD_ASSETS.star}
-        alt=""
-        width={typography.ratingStarSizePx}
-        height={typography.ratingStarSizePx}
-        className="absolute top-0"
-        style={{ left: lp(-7) }}
-      />
-      <p
-        className="absolute whitespace-nowrap font-normal"
-        style={{
-          left: lp(11),
-          top: 0,
-          color: HOME_PRODUCT_CARD_RATING_COLOR,
-          fontSize: typography.ratingSizePx,
-          lineHeight: `${typography.ratingLineHeightPx}px`,
-        }}
-      >
-        {ratingLabel}
-      </p>
     </div>
   );
 
@@ -325,7 +301,7 @@ function HomeProductCardComponent({
     <div className="flex h-full min-h-0 w-full flex-col">
       <div className="flex w-full items-center justify-between" style={{ gap: lp(8) }}>
         <div className="min-w-0 flex-1">{titleLine}</div>
-        {ratingRow}
+        <div className="shrink-0">{ratingRow}</div>
       </div>
 
       <div

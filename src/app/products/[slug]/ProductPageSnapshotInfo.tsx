@@ -12,13 +12,13 @@ import { t } from '../../../lib/i18n';
 import type { ProductPageSnapshot } from '../../../lib/product-page-snapshot';
 import { sanitizeHtml } from '../../../lib/utils/sanitize';
 import {
-  PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+  PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
   PRODUCT_QUANTITY_STEPPER_SHELL_CLASS,
   PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS,
   PRODUCT_QUANTITY_STEPPER_VALUE_CLASS,
 } from './constants';
-import { ProductRatingSummary } from './ProductRatingSummary';
 import { ProductPageSnapshotAttributes } from './ProductPageSnapshotAttributes';
+import { ProductRatingSummary } from './ProductRatingSummary';
 
 interface ProductPageSnapshotInfoProps {
   snapshot: ProductPageSnapshot;
@@ -27,12 +27,12 @@ interface ProductPageSnapshotInfoProps {
 function ProductPageSnapshotQuantityStepper() {
   return (
     <div
-      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_QUANTITY_STEPPER_SHELL_CLASS}`}
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_QUANTITY_STEPPER_SHELL_CLASS} shrink-0`}
       style={{
         ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_GIRLS_BG_COLOR),
         paddingLeft: 0,
         paddingRight: 0,
-        height: PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
+        height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
       }}
     >
       <button
@@ -103,19 +103,12 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
           </div>
         ) : null}
 
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <h1 className="min-w-0 flex-1 text-4xl font-bold text-gray-900">{snapshot.title}</h1>
-          <ProductRatingSummary
-            averageRating={snapshot.averageRating ?? 0}
-            reviewsCount={snapshot.reviewsCount ?? 0}
-            onReviewsClick={() => {}}
-            language={language}
-            className="mb-0 shrink-0 justify-end pointer-events-none"
-          />
+        <div className="mb-6">
+          <h1 className="min-w-0 text-4xl font-bold text-gray-900">{snapshot.title}</h1>
         </div>
 
-        <div className="mb-6">
-          <div className="flex items-center justify-between gap-3">
+        <div className="mb-6 w-full">
+          <div className="grid w-full grid-cols-[1fr_auto] items-center gap-4">
             <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
               <p className="text-3xl font-bold text-gray-900">
                 {formatPrice(snapshot.price, currency)}
@@ -131,9 +124,13 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
                 </span>
               ) : null}
             </div>
-            <div className="shrink-0">
-              <ProductPageSnapshotQuantityStepper />
-            </div>
+            <ProductRatingSummary
+              averageRating={snapshot.averageRating ?? 0}
+              reviewsCount={snapshot.reviewsCount ?? 0}
+              onReviewsClick={() => {}}
+              language={language}
+              className="mb-0 shrink-0 justify-self-end pointer-events-none"
+            />
           </div>
         </div>
 
@@ -153,6 +150,7 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
 
       <div className="mt-auto lg:pt-0 pt-6">
         <div className="flex items-center gap-3 pointer-events-none">
+          <ProductPageSnapshotQuantityStepper />
           <button
             type="button"
             disabled
