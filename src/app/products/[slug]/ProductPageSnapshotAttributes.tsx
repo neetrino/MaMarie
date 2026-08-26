@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  CLAY_PRIMARY_BUTTON_CLASS,
+  getClayPrimaryButtonCompactStyle,
+} from '../../../constants/clay-primary-button';
+import { HERO_GENDER_BUTTON_BOYS_BG_COLOR } from '../../../constants/hero';
 import { getAttributeLabel, t } from '../../../lib/i18n';
 import type {
   ProductPageSnapshotColor,
@@ -8,6 +13,7 @@ import type {
 import type { LanguageCode } from '../../../lib/language';
 import { getColorHex } from '../../../lib/colorMap';
 import { processImageUrl } from '../../../lib/utils/image-utils';
+import { PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX } from './constants';
 
 interface ProductPageSnapshotAttributesProps {
   colors?: ProductPageSnapshotColor[];
@@ -65,7 +71,8 @@ function SnapshotSizeOptions({
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-bold uppercase text-blue-600">{t(language, 'product.size')}</label>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
         {sizes.map((size) => {
           const isUnavailable = size.inStock === false;
           const label = size.label ?? getAttributeLabel(language, 'size', size.value);
@@ -75,19 +82,25 @@ function SnapshotSizeOptions({
               key={size.value}
               type="button"
               disabled
-              className={`min-w-[50px] rounded-lg border-2 px-3 py-2 transition-all disabled:cursor-default ${
-                isUnavailable ? 'border-gray-200 opacity-60' : 'border-gray-200'
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 text-sm font-medium transition-all disabled:cursor-default ${
+                isUnavailable ? 'border-gray-200 opacity-60' : 'border-gray-300'
               }`}
+              title={label}
             >
-              <div className="flex flex-col text-center">
-                <span className="text-sm font-medium">{label}</span>
-                {isUnavailable ? (
-                  <span className="text-xs text-gray-400">({t(language, 'product.outOfStock')})</span>
-                ) : null}
-              </div>
+              {label}
             </button>
           );
         })}
+        </div>
+        <span
+          className={`${CLAY_PRIMARY_BUTTON_CLASS} ml-auto shrink-0 self-center pointer-events-none opacity-60`}
+          style={{
+            ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_BOYS_BG_COLOR),
+            height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+          }}
+        >
+          {t(language, 'product.sizeGuide.open')}
+        </span>
       </div>
     </div>
   );
