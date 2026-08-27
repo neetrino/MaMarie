@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import type { MouseEvent } from 'react';
 import { useEffect, useState } from 'react';
 import {
@@ -26,7 +25,6 @@ import { HomeProductCardImageGallery } from '../home/HomeProductCardImageGallery
 
 interface MobileProductsCatalogProductCardMediaProps {
   slug: string;
-  productHref: string;
   title: string;
   imageSrc: string | null;
   images?: string[];
@@ -34,13 +32,11 @@ interface MobileProductsCatalogProductCardMediaProps {
   layoutWidthPx: number;
   isInWishlist: boolean;
   onWishlistToggle: (event: MouseEvent<HTMLButtonElement>) => void;
-  onBeforeNavigate?: () => void;
 }
 
 /** Figma `167:619` — product photo frame and wishlist control. */
 export function MobileProductsCatalogProductCardMedia({
   slug,
-  productHref,
   title,
   imageSrc,
   images,
@@ -48,7 +44,6 @@ export function MobileProductsCatalogProductCardMedia({
   layoutWidthPx,
   isInWishlist,
   onWishlistToggle,
-  onBeforeNavigate,
 }: MobileProductsCatalogProductCardMediaProps) {
   const galleryImages =
     images && images.length > 0 ? images : imageSrc ? [imageSrc] : [];
@@ -68,7 +63,7 @@ export function MobileProductsCatalogProductCardMedia({
 
   return (
     <div
-      className="absolute overflow-hidden"
+      className="pointer-events-none absolute overflow-hidden"
       style={{
         left: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_FRAME_LEFT_PX),
         top: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_FRAME_TOP_PX),
@@ -77,11 +72,8 @@ export function MobileProductsCatalogProductCardMedia({
         borderRadius: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_FRAME_RADIUS_PX),
       }}
     >
-      <Link
-        href={productHref}
+      <div
         className="absolute overflow-hidden"
-        onFocus={onBeforeNavigate}
-        onPointerDown={onBeforeNavigate}
         style={{
           left: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_LEFT_PX),
           top: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_TOP_PX),
@@ -114,10 +106,10 @@ export function MobileProductsCatalogProductCardMedia({
             <ProductImagePlaceholder className="h-full w-full" aria-label={title} />
           )}
         </div>
-      </Link>
+      </div>
 
       {hasMultipleImages ? (
-        <div className="pointer-events-auto absolute inset-0 z-10">
+        <div className="pointer-events-none absolute inset-0 z-10">
           <HomeProductCardImageGallery
             images={galleryImages}
             activeIndex={galleryIndex}
@@ -134,7 +126,7 @@ export function MobileProductsCatalogProductCardMedia({
         onClick={onWishlistToggle}
         aria-pressed={isInWishlist}
         aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-        className={`absolute z-20 flex items-center justify-center transition-opacity hover:opacity-80 ${
+        className={`pointer-events-auto absolute z-20 flex items-center justify-center transition-opacity hover:opacity-80 ${
           isInWishlist ? 'text-brand-pink' : ''
         }`}
         style={{

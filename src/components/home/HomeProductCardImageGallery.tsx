@@ -41,7 +41,7 @@ export function HomeProductCardImageGallery({
         type="button"
         onClick={goPrev}
         aria-label="Previous image"
-        className="absolute left-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-base font-semibold text-gray-800 shadow-md hover:bg-white"
+        className="absolute left-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 pointer-events-auto items-center justify-center rounded-full bg-white/90 text-base font-semibold text-gray-800 shadow-md hover:bg-white"
       >
         ‹
       </button>
@@ -49,7 +49,7 @@ export function HomeProductCardImageGallery({
         type="button"
         onClick={goNext}
         aria-label="Next image"
-        className="absolute right-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-base font-semibold text-gray-800 shadow-md hover:bg-white"
+        className="absolute right-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 pointer-events-auto items-center justify-center rounded-full bg-white/90 text-base font-semibold text-gray-800 shadow-md hover:bg-white"
       >
         ›
       </button>
