@@ -252,6 +252,8 @@ export function ProductPageClient({
           currentImageIndex={currentImageIndex}
           onImageIndexChange={setCurrentImageIndex}
           mainImagePriority={currentImageIndex === 0}
+          isInWishlist={isInWishlist}
+          onAddToWishlist={handleAddToWishlist}
         />
 
         <ProductInfoAndActions

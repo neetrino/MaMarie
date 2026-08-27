@@ -1,10 +1,11 @@
 'use client';
 
 import NextImage from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { ProductLabels } from '../../../components/ProductLabels';
 import { ProductImagePlaceholder } from '../../../components/ProductImagePlaceholder';
+import { WishlistIcon } from '../../../components/icons/WishlistIcon';
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { readProductPageSnapshot } from '../../../lib/product-page-snapshot';
@@ -17,6 +18,9 @@ import {
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS,
+  PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
+  PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
+  PRODUCT_PDP_MOBILE_WISHLIST_ICON_SIZE_PX,
   PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS,
   PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS,
   PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
@@ -37,6 +41,8 @@ interface ProductImageGalleryProps {
   onImageIndexChange: (index: number) => void;
   /** LCP: prioritize only the first above-the-fold hero image. */
   mainImagePriority?: boolean;
+  isInWishlist: boolean;
+  onAddToWishlist: (e: MouseEvent) => void;
 }
 
 const PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 55vw';
@@ -115,6 +121,8 @@ export function ProductImageGallery({
   currentImageIndex,
   onImageIndexChange,
   mainImagePriority = false,
+  isInWishlist,
+  onAddToWishlist,
 }: ProductImageGalleryProps) {
   const [showZoom, setShowZoom] = useState(false);
   const [failedSources, setFailedSources] = useState<Set<string>>(new Set());
@@ -199,12 +207,37 @@ export function ProductImageGallery({
             )}
 
             {discountPercent ? (
-              <div className="pointer-events-none absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
+              <div className="pointer-events-none absolute top-4 left-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
                 -{discountPercent}%
               </div>
             ) : null}
 
             {product.labels ? <ProductLabels labels={product.labels} /> : null}
+
+            <button
+              type="button"
+              onClick={onAddToWishlist}
+              aria-pressed={isInWishlist}
+              aria-label={
+                isInWishlist
+                  ? t(language, 'common.ariaLabels.removeFromWishlist')
+                  : t(language, 'common.ariaLabels.addToWishlist')
+              }
+              className={`absolute z-20 flex items-center justify-center rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] transition-colors hover:bg-white/90 lg:hidden ${
+                isInWishlist ? 'text-brand-pink' : 'text-gray-800'
+              }`}
+              style={{
+                top: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
+                right: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
+                width: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
+                height: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
+              }}
+            >
+              <WishlistIcon
+                isActive={isInWishlist}
+                size={PRODUCT_PDP_MOBILE_WISHLIST_ICON_SIZE_PX}
+              />
+            </button>
 
             {hasMultipleImages ? (
               <>

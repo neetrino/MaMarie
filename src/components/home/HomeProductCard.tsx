@@ -98,21 +98,55 @@ function areHomeProductCardPropsEqual(
 
   const prevProduct = prev.product;
   const nextProduct = next.product;
-  return (
-    prevProduct.id === nextProduct.id &&
-    prevProduct.slug === nextProduct.slug &&
-    prevProduct.title === nextProduct.title &&
-    prevProduct.subtitle === nextProduct.subtitle &&
-    prevProduct.price === nextProduct.price &&
-    prevProduct.compareAtPrice === nextProduct.compareAtPrice &&
-    prevProduct.originalPrice === nextProduct.originalPrice &&
-    prevProduct.image === nextProduct.image &&
-    (prevProduct.images?.join('|') ?? '') === (nextProduct.images?.join('|') ?? '') &&
-    prevProduct.inStock === nextProduct.inStock &&
-    prevProduct.defaultVariantId === nextProduct.defaultVariantId &&
-    prevProduct.averageRating === nextProduct.averageRating &&
-    prevProduct.reviewsCount === nextProduct.reviewsCount
-  );
+  const prevSizes = prevProduct.sizes ?? [];
+  const nextSizes = nextProduct.sizes ?? [];
+  const prevColors = prevProduct.colors ?? [];
+  const nextColors = nextProduct.colors ?? [];
+
+  if (
+    prevProduct.id !== nextProduct.id ||
+    prevProduct.slug !== nextProduct.slug ||
+    prevProduct.title !== nextProduct.title ||
+    prevProduct.subtitle !== nextProduct.subtitle ||
+    prevProduct.price !== nextProduct.price ||
+    prevProduct.compareAtPrice !== nextProduct.compareAtPrice ||
+    prevProduct.originalPrice !== nextProduct.originalPrice ||
+    prevProduct.image !== nextProduct.image ||
+    (prevProduct.images?.join('|') ?? '') !== (nextProduct.images?.join('|') ?? '') ||
+    prevProduct.inStock !== nextProduct.inStock ||
+    prevProduct.defaultVariantId !== nextProduct.defaultVariantId ||
+    prevProduct.averageRating !== nextProduct.averageRating ||
+    prevProduct.reviewsCount !== nextProduct.reviewsCount ||
+    prevSizes.length !== nextSizes.length ||
+    prevColors.length !== nextColors.length
+  ) {
+    return false;
+  }
+
+  for (let index = 0; index < prevSizes.length; index += 1) {
+    const prevSize = prevSizes[index];
+    const nextSize = nextSizes[index];
+    if (
+      prevSize.value !== nextSize.value ||
+      prevSize.label !== nextSize.label ||
+      prevSize.inStock !== nextSize.inStock
+    ) {
+      return false;
+    }
+  }
+
+  for (let index = 0; index < prevColors.length; index += 1) {
+    const prevColor = prevColors[index];
+    const nextColor = nextColors[index];
+    if (
+      prevColor.value !== nextColor.value ||
+      prevColor.imageUrl !== nextColor.imageUrl
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function HomeProductCardComponent({

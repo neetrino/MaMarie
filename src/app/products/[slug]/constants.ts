@@ -69,13 +69,35 @@ export const PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX = 280;
 /** PDP action row — Add to cart / size guide height (`h-12`). */
 export const PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX = 48;
 
+/** Mobile PDP — wishlist control overlaid on the main image (Kamancha-style). */
+export const PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX = 44;
+export const PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX = 12;
+export const PRODUCT_PDP_MOBILE_WISHLIST_ICON_SIZE_PX = 22;
+
 /** Pink clay −/+ quantity stepper — slightly under compact CTA. */
 export const PRODUCT_QUANTITY_STEPPER_HEIGHT_PX = 44;
-export const PRODUCT_QUANTITY_STEPPER_SHELL_CLASS = 'min-w-[7.5rem] gap-0 overflow-hidden !px-0';
+/** Mobile: equal width with size guide; desktop keeps compact pill. */
+export const PRODUCT_QUANTITY_STEPPER_SHELL_CLASS =
+  'min-w-0 flex-1 gap-0 overflow-hidden !px-0 lg:w-auto lg:min-w-[7.5rem] lg:flex-none lg:shrink-0';
 export const PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS =
-  'flex h-full w-10 items-center justify-center text-base font-bold text-white';
+  'flex h-full flex-1 items-center justify-center text-base font-bold text-white lg:flex-none lg:w-10';
 export const PRODUCT_QUANTITY_STEPPER_VALUE_CLASS =
-  'min-w-[2rem] text-center text-base font-bold text-white';
+  'min-w-[1.75rem] shrink-0 text-center text-base font-bold text-white';
+
+/**
+ * Mobile PDP actions:
+ * row 1 — qty + size guide (equal width)
+ * row 2 — add to cart (full width)
+ * Desktop — qty + cart + wishlist in one row.
+ */
+export const PRODUCT_PDP_ACTIONS_ROW_CLASS =
+  'flex flex-col gap-3 lg:flex-row lg:items-center';
+export const PRODUCT_PDP_ACTIONS_TOP_ROW_CLASS =
+  'flex w-full items-center gap-3 lg:contents';
+export const PRODUCT_PDP_SIZE_GUIDE_ACTION_CLASS =
+  'min-w-0 flex-1 lg:hidden';
+export const PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS =
+  'w-full rounded-full bg-brand-cart font-bold text-gray-900 transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 lg:flex-1';
 
 /**
  * PDP image zoom modal — above header (80), bottom nav (70), cart (90),

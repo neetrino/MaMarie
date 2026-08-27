@@ -934,13 +934,66 @@ html:has(main.profile-page-main)::-webkit-scrollbar {
 }
 
 @media (min-width: 1024px) {
+  /**
+   * Profile desktop (Kamancha): sticky band under the header.
+   * Equal top/bottom gaps; content column scrolls internally. When that
+   * column reaches its end, page scroll continues so the footer is reachable.
+   * Heights use design px inside DesktopFluidFrame zoom.
+   */
   main.profile-page-main {
+    --profile-sticky-gap: 20px;
+    --profile-header-offset-design: calc(
+      var(--header-clearance-desktop, 0px) / var(--desktop-layout-scale, 1)
+    );
+    --profile-sticky-band-height: calc(
+      (100dvh / var(--desktop-layout-scale, 1))
+      - var(--profile-header-offset-design)
+      - (var(--profile-sticky-gap) * 2)
+    );
     background-color: #faf8f5;
     box-sizing: border-box;
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden;
     display: flex;
+    flex-direction: column;
+  }
+
+  .profile-desktop-page {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-top: var(--profile-sticky-gap);
+    padding-bottom: var(--profile-sticky-gap);
+    padding-left: 2rem;
+    padding-right: 2rem;
+    flex: 1 1 auto;
+    min-height: var(--profile-sticky-band-height);
+  }
+
+  .profile-sticky-band {
+    position: sticky;
+    top: calc(var(--profile-header-offset-design) + var(--profile-sticky-gap));
+    z-index: 10;
+    height: var(--profile-sticky-band-height);
+    max-height: var(--profile-sticky-band-height);
+    align-self: flex-start;
+  }
+
+  .profile-desktop-content {
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .profile-desktop-content::-webkit-scrollbar {
+    display: none;
+  }
+
+  .profile-desktop-content > * {
+    display: flex;
+    min-height: 100%;
     flex-direction: column;
   }
 
@@ -952,14 +1005,6 @@ html:has(main.profile-page-main)::-webkit-scrollbar {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-  }
-
-  .layout-shell-mobile-bottom-clearance:has(.profile-desktop-page) {
-    height: 100dvh;
-    max-height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-    background-color: #faf8f5;
   }
 
   .layout-shell-mobile-bottom-clearance:has(.admin-page-shell) {
