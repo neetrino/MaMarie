@@ -10,6 +10,7 @@ import {
 import {
   LEGAL_POLICY_HUB_LIST_CLASS,
   LEGAL_POLICY_HUB_PAGE_CLASS,
+  LEGAL_POLICY_HUB_ROW_CLASS,
   LEGAL_POLICY_HUB_TITLE_CLASS,
   LEGAL_POLICY_SHEET_DESKTOP_WIDTH_PERCENT,
 } from '../../constants/legal-policy-sheet';
@@ -37,7 +38,7 @@ export function LegalPoliciesHub() {
                 <button
                   type="button"
                   onClick={() => setActiveKey(item.key)}
-                  className="flex w-full items-center justify-between gap-3 rounded-[15px] bg-white px-4 py-4 text-left text-base font-semibold text-gray-900 shadow-[0_1px_2px_rgba(16,24,40,0.04)] ring-1 ring-gray-100/80 transition hover:bg-gray-50"
+                  className={LEGAL_POLICY_HUB_ROW_CLASS}
                 >
                   <span className="min-w-0 flex-1">{t(item.labelKey)}</span>
                   <ChevronRight className="size-5 shrink-0 text-brand-pink" aria-hidden />

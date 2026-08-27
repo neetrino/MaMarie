@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import type { MouseEvent } from 'react';
 import { memo, useEffect, useState } from 'react';
 import {
@@ -42,6 +41,7 @@ import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapsho
 import { buildProductDetailHref } from '../../lib/products/build-product-detail-href';
 import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { WishlistIcon } from '../icons/WishlistIcon';
+import { ProductCardStretchedLink } from '../ProductCard/ProductCardStretchedLink';
 import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
 import { HomeProductCardSizeBadges } from './HomeProductCardSizeBadges';
@@ -307,11 +307,8 @@ function HomeProductCardComponent({
   );
 
   const titleLine = (
-    <Link
-      href={productHref}
+    <p
       className="truncate font-bold"
-      onFocus={saveSnapshot}
-      onPointerDown={saveSnapshot}
       style={{
         color: HOME_PRODUCT_CARD_TEXT_DARK,
         fontSize: typography.titleSizePx,
@@ -319,7 +316,7 @@ function HomeProductCardComponent({
       }}
     >
       {product.title}
-    </Link>
+    </p>
   );
 
   const colorSwatches = (
@@ -343,7 +340,7 @@ function HomeProductCardComponent({
       </div>
 
       <div
-        className="home-product-card-actions flex shrink-0 flex-col items-end justify-center"
+        className="home-product-card-actions pointer-events-auto relative z-[3] flex shrink-0 flex-col items-end justify-center"
         style={{ width: lp(100) }}
       >
         {ratingRow}
@@ -369,7 +366,7 @@ function HomeProductCardComponent({
 
       <div className="flex items-center justify-between" style={{ gap: lp(8) }}>
         {priceRow}
-        <div className="home-product-card-actions flex shrink-0 items-center justify-center">
+        <div className="home-product-card-actions pointer-events-auto relative z-[3] flex shrink-0 items-center justify-center">
           {cartButton}
         </div>
       </div>
@@ -387,13 +384,14 @@ function HomeProductCardComponent({
         className="home-product-card-surface relative h-full w-full overflow-visible"
         style={{ borderRadius: lp(HOME_PRODUCT_CARD_RADIUS_PX) }}
       >
-        <div className="home-product-card-image-wrap absolute overflow-hidden">
-          <Link
-            href={productHref}
-            className="absolute inset-0 block"
-            onFocus={saveSnapshot}
-            onPointerDown={saveSnapshot}
-          >
+        <ProductCardStretchedLink
+          href={productHref}
+          ariaLabel={product.title}
+          onBeforeNavigate={saveSnapshot}
+        />
+
+        <div className="home-product-card-image-wrap pointer-events-none absolute overflow-hidden">
+          <div className="absolute inset-0 block">
             <div
               className="pointer-events-none absolute relative max-w-none"
               style={{
@@ -419,12 +417,14 @@ function HomeProductCardComponent({
                 <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
               )}
             </div>
-          </Link>
+          </div>
           {hasMultipleImages ? (
-            <div className="pointer-events-auto absolute inset-0 z-10">
+            <div className="pointer-events-none absolute inset-0 z-10">
               <HomeProductCardImageGallery
                 images={galleryImages}
                 activeIndex={galleryIndex}
+                productHref={productHref}
+                onBeforeNavigate={saveSnapshot}
                 onIndexChange={(next) => {
                   setGalleryIndex(next);
                   setImageError(false);
@@ -443,7 +443,7 @@ function HomeProductCardComponent({
           onClick={handleWishlist}
           aria-pressed={isInWishlist}
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-          className={`absolute z-20 flex items-center justify-center transition-colors hover:opacity-80 ${
+          className={`pointer-events-auto absolute z-20 flex items-center justify-center transition-colors hover:opacity-80 ${
             isInWishlist ? 'text-brand-pink' : ''
           }`}
           style={{
@@ -457,7 +457,7 @@ function HomeProductCardComponent({
         </button>
 
         <div
-          className="absolute left-1/2 flex w-full -translate-x-1/2 flex-col bg-white"
+          className="pointer-events-none absolute left-1/2 flex w-full -translate-x-1/2 flex-col bg-white"
           style={{
             top: lp(HOME_PRODUCT_CARD_PANEL_TOP_PX),
             width: lp(HOME_PRODUCT_CARD_PANEL_WIDTH_PX),

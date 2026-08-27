@@ -79,7 +79,7 @@ function AdminDrawerMenuRow({
     >
       <span className="flex min-w-0 items-center gap-3">
         <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:h-5 [&>svg]:w-5"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl [&>svg]:h-4 [&>svg]:w-4"
           style={{
             backgroundColor: theme.background,
             color: theme.foreground,

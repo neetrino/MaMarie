@@ -26,6 +26,7 @@ import {
   PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
   PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS,
   PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_SIZES,
   PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT,
   PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
 } from './constants';
@@ -44,8 +45,6 @@ interface ProductImageGalleryProps {
   isInWishlist: boolean;
   onAddToWishlist: (e: MouseEvent) => void;
 }
-
-const PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 55vw';
 
 interface ProductThumbnailRailProps {
   images: string[];
@@ -191,7 +190,7 @@ export function ProductImageGallery({
                     alt={product.title}
                     fill
                     className="object-contain transition-transform duration-500 group-hover:scale-105"
-                    sizes={PDP_MAIN_IMAGE_SIZES}
+                    sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                     loading={mainImagePriority ? 'eager' : 'lazy'}
                     unoptimized
                     onLoad={() => setSnapshotSrc(currentSrc)}

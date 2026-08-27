@@ -1,88 +1,102 @@
 'use client';
 
-import { STORE_EMAIL, STORE_EMAIL_HREF } from '@/constants/store-contact';
 import {
   LEGAL_POLICY_SHEET_BODY_CLASS,
   LEGAL_POLICY_SHEET_LIST_CLASS,
-  LEGAL_POLICY_SHEET_ORDERED_LIST_CLASS,
   LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS,
   LEGAL_POLICY_SHEET_STACK_CLASS,
 } from '../../constants/legal-policy-sheet';
 import { useTranslation } from '../../lib/i18n-client';
 
-/** Refund policy body for the legal side sheet. */
+type TranslateFn = (key: string) => string;
+
+const NON_RETURNABLE_KEYS = [
+  'underwear',
+  'socks',
+  'swimwear',
+  'giftCards',
+  'other',
+] as const;
+
+function RefundPolicySections({ t }: { t: TranslateFn }) {
+  return (
+    <>
+      <section className="flex flex-col gap-3">
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.subtitle')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.exchanges.title')}
+        </h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.exchanges.p1')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.exchanges.p2')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.exchanges.p3')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.exchanges.p4')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.returns.title')}
+        </h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.returns.p1')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.returns.p2')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.returns.p3')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.refunds.title')}
+        </h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.refunds.p1')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.refunds.p2')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.refunds.p3')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.cancellation.title')}
+        </h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.cancellation.p1')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.cancellation.p2')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.personalized.title')}
+        </h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.personalized.p1')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.nonReturnable.title')}
+        </h2>
+        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
+          {NON_RETURNABLE_KEYS.map((key) => (
+            <li key={key}>{t(`refund-policy.nonReturnable.items.${key}`)}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
+          {t('refund-policy.specialNote.title')}
+        </h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.specialNote.p1')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.specialNote.p2')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.brand')}</p>
+      </section>
+    </>
+  );
+}
+
+/** Return and exchange policy body for the legal side sheet. */
 export function RefundPolicySheetContent() {
   const { t } = useTranslation();
-
   return (
     <article className={LEGAL_POLICY_SHEET_STACK_CLASS}>
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('refund-policy.overview.title')}
-        </h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.overview.description')}</p>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('refund-policy.eligibility.title')}
-        </h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('refund-policy.eligibility.description')}</p>
-        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-          <li>{t('refund-policy.eligibility.items.condition')}</li>
-          <li>{t('refund-policy.eligibility.items.timeline')}</li>
-          <li>{t('refund-policy.eligibility.items.proof')}</li>
-          <li>{t('refund-policy.eligibility.items.excluded')}</li>
-        </ul>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('refund-policy.howToInitiate.title')}
-        </h2>
-        <ol className={LEGAL_POLICY_SHEET_ORDERED_LIST_CLASS}>
-          <li>{t('refund-policy.howToInitiate.steps.contact')}</li>
-          <li>{t('refund-policy.howToInitiate.steps.authorization')}</li>
-          <li>{t('refund-policy.howToInitiate.steps.ship')}</li>
-        </ol>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>
-          {t('refund-policy.howToInitiate.description')}
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('refund-policy.refundMethod.title')}
-        </h2>
-        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-          <li>{t('refund-policy.refundMethod.items.method')}</li>
-          <li>{t('refund-policy.refundMethod.items.timing')}</li>
-          <li>{t('refund-policy.refundMethod.items.shipping')}</li>
-        </ul>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('refund-policy.nonRefundable.title')}
-        </h2>
-        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-          <li>{t('refund-policy.nonRefundable.items.giftCards')}</li>
-          <li>{t('refund-policy.nonRefundable.items.personalized')}</li>
-          <li>{t('refund-policy.nonRefundable.items.unauthorized')}</li>
-          <li>{t('refund-policy.nonRefundable.items.condition')}</li>
-        </ul>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('refund-policy.contact.title')}</h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>
-          {t('refund-policy.contact.description')}{' '}
-          <a href={STORE_EMAIL_HREF} className="text-brand-pink hover:underline">
-            {STORE_EMAIL}
-          </a>
-          .
-        </p>
-      </section>
+      <RefundPolicySections t={t} />
     </article>
   );
 }

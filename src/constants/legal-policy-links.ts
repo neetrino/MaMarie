@@ -1,52 +1,51 @@
-/** Store policy documents for the legal hub (Grill.am-style sheet list). */
+/** Store policy documents for the legal hub — same 4 items as footer policy column. */
 
 export const LEGAL_POLICY_KEYS = [
   'privacy',
   'terms',
   'refund',
   'delivery',
-  'returns',
 ] as const;
 
 export type LegalPolicyKey = (typeof LEGAL_POLICY_KEYS)[number];
 
 export interface LegalPolicyListItem {
   key: LegalPolicyKey;
+  /** Document title i18n key — same as page / sheet heading. */
   labelKey: string;
   titleKey: string;
   href: string;
 }
 
+/**
+ * Mobile policies hub list — same order/hrefs as footer.
+ * `labelKey` === document page title so hub / footer / page / sheet always match.
+ * Do not import `footer.ts` here (circular dep via brand → nav-links → this file).
+ */
 export const LEGAL_POLICY_ITEMS: readonly LegalPolicyListItem[] = [
   {
     key: 'privacy',
-    labelKey: 'legal.links.privacy',
+    labelKey: 'privacy.title',
     titleKey: 'privacy.title',
     href: '/privacy',
   },
   {
     key: 'terms',
-    labelKey: 'legal.links.terms',
+    labelKey: 'terms.title',
     titleKey: 'terms.title',
     href: '/terms',
   },
   {
     key: 'refund',
-    labelKey: 'legal.links.refund',
+    labelKey: 'refund-policy.title',
     titleKey: 'refund-policy.title',
     href: '/refund-policy',
   },
   {
     key: 'delivery',
-    labelKey: 'legal.links.delivery',
+    labelKey: 'delivery-terms.title',
     titleKey: 'delivery-terms.title',
     href: '/delivery-terms',
-  },
-  {
-    key: 'returns',
-    labelKey: 'legal.links.returns',
-    titleKey: 'returns.title',
-    href: '/returns',
   },
 ] as const;
 

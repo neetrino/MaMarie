@@ -303,7 +303,7 @@ export default function UsersPage() {
         </form>
       </Card>
 
-        {!loading && filteredUsers.length > 0 && (
+        {!loading && filteredUsers.length > 0 && selectedIds.size > 0 && (
           <Card className="mb-6 w-full min-w-0 p-4">
             <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-4">
               <div className="min-w-0 flex-1 text-sm text-gray-700">
@@ -312,9 +312,9 @@ export default function UsersPage() {
               <Button
                 variant="outline"
                 type="button"
-                className="shrink-0"
+                className="shrink-0 !border-red-600 !bg-red-600 !text-white hover:!bg-red-700 hover:!text-white focus:!ring-red-500"
                 onClick={handleBulkDelete}
-                disabled={selectedIds.size === 0 || bulkDeleting}
+                disabled={bulkDeleting}
               >
                 {bulkDeleting ? t('admin.users.deleting') : t('admin.users.deleteSelected')}
               </Button>

@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import type { MouseEvent } from 'react';
 import { useEffect, useState } from 'react';
 import {
@@ -68,7 +67,7 @@ export function MobileProductsCatalogProductCardMedia({
 
   return (
     <div
-      className="absolute overflow-hidden"
+      className="pointer-events-none absolute overflow-hidden"
       style={{
         left: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_FRAME_LEFT_PX),
         top: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_FRAME_TOP_PX),
@@ -77,11 +76,8 @@ export function MobileProductsCatalogProductCardMedia({
         borderRadius: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_FRAME_RADIUS_PX),
       }}
     >
-      <Link
-        href={productHref}
+      <div
         className="absolute overflow-hidden"
-        onFocus={onBeforeNavigate}
-        onPointerDown={onBeforeNavigate}
         style={{
           left: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_LEFT_PX),
           top: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_TOP_PX),
@@ -114,13 +110,15 @@ export function MobileProductsCatalogProductCardMedia({
             <ProductImagePlaceholder className="h-full w-full" aria-label={title} />
           )}
         </div>
-      </Link>
+      </div>
 
       {hasMultipleImages ? (
-        <div className="pointer-events-auto absolute inset-0 z-10">
+        <div className="pointer-events-none absolute inset-0 z-10">
           <HomeProductCardImageGallery
             images={galleryImages}
             activeIndex={galleryIndex}
+            productHref={productHref}
+            onBeforeNavigate={onBeforeNavigate}
             onIndexChange={(next) => {
               setGalleryIndex(next);
               setImageError(false);
@@ -134,7 +132,7 @@ export function MobileProductsCatalogProductCardMedia({
         onClick={onWishlistToggle}
         aria-pressed={isInWishlist}
         aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-        className={`absolute z-20 flex items-center justify-center transition-opacity hover:opacity-80 ${
+        className={`pointer-events-auto absolute z-20 flex items-center justify-center transition-opacity hover:opacity-80 ${
           isInWishlist ? 'text-brand-pink' : ''
         }`}
         style={{

@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import type { MouseEvent } from 'react';
 import { memo, useLayoutEffect, useRef, useState } from 'react';
 import {
@@ -57,6 +56,7 @@ import { buildProductDetailHref } from '../../lib/products/build-product-detail-
 import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { resolveComparePrice } from '../home/home-product-card-shared';
 import type { HomeProductCardData } from '../home/HomeProductCard';
+import { ProductCardStretchedLink } from '../ProductCard/ProductCardStretchedLink';
 import { MobileProductsCatalogColorSwatches } from './MobileProductsCatalogColorSwatches';
 import { MobileProductsCatalogProductCardMedia } from './MobileProductsCatalogProductCardMedia';
 
@@ -159,6 +159,12 @@ function MobileProductsCatalogProductCardComponent({
         ...(appearIndex !== undefined ? productAppearStyle(appearIndex) : null),
       }}
     >
+      <ProductCardStretchedLink
+        href={productHref}
+        ariaLabel={product.title}
+        onBeforeNavigate={saveSnapshot}
+      />
+
       <MobileProductsCatalogProductCardMedia
         slug={product.slug}
         productHref={productHref}
@@ -173,7 +179,7 @@ function MobileProductsCatalogProductCardComponent({
       />
 
       <div
-        className="absolute inset-x-0"
+        className="pointer-events-none absolute inset-x-0"
         style={{
           top: lp(MOBILE_PRODUCTS_CATALOG_CARD_CONTENT_TOP_PX),
           paddingLeft: lp(MOBILE_PRODUCTS_CATALOG_CARD_CONTENT_PADDING_X_PX),
@@ -182,11 +188,8 @@ function MobileProductsCatalogProductCardComponent({
       >
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <Link
-              href={productHref}
+            <p
               className="block truncate font-medium"
-              onFocus={saveSnapshot}
-              onPointerDown={saveSnapshot}
               style={{
                 color: MOBILE_PRODUCTS_CATALOG_CARD_TEXT_DARK,
                 fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_TITLE_SIZE_PX),
@@ -194,7 +197,7 @@ function MobileProductsCatalogProductCardComponent({
               }}
             >
               {product.title}
-            </Link>
+            </p>
             <p
               className="truncate font-normal"
               style={{
@@ -264,7 +267,7 @@ function MobileProductsCatalogProductCardComponent({
         onClick={handleAddToCart}
         disabled={!product.inStock || isAddingToCart}
         aria-label={addToCartLabel}
-        className="absolute flex items-center justify-between rounded-full bg-brand-pink text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="pointer-events-auto absolute z-[3] flex items-center justify-between rounded-full bg-brand-pink text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         style={{
           left: lp(MOBILE_PRODUCTS_CATALOG_CARD_CTA_HORIZONTAL_INSET_PX),
           right: lp(MOBILE_PRODUCTS_CATALOG_CARD_CTA_HORIZONTAL_INSET_PX),

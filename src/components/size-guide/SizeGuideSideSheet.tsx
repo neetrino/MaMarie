@@ -1,6 +1,7 @@
 'use client';
 
 import { ProfileSideSheet } from '../../app/profile/components/ProfileSideSheet';
+import { SIZE_GUIDE_SHEET_DESKTOP_WIDTH_PERCENT } from '../../constants/size-guide';
 import { t } from '../../lib/i18n';
 import type { LanguageCode } from '../../lib/language';
 import { SizeGuideContent } from './SizeGuideContent';
@@ -19,6 +20,7 @@ export function SizeGuideSideSheet({ isOpen, language, onClose }: SizeGuideSideS
       title={t(language, 'product.sizeGuide.title')}
       subtitle={t(language, 'product.sizeGuide.subtitle')}
       closeLabel={t(language, 'common.buttons.close')}
+      desktopWidthPercent={SIZE_GUIDE_SHEET_DESKTOP_WIDTH_PERCENT}
       onClose={onClose}
     >
       <SizeGuideContent language={language} />

@@ -1,3 +1,6 @@
+/** Size guide side sheet — slightly wider than default profile sheets (42%). */
+export const SIZE_GUIDE_SHEET_DESKTOP_WIDTH_PERCENT = 52;
+
 /** Kids size guide — body measurements (cm). */
 export const SIZE_GUIDE_ILLUSTRATION_SRC = '/assets/product/size-guide-illustration.webp';
 

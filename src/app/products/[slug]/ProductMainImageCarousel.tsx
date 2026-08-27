@@ -5,10 +5,9 @@ import { useEffect, useRef } from 'react';
 import { ProductImagePlaceholder } from '../../../components/ProductImagePlaceholder';
 import {
   PRODUCT_PDP_MAIN_IMAGE_CAROUSEL_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_SIZES,
   PRODUCT_PDP_MAIN_IMAGE_SLIDE_CLASS,
 } from './constants';
-
-const PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 55vw';
 
 interface ProductMainImageCarouselProps {
   images: string[];
@@ -109,7 +108,7 @@ export function ProductMainImageCarousel({
                 alt={index === currentImageIndex ? alt : ''}
                 fill
                 className="object-contain"
-                sizes={PDP_MAIN_IMAGE_SIZES}
+                sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                 loading={mainImagePriority && index === 0 ? 'eager' : 'lazy'}
                 unoptimized
                 draggable={false}

@@ -1,74 +1,11 @@
 import { db } from "@white-shop/db";
 import { Prisma } from "@white-shop/db";
 import type { CheckoutData } from "../types/checkout";
-import {
-  FIRST_PUBLIC_ORDER_NUMBER,
-  ORDER_NUMBER_ALLOCATION_LOCK_KEY,
-} from "../constants/order-number";
 import { logger } from "../utils/logger";
 import { adminDeliveryService } from "./admin/admin-delivery.service";
-import { extractMediaUrl } from "../utils/extractMediaUrl";
-
-const ORDER_SEQUENCE_FLOOR = FIRST_PUBLIC_ORDER_NUMBER - 1;
-
-async function allocateNextOrderNumber(
-  tx: Prisma.TransactionClient
-): Promise<string> {
-  await tx.$executeRaw(
-    Prisma.sql`SELECT pg_advisory_xact_lock(${ORDER_NUMBER_ALLOCATION_LOCK_KEY}::bigint)`
-  );
-  const rows = await tx.$queryRaw<Array<{ next: string }>>(
-    Prisma.sql`
-      SELECT (GREATEST(COALESCE(MAX(CAST("number" AS INTEGER)), ${ORDER_SEQUENCE_FLOOR}), ${ORDER_SEQUENCE_FLOOR}) + 1)::text AS next
-      FROM "orders"
-      WHERE "number" ~ '^[0-9]+$'
-    `
-  );
-  const raw = rows[0]?.next;
-  if (raw === undefined || raw === null) {
-    throw {
-      status: 500,
-      type: "https://api.shop.am/problems/internal-error",
-      title: "Internal Server Error",
-      detail: "Could not allocate order number",
-    };
-  }
-  const nextNum = Number.parseInt(String(raw), 10);
-  if (!Number.isFinite(nextNum) || nextNum < FIRST_PUBLIC_ORDER_NUMBER) {
-    throw {
-      status: 500,
-      type: "https://api.shop.am/problems/internal-error",
-      title: "Internal Server Error",
-      detail: "Invalid order number sequence",
-    };
-  }
-  return String(nextNum);
-}
-type CartItemWithRelations = Prisma.CartItemGetPayload<{
-  include: {
-    product: {
-      include: {
-        translations: true;
-      };
-    };
-    variant: {
-      include: {
-        options: true;
-      };
-    };
-  };
-}>;
-
-type ProductVariantWithProduct = Prisma.ProductVariantGetPayload<{
-  include: {
-    product: {
-      include: {
-        translations: true;
-      };
-    };
-    options: true;
-  };
-}>;
+import { persistCheckoutOrder } from "./orders/persist-checkout-order";
+import { resolveCheckoutCartItems } from "./orders/resolve-checkout-cart-items";
+import { validateCheckoutFields } from "./orders/validate-checkout-fields";
 
 type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
   include: {
@@ -102,284 +39,40 @@ class OrdersService {
         lastName,
         email,
         phone,
-        shippingMethod = 'pickup',
+        shippingMethod = "pickup",
         shippingAddress,
-        paymentMethod = 'idram',
+        paymentMethod = "idram",
         cashChangeFor,
         notes,
       } = data;
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
-      const trimmedFirstName = firstName?.trim() ?? '';
-      const trimmedLastName = lastName?.trim() ?? '';
-
-      // Validate required fields
-      if (!trimmedFirstName || !trimmedLastName) {
-        throw {
-          status: 400,
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          detail: "First name and last name are required",
-        };
-      }
-
-      if (!email || !phone) {
-        throw {
-          status: 400,
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          detail: "Email and phone are required",
-        };
-      }
-
-      const contactAddress = {
-        firstName: trimmedFirstName,
-        lastName: trimmedLastName,
-        phone,
+      const { contactAddress, persistedShippingAddress } = validateCheckoutFields({
+        firstName,
+        lastName,
         email,
-      };
+        phone,
+        paymentMethod,
+        cashChangeFor,
+        shippingAddress,
+      });
 
-      const persistedShippingAddress = shippingAddress
-        ? {
-            ...shippingAddress,
-            firstName: shippingAddress.firstName?.trim() || trimmedFirstName,
-            lastName: shippingAddress.lastName?.trim() || trimmedLastName,
-            phone: shippingAddress.phone || phone,
-          }
-        : null;
-
-      const allowedCashChangeFor = new Set([
-        'none',
-        '2000',
-        '5000',
-        '10000',
-        '20000',
-        '50000',
-        '100000',
-      ]);
-
-      if (
-        paymentMethod === 'cash_on_delivery' &&
-        cashChangeFor !== undefined &&
-        !allowedCashChangeFor.has(cashChangeFor)
-      ) {
-        throw {
-          status: 400,
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Validation Error",
-          detail: "Invalid cash change option",
-        };
-      }
-
-      // Get cart items - either from user cart or guest items
-      let cartItems: Array<{
-        variantId: string;
-        productId: string;
-        quantity: number;
-        price: number;
-        productTitle: string;
-        variantTitle?: string;
-        sku: string;
-        imageUrl?: string;
-      }> = [];
-
-      if (userId && cartId && cartId !== 'guest-cart') {
-        // Get items from user's cart
-        const cart = await db.cart.findFirst({
-          where: { id: cartId, userId },
-          include: {
-            items: {
-              include: {
-                variant: {
-                  include: {
-                    product: {
-                      include: {
-                        translations: true,
-                      },
-                    },
-                    options: true,
-                  },
-                },
-                product: {
-                  include: {
-                    translations: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        if (!cart || cart.items.length === 0) {
-          throw {
-            status: 400,
-            type: "https://api.shop.am/problems/validation-error",
-            title: "Cart is empty",
-            detail: "Cannot checkout with an empty cart",
-          };
-        }
-
-        // Format cart items
-        logger.debug('Processing cart items', { count: cart.items.length });
-        
-        cartItems = await Promise.all(
-          cart.items.map(async (item: CartItemWithRelations) => {
-            const product = item.product;
-            const variant = item.variant;
-            
-            if (!variant) {
-              logger.error('Cart item missing variant', {
-                itemId: item.id,
-                variantId: item.variantId,
-                productId: item.productId,
-              });
-              throw {
-                status: 404,
-                type: "https://api.shop.am/problems/not-found",
-                title: "Variant not found",
-                detail: `Variant ${item.variantId} not found for cart item`,
-              };
-            }
-            
-            logger.debug('Processing cart item', {
-              itemId: item.id,
-              variantId: variant.id,
-              productId: product.id,
-              quantity: item.quantity,
-              variantStock: variant.stock,
-              variantSku: variant.sku,
-            });
-            
-            const translation = product.translations?.[0] || product.translations?.[0];
-
-            // Get variant title from options
-            const variantTitle = variant.options
-              ?.map((opt) => `${opt.attributeKey || ''}: ${opt.value || ''}`)
-              .join(', ') || undefined;
-
-            // Get image URL
-            const imageUrl = extractMediaUrl(product.media, product.id) ?? undefined;
-
-            // Check stock availability
-            if (variant.stock < item.quantity) {
-              throw {
-                status: 422,
-                type: "https://api.shop.am/problems/validation-error",
-                title: "Insufficient stock",
-                detail: `Product "${translation?.title || 'Unknown'}" - insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
-              };
-            }
-
-            // Use current variant price from DB (ignore priceSnapshot to prevent outdated/abused prices)
-            const currentPrice = Number(variant.price);
-            const cartItem = {
-              variantId: variant.id,
-              productId: product.id,
-              quantity: item.quantity,
-              price: currentPrice,
-              productTitle: translation?.title || 'Unknown Product',
-              variantTitle,
-              sku: variant.sku || '',
-              imageUrl,
-            };
-            
-            logger.debug('Cart item formatted', {
-              variantId: cartItem.variantId,
-              productId: cartItem.productId,
-              quantity: cartItem.quantity,
-              sku: cartItem.sku,
-            });
-            
-            return cartItem;
-          })
-        );
-        
-        logger.info('All cart items processed', { count: cartItems.length });
-      } else if (guestItems && Array.isArray(guestItems) && guestItems.length > 0) {
-        // Validate and collect variant IDs
-        const variantIds: string[] = [];
-        for (const item of guestItems) {
-          if (!item.productId || !item.variantId || !item.quantity) {
-            throw {
-              status: 400,
-              type: "https://api.shop.am/problems/validation-error",
-              title: "Validation Error",
-              detail: "Each item must have productId, variantId, and quantity",
-            };
-          }
-          variantIds.push(item.variantId);
-        }
-        const uniqueVariantIds = [...new Set(variantIds)];
-
-        // Batch fetch all variants (one query instead of N)
-        const variants = await db.productVariant.findMany({
-          where: { id: { in: uniqueVariantIds } },
-          include: {
-            product: { include: { translations: true } },
-            options: true,
-          },
-        });
-        const variantMap = new Map(variants.map((v) => [v.id, v]));
-
-        cartItems = guestItems.map((item: { productId: string; variantId: string; quantity: number }) => {
-          const variant = variantMap.get(item.variantId);
-          if (!variant || variant.productId !== item.productId) {
-            throw {
-              status: 404,
-              type: "https://api.shop.am/problems/not-found",
-              title: "Product variant not found",
-              detail: `Variant ${item.variantId} not found for product ${item.productId}`,
-            };
-          }
-          if (variant.stock < item.quantity) {
-            throw {
-              status: 422,
-              type: "https://api.shop.am/problems/validation-error",
-              title: "Insufficient stock",
-              detail: `Insufficient stock. Available: ${variant.stock}, Requested: ${item.quantity}`,
-            };
-          }
-          const translation = variant.product.translations?.[0] || variant.product.translations?.[0];
-          const variantTitle = variant.options
-            ?.map((opt: { attributeKey?: string | null; value?: string | null }) => `${opt.attributeKey ?? ""}: ${opt.value ?? ""}`)
-            .join(", ") ?? undefined;
-          const imageUrl = extractMediaUrl(variant.product.media, variant.product.id) ?? undefined;
-          return {
-            variantId: variant.id,
-            productId: variant.product.id,
-            quantity: item.quantity,
-            price: Number(variant.price),
-            productTitle: translation?.title ?? "Unknown Product",
-            variantTitle,
-            sku: variant.sku ?? "",
-            imageUrl,
-          };
-        });
-      } else {
-        throw {
-          status: 400,
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Cart is empty",
-          detail: "Cannot checkout with an empty cart",
-        };
-      }
-
-      if (cartItems.length === 0) {
-        throw {
-          status: 400,
-          type: "https://api.shop.am/problems/validation-error",
-          title: "Cart is empty",
-          detail: "Cannot checkout with an empty cart",
-        };
-      }
+      const cartItems = await resolveCheckoutCartItems({
+        userId,
+        cartId,
+        guestItems,
+      });
 
       // Calculate totals
-      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const subtotal = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
       const discountAmount = 0; // TODO: Implement discount/coupon logic
       // Shipping: computed server-side only (never trust client-provided amount)
       let shippingAmount = 0;
-      if (shippingMethod === 'delivery' && shippingAddress?.city?.trim()) {
-        const country = (shippingAddress.countryCode ?? 'Armenia').toString();
+      if (shippingMethod === "delivery" && shippingAddress?.city?.trim()) {
+        const country = (shippingAddress.countryCode ?? "Armenia").toString();
         shippingAmount = await adminDeliveryService.getDeliveryPrice(
           shippingAddress.city.trim(),
           country
@@ -389,148 +82,24 @@ class OrdersService {
       const taxAmount = 0; // TODO: Calculate tax if needed
       const total = subtotal - discountAmount + shippingAmount + taxAmount;
 
-      // Create order with items in a transaction (timeout to avoid hung connections)
-      const order = await db.$transaction(
-        async (tx: Prisma.TransactionClient) => {
-        const orderNumber = await allocateNextOrderNumber(tx);
-        // Create order
-        const newOrder = await tx.order.create({
-          data: {
-            number: orderNumber,
-            userId: userId || null,
-            status: 'pending',
-            paymentStatus: 'pending',
-            fulfillmentStatus: 'unfulfilled',
-            subtotal,
-            discountAmount,
-            shippingAmount,
-            taxAmount,
-            total,
-            currency: 'AMD',
-            customerEmail: email,
-            customerPhone: phone,
-            customerLocale: 'en', // TODO: Get from request
-            shippingMethod,
-            shippingAddress: persistedShippingAddress
-              ? JSON.parse(JSON.stringify(persistedShippingAddress))
-              : null,
-            // Always store checkout contact (incl. guest name) for admin display
-            billingAddress: JSON.parse(
-              JSON.stringify({
-                ...contactAddress,
-                ...(persistedShippingAddress ?? {}),
-              })
-            ),
-            notes: notes ?? null,
-            items: {
-              create: cartItems.map((item) => ({
-                variantId: item.variantId,
-                productTitle: item.productTitle,
-                variantTitle: item.variantTitle,
-                sku: item.sku,
-                quantity: item.quantity,
-                price: item.price,
-                total: item.price * item.quantity,
-                imageUrl: item.imageUrl,
-              })),
-            },
-            events: {
-              create: {
-                type: 'order_created',
-                data: {
-                  source: userId ? 'user' : 'guest',
-                  paymentMethod,
-                  shippingMethod,
-                  ...(paymentMethod === 'cash_on_delivery' && cashChangeFor
-                    ? { cashChangeFor }
-                    : {}),
-                },
-              },
-            },
-          },
-          include: {
-            items: true,
-          },
-        });
-
-        // Update stock atomically: only decrement if stock >= quantity (avoids race condition)
-        logger.debug('Updating stock for variants', { count: cartItems.length });
-        
-        try {
-          for (const item of cartItems) {
-            if (!item.variantId) {
-              logger.error('Missing variantId for item', { item });
-              throw {
-                status: 400,
-                type: "https://api.shop.am/problems/validation-error",
-                title: "Validation Error",
-                detail: `Missing variantId for item with SKU: ${item.sku}`,
-              };
-            }
-
-            const quantity = Number(item.quantity);
-            const variantId = item.variantId;
-            const updated = await tx.$executeRaw(
-              Prisma.sql`UPDATE product_variants SET stock = stock - ${quantity} WHERE id = ${variantId} AND stock >= ${quantity}`
-            );
-            if (updated === 0) {
-              const variant = await tx.productVariant.findUnique({
-                where: { id: variantId },
-                select: { sku: true, stock: true },
-              });
-              logger.error('Insufficient stock on atomic decrement', {
-                variantId,
-                sku: variant?.sku,
-                currentStock: variant?.stock,
-                requested: quantity,
-              });
-              throw {
-                status: 422,
-                type: "https://api.shop.am/problems/validation-error",
-                title: "Insufficient stock",
-                detail: `Insufficient stock for SKU ${variant?.sku ?? variantId}. Available: ${variant?.stock ?? 0}, requested: ${quantity}`,
-              };
-            }
-            logger.debug('Stock decremented', { variantId, quantity });
-          }
-          logger.info('All variant stocks updated successfully');
-        } catch (stockError: unknown) {
-          const err = stockError as { status?: number; type?: string };
-          if (err.status && err.type) throw stockError;
-          logger.error('Error updating stock', { error: stockError });
-          throw stockError;
-        }
-
-        // Create payment record
-        const payment = await tx.payment.create({
-          data: {
-            orderId: newOrder.id,
-            provider: paymentMethod,
-            method: paymentMethod,
-            amount: total,
-            currency: 'AMD',
-            status: 'pending',
-            ...(paymentMethod === 'cash_on_delivery' && cashChangeFor
-              ? {
-                  providerResponse: {
-                    cashChangeFor,
-                  },
-                }
-              : {}),
-          },
-        });
-
-        // If user cart, delete cart after successful checkout
-        if (userId && cartId && cartId !== 'guest-cart') {
-          await tx.cart.delete({
-            where: { id: cartId },
-          });
-        }
-
-        return { order: newOrder, payment };
-      },
-        { timeout: 10000, maxWait: 5000 }
-      );
+      const order = await persistCheckoutOrder({
+        userId,
+        cartId,
+        email,
+        phone,
+        shippingMethod,
+        paymentMethod,
+        cashChangeFor,
+        notes,
+        contactAddress,
+        persistedShippingAddress,
+        cartItems,
+        subtotal,
+        discountAmount,
+        shippingAmount,
+        taxAmount,
+        total,
+      });
 
       // Return order and payment info
       return {
@@ -547,14 +116,23 @@ class OrdersService {
           paymentUrl: null, // TODO: Generate payment URL for Idram/ArCa
           expiresAt: null, // TODO: Set expiration if needed
         },
-        nextAction: paymentMethod === 'idram' || paymentMethod === 'arca' 
-          ? 'redirect_to_payment' 
-          : 'view_order',
+        nextAction:
+          paymentMethod === "idram" || paymentMethod === "arca"
+            ? "redirect_to_payment"
+            : "view_order",
       };
     } catch (error: unknown) {
       // Type guard for custom error
-      const customError = error as { status?: number; type?: string; message?: string; code?: string; name?: string; meta?: unknown; stack?: string };
-      
+      const customError = error as {
+        status?: number;
+        type?: string;
+        message?: string;
+        code?: string;
+        name?: string;
+        meta?: unknown;
+        stack?: string;
+      };
+
       // If it's already our custom error, re-throw it
       if (customError.status && customError.type) {
         throw error;
@@ -572,7 +150,7 @@ class OrdersService {
       });
 
       // Handle Prisma errors
-      if (customError?.code === 'P2002') {
+      if (customError?.code === "P2002") {
         throw {
           status: 409,
           type: "https://api.shop.am/problems/conflict",
@@ -696,7 +274,7 @@ class OrdersService {
 
     // Parse shipping address if it's a JSON string
     let shippingAddress = order.shippingAddress;
-    if (typeof shippingAddress === 'string') {
+    if (typeof shippingAddress === "string") {
       try {
         shippingAddress = JSON.parse(shippingAddress);
       } catch {
@@ -705,17 +283,19 @@ class OrdersService {
     }
 
     // Debug logging
-    logger.info('Order found', {
+    logger.info("Order found", {
       orderNumber: order.number,
       itemsCount: order.items.length,
       items: order.items.map((item: OrderItemWithVariant) => ({
         variantId: item.variantId,
         productTitle: item.productTitle,
-        variant: item.variant ? {
-          id: item.variant.id,
-          optionsCount: item.variant.options?.length || 0,
-          options: item.variant.options,
-        } : null,
+        variant: item.variant
+          ? {
+              id: item.variant.id,
+              optionsCount: item.variant.options?.length || 0,
+              options: item.variant.options,
+            }
+          : null,
       })),
     });
 
@@ -726,43 +306,49 @@ class OrdersService {
       paymentStatus: order.paymentStatus,
       fulfillmentStatus: order.fulfillmentStatus,
       items: order.items.map((item: OrderItemWithVariant) => {
-        const variantOptions = item.variant?.options?.map((opt) => {
-          // Debug logging for each option
-          logger.debug('Processing option', {
-            attributeKey: opt.attributeKey,
-            value: opt.value,
-            valueId: opt.valueId,
-            hasAttributeValue: !!opt.attributeValue,
-            attributeValueData: opt.attributeValue ? {
-              value: opt.attributeValue.value,
-              attributeKey: opt.attributeValue.attribute.key,
-              imageUrl: opt.attributeValue.imageUrl,
-              hasTranslations: opt.attributeValue.translations?.length > 0,
-            } : null,
-          });
+        const variantOptions =
+          item.variant?.options?.map((opt) => {
+            // Debug logging for each option
+            logger.debug("Processing option", {
+              attributeKey: opt.attributeKey,
+              value: opt.value,
+              valueId: opt.valueId,
+              hasAttributeValue: !!opt.attributeValue,
+              attributeValueData: opt.attributeValue
+                ? {
+                    value: opt.attributeValue.value,
+                    attributeKey: opt.attributeValue.attribute.key,
+                    imageUrl: opt.attributeValue.imageUrl,
+                    hasTranslations: opt.attributeValue.translations?.length > 0,
+                  }
+                : null,
+            });
 
-          // New format: Use AttributeValue if available
-          if (opt.attributeValue) {
-            // Get label from translations (prefer current locale, fallback to first available)
-            const translations = opt.attributeValue.translations || [];
-            const label = translations.length > 0 ? translations[0].label : opt.attributeValue.value;
-            
+            // New format: Use AttributeValue if available
+            if (opt.attributeValue) {
+              // Get label from translations (prefer current locale, fallback to first available)
+              const translations = opt.attributeValue.translations || [];
+              const label =
+                translations.length > 0
+                  ? translations[0].label
+                  : opt.attributeValue.value;
+
+              return {
+                attributeKey: opt.attributeValue.attribute.key || undefined,
+                value: opt.attributeValue.value || undefined,
+                label: label || undefined,
+                imageUrl: opt.attributeValue.imageUrl || undefined,
+                colors: opt.attributeValue.colors || undefined,
+              };
+            }
+            // Old format: Use attributeKey and value directly
             return {
-              attributeKey: opt.attributeValue.attribute.key || undefined,
-              value: opt.attributeValue.value || undefined,
-              label: label || undefined,
-              imageUrl: opt.attributeValue.imageUrl || undefined,
-              colors: opt.attributeValue.colors || undefined,
+              attributeKey: opt.attributeKey || undefined,
+              value: opt.value || undefined,
             };
-          }
-          // Old format: Use attributeKey and value directly
-          return {
-            attributeKey: opt.attributeKey || undefined,
-            value: opt.value || undefined,
-          };
-        }) || [];
+          }) || [];
 
-        logger.debug('Item mapping', {
+        logger.debug("Item mapping", {
           productTitle: item.productTitle,
           variantId: item.variantId,
           hasVariant: !!item.variant,
@@ -771,9 +357,9 @@ class OrdersService {
         });
 
         return {
-          variantId: item.variantId || '',
+          variantId: item.variantId || "",
           productTitle: item.productTitle,
-          variantTitle: item.variantTitle || '',
+          variantTitle: item.variantTitle || "",
           sku: item.sku,
           quantity: item.quantity,
           price: Number(item.price),
@@ -795,7 +381,7 @@ class OrdersService {
         phone: order.customerPhone || undefined,
       },
       shippingAddress: shippingAddress,
-      shippingMethod: order.shippingMethod || 'pickup',
+      shippingMethod: order.shippingMethod || "pickup",
       trackingNumber: order.trackingNumber || undefined,
       createdAt: order.createdAt.toISOString(),
       updatedAt: order.updatedAt.toISOString(),
@@ -804,4 +390,3 @@ class OrdersService {
 }
 
 export const ordersService = new OrdersService();
-

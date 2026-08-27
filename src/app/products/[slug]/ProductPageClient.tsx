@@ -27,6 +27,7 @@ import {
 import type { CartItem, GuestCartItem } from '../../../app/cart/types';
 import { playCartFlyAnimation } from '../../../lib/cart-fly-animation';
 import {
+  PRODUCT_PDP_GRID_CLASS,
   PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX,
   PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX,
 } from './constants';
@@ -243,7 +244,7 @@ export function ProductPageClient({
 
   return (
     <ProductPageFrame>
-      <div className="grid grid-cols-1 gap-12 items-start lg:grid-cols-[55%_45%] lg:items-stretch">
+      <div className={PRODUCT_PDP_GRID_CLASS}>
         <ProductImageGallery
           images={images}
           product={product}

@@ -4,7 +4,6 @@ import type { LegalPolicyKey } from '../../constants/legal-policy-links';
 import { DeliveryTermsSheetContent } from './DeliveryTermsSheetContent';
 import { PrivacyPolicySheetContent } from './PrivacyPolicySheetContent';
 import { RefundPolicySheetContent } from './RefundPolicySheetContent';
-import { ReturnsPolicySheetContent } from './ReturnsPolicySheetContent';
 import { TermsPolicySheetContent } from './TermsPolicySheetContent';
 
 interface LegalPolicySheetContentProps {
@@ -22,8 +21,6 @@ export function LegalPolicySheetContent({ policyKey }: LegalPolicySheetContentPr
       return <RefundPolicySheetContent />;
     case 'delivery':
       return <DeliveryTermsSheetContent />;
-    case 'returns':
-      return <ReturnsPolicySheetContent />;
     default: {
       const _exhaustive: never = policyKey;
       return _exhaustive;
