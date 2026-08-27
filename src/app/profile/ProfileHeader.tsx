@@ -3,9 +3,11 @@ import {
   PROFILE_DESKTOP_AVATAR_NAME_GAP_PX,
   PROFILE_DESKTOP_AVATAR_SIZE_PX,
   PROFILE_DESKTOP_CARD_CLASS,
+  PROFILE_DESKTOP_DANGER_TAB_THEME,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
+  PROFILE_MOBILE_ICON_THEMES,
 } from '../../constants/profile-desktop-page';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileDesktopTabNav } from './components/ProfileDesktopTabNav';
@@ -55,6 +57,10 @@ function ProfileDesktopContactRow({
 
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout, t }: ProfileHeaderProps) {
   const hasSplitName = Boolean(profile?.firstName && profile?.lastName);
+  const mainTabs = tabs.filter((tab) => tab.id !== 'deleteAccount');
+  const deleteAccountTab = tabs.find((tab) => tab.id === 'deleteAccount');
+  const isDeleteAccountActive = activeTab === 'deleteAccount';
+  const logoutTheme = PROFILE_MOBILE_ICON_THEMES.blue;
 
   return (
     <div
@@ -104,19 +110,62 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout,
       </div>
 
       <div className="profile-desktop-sidebar-scroll profile-scroll-area mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-gray-100 pt-4">
-        <ProfileDesktopTabNav tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
+        <ProfileDesktopTabNav tabs={mainTabs} activeTab={activeTab} onTabChange={onTabChange} />
         <button
           type="button"
           onClick={onLogout}
           className="mt-2 flex w-full items-center gap-3 rounded-[15px] border-l-4 border-transparent px-3 py-2.5 text-left transition-colors hover:bg-white/70"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fdeef2] text-brand-pink">
+          <span
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            style={{
+              backgroundColor: logoutTheme.background,
+              color: logoutTheme.foreground,
+            }}
+          >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
             </svg>
           </span>
-          <span className="text-sm font-semibold text-brand-pink">{t('common.navigation.logout')}</span>
+          <span className="text-sm font-semibold" style={{ color: logoutTheme.foreground }}>
+            {t('common.navigation.logout')}
+          </span>
         </button>
+        {deleteAccountTab ? (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={isDeleteAccountActive}
+            onClick={() => onTabChange(deleteAccountTab.id)}
+            className={`mt-1 flex w-full items-center gap-3 rounded-[15px] border-l-4 px-3 py-2.5 text-left transition-colors ${
+              isDeleteAccountActive
+                ? 'border-red-500'
+                : 'border-transparent hover:bg-red-50/70'
+            }`}
+            style={
+              isDeleteAccountActive
+                ? { backgroundColor: PROFILE_DESKTOP_DANGER_TAB_THEME.activeBackground }
+                : undefined
+            }
+          >
+            <span
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:h-5 [&>svg]:w-5"
+              style={{
+                backgroundColor: PROFILE_DESKTOP_DANGER_TAB_THEME.background,
+                color: PROFILE_DESKTOP_DANGER_TAB_THEME.foreground,
+              }}
+            >
+              {deleteAccountTab.icon}
+            </span>
+            <span
+              className={`min-w-0 flex-1 text-sm font-semibold ${
+                isDeleteAccountActive ? 'text-red-600' : 'text-red-500'
+              }`}
+            >
+              {deleteAccountTab.label}
+            </span>
+          </button>
+        ) : null}
       </div>
     </div>
   );

@@ -43,6 +43,7 @@ export function ProfileDesktopTabNav({
   const updateIndicator = useCallback(() => {
     const button = buttonRefs.current.get(activeTab);
     if (!button) {
+      setIndicator(null);
       return;
     }
     setIndicator({

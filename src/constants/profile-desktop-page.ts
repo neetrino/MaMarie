@@ -130,6 +130,13 @@ export const PROFILE_DESKTOP_TAB_ORDER: readonly ProfileTab[] = [
   'deleteAccount',
 ] as const;
 
+/** Delete-account sidebar row — last item, danger styling. */
+export const PROFILE_DESKTOP_DANGER_TAB_THEME = {
+  background: '#fef2f2',
+  foreground: '#ef4444',
+  activeBackground: '#fee2e2',
+} as const;
+
 /** Desktop content panel enter — vertical slide + fade. */
 export const PROFILE_DESKTOP_TAB_TRANSITION_MS = 380;
 export const PROFILE_DESKTOP_TAB_TRANSITION_OFFSET_PX = 18;
