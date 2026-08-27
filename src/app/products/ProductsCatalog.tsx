@@ -18,6 +18,7 @@ import { MOBILE_FILTERS_EVENT } from '../../lib/events';
 import { logger } from '../../lib/utils/logger';
 import { getStorefrontProductsListForCatalog } from '../../lib/services/storefront-products-list-loader';
 import { getStorefrontProductsFiltersForCatalog } from '../../lib/services/storefront-products-filters-loader';
+import { hasLoadedFilterFacets } from '../../lib/products/has-loaded-filter-facets';
 import type { ProductsFiltersData } from '../../components/ProductsFiltersProvider';
 import {
   PRODUCTS_CATALOG_VIEW_MODE_COOKIE,
@@ -58,11 +59,12 @@ function toInitialFilters(
   if (!result) {
     return null;
   }
-  return {
+  const data: ProductsFiltersData = {
     colors: result.colors ?? [],
     sizes: result.sizes ?? [],
     brands: result.brands ?? [],
     attributes: result.attributes ?? [],
+    categoryIds: result.categoryIds ?? [],
     priceRange: result.priceRange ?? {
       min: 0,
       max: 100000,
@@ -70,6 +72,7 @@ function toInitialFilters(
       stepSizePerCurrency: null,
     },
   };
+  return hasLoadedFilterFacets(data) ? data : null;
 }
 
 function buildCatalogParams(
@@ -118,6 +121,7 @@ function normalizeProduct(product: ProductsCatalogProduct): ProductsCatalogProdu
     compareAtPrice: product.compareAtPrice ?? product.originalPrice ?? null,
     originalPrice: product.originalPrice ?? product.compareAtPrice ?? null,
     image: product.image ?? null,
+    images: Array.isArray(product.images) ? product.images : product.image ? [product.image] : [],
     inStock: product.inStock ?? true,
     brand: product.brand ?? null,
     defaultVariantId: product.defaultVariantId ?? null,

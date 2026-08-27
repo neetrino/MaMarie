@@ -1,130 +1,66 @@
-import { db } from "@white-shop/db";
-import { invalidateAdminAttributesCache } from "@/lib/cache/admin-reference-cache";
-import { logger } from "../../../utils/logger";
-import { formatAttribute } from "./utils";
+import { db, Prisma } from '@white-shop/db';
+import {
+  PRIMARY_PRODUCT_CONTENT_LOCALE,
+  isProductContentLocale,
+  type ProductContentLocale,
+} from '@/constants/product-content-locales';
+import {
+  resolveAttributeKeyFromNames,
+  type AttributeLocaleTextMap,
+} from '@/lib/admin/attribute-locale-helpers';
+import { invalidateAdminAttributesCache } from '@/lib/cache/admin-reference-cache';
+import { logger } from '../../../utils/logger';
+import { formatAttribute } from './utils';
 
-/**
- * Create attribute
- */
-export async function createAttribute(data: {
-  name: string;
-  key: string;
-  type?: string;
-  filterable?: boolean;
-  locale?: string;
-}) {
-  logger.info('Creating attribute', { key: data.key });
+type NameTranslationInput = { locale: string; name: string };
 
-  // Check if attribute with this key already exists
-  const existing = await db.attribute.findUnique({
-    where: { key: data.key },
-  });
-
-  if (existing) {
-    throw {
-      status: 400,
-      type: "https://api.shop.am/problems/validation-error",
-      title: "Attribute already exists",
-      detail: `Attribute with key '${data.key}' already exists`,
-    };
+function namesMapFromRows(
+  rows: Array<{ locale: ProductContentLocale; name: string }>,
+): AttributeLocaleTextMap {
+  const map: AttributeLocaleTextMap = { en: '', hy: '', ru: '' };
+  for (const row of rows) {
+    map[row.locale] = row.name;
   }
-
-  const locale = data.locale || "en";
-
-  const attribute = await db.attribute.create({
-    data: {
-      key: data.key,
-      type: data.type || "select",
-      filterable: data.filterable !== false,
-      translations: {
-        create: {
-          locale,
-          name: data.name,
-        },
-      },
-    },
-    include: {
-      translations: {
-        where: { locale },
-      },
-      values: {
-        include: {
-          translations: {
-            where: { locale },
-          },
-        },
-      },
-    },
-  });
-
-  invalidateAdminAttributesCache();
-  return formatAttribute(attribute, locale);
+  return map;
 }
 
-/**
- * Update attribute translation (name)
- */
-export async function updateAttributeTranslation(
-  attributeId: string,
-  data: {
-    name: string;
-    locale?: string;
-  }
-) {
-  logger.info('Updating attribute translation', { attributeId, name: data.name });
-
-  const attribute = await db.attribute.findUnique({
-    where: { id: attributeId },
-    include: {
-      translations: {
-        where: { locale: data.locale || "en" },
-      },
-    },
-  });
-
-  if (!attribute) {
-    throw {
-      status: 404,
-      type: "https://api.shop.am/problems/not-found",
-      title: "Attribute not found",
-      detail: `Attribute with id '${attributeId}' does not exist`,
-    };
+function normalizeNameTranslations(data: {
+  name?: string;
+  locale?: string;
+  translations?: NameTranslationInput[];
+}): Array<{ locale: ProductContentLocale; name: string }> {
+  if (Array.isArray(data.translations) && data.translations.length > 0) {
+    const rows: Array<{ locale: ProductContentLocale; name: string }> = [];
+    for (const row of data.translations) {
+      if (!isProductContentLocale(row.locale) || !row.name?.trim()) {
+        continue;
+      }
+      rows.push({ locale: row.locale, name: row.name.trim() });
+    }
+    return rows;
   }
 
-  const locale = data.locale || "en";
+  if (data.name?.trim()) {
+    const rawLocale = data.locale || '';
+    const locale: ProductContentLocale = isProductContentLocale(rawLocale)
+      ? rawLocale
+      : PRIMARY_PRODUCT_CONTENT_LOCALE;
+    return [{ locale, name: data.name.trim() }];
+  }
 
-  // Use upsert to handle both create and update cases
-  await db.attributeTranslation.upsert({
-    where: {
-      attributeId_locale: {
-        attributeId,
-        locale,
-      },
-    },
-    update: {
-      name: data.name.trim(),
-    },
-    create: {
-      attributeId,
-      locale,
-      name: data.name.trim(),
-    },
-  });
+  return [];
+}
 
-  // Return updated attribute with all values
+async function loadFormattedAttribute(attributeId: string) {
   const updatedAttribute = await db.attribute.findUnique({
     where: { id: attributeId },
     include: {
-      translations: {
-        where: { locale },
-      },
+      translations: true,
       values: {
         include: {
-          translations: {
-            where: { locale },
-          },
+          translations: true,
         },
-        orderBy: { position: "asc" },
+        orderBy: { position: 'asc' },
       },
     },
   });
@@ -132,16 +68,149 @@ export async function updateAttributeTranslation(
   if (!updatedAttribute) {
     throw {
       status: 500,
-      type: "https://api.shop.am/problems/internal-error",
-      title: "Internal Server Error",
-      detail: "Failed to retrieve updated attribute",
+      type: 'https://api.shop.am/problems/internal-error',
+      title: 'Internal Server Error',
+      detail: 'Failed to retrieve updated attribute',
     };
   }
 
-  invalidateAdminAttributesCache();
-  return formatAttribute(updatedAttribute, locale);
+  return formatAttribute(updatedAttribute);
 }
 
+/**
+ * Create attribute with one or more locale names.
+ */
+export async function createAttribute(data: {
+  name?: string;
+  key?: string;
+  type?: string;
+  filterable?: boolean;
+  locale?: string;
+  translations?: NameTranslationInput[];
+}) {
+  const nameRows = normalizeNameTranslations(data);
+  if (nameRows.length === 0) {
+    throw {
+      status: 400,
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Validation Error',
+      detail: 'At least one attribute name translation is required',
+    };
+  }
 
+  const key = (data.key?.trim() || resolveAttributeKeyFromNames(namesMapFromRows(nameRows))).trim();
 
+  if (!key) {
+    throw {
+      status: 400,
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Validation Error',
+      detail: 'Attribute key could not be generated from the provided name',
+    };
+  }
 
+  logger.info('Creating attribute', { key, locales: nameRows.map((row) => row.locale) });
+
+  const existing = await db.attribute.findUnique({ where: { key } });
+  if (existing) {
+    throw {
+      status: 400,
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Attribute already exists',
+      detail: `Attribute with key '${key}' already exists`,
+    };
+  }
+
+  try {
+    const attribute = await db.attribute.create({
+      data: {
+        key,
+        type: data.type || 'select',
+        filterable: data.filterable !== false,
+        translations: {
+          create: nameRows,
+        },
+      },
+      include: {
+        translations: true,
+        values: {
+          include: {
+            translations: true,
+          },
+        },
+      },
+    });
+
+    invalidateAdminAttributesCache();
+    return formatAttribute(attribute);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw {
+        status: 409,
+        type: 'https://api.shop.am/problems/conflict',
+        title: 'Attribute already exists',
+        detail: `Attribute with key '${key}' already exists`,
+      };
+    }
+    throw error;
+  }
+}
+
+/**
+ * Update attribute name translations (single locale or batch).
+ */
+export async function updateAttributeTranslation(
+  attributeId: string,
+  data: {
+    name?: string;
+    locale?: string;
+    translations?: NameTranslationInput[];
+  },
+) {
+  const nameRows = normalizeNameTranslations(data);
+  if (nameRows.length === 0) {
+    throw {
+      status: 400,
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Validation Error',
+      detail: 'At least one attribute name translation is required',
+    };
+  }
+
+  logger.info('Updating attribute translations', {
+    attributeId,
+    locales: nameRows.map((row) => row.locale),
+  });
+
+  const attribute = await db.attribute.findUnique({ where: { id: attributeId } });
+  if (!attribute) {
+    throw {
+      status: 404,
+      type: 'https://api.shop.am/problems/not-found',
+      title: 'Attribute not found',
+      detail: `Attribute with id '${attributeId}' does not exist`,
+    };
+  }
+
+  await db.$transaction(
+    nameRows.map((row) =>
+      db.attributeTranslation.upsert({
+        where: {
+          attributeId_locale: {
+            attributeId,
+            locale: row.locale,
+          },
+        },
+        update: { name: row.name },
+        create: {
+          attributeId,
+          locale: row.locale,
+          name: row.name,
+        },
+      }),
+    ),
+  );
+
+  invalidateAdminAttributesCache();
+  return loadFormattedAttribute(attributeId);
+}

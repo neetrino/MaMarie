@@ -6,11 +6,15 @@ import {
 } from '../../../constants/clay-primary-button';
 import { HERO_GENDER_BUTTON_BOYS_BG_COLOR } from '../../../constants/hero';
 import { processImageUrl } from '../../../lib/utils/image-utils';
-import { t, getAttributeLabel } from '../../../lib/i18n';
+import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX } from './constants';
 import type { Product, ProductVariant } from './types';
 import { logger } from "@/lib/utils/logger";
+import {
+  resolveAttributeNameDisplay,
+  resolveAttributeValueDisplayLabel,
+} from './utils/attribute-display-label';
 
 interface AttributeGroupValue {
   valueId?: string;
@@ -160,8 +164,12 @@ export function ProductAttributesSelector({
         // Use attributeGroups which contains all attributes (from productAttributes and variants)
         Array.from(attributeGroups.entries()).map(([attrKey, attrGroups]) => {
           // Try to get attribute name from productAttributes if available
-          const productAttr = product?.productAttributes?.find((pa: any) => pa.attribute?.key === attrKey);
-          const attributeName = productAttr?.attribute?.name || attrKey.charAt(0).toUpperCase() + attrKey.slice(1);
+          const productAttr = product?.productAttributes?.find((pa: { attribute?: { key?: string; name?: string } }) => pa.attribute?.key === attrKey);
+          const attributeName = resolveAttributeNameDisplay(
+            language,
+            attrKey,
+            productAttr?.attribute?.name,
+          );
           const isColor = attrKey === 'color';
           const isSize = attrKey === 'size';
 
@@ -183,7 +191,7 @@ export function ProductAttributesSelector({
                     isUnavailable ? 'text-red-600' : 'text-blue-600'
                   }`}
                 >
-                  {t(language, 'product.size')}
+                  {attributeName}
                 </label>
               ) : (
                 <label
@@ -195,7 +203,7 @@ export function ProductAttributesSelector({
                         : ''
                   }`}
                 >
-                  {attrKey === 'color' ? t(language, 'product.color') : `${attributeName}:`}
+                  {isColor ? attributeName : `${attributeName}:`}
                 </label>
               )}
               {isColor ? (
@@ -211,6 +219,12 @@ export function ProductAttributesSelector({
                     const colorHex = g.colors && Array.isArray(g.colors) && g.colors.length > 0 
                       ? g.colors[0] 
                       : getColorValue(g.value);
+                    const colorLabel = resolveAttributeValueDisplayLabel(
+                      language,
+                      attrKey,
+                      g.value,
+                      g.label,
+                    );
                     
                     // Dynamic sizing based on number of values
                     // Keep size consistent for 2 values, reduce for more
@@ -220,6 +234,11 @@ export function ProductAttributesSelector({
                       : totalValues > 3 
                       ? 'w-9 h-9' 
                       : 'w-10 h-10';
+                    const labelSizeClass = totalValues > 6
+                      ? 'max-w-[2rem] text-[10px]'
+                      : totalValues > 3
+                        ? 'max-w-[2.25rem] text-[10px]'
+                        : 'max-w-[2.5rem] text-xs';
                     
                     return (
                       <div key={g.valueId || g.value} className="flex flex-col items-center gap-0.5">
@@ -233,12 +252,12 @@ export function ProductAttributesSelector({
                                 : 'border-2 border-gray-300 hover:scale-105'
                           }`}
                           style={hasImage ? {} : { backgroundColor: colorHex }}
-                          title={getAttributeLabel(language, attrKey, g.value)}
+                          title={colorLabel}
                         >
                           {hasImage && processedImageUrl ? (
                             <img 
                               src={processedImageUrl} 
-                              alt={g.label}
+                              alt={colorLabel}
                               className="w-full h-full object-cover"
                               onError={(e) => {
                                 console.error(`❌ [COLOR IMAGE] Failed to load image for color "${g.value}":`, processedImageUrl);
@@ -250,6 +269,11 @@ export function ProductAttributesSelector({
                             />
                           ) : null}
                         </button>
+                        <span
+                          className={`${labelSizeClass} text-center leading-tight text-gray-700 line-clamp-2`}
+                        >
+                          {colorLabel}
+                        </span>
                       </div>
                     );
                   })}
@@ -273,7 +297,12 @@ export function ProductAttributesSelector({
                     // Keep size consistent for 2 values, reduce for more
                     const totalValues = attrGroups.length;
                     const dimensionClass = getSizeCircleDimensionClass(totalValues);
-                    const sizeLabel = getAttributeLabel(language, attrKey, g.value);
+                    const sizeLabel = resolveAttributeValueDisplayLabel(
+                      language,
+                      attrKey,
+                      g.value,
+                      g.label,
+                    );
 
                     return (
                       <button 
@@ -390,7 +419,9 @@ export function ProductAttributesSelector({
                             style={{ backgroundColor: colorHex }}
                           />
                         ) : null}
-                        <span className={textSizeClass}>{getAttributeLabel(language, attrKey, g.value)}</span>
+                        <span className={textSizeClass}>
+                          {resolveAttributeValueDisplayLabel(language, attrKey, g.value, g.label)}
+                        </span>
                       </button>
                     );
                   })}
@@ -409,6 +440,7 @@ export function ProductAttributesSelector({
                 {colorGroups.map((g) => {
                   const isSelected = selectedColor === g.color?.toLowerCase().trim();
                   const isDisabled = g.stock <= 0;
+                  const colorLabel = resolveAttributeValueDisplayLabel(language, 'color', g.color);
                   
                   return (
                     <div key={g.color} className="flex flex-col items-center gap-1">
@@ -423,8 +455,11 @@ export function ProductAttributesSelector({
                               : 'border-2 border-gray-300 hover:scale-105'
                         }`}
                         style={{ backgroundColor: getColorValue(g.color) }} 
-                        title={getAttributeLabel(language, 'color', g.color)}
+                        title={colorLabel}
                       />
+                      <span className="max-w-[2.5rem] text-center text-xs leading-tight text-gray-700 line-clamp-2">
+                        {colorLabel}
+                      </span>
                     </div>
                   );
                 })}
@@ -451,7 +486,7 @@ export function ProductAttributesSelector({
               }
               const isSelected = selectedSize === g.size;
               const isDisabled = displayStock <= 0;
-              const sizeLabel = getAttributeLabel(language, 'size', g.size);
+              const sizeLabel = resolveAttributeValueDisplayLabel(language, 'size', g.size);
               const dimensionClass = getSizeCircleDimensionClass(sizeGroups.length);
 
               return (

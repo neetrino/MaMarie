@@ -5,6 +5,7 @@ import { useCategories } from './CategoryNavigation/hooks/useCategories';
 import { CategoryHierarchyLabel } from './category-tree/CategoryHierarchyLabel';
 import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
 import { useProductsCatalogFilterNavigation } from './products/useProductsCatalogFilterNavigation';
+import { useProductsFilters } from './ProductsFiltersProvider';
 import { getCategoryTreeIndentClass } from '../constants/category-tree-ui';
 import {
   PRODUCTS_CATALOG_FILTER_ACCENT,
@@ -75,6 +76,17 @@ function isCategoryOptionSelected(
   return currentCategory === category.slug;
 }
 
+function filterCategoriesUsedByProducts(
+  categories: Category[],
+  usedCategoryIds: string[] | null | undefined
+): Category[] {
+  if (usedCategoryIds == null) {
+    return categories;
+  }
+  const used = new Set(usedCategoryIds);
+  return categories.filter((category) => used.has(category.id));
+}
+
 export function CategoryFilter({
   currentCategory,
   categoryScope,
@@ -82,8 +94,10 @@ export function CategoryFilter({
 }: CategoryFilterProps) {
   const { applyPatch } = useProductsCatalogFilterNavigation();
   const catalog = useOptionalProductsCatalog();
+  const filtersData = useProductsFilters()?.data;
   const { t } = useTranslation();
-  const { categories, loading } = useCategories();
+  const { categories: allCategories, loading } = useCategories();
+  const categories = filterCategoriesUsedByProducts(allCategories, filtersData?.categoryIds);
   const idCounts = countCategoryIds(categories);
   const activeCategory = catalog?.params.category ?? currentCategory;
   const activeScope = catalog?.params.categoryScope ?? categoryScope;
@@ -106,7 +120,7 @@ export function CategoryFilter({
     return null;
   }
 
-  if (loading && categories.length === 0) {
+  if (loading && allCategories.length === 0) {
     return (
       <p
         className="text-[#555]"

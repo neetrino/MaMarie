@@ -1,6 +1,6 @@
 import { Prisma } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
-import { processImageUrl, smartSplitUrls } from "../../../utils/image-utils";
+import { persistInlineImageUrlsToR2 } from "../../persist-inline-images-to-r2";
 import {
   processVariantOptions,
   parseVariantPrices,
@@ -57,16 +57,12 @@ async function findVariant(
 }
 
 /**
- * Process variant image URL
+ * Process variant image URL — inline base64 is uploaded to R2 before persist.
  */
-function processVariantImageUrl(imageUrl: string | undefined): string | undefined {
-  if (!imageUrl) {
-    return undefined;
-  }
-  
-  const urls = smartSplitUrls(imageUrl);
-  const processedUrls = urls.map(url => processImageUrl(url)).filter((url): url is string => url !== null);
-  return processedUrls.length > 0 ? processedUrls.join(',') : undefined;
+async function processVariantImageUrl(
+  imageUrl: string | undefined
+): Promise<string | undefined> {
+  return persistInlineImageUrlsToR2(imageUrl);
 }
 
 /**
@@ -77,6 +73,7 @@ async function updateExistingVariant(
   variant: {
     sku?: string;
     imageUrl?: string;
+    isMain?: boolean;
     published?: boolean;
   },
   price: number,
@@ -91,7 +88,7 @@ async function updateExistingVariant(
     where: { variantId },
   });
   
-  const processedVariantImageUrl = processVariantImageUrl(variant.imageUrl);
+  const processedVariantImageUrl = await processVariantImageUrl(variant.imageUrl);
 
   await tx.productVariant.update({
     where: { id: variantId },
@@ -101,6 +98,7 @@ async function updateExistingVariant(
       compareAtPrice,
       stock: isNaN(stock) ? 0 : stock,
       imageUrl: processedVariantImageUrl,
+      isMain: variant.isMain === true,
       published: variant.published !== false,
       attributes: (attributesJson || undefined) as Prisma.InputJsonValue | undefined,
       options: {
@@ -120,6 +118,7 @@ async function createNewVariant(
   variant: {
     sku?: string;
     imageUrl?: string;
+    isMain?: boolean;
     published?: boolean;
   },
   price: number,
@@ -158,7 +157,7 @@ async function createNewVariant(
     usedSkuSet.add(skuKey);
   }
   
-  const processedVariantImageUrl = processVariantImageUrl(variant.imageUrl);
+  const processedVariantImageUrl = await processVariantImageUrl(variant.imageUrl);
 
   logger.info(`Creating new variant`, { sku: variant.sku || 'none' });
   const newVariant = await tx.productVariant.create({
@@ -169,6 +168,7 @@ async function createNewVariant(
       compareAtPrice,
       stock: isNaN(stock) ? 0 : stock,
       imageUrl: processedVariantImageUrl,
+      isMain: variant.isMain === true,
       published: variant.published !== false,
       attributes: (attributesJson || undefined) as Prisma.InputJsonValue | undefined,
       options: {
@@ -192,6 +192,7 @@ export async function updateOrCreateVariant(
     compareAtPrice?: string | number;
     stock: string | number;
     imageUrl?: string;
+    isMain?: boolean;
     published?: boolean;
     options?: Array<{
       attributeKey: string;

@@ -264,7 +264,10 @@ model ProductVariant {
   stock          Int                    @default(0)
   stockReserved  Int                    @default(0)
   weightGrams    Int?
+  /// Comma-separated image URLs (order preserved). Multi-image gallery per variant.
   imageUrl       String?
+  /// Explicit default presentation variant for variable products. At most one per product.
+  isMain         Boolean                @default(false)
   position       Int                    @default(0)
   published      Boolean                @default(true)
   attributes     Json?                  // JSONB: Stores variant attributes as { "color": [...], "size": [...] }
@@ -278,6 +281,7 @@ model ProductVariant {
 
   @@index([productId])
   @@index([productId, published, price])
+  @@index([productId, isMain])
   @@map("product_variants")
 }
 

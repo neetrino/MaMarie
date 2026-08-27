@@ -2,7 +2,12 @@
  * Dashboard utility functions
  */
 
-import { CURRENCIES, formatPriceInCurrency, type CurrencyCode } from '../../../lib/currency';
+import {
+  CURRENCIES,
+  convertPrice,
+  formatPriceInCurrency,
+  type CurrencyCode,
+} from '../../../lib/currency';
 
 /**
  * Formats currency amount
@@ -17,6 +22,14 @@ export function formatCurrency(amount: number, currency: string = 'USD'): string
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+/**
+ * Order/item amounts in admin stats are stored in USD; dashboard always shows AMD.
+ */
+export function formatDashboardAmdFromUsd(amountUsd: number): string {
+  const amountAmd = convertPrice(amountUsd, 'USD', 'AMD');
+  return formatPriceInCurrency(amountAmd, 'AMD');
 }
 
 /**

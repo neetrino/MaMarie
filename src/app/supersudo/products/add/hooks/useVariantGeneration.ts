@@ -15,6 +15,8 @@ interface UseVariantGenerationProps {
   formDataTitle: string;
   isEditMode: boolean;
   productId: string | null;
+  /** When true, edit-mode conversion owns variants — do not auto-regenerate. */
+  hasVariantsToLoad: boolean;
   setGeneratedVariants: (updater: (prev: GeneratedVariant[]) => GeneratedVariant[]) => void;
 }
 
@@ -27,6 +29,7 @@ export function useVariantGeneration({
   formDataTitle,
   isEditMode,
   productId,
+  hasVariantsToLoad,
   setGeneratedVariants,
 }: UseVariantGenerationProps) {
   const generateVariantsFromAttributes = () => {
@@ -85,7 +88,7 @@ export function useVariantGeneration({
         compareAtPrice: existingAutoVariant?.compareAtPrice || '',
         stock: existingAutoVariant?.stock || '',
         sku: existingAutoVariant?.sku || sku,
-        image: existingAutoVariant?.image || null,
+        images: existingAutoVariant?.images ? [...existingAutoVariant.images] : [],
         isMain: existingAutoVariant?.isMain ?? true,
       };
 
@@ -111,19 +114,30 @@ export function useVariantGeneration({
   };
 
   useEffect(() => {
-    if (isEditMode && productId && (window as any).__productVariantsToConvert) {
+    // Edit load: wait until conversion finishes (window cleared + hasVariantsToLoad false).
+    if (
+      isEditMode &&
+      productId &&
+      (hasVariantsToLoad || (window as Window & { __productVariantsToConvert?: unknown }).__productVariantsToConvert)
+    ) {
       return;
     }
 
     if (selectedAttributesForVariants.size > 0) {
       generateVariantsFromAttributes();
-    } else {
-      if (!isEditMode) {
-        setGeneratedVariants(() => []);
-      }
+    } else if (!isEditMode) {
+      setGeneratedVariants(() => []);
     }
-     
-  }, [selectedAttributesForVariants, selectedAttributeValueIds, attributes, formDataSlug, formDataTitle, isEditMode, productId]);
+  }, [
+    selectedAttributesForVariants,
+    selectedAttributeValueIds,
+    attributes,
+    formDataSlug,
+    formDataTitle,
+    isEditMode,
+    productId,
+    hasVariantsToLoad,
+  ]);
 
   return {
     generateVariantsFromAttributes,

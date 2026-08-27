@@ -7,7 +7,7 @@ import {
 } from "../../utils/image-utils";
 import {
   toProductMediaStorefrontUrl,
-  toVariantStorefrontImageUrl,
+  toVariantStorefrontImageUrls,
 } from "../../utils/storefront-image-url";
 
 /** Minimal variant shape for gallery URL merge. */
@@ -63,12 +63,14 @@ export function computeProductGalleryUrls(
   });
 
   sortedVariants.forEach((variant) => {
-    const storefront = toVariantStorefrontImageUrl(variant.id, variant.imageUrl);
-    if (!storefront || seen.has(storefront)) {
-      return;
-    }
-    seen.add(storefront);
-    allImages.push(storefront);
+    const storefrontUrls = toVariantStorefrontImageUrls(variant.id, variant.imageUrl);
+    storefrontUrls.forEach((storefront) => {
+      if (!storefront || seen.has(storefront)) {
+        return;
+      }
+      seen.add(storefront);
+      allImages.push(storefront);
+    });
   });
 
   return allImages;

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
-import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters, readCachedProductsFilters, writeCachedProductsFilters } from './ProductsFiltersProvider';
 import { useOptionalProductsCatalog } from './products/ProductsCatalogProvider';
@@ -44,16 +43,16 @@ export function SizeFilter({
   const filtersContext = useProductsFilters();
   const catalog = useOptionalProductsCatalog();
   const { applyPatch } = useProductsCatalogFilterNavigation();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [sizes, setSizes] = useState<SizeOption[]>([]);
   const [loading, setLoading] = useState(true);
   const activeSelected = catalog?.selectedSizes ?? selectedSizes;
   const [selected, setSelected] = useState<string[]>(activeSelected);
 
   useEffect(() => {
-    if (filtersContext?.data?.sizes) {
+    if (filtersContext?.data && Array.isArray(filtersContext.data.sizes)) {
       setSizes(filtersContext.data.sizes);
-      setLoading(false);
+      setLoading(filtersContext.loading);
       return;
     }
     if (filtersContext === null) {
@@ -61,14 +60,14 @@ export function SizeFilter({
     } else {
       setLoading(filtersContext.loading);
     }
-  }, [category, search, minPrice, maxPrice, filtersContext?.data?.sizes, filtersContext?.loading, filtersContext === null]);
+  }, [category, search, minPrice, maxPrice, filtersContext?.data?.sizes, filtersContext?.loading, filtersContext === null, lang]);
 
   useEffect(() => {
     setSelected(activeSelected);
   }, [activeSelected]);
 
   const fetchSizes = async () => {
-    const cached = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+    const cached = readCachedProductsFilters({ lang, category, search, minPrice, maxPrice });
     if (cached) {
       setSizes(cached.sizes);
       setLoading(false);
@@ -77,9 +76,8 @@ export function SizeFilter({
 
     try {
       setLoading(true);
-      const language = getStoredLanguage();
       const params: Record<string, string> = {
-        lang: language,
+        lang,
       };
       
       if (category) params.category = category;
@@ -87,15 +85,20 @@ export function SizeFilter({
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
 
-      const response = await apiClient.get<{ colors: any[]; sizes: SizeOption[] }>('/api/v1/products/filters', { params });
-      const existing = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+      const response = await apiClient.get<{
+        colors?: Array<{ value: string; label: string; count: number }>;
+        sizes: SizeOption[];
+        categoryIds?: string[];
+      }>('/api/v1/products/filters', { params });
+      const existing = readCachedProductsFilters({ lang, category, search, minPrice, maxPrice });
       writeCachedProductsFilters(
-        { category, search, minPrice, maxPrice },
+        { lang, category, search, minPrice, maxPrice },
         {
           colors: existing?.colors || response.colors || [],
           sizes: response.sizes || [],
           brands: existing?.brands || [],
           attributes: existing?.attributes || [],
+          categoryIds: existing?.categoryIds || response.categoryIds || [],
           priceRange: existing?.priceRange || {
             min: 0,
             max: 100000,

@@ -44,11 +44,12 @@ async function fetchVisualRow(slug: string, lang: string) {
       },
       variants: {
         where: { published: true },
-        orderBy: { position: "asc" },
+        orderBy: [{ isMain: "desc" }, { position: "asc" }],
         select: {
           id: true,
           imageUrl: true,
           position: true,
+          isMain: true,
         },
       },
     },

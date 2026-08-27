@@ -4,9 +4,21 @@ import { useEffect, useState, useCallback, useRef, ChangeEvent } from 'react';
 import { apiClient } from '../../../lib/api-client';
 import { useTranslation } from '../../../lib/i18n-client';
 import { showToast } from '../../../components/Toast';
-import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../context/AdminDialogsContext';
 import { useAdminAttributesReference } from '../providers/AdminReferenceDataProvider';
+import {
+  DEFAULT_PRODUCT_CONTENT_LOCALE,
+  PRIMARY_PRODUCT_CONTENT_LOCALE,
+  type ProductContentLocale,
+} from '@/constants/product-content-locales';
+import {
+  attributeLocaleTextMapFromRows,
+  emptyAttributeLocaleTextMap,
+  pickPrimaryAttributeText,
+  resolveAttributeKeyFromNames,
+  toAttributeTranslationRows,
+  type AttributeLocaleTextMap,
+} from '@/lib/admin/attribute-locale-helpers';
 
 export interface AttributeValue {
   id: string;
@@ -14,6 +26,7 @@ export interface AttributeValue {
   label: string;
   colors?: string[];
   imageUrl?: string | null;
+  translations?: Array<{ locale: string; label: string }>;
 }
 
 export interface Attribute {
@@ -22,7 +35,22 @@ export interface Attribute {
   name: string;
   type: string;
   filterable: boolean;
+  translations?: Array<{ locale: string; name: string }>;
   values: AttributeValue[];
+}
+
+function labelsToApiPayload(map: AttributeLocaleTextMap) {
+  return toAttributeTranslationRows(map).map((row) => ({
+    locale: row.locale,
+    label: row.text,
+  }));
+}
+
+function namesToApiPayload(map: AttributeLocaleTextMap) {
+  return toAttributeTranslationRows(map).map((row) => ({
+    locale: row.locale,
+    name: row.text,
+  }));
 }
 
 export function useAttributes() {
@@ -33,28 +61,32 @@ export function useAttributes() {
     loading: sharedAttributesLoading,
     refetchAttributes,
   } = useAdminAttributesReference();
+
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isCreatingAttribute, setIsCreatingAttribute] = useState(false);
+  const [contentLocale, setContentLocale] = useState<ProductContentLocale>(
+    DEFAULT_PRODUCT_CONTENT_LOCALE,
+  );
   const [editingAttribute, setEditingAttribute] = useState<string | null>(null);
-  const [editingAttributeName, setEditingAttributeName] = useState('');
+  const [editingAttributeNames, setEditingAttributeNames] =
+    useState<AttributeLocaleTextMap>(emptyAttributeLocaleTextMap());
   const [savingAttribute, setSavingAttribute] = useState(false);
   const [expandedAttributes, setExpandedAttributes] = useState<Set<string>>(new Set());
-  
-  // Form states
-  const [formData, setFormData] = useState({
-    name: '',
-  });
-  
-  const [newValue, setNewValue] = useState('');
+  const [formNames, setFormNames] = useState<AttributeLocaleTextMap>(emptyAttributeLocaleTextMap());
+  const [newValueLabels, setNewValueLabels] =
+    useState<AttributeLocaleTextMap>(emptyAttributeLocaleTextMap());
   const [addingValueTo, setAddingValueTo] = useState<string | null>(null);
   const [deletingValue, setDeletingValue] = useState<string | null>(null);
-  const [editingValue, setEditingValue] = useState<{ attributeId: string; value: AttributeValue } | null>(null);
+  const [editingValue, setEditingValue] = useState<{
+    attributeId: string;
+    value: AttributeValue;
+  } | null>(null);
   const [valueError, setValueError] = useState<string | null>(null);
   const [expandedValueId, setExpandedValueId] = useState<string | null>(null);
-  
-  // Inline edit form states
-  const [editingLabel, setEditingLabel] = useState('');
+  const [editingLabels, setEditingLabels] =
+    useState<AttributeLocaleTextMap>(emptyAttributeLocaleTextMap());
   const [editingColors, setEditingColors] = useState<string[]>([]);
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
   const [savingValue, setSavingValue] = useState(false);
@@ -64,10 +96,8 @@ export function useAttributes() {
   const fetchAttributes = useCallback(async () => {
     try {
       setLoading(true);
-      logger.debug('📋 [ADMIN] Refreshing attributes...');
       const data = await refetchAttributes();
       setAttributes((data as Attribute[]) || []);
-      logger.debug('✅ [ADMIN] Attributes loaded:', data.length);
     } catch (err) {
       console.error('❌ [ADMIN] Error fetching attributes:', err);
       setAttributes([]);
@@ -85,34 +115,35 @@ export function useAttributes() {
 
   const handleCreateAttribute = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name.trim()) {
-      showToast(t('admin.attributes.fillName'), 'warning');
+    if (isCreatingAttribute) {
       return;
     }
 
-    // Auto-generate key from name
-    const autoKey = formData.name.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const primaryName = pickPrimaryAttributeText(formNames);
+    if (!primaryName) {
+      showToast(t('admin.attributes.fillName'), 'warning');
+      setContentLocale(PRIMARY_PRODUCT_CONTENT_LOCALE);
+      return;
+    }
 
+    setIsCreatingAttribute(true);
     try {
-      logger.debug('🆕 [ADMIN] Creating attribute:', autoKey);
       await apiClient.post('/api/v1/admin/attributes', {
-        name: formData.name.trim(),
-        key: autoKey,
+        key: resolveAttributeKeyFromNames(formNames),
         type: 'select',
         filterable: true,
-        locale: 'en',
+        translations: namesToApiPayload(formNames),
       });
-      
-      logger.debug('✅ [ADMIN] Attribute created successfully');
       setShowAddForm(false);
-      setFormData({ name: '' });
+      setFormNames(emptyAttributeLocaleTextMap());
       fetchAttributes();
       showToast(t('admin.attributes.createdSuccess'), 'success');
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error creating attribute:', err);
-      const errorMessage = err?.data?.detail || err?.message || 'Failed to create attribute';
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string }; message?: string };
+      const errorMessage = error?.data?.detail || error?.message || 'Failed to create attribute';
       showToast(t('admin.attributes.errorCreating').replace('{message}', errorMessage), 'error');
+    } finally {
+      setIsCreatingAttribute(false);
     }
   };
 
@@ -123,47 +154,39 @@ export function useAttributes() {
       confirmText: t('admin.common.delete'),
       destructive: true,
     });
-    if (!isConfirmed) {
-      return;
-    }
+    if (!isConfirmed) return;
 
     try {
-      logger.debug(`🗑️ [ADMIN] Deleting attribute: ${attributeName} (${attributeId})`);
       await apiClient.delete(`/api/v1/admin/attributes/${attributeId}`);
-      logger.debug('✅ [ADMIN] Attribute deleted successfully');
       fetchAttributes();
       showToast(t('admin.attributes.deletedSuccess'), 'success');
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error deleting attribute:', err);
-      const errorMessage = err?.data?.detail || err?.message || 'Failed to delete attribute';
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string }; message?: string };
+      const errorMessage = error?.data?.detail || error?.message || 'Failed to delete attribute';
       showToast(t('admin.attributes.errorDeleting').replace('{message}', errorMessage), 'error');
     }
   };
 
   const handleUpdateAttributeName = async (attributeId: string) => {
-    const trimmedName = editingAttributeName.trim();
-    
-    if (!trimmedName) {
+    const primaryName = pickPrimaryAttributeText(editingAttributeNames);
+    if (!primaryName) {
       showToast(t('admin.attributes.fillName'), 'warning');
+      setContentLocale(PRIMARY_PRODUCT_CONTENT_LOCALE);
       return;
     }
 
     try {
       setSavingAttribute(true);
-      logger.debug(`✏️ [ADMIN] Updating attribute name: ${attributeId} -> ${trimmedName}`);
       await apiClient.patch(`/api/v1/admin/attributes/${attributeId}/translations`, {
-        name: trimmedName,
-        locale: 'en',
+        translations: namesToApiPayload(editingAttributeNames),
       });
-      logger.debug('✅ [ADMIN] Attribute name updated successfully');
       setEditingAttribute(null);
-      setEditingAttributeName('');
+      setEditingAttributeNames(emptyAttributeLocaleTextMap());
       fetchAttributes();
-      showToast(t('admin.attributes.nameUpdatedSuccess') || 'Attribute name updated successfully', 'success');
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error updating attribute name:', err);
-      const errorMessage = err?.data?.detail || err?.message || 'Failed to update attribute name';
-      showToast(errorMessage, 'error');
+      showToast(t('admin.attributes.nameUpdatedSuccess'), 'success');
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string }; message?: string };
+      showToast(error?.data?.detail || error?.message || 'Failed to update attribute name', 'error');
     } finally {
       setSavingAttribute(false);
     }
@@ -171,70 +194,69 @@ export function useAttributes() {
 
   const toggleAttributeEdit = (attribute: Attribute) => {
     if (editingAttribute === attribute.id) {
-      // Close
       setEditingAttribute(null);
-      setEditingAttributeName('');
-    } else {
-      // Open
-      setEditingAttribute(attribute.id);
-      setEditingAttributeName(attribute.name);
+      setEditingAttributeNames(emptyAttributeLocaleTextMap());
+      return;
+    }
+
+    setEditingAttribute(attribute.id);
+    setEditingAttributeNames(
+      attributeLocaleTextMapFromRows(
+        (attribute.translations || []).map((row) => ({ locale: row.locale, text: row.name })),
+      ),
+    );
+    if (!attribute.translations?.length && attribute.name) {
+      setEditingAttributeNames({
+        ...emptyAttributeLocaleTextMap(),
+        [PRIMARY_PRODUCT_CONTENT_LOCALE]: attribute.name,
+      });
     }
   };
 
   const handleAddValue = async (attributeId: string) => {
-    const trimmedValue = newValue.trim();
-    
-    if (!trimmedValue) {
+    const primaryLabel = pickPrimaryAttributeText(newValueLabels);
+    if (!primaryLabel) {
       showToast(t('admin.attributes.enterValue'), 'warning');
       setValueError(t('admin.attributes.enterValue'));
+      setContentLocale(PRIMARY_PRODUCT_CONTENT_LOCALE);
       return;
     }
 
-    // Find the attribute
     const attribute = attributes.find((attr) => attr.id === attributeId);
     if (!attribute) {
       showToast(t('admin.attributes.attributeNotFound'), 'error');
       return;
     }
 
-    // Check for duplicates on frontend (case-insensitive, normalized)
-    const normalizedNewValue = trimmedValue.toLowerCase().trim();
-    const existingValue = attribute.values.find((val) => {
-      const normalizedExisting = val.label.toLowerCase().trim();
-      return normalizedExisting === normalizedNewValue;
-    });
-
-    if (existingValue) {
-      const errorMsg = t('admin.attributes.valueAlreadyExists').replace('{value}', trimmedValue);
+    const duplicate = attribute.values.find(
+      (val) => val.label.toLowerCase().trim() === primaryLabel.toLowerCase(),
+    );
+    if (duplicate) {
+      const errorMsg = t('admin.attributes.valueAlreadyExists').replace('{value}', primaryLabel);
       showToast(errorMsg, 'error', 5000);
       setValueError(errorMsg);
       return;
     }
 
-    // Clear any previous errors
     setValueError(null);
-
     try {
       setAddingValueTo(attributeId);
-      logger.debug('➕ [ADMIN] Adding value to attribute:', attributeId, trimmedValue);
       await apiClient.post(`/api/v1/admin/attributes/${attributeId}/values`, {
-        label: trimmedValue,
-        locale: 'en',
+        translations: labelsToApiPayload(newValueLabels),
       });
-      
-      logger.debug('✅ [ADMIN] Value added successfully');
-      setNewValue('');
-      setValueError(null);
+      setNewValueLabels(emptyAttributeLocaleTextMap());
       setAddingValueTo(null);
       showToast(t('admin.attributes.valueAddedSuccess'), 'success');
       fetchAttributes();
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error adding value:', err);
-      const errorMessage = err?.data?.detail || err?.message || t('admin.attributes.failedToAddValue');
-      
-      // Check if it's a duplicate error from backend
-      if (errorMessage.includes('already exists') || errorMessage.includes('уже существует')) {
-        const duplicateMsg = t('admin.attributes.valueAlreadyExists').replace('{value}', trimmedValue);
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string }; message?: string };
+      const errorMessage =
+        error?.data?.detail || error?.message || t('admin.attributes.failedToAddValue');
+      if (errorMessage.includes('already exists')) {
+        const duplicateMsg = t('admin.attributes.valueAlreadyExists').replace(
+          '{value}',
+          primaryLabel,
+        );
         showToast(duplicateMsg, 'error', 5000);
         setValueError(duplicateMsg);
       } else {
@@ -252,77 +274,51 @@ export function useAttributes() {
       confirmText: t('admin.common.delete'),
       destructive: true,
     });
-    if (!isConfirmed) {
-      return;
-    }
+    if (!isConfirmed) return;
 
     try {
       setDeletingValue(valueId);
-      logger.debug(`🗑️ [ADMIN] Deleting value: ${valueLabel} (${valueId})`);
       await apiClient.delete(`/api/v1/admin/attributes/${attributeId}/values/${valueId}`);
-      logger.debug('✅ [ADMIN] Value deleted successfully');
       fetchAttributes();
       setDeletingValue(null);
       showToast(t('admin.attributes.valueDeletedSuccess'), 'success');
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error deleting value:', err);
-      const errorMessage = err?.data?.detail || err?.message || 'Failed to delete value';
-      showToast(t('admin.attributes.errorDeletingValue').replace('{message}', errorMessage), 'error');
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string }; message?: string };
+      const errorMessage = error?.data?.detail || error?.message || 'Failed to delete value';
+      showToast(
+        t('admin.attributes.errorDeletingValue').replace('{message}', errorMessage),
+        'error',
+      );
       setDeletingValue(null);
-    }
-  };
-
-  const handleUpdateValue = async (data: {
-    label?: string;
-    colors?: string[];
-    imageUrl?: string | null;
-  }) => {
-    if (!editingValue) return;
-
-    try {
-      logger.debug('✏️ [ADMIN] Updating value:', { 
-        valueId: editingValue.value.id, 
-        attributeId: editingValue.attributeId,
-        data,
-        colorsType: typeof data.colors,
-        colorsIsArray: Array.isArray(data.colors),
-        colorsLength: data.colors?.length
-      });
-      await apiClient.patch(`/api/v1/admin/attributes/${editingValue.attributeId}/values/${editingValue.value.id}`, {
-        ...data,
-        locale: 'en',
-      });
-      logger.debug('✅ [ADMIN] Value updated successfully');
-      fetchAttributes();
-      showToast(t('admin.attributes.valueUpdatedSuccess'), 'success');
-    } catch (err: any) {
-      console.error('❌ [ADMIN] Error updating value:', err);
-      const errorMessage = err?.data?.detail || err?.message || 'Failed to update value';
-      showToast(t('admin.attributes.errorUpdatingValue')?.replace('{message}', errorMessage) || errorMessage, 'error');
-      throw err;
     }
   };
 
   const toggleValueEdit = (attributeId: string, value: AttributeValue) => {
     if (expandedValueId === value.id) {
-      // Close
       setExpandedValueId(null);
       setEditingValue(null);
-      setEditingLabel('');
+      setEditingLabels(emptyAttributeLocaleTextMap());
       setEditingColors([]);
       setEditingImageUrl(null);
-    } else {
-      // Open
-      setExpandedValueId(value.id);
-      setEditingValue({ attributeId, value });
-      setEditingLabel(value.label);
-      setEditingColors(value.colors || []);
-      setEditingImageUrl(value.imageUrl || null);
+      return;
     }
+
+    const fromTranslations = attributeLocaleTextMapFromRows(
+      (value.translations || []).map((row) => ({ locale: row.locale, text: row.label })),
+    );
+    if (!value.translations?.length && value.label) {
+      fromTranslations[PRIMARY_PRODUCT_CONTENT_LOCALE] = value.label;
+    }
+
+    setExpandedValueId(value.id);
+    setEditingValue({ attributeId, value });
+    setEditingLabels(fromTranslations);
+    setEditingColors(value.colors || []);
+    setEditingImageUrl(value.imageUrl || null);
   };
 
   const fileToBase64 = (file: File): Promise<string> =>
-    new Promise<string>((resolve, reject) => {
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
@@ -336,49 +332,56 @@ export function useAttributes() {
     const imageFile = files.find((file) => file.type.startsWith('image/'));
     if (!imageFile) {
       showToast(t('admin.attributes.valueModal.selectImageFile'), 'warning');
-      if (event.target) {
-        event.target.value = '';
-      }
+      event.target.value = '';
       return;
     }
 
     try {
       setImageUploading(true);
-      const base64 = await fileToBase64(imageFile);
-      setEditingImageUrl(base64);
-    } catch (error: any) {
-      console.error('❌ [ADMIN] Error uploading image:', error);
-      showToast(error?.message || t('admin.attributes.valueModal.failedToProcessImage'), 'error');
+      setEditingImageUrl(await fileToBase64(imageFile));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : undefined;
+      showToast(message || t('admin.attributes.valueModal.failedToProcessImage'), 'error');
     } finally {
       setImageUploading(false);
-      if (event.target) {
-        event.target.value = '';
-      }
+      event.target.value = '';
     }
-  };
-
-  const handleRemoveImage = () => {
-    setEditingImageUrl(null);
   };
 
   const handleSaveInlineValue = async () => {
     if (!editingValue) return;
+    const primaryLabel = pickPrimaryAttributeText(editingLabels);
+    if (!primaryLabel) {
+      showToast(t('admin.attributes.enterValue'), 'warning');
+      setContentLocale(PRIMARY_PRODUCT_CONTENT_LOCALE);
+      return;
+    }
 
     try {
       setSavingValue(true);
-      await handleUpdateValue({
-        label: editingLabel.trim() !== editingValue.value.label ? editingLabel.trim() : undefined,
-        colors: editingColors.length > 0 ? editingColors : undefined,
-        imageUrl: editingImageUrl,
-      });
-      // Close the expanded form
+      await apiClient.patch(
+        `/api/v1/admin/attributes/${editingValue.attributeId}/values/${editingValue.value.id}`,
+        {
+          translations: labelsToApiPayload(editingLabels),
+          colors: editingColors,
+          imageUrl: editingImageUrl,
+        },
+      );
       setExpandedValueId(null);
       setEditingValue(null);
-      setEditingLabel('');
+      setEditingLabels(emptyAttributeLocaleTextMap());
       setEditingColors([]);
       setEditingImageUrl(null);
-    } catch (error: any) {
-      console.error('❌ [ADMIN] Error saving value:', error);
+      fetchAttributes();
+      showToast(t('admin.attributes.valueUpdatedSuccess'), 'success');
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string }; message?: string };
+      const errorMessage = error?.data?.detail || error?.message || 'Failed to update value';
+      showToast(
+        t('admin.attributes.errorUpdatingValue')?.replace('{message}', errorMessage) ||
+          errorMessage,
+        'error',
+      );
     } finally {
       setSavingValue(false);
     }
@@ -386,47 +389,66 @@ export function useAttributes() {
 
   const toggleExpand = (attributeId: string) => {
     setExpandedAttributes((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(attributeId)) {
-        newSet.delete(attributeId);
-      } else {
-        newSet.add(attributeId);
-      }
-      return newSet;
+      const next = new Set(prev);
+      if (next.has(attributeId)) next.delete(attributeId);
+      else next.add(attributeId);
+      return next;
     });
   };
 
+  const updateFormName = (locale: ProductContentLocale, name: string) => {
+    setFormNames((prev) => ({ ...prev, [locale]: name }));
+  };
+
+  const updateEditingAttributeName = (locale: ProductContentLocale, name: string) => {
+    setEditingAttributeNames((prev) => ({ ...prev, [locale]: name }));
+  };
+
+  const updateNewValueLabel = (locale: ProductContentLocale, label: string) => {
+    setNewValueLabels((prev) => ({ ...prev, [locale]: label }));
+    if (valueError) setValueError(null);
+  };
+
+  const updateEditingLabel = (locale: ProductContentLocale, label: string) => {
+    setEditingLabels((prev) => ({ ...prev, [locale]: label }));
+  };
+
+  const resetFormNames = () => {
+    setFormNames(emptyAttributeLocaleTextMap());
+  };
+
   return {
-    // State
     attributes,
     loading,
     showAddForm,
+    isCreatingAttribute,
+    contentLocale,
     editingAttribute,
-    editingAttributeName,
+    editingAttributeNames,
     savingAttribute,
     expandedAttributes,
-    formData,
-    newValue,
+    formNames,
+    newValueLabels,
     addingValueTo,
     deletingValue,
     editingValue,
     valueError,
     expandedValueId,
-    editingLabel,
+    editingLabels,
     editingColors,
     editingImageUrl,
     savingValue,
     imageUploading,
     fileInputRef,
-    // Actions
     setShowAddForm,
-    setFormData,
-    setNewValue,
-    setEditingAttributeName,
-    setEditingLabel,
+    setContentLocale,
     setEditingColors,
-    setEditingImageUrl,
     setValueError,
+    updateFormName,
+    updateEditingAttributeName,
+    updateNewValueLabel,
+    updateEditingLabel,
+    resetFormNames,
     handleCreateAttribute,
     handleDeleteAttribute,
     handleUpdateAttributeName,
@@ -435,11 +457,8 @@ export function useAttributes() {
     handleDeleteValue,
     toggleValueEdit,
     handleImageUpload,
-    handleRemoveImage,
+    handleRemoveImage: () => setEditingImageUrl(null),
     handleSaveInlineValue,
     toggleExpand,
   };
 }
-
-
-

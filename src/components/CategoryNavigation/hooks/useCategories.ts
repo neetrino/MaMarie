@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../../lib/api-client';
-import { getStoredLanguage } from '../../../lib/language';
+import { useTranslation } from '../../../lib/i18n-client';
 import { flattenCategories, type Category } from '../utils';
 
 interface CategoriesResponse {
@@ -13,6 +13,7 @@ interface CategoriesResponse {
  * Hook for fetching categories
  */
 export function useCategories() {
+  const { lang } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,9 +21,8 @@ export function useCategories() {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const language = getStoredLanguage();
         const response = await apiClient.get<CategoriesResponse>('/api/v1/categories/tree', {
-          params: { lang: language },
+          params: { lang },
         });
 
         const categoriesList = response.data || [];
@@ -35,8 +35,8 @@ export function useCategories() {
       }
     };
 
-    fetchCategories();
-  }, []);
+    void fetchCategories();
+  }, [lang]);
 
   return { categories, loading };
 }

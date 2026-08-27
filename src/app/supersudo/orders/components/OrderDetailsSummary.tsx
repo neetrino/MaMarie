@@ -4,7 +4,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { convertPrice, formatPriceInCurrency, type CurrencyCode } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
-import { getStatusColor, getPaymentStatusColor, translateAdminPaymentStatus } from '../utils/orderUtils';
+import { getStatusColor, getPaymentStatusColor, translateAdminPaymentStatus, computeOrderTotalAmd } from '../utils/orderUtils';
 
 function translateAdminPhrase(status: string, t: (key: string) => string): string {
   const key = `admin.orders.${status}`;
@@ -31,6 +31,11 @@ export function OrderDetailsSummary({
       .join(' ')
       .trim() || t('admin.orders.unknownCustomer');
 
+  const customerPhone =
+    orderDetails.customerPhone || orderDetails.customer?.phone || undefined;
+  const customerEmail =
+    orderDetails.customerEmail || orderDetails.customer?.email || undefined;
+
   return (
     <Card className="p-4 md:p-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -49,11 +54,7 @@ export function OrderDetailsSummary({
             </dt>
             <dd className="tabular-nums">
               {orderDetails.totals ? (() => {
-                const subtotalAMD = convertPrice(orderDetails.totals.subtotal, 'USD', 'AMD');
-                const discountAMD = convertPrice(orderDetails.totals.discount, 'USD', 'AMD');
-                const shippingAMD = orderDetails.totals.shipping;
-                const taxAMD = convertPrice(orderDetails.totals.tax, 'USD', 'AMD');
-                const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
+                const totalAMD = computeOrderTotalAmd(orderDetails.totals);
                 const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
                 return formatPriceInCurrency(totalDisplay, currency as CurrencyCode);
               })() : formatCurrency(orderDetails.total, (orderDetails.currency || 'AMD') as CurrencyCode, 'USD')}
@@ -92,20 +93,20 @@ export function OrderDetailsSummary({
             </dt>
             <dd className="text-gray-900">{customerName}</dd>
 
-            {orderDetails.customerPhone && (
+            {customerPhone && (
               <>
                 <dt className="font-medium text-gray-500 whitespace-nowrap">
                   {t('checkout.form.phoneNumber')}
                 </dt>
-                <dd className="tabular-nums">{orderDetails.customerPhone}</dd>
+                <dd className="tabular-nums">{customerPhone}</dd>
               </>
             )}
-            {orderDetails.customerEmail && (
+            {customerEmail && (
               <>
                 <dt className="font-medium text-gray-500 whitespace-nowrap">
                   {t('checkout.form.email')}
                 </dt>
-                <dd className="break-all">{orderDetails.customerEmail}</dd>
+                <dd className="break-all">{customerEmail}</dd>
               </>
             )}
           </dl>

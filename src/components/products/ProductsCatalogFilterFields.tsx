@@ -14,7 +14,19 @@ import { ProductsFilterSection } from './ProductsFilterSection';
 export function ProductsCatalogFilterFields() {
   const { params } = useProductsCatalog();
   const { t } = useTranslation();
-  const extraAttributes = useProductsFilters()?.data?.attributes ?? [];
+  const filtersState = useProductsFilters();
+  const filtersData = filtersState?.data;
+  const filtersLoading = filtersState?.loading ?? false;
+  // Keep sections visible while revalidating for a new locale.
+  const showSizes =
+    filtersLoading || filtersData == null || filtersData.sizes.length > 0;
+  const showBrands =
+    filtersLoading || filtersData == null || filtersData.brands.length > 0;
+  const showColors =
+    filtersLoading || filtersData == null || filtersData.colors.length > 0;
+  const extraAttributes = (filtersData?.attributes ?? []).filter(
+    (group) => filtersLoading || group.values.length > 0
+  );
 
   return (
     <>
@@ -26,25 +38,29 @@ export function ProductsCatalogFilterFields() {
         />
       </ProductsFilterSection>
 
-      <ProductsFilterSection title={t('products.catalog.filters.size')}>
-        <SizeFilter
-          category={params.category}
-          search={params.search}
-          minPrice={params.minPrice}
-          maxPrice={params.maxPrice}
-          variant="catalog"
-        />
-      </ProductsFilterSection>
+      {showSizes ? (
+        <ProductsFilterSection title={t('products.catalog.filters.size')}>
+          <SizeFilter
+            category={params.category}
+            search={params.search}
+            minPrice={params.minPrice}
+            maxPrice={params.maxPrice}
+            variant="catalog"
+          />
+        </ProductsFilterSection>
+      ) : null}
 
-      <ProductsFilterSection title={t('products.catalog.filters.brand')}>
-        <BrandFilter
-          category={params.category}
-          search={params.search}
-          minPrice={params.minPrice}
-          maxPrice={params.maxPrice}
-          variant="catalog"
-        />
-      </ProductsFilterSection>
+      {showBrands ? (
+        <ProductsFilterSection title={t('products.catalog.filters.brand')}>
+          <BrandFilter
+            category={params.category}
+            search={params.search}
+            minPrice={params.minPrice}
+            maxPrice={params.maxPrice}
+            variant="catalog"
+          />
+        </ProductsFilterSection>
+      ) : null}
 
       <ProductsFilterSection title={t('products.catalog.filters.price')}>
         <PriceFilter
@@ -56,15 +72,17 @@ export function ProductsCatalogFilterFields() {
         />
       </ProductsFilterSection>
 
-      <ProductsFilterSection title={t('products.catalog.filters.color')}>
-        <ColorFilter
-          category={params.category}
-          search={params.search}
-          minPrice={params.minPrice}
-          maxPrice={params.maxPrice}
-          variant="catalog"
-        />
-      </ProductsFilterSection>
+      {showColors ? (
+        <ProductsFilterSection title={t('products.catalog.filters.color')}>
+          <ColorFilter
+            category={params.category}
+            search={params.search}
+            minPrice={params.minPrice}
+            maxPrice={params.maxPrice}
+            variant="catalog"
+          />
+        </ProductsFilterSection>
+      ) : null}
 
       {extraAttributes.map((group) => (
         <ProductsFilterSection key={group.key} title={group.name}>

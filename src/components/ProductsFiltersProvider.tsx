@@ -11,12 +11,15 @@ import {
   type ReactNode,
 } from 'react';
 import { apiClient } from '../lib/api-client';
+import type { LanguageCode } from '../lib/language';
 import { getStoredLanguage } from '../lib/language';
+import { useTranslation } from '../lib/i18n-client';
 import {
   buildCatalogClientCacheKey,
   readCatalogClientCache,
   writeCatalogClientCache,
 } from '../lib/products-catalog-client-cache';
+import { hasLoadedFilterFacets } from '../lib/products/has-loaded-filter-facets';
 
 export interface ColorOption {
   value: string;
@@ -49,6 +52,7 @@ export interface ProductsFiltersData {
   sizes: SizeOption[];
   brands: BrandOption[];
   attributes: CatalogAttributeGroup[];
+  categoryIds: string[];
   priceRange: PriceRangeOption;
 }
 
@@ -72,10 +76,11 @@ const DEFAULT_FILTERS: ProductsFiltersData = {
   sizes: [],
   brands: [],
   attributes: [],
+  categoryIds: [],
   priceRange: { min: 0, max: 100000, stepSize: null, stepSizePerCurrency: null },
 };
 
-const PRODUCTS_FILTERS_CACHE_SCOPE = 'filters';
+const PRODUCTS_FILTERS_CACHE_SCOPE = 'filters-v4';
 
 interface ProductsFiltersProviderProps {
   category?: string;
@@ -88,6 +93,7 @@ interface ProductsFiltersProviderProps {
 }
 
 function buildFiltersCacheKey(input: {
+  lang: LanguageCode;
   category?: string;
   categoryScope?: string;
   search?: string;
@@ -95,7 +101,7 @@ function buildFiltersCacheKey(input: {
   maxPrice?: string;
 }): string {
   return buildCatalogClientCacheKey(PRODUCTS_FILTERS_CACHE_SCOPE, {
-    lang: getStoredLanguage(),
+    lang: input.lang,
     category: input.category,
     categoryScope: input.categoryScope,
     search: input.search,
@@ -113,26 +119,39 @@ export function ProductsFiltersProvider({
   initialData = null,
   children,
 }: ProductsFiltersProviderProps) {
-  const cacheKey = buildFiltersCacheKey({ category, categoryScope, search, minPrice, maxPrice });
-  const cachedFilters = initialData ?? readCatalogClientCache<ProductsFiltersData>(cacheKey);
+  const { lang } = useTranslation();
+  const cacheKey = buildFiltersCacheKey({ lang, category, categoryScope, search, minPrice, maxPrice });
+  const cachedFromStorage = readCatalogClientCache<ProductsFiltersData>(cacheKey);
+  const usableInitialData =
+    initialData && hasLoadedFilterFacets(initialData) ? initialData : null;
+  const usableCachedFilters =
+    cachedFromStorage && hasLoadedFilterFacets(cachedFromStorage) ? cachedFromStorage : null;
+  const cachedFilters = usableInitialData ?? usableCachedFilters;
   const [data, setData] = useState<ProductsFiltersData | null>(cachedFilters);
   const [loading, setLoading] = useState(!cachedFilters);
   const [error, setError] = useState(false);
   const requestSeqRef = useRef(0);
-  const skipInitialFetchRef = useRef(Boolean(initialData));
+  const skipInitialFetchRef = useRef(Boolean(usableInitialData));
 
   useEffect(() => {
-    if (initialData) {
-      writeCatalogClientCache(cacheKey, initialData);
+    if (usableInitialData) {
+      writeCatalogClientCache(cacheKey, usableInitialData);
     }
-  }, [cacheKey, initialData]);
+  }, [cacheKey, usableInitialData]);
 
   const fetchFilters = useCallback(async () => {
     const requestId = ++requestSeqRef.current;
-    const activeCacheKey = buildFiltersCacheKey({ category, categoryScope, search, minPrice, maxPrice });
+    const activeCacheKey = buildFiltersCacheKey({
+      lang,
+      category,
+      categoryScope,
+      search,
+      minPrice,
+      maxPrice,
+    });
     const cached = readCatalogClientCache<ProductsFiltersData>(activeCacheKey);
 
-    if (cached) {
+    if (cached && hasLoadedFilterFacets(cached)) {
       setData(cached);
       setLoading(false);
       setError(false);
@@ -143,7 +162,6 @@ export function ProductsFiltersProvider({
     setError(false);
 
     try {
-      const lang = getStoredLanguage();
       const params: Record<string, string> = { lang };
       if (category) params.category = category;
       if (categoryScope) params.categoryScope = categoryScope;
@@ -161,22 +179,24 @@ export function ProductsFiltersProvider({
         sizes: res.sizes ?? [],
         brands: res.brands ?? [],
         attributes: res.attributes ?? [],
+        categoryIds: res.categoryIds ?? [],
         priceRange: res.priceRange ?? DEFAULT_FILTERS.priceRange,
       };
-      writeCatalogClientCache(activeCacheKey, nextData);
-      setData(nextData);
+      if (hasLoadedFilterFacets(nextData)) {
+        writeCatalogClientCache(activeCacheKey, nextData);
+        setData(nextData);
+      }
     } catch {
       if (requestId !== requestSeqRef.current) {
         return;
       }
       setError(true);
-      setData(DEFAULT_FILTERS);
     } finally {
       if (requestId === requestSeqRef.current) {
         setLoading(false);
       }
     }
-  }, [category, categoryScope, search, minPrice, maxPrice]);
+  }, [category, categoryScope, search, minPrice, maxPrice, lang]);
 
   useEffect(() => {
     if (skipInitialFetchRef.current) {
@@ -204,18 +224,25 @@ export function useProductsFilters(): ProductsFiltersContextValue | null {
 
 /** Reads cached sidebar filter options (colors/sizes/brands) for standalone filter components. */
 export function readCachedProductsFilters(input: {
+  lang?: LanguageCode;
   category?: string;
   categoryScope?: string;
   search?: string;
   minPrice?: string;
   maxPrice?: string;
 }): ProductsFiltersData | null {
-  return readCatalogClientCache<ProductsFiltersData>(buildFiltersCacheKey(input));
+  const { lang = getStoredLanguage(), ...rest } = input;
+  const cached = readCatalogClientCache<ProductsFiltersData>(buildFiltersCacheKey({ lang, ...rest }));
+  if (!cached || !hasLoadedFilterFacets(cached)) {
+    return null;
+  }
+  return cached;
 }
 
 /** Persists sidebar filter options after a successful API fetch. */
 export function writeCachedProductsFilters(
   input: {
+    lang?: LanguageCode;
     category?: string;
     categoryScope?: string;
     search?: string;
@@ -224,5 +251,9 @@ export function writeCachedProductsFilters(
   },
   data: ProductsFiltersData
 ): void {
-  writeCatalogClientCache(buildFiltersCacheKey(input), data);
+  if (!hasLoadedFilterFacets(data)) {
+    return;
+  }
+  const { lang = getStoredLanguage(), ...rest } = input;
+  writeCatalogClientCache(buildFiltersCacheKey({ lang, ...rest }), data);
 }

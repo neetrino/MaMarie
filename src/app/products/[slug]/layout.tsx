@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { DEFAULT_LANGUAGE } from '@/lib/language';
+import { normalizeProductSlug } from '@/lib/products/parse-product-slug-param';
 import { getProductPageCore } from './get-product-by-slug';
 
 const DEFAULT_TITLE = 'Product';
@@ -11,7 +12,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: rawSlug } = await params;
-  const slug = rawSlug.includes(':') ? rawSlug.split(':')[0] : rawSlug;
+  const slug = normalizeProductSlug(rawSlug);
 
   try {
     const core = await getProductPageCore(slug, DEFAULT_LANGUAGE);

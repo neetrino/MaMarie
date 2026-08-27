@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { convertPrice, type CurrencyCode } from '@/lib/currency';
+import { smartSplitUrls } from '@/lib/utils/image-utils';
 import type { GeneratedVariant } from '../types';
 import { ensureOneMainVariant } from '../utils/variantMainHelpers';
 import { logger } from "@/lib/utils/logger";
@@ -10,16 +11,30 @@ interface UseProductVariantConversionProps {
   productId: string | null;
   attributes: any[];
   defaultCurrency: CurrencyCode;
+  /** True after edit load parked variants on window — triggers conversion when attributes are ready. */
+  hasVariantsToLoad: boolean;
   setSelectedAttributesForVariants: (attrs: Set<string>) => void;
   setSelectedAttributeValueIds: (ids: Record<string, string[]>) => void;
   setGeneratedVariants: (variants: GeneratedVariant[]) => void;
   setHasVariantsToLoad: (has: boolean) => void;
 }
 
+function parseVariantNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
 export function useProductVariantConversion({
   productId,
   attributes,
   defaultCurrency,
+  hasVariantsToLoad,
   setSelectedAttributesForVariants,
   setSelectedAttributeValueIds,
   setGeneratedVariants,
@@ -88,7 +103,8 @@ export function useProductVariantConversion({
         compareAtPrice: number | null;
         stock: number;
         sku: string;
-        image: string | null;
+        images: string[];
+        isMain?: boolean;
         originalVariantIds: string[];
       }
       
@@ -132,88 +148,94 @@ export function useProductVariantConversion({
         
         if (selectedValueIds.length === 0 && variant.options && Array.isArray(variant.options)) {
           logger.debug(`🔍 [ADMIN] Variant ${variantIndex} using options fallback:`, variant.options);
-          
-          const attributeValueMap: Record<string, Set<string>> = {};
-          
+
           variant.options.forEach((opt: any) => {
             let attributeId = opt.attributeId;
             let valueId = opt.valueId;
             let attributeKey = opt.attributeKey;
-            
+
             if (!attributeId && opt.attributeValue) {
-              attributeId = opt.attributeValue.attributeId || opt.attributeValue.attribute?.id || opt.attributeValue.attributeId;
+              attributeId = opt.attributeValue.attributeId || opt.attributeValue.attribute?.id;
               attributeKey = opt.attributeValue.attribute?.key || opt.attributeValue.attributeKey;
             }
             if (!valueId && opt.attributeValue) {
               valueId = opt.attributeValue.id || opt.attributeValue.valueId;
             }
-            
+
             if (!attributeId && opt.attributeKey) {
-              const foundAttr = attributes.find(a => a.key === opt.attributeKey);
+              const foundAttr = attributes.find((a: { key: string; id: string }) => a.key === opt.attributeKey);
               if (foundAttr) {
                 attributeId = foundAttr.id;
                 attributeKey = foundAttr.key;
               }
             }
-            
+
             if (attributeId && !valueId && opt.value) {
-              const foundAttr = attributes.find(a => a.id === attributeId);
+              const foundAttr = attributes.find((a: { id: string; values: Array<{ id: string; value: string; label: string }> }) => a.id === attributeId);
               if (foundAttr) {
-                const foundValue = foundAttr.values.find((v: { id: string; value: string; label: string }) => v.value === opt.value || v.label === opt.value);
+                const foundValue = foundAttr.values.find(
+                  (v: { id: string; value: string; label: string }) =>
+                    v.value === opt.value || v.label === opt.value
+                );
                 if (foundValue) {
                   valueId = foundValue.id;
                 }
               }
             }
-            
-            if (attributeKey && valueId) {
-              if (!attributeValueMap[attributeKey]) {
-                attributeValueMap[attributeKey] = new Set();
+
+            if (!valueId && attributeKey && opt.value) {
+              const foundAttr = attributes.find((a: { key: string }) => a.key === attributeKey);
+              if (foundAttr) {
+                const foundValue = foundAttr.values.find(
+                  (v: { id: string; value: string; label: string }) =>
+                    v.value === opt.value || v.label === opt.value
+                );
+                if (foundValue) {
+                  valueId = foundValue.id;
+                }
               }
-              attributeValueMap[attributeKey].add(valueId);
             }
-          });
-          
-          Object.values(attributeValueMap).forEach((valueIdSet) => {
-            valueIdSet.forEach((valueId) => {
-              if (!selectedValueIds.includes(valueId)) {
-                selectedValueIds.push(valueId);
-              }
-            });
+
+            if (valueId && !selectedValueIds.includes(valueId)) {
+              selectedValueIds.push(valueId);
+            }
           });
         }
         
-        let variantImage: string | null = null;
-        if (variant.imageUrl) {
-          if (typeof variant.imageUrl === 'string' && variant.imageUrl.startsWith('data:')) {
-            variantImage = variant.imageUrl;
-            logger.debug(`🖼️ [ADMIN] Variant ${variantIndex} base64 image length:`, variantImage?.length || 0);
-          } else {
-            const imageUrls = typeof variant.imageUrl === 'string' 
-              ? variant.imageUrl.split(',').map((url: string) => url.trim()).filter(Boolean)
-              : [];
-            variantImage = imageUrls.length > 0 ? imageUrls[0] : null;
-            logger.debug(`🖼️ [ADMIN] Variant ${variantIndex} imageUrl length:`, variant.imageUrl?.length || 0, '→ extracted image length:', variantImage?.length || 0);
-          }
+        const variantImages =
+          typeof variant.imageUrl === 'string' && variant.imageUrl.trim()
+            ? smartSplitUrls(variant.imageUrl)
+            : [];
+        if (variantImages.length > 0) {
+          logger.debug(`🖼️ [ADMIN] Variant ${variantIndex} imageUrl count:`, variantImages.length);
         } else {
           logger.debug(`🖼️ [ADMIN] Variant ${variantIndex} has no imageUrl`);
         }
-        
-        const priceInDefaultCurrency = variant.price !== undefined && variant.price !== null 
-          ? convertPrice(variant.price, 'USD', defaultCurrency)
-          : 0;
-        const compareAtPriceInDefaultCurrency = variant.compareAtPrice !== undefined && variant.compareAtPrice !== null 
-          ? convertPrice(variant.compareAtPrice, 'USD', defaultCurrency)
-          : null;
-        
+
+        const rawPrice = parseVariantNumber(variant.price);
+        const rawCompareAt =
+          variant.compareAtPrice !== undefined &&
+          variant.compareAtPrice !== null &&
+          String(variant.compareAtPrice).trim() !== ''
+            ? parseVariantNumber(variant.compareAtPrice)
+            : null;
+        const priceInDefaultCurrency =
+          rawPrice > 0 ? convertPrice(rawPrice, 'USD', defaultCurrency) : 0;
+        const compareAtPriceInDefaultCurrency =
+          rawCompareAt !== null && rawCompareAt > 0
+            ? convertPrice(rawCompareAt, 'USD', defaultCurrency)
+            : null;
+        const stockValue = parseVariantNumber(variant.stock);
+
         variantDataList.push({
           id: variant.id || `variant-${Date.now()}-${variantIndex}-${Math.random()}`,
           selectedValueIds: selectedValueIds.sort(),
           price: priceInDefaultCurrency,
           compareAtPrice: compareAtPriceInDefaultCurrency,
-          stock: variant.stock !== undefined && variant.stock !== null ? variant.stock : 0,
+          stock: stockValue,
           sku: variant.sku || '',
-          image: variantImage,
+          images: variantImages,
+          isMain: variant.isMain === true,
           originalVariantIds: [variant.id || `variant-${variantIndex}`],
         });
       });
@@ -236,7 +258,7 @@ export function useProductVariantConversion({
       const builtVariants: GeneratedVariant[] = [];
       const productMainImage = (window as { __productMainImage?: string }).__productMainImage ?? '';
 
-      variantGroups.forEach((group, groupKey) => {
+      variantGroups.forEach((group) => {
         const allValueIds = new Set<string>();
         group.forEach(variantData => {
           variantData.selectedValueIds.forEach(valueId => {
@@ -252,7 +274,14 @@ export function useProductVariantConversion({
           ? firstVariant.sku 
           : group.map(v => v.sku).filter(Boolean).join(', ');
         
-        const combinedImage = firstVariant.image;
+        const combinedImages = group.reduce<string[]>((acc, item) => {
+          for (const img of item.images) {
+            if (!acc.includes(img)) acc.push(img);
+          }
+          return acc;
+        }, []);
+
+        const groupIsMain = group.some((item) => item.isMain);
 
         builtVariants.push({
           id: `variant-group-${Date.now()}-${Math.random()}`,
@@ -261,14 +290,15 @@ export function useProductVariantConversion({
           compareAtPrice: firstVariant.compareAtPrice !== null ? firstVariant.compareAtPrice.toString() : '',
           stock: stockValue.toString(),
           sku: combinedSku,
-          image: combinedImage,
+          images: combinedImages,
+          isMain: groupIsMain,
         });
         
         logger.debug(`✅ [ADMIN] Grouped ${group.length} variants into 1 row:`, {
-          groupKey,
           valueIds: Array.from(allValueIds),
           price: firstVariant.price,
           stock: stockValue,
+          imagesCount: combinedImages.length,
           originalVariantIds: group.flatMap(v => v.originalVariantIds),
         });
       });
@@ -276,16 +306,24 @@ export function useProductVariantConversion({
       const imagesMatch = (a: string, b: string): boolean =>
         a === b || a.includes(b) || b.includes(a);
 
-      const mainIndex = productMainImage
-        ? builtVariants.findIndex(
-            (v) => v.image && imagesMatch(v.image, productMainImage)
-          )
-        : -1;
-      const resolvedMainIndex = mainIndex >= 0 ? mainIndex : 0;
-      const convertedVariants = builtVariants.map((variant, index) => ({
-        ...variant,
-        isMain: index === resolvedMainIndex,
-      }));
+      const hasExplicitMain = builtVariants.some((v) => v.isMain);
+      let convertedVariants: GeneratedVariant[];
+
+      if (hasExplicitMain) {
+        convertedVariants = ensureOneMainVariant(builtVariants);
+      } else {
+        const mainIndex = productMainImage
+          ? builtVariants.findIndex(
+              (v) => v.images.some((img) => imagesMatch(img, productMainImage))
+            )
+          : -1;
+        const resolvedMainIndex = mainIndex >= 0 ? mainIndex : 0;
+        convertedVariants = builtVariants.map((variant, index) => ({
+          ...variant,
+          isMain: index === resolvedMainIndex,
+        }));
+        convertedVariants = ensureOneMainVariant(convertedVariants);
+      }
 
       if (convertedVariants.length > 0) {
         const variantsWithMain = ensureOneMainVariant(convertedVariants);
@@ -310,11 +348,22 @@ export function useProductVariantConversion({
           variantsCount: productVariants.length,
           firstVariantOptions: productVariants[0]?.options,
         });
+        delete (window as { __productVariantsToConvert?: unknown }).__productVariantsToConvert;
+        delete (window as { __productMainImage?: string }).__productMainImage;
         setHasVariantsToLoad(false);
       }
-    } else if (productId && attributes.length > 0) {
+    } else if (productId && attributes.length > 0 && hasVariantsToLoad) {
       logger.debug('ℹ️ [ADMIN] Waiting for variants to convert. Attributes loaded:', attributes.length);
     }
-  }, [productId, attributes, defaultCurrency, setSelectedAttributesForVariants, setSelectedAttributeValueIds, setGeneratedVariants, setHasVariantsToLoad]);
+  }, [
+    productId,
+    attributes,
+    defaultCurrency,
+    hasVariantsToLoad,
+    setSelectedAttributesForVariants,
+    setSelectedAttributeValueIds,
+    setGeneratedVariants,
+    setHasVariantsToLoad,
+  ]);
 }
 

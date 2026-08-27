@@ -1,9 +1,8 @@
 import { apiClient } from '../../lib/api-client';
 import {
   buildCartFromGuestStorage,
-  mergeNormalizedGuestItems,
   readGuestCartItems,
-  syncGuestCartDisplayFromApiCart,
+  reconcileGuestItemsWithApiCart,
   writeGuestCartItems,
 } from '../../lib/guest-cart-storage';
 import { extractMediaUrl } from '../../lib/utils/extractMediaUrl';
@@ -143,57 +142,75 @@ export async function fetchGuestCart(
   const productLabel = t('common.messages.product');
 
   try {
-    const guestCart = readGuestCartItems();
+    const guestCartAtStart = readGuestCartItems();
 
-    if (guestCart.length === 0) {
+    if (guestCartAtStart.length === 0) {
       return null;
     }
 
-    const localCart = buildCartFromGuestStorage(guestCart, productLabel);
-
     try {
       const batch = await apiClient.post<GuestCartBatchResponse>('/api/v1/cart/guest', {
-        items: guestCart,
+        items: guestCartAtStart,
         lang: getStoredLanguage(),
       });
 
-      if (batch.cart) {
-        const synced = syncGuestCartDisplayFromApiCart(batch.cart, guestCart);
-        const normalized = Array.isArray(batch.normalizedItems) ? batch.normalizedItems : [];
-        const merged = mergeNormalizedGuestItems(normalized, synced);
-        writeGuestCartItems(merged);
-        return batch.cart;
+      // User may have added/removed lines while the batch request was in flight.
+      const guestCartNow = readGuestCartItems();
+      if (guestCartNow.length === 0) {
+        return null;
       }
+
+      const normalized = Array.isArray(batch.normalizedItems) ? batch.normalizedItems : [];
+      const reconciled = reconcileGuestItemsWithApiCart(
+        guestCartNow,
+        batch.cart,
+        normalized,
+      );
+      writeGuestCartItems(reconciled);
+      return buildCartFromGuestStorage(reconciled, productLabel);
     } catch (batchError: unknown) {
       logger.warn('[CART] Guest batch fetch failed, using localStorage snapshot', { error: batchError });
     }
 
+    const guestCartNow = readGuestCartItems();
+    const localCart = buildCartFromGuestStorage(guestCartNow, productLabel);
     if (localCart) {
       return localCart;
     }
 
-    // Get product details from API
-    const itemsWithDetails = await fetchGuestCartItems(guestCart, t);
-
-    // Remove items that were not found
-    const itemsToRemove = itemsWithDetails
-      .map((result, index) => result.shouldRemove ? index : -1)
-      .filter(index => index !== -1);
-
-    if (itemsToRemove.length > 0) {
-      const updatedCart = guestCart.filter((_, index) => !itemsToRemove.includes(index));
-      writeGuestCartItems(updatedCart);
-    }
-
-    const validItems = itemsWithDetails
-      .map(result => result.item)
-      .filter((item): item is CartItem => item !== null);
-
-    if (validItems.length === 0) {
+    if (guestCartNow.length === 0) {
       return null;
     }
 
-    return buildCartFromItems(validItems);
+    // Get product details from API
+    const itemsWithDetails = await fetchGuestCartItems(guestCartNow, t);
+
+    // Remove items that were not found — only touch indices still present locally.
+    const latestBeforeWrite = readGuestCartItems();
+    const itemsToRemove = itemsWithDetails
+      .map((result, index) => (result.shouldRemove ? index : -1))
+      .filter((index) => index !== -1);
+
+    if (itemsToRemove.length > 0) {
+      const updatedCart = latestBeforeWrite.filter((_, index) => !itemsToRemove.includes(index));
+      writeGuestCartItems(updatedCart);
+    }
+
+    const currentAfterCleanup = readGuestCartItems();
+    const fromStorage = buildCartFromGuestStorage(currentAfterCleanup, productLabel);
+    if (fromStorage) {
+      return fromStorage;
+    }
+
+    if (currentAfterCleanup.length === 0) {
+      return null;
+    }
+
+    const validItems = itemsWithDetails
+      .map((result) => result.item)
+      .filter((item): item is CartItem => item !== null);
+
+    return validItems.length > 0 ? buildCartFromItems(validItems) : null;
   } catch (error: unknown) {
     logger.error('Error loading guest cart', { error });
     return buildCartFromGuestStorage(readGuestCartItems(), productLabel);

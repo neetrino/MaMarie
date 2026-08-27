@@ -1,7 +1,6 @@
 import { db } from "@white-shop/db";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { findOrCreateAttributeValue } from "../../utils/variant-generator";
-import { ensureProductAttributesTable } from "../../utils/db-ensure";
+import { ensureProductAttributesTable, ensureProductVariantIsMainColumn } from "../../utils/db-ensure";
 import {
   processImageUrl,
   smartSplitUrls,
@@ -9,14 +8,18 @@ import {
   separateMainAndVariantImages,
 } from "../../utils/image-utils";
 import { logger } from "@/lib/utils/logger";
-import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
-import { invalidateAdminProductsListCache } from "./admin-products-read/list-cache";
+import { revalidateProductCache } from "./admin-products-update/cache-revalidator";
 import {
   normalizeProductTranslationInputs,
   pickPrimaryTranslation,
   type ProductTranslationInput,
 } from "./product-translation-input";
 import { buildUniqueTranslationCreates } from "./product-translation-persist";
+import { normalizeVariantIsMainFlags } from "../../products/normalize-variant-is-main";
+import {
+  persistInlineImageUrlsToR2,
+  persistMediaInlineImagesToR2,
+} from "../persist-inline-images-to-r2";
 
 const PRODUCT_CREATE_TX_TIMEOUT_MS = 30000;
 const PRODUCT_CREATE_TX_MAX_WAIT_MS = 5000;
@@ -126,6 +129,7 @@ class AdminProductsCreateService {
       color?: string;
       size?: string;
       imageUrl?: string;
+      isMain?: boolean;
       published?: boolean;
       options?: Array<{
         attributeKey: string;
@@ -137,9 +141,25 @@ class AdminProductsCreateService {
     try {
       logger.debug('🆕 [ADMIN PRODUCTS CREATE SERVICE] Creating product:', data.title);
 
+      // Upload inline images to R2 before the DB transaction.
+      const variants = await Promise.all(
+        (data.variants ?? []).map(async (variant) => ({
+          ...variant,
+          imageUrl: await persistInlineImageUrlsToR2(variant.imageUrl),
+        }))
+      );
+      const media = data.media
+        ? await persistMediaInlineImagesToR2(data.media)
+        : data.media;
+      const mainProductImage = data.mainProductImage
+        ? (await persistInlineImageUrlsToR2(data.mainProductImage)) ?? data.mainProductImage
+        : data.mainProductImage;
+      data = { ...data, variants, media, mainProductImage };
+
       if (data.attributeIds && data.attributeIds.length > 0) {
         await ensureProductAttributesTable();
       }
+      await ensureProductVariantIsMainColumn();
 
       const result = await db.$transaction(async (tx: any) => {
         const translationInputs = normalizeProductTranslationInputs(data);
@@ -158,12 +178,14 @@ class AdminProductsCreateService {
 
         // Track used SKUs within this transaction to ensure uniqueness
         const usedSkus = new Set<string>();
+
+        const normalizedVariants = normalizeVariantIsMainFlags(data.variants);
         
         // Generate variants with options
         // Support both old format (color/size strings) and new format (AttributeValue IDs)
         // Also support generic options array for any attribute type
         const variantsData = await Promise.all(
-          data.variants.map(async (variant: any, variantIndex: number) => {
+          normalizedVariants.map(async (variant: (typeof normalizedVariants)[number], variantIndex: number) => {
             const options: any[] = [];
             const attributesMap: Record<string, Array<{ valueId: string; value: string; attributeKey: string }>> = {};
             
@@ -285,14 +307,10 @@ class AdminProductsCreateService {
 
             logger.debug(`📦 [ADMIN PRODUCTS CREATE SERVICE] Variant ${variantIndex + 1} attributes:`, JSON.stringify(attributesJson, null, 2));
 
-            // Process and validate variant imageUrl
+            // Process and validate variant imageUrl (inline → R2)
             let processedVariantImageUrl: string | undefined = undefined;
             if (variant.imageUrl) {
-              const urls = smartSplitUrls(variant.imageUrl);
-              const processedUrls = urls.map(url => processImageUrl(url)).filter((url): url is string => url !== null);
-              if (processedUrls.length > 0) {
-                processedVariantImageUrl = processedUrls.join(',');
-              }
+              processedVariantImageUrl = await persistInlineImageUrlsToR2(variant.imageUrl);
             }
 
             return {
@@ -301,6 +319,7 @@ class AdminProductsCreateService {
               compareAtPrice,
               stock: isNaN(stock) ? 0 : stock,
               imageUrl: processedVariantImageUrl,
+              isMain: variant.isMain === true,
               published: variant.published !== false,
               attributes: attributesJson, // JSONB column
               options: {
@@ -309,6 +328,14 @@ class AdminProductsCreateService {
             };
           })
         );
+
+        // Exactly one Main Variant (explicit flag — never infer from price).
+        const mainCount = variantsData.filter((v) => v.isMain).length;
+        if (variantsData.length > 0 && mainCount !== 1) {
+          variantsData.forEach((v, index) => {
+            v.isMain = index === 0;
+          });
+        }
 
         // Final validation: log all SKUs to ensure uniqueness
         const allSkus = variantsData.map(v => v.sku).filter(Boolean);
@@ -362,7 +389,9 @@ class AdminProductsCreateService {
 
         // Separate main images from variant images and clean them
         const { main } = separateMainAndVariantImages(rawMedia, allVariantImages);
-        const finalMedia = cleanImageUrls(main);
+        const cleanedMedia = cleanImageUrls(main);
+        const finalMedia =
+          (await persistMediaInlineImagesToR2(cleanedMedia)) ?? cleanedMedia;
         
         logger.debug('📸 [ADMIN PRODUCTS CREATE SERVICE] Final main media count:', finalMedia.length);
         logger.debug('📸 [ADMIN PRODUCTS CREATE SERVICE] Variant images excluded:', allVariantImages.length);
@@ -373,9 +402,9 @@ class AdminProductsCreateService {
             primaryCategoryId: data.primaryCategoryId || undefined,
             categoryIds: data.categoryIds || [],
             media: finalMedia,
-            published: data.published !== false,
+            published: data.published === true,
             featured: data.featured ?? false,
-            publishedAt: data.published !== false ? new Date() : undefined,
+            publishedAt: data.published === true ? new Date() : undefined,
             translations: {
               create: translationCreates,
             },
@@ -435,18 +464,9 @@ class AdminProductsCreateService {
         maxWait: PRODUCT_CREATE_TX_MAX_WAIT_MS,
       });
 
-      // Revalidate cache
-      try {
-        logger.debug('🧹 [ADMIN PRODUCTS CREATE SERVICE] Revalidating paths for new product');
-        revalidatePath('/');
-        revalidatePath('/products');
-        // @ts-expect-error - revalidateTag type issue in Next.js
-        revalidateTag('products');
-        invalidateAdminProductsListCache();
-        invalidateHomeFeaturedProductsCache();
-      } catch (e) {
-        console.warn('⚠️ [ADMIN PRODUCTS CREATE SERVICE] Revalidation failed:', e);
-      }
+      // Revalidate storefront + admin caches so /products updates immediately
+      const createdSlug = result?.translations?.[0]?.slug as string | undefined;
+      await revalidateProductCache(result?.id ?? '', createdSlug);
 
       return result;
     } catch (error: any) {

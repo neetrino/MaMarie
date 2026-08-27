@@ -17,6 +17,13 @@ import { useProductAttributeHelpers } from './hooks/useProductAttributeHelpers';
 import { useProductAttributeHandlers } from './hooks/useProductAttributeHandlers';
 import { useProductFormHandlers } from './hooks/useProductFormHandlers';
 import { useProductFormCallbacks } from './hooks/useProductFormCallbacks';
+import { useLocalizedReferenceData } from './hooks/useLocalizedReferenceData';
+import {
+  useAdminAttributesReference,
+  useAdminBrands,
+  useAdminCategories,
+} from '../../providers/AdminReferenceDataProvider';
+import type { Attribute, Brand, Category } from './types';
 import { isClothingCategory as checkIsClothingCategory, generateSlug } from './utils/productUtils';
 import { clearProductFieldError } from './utils/product-form-field-errors';
 
@@ -29,6 +36,15 @@ function AddProductPageContent() {
   const isEditMode = !!productId;
 
   const formState = useProductFormState();
+  const { categories: referenceCategories } = useAdminCategories();
+  const { brands: referenceBrands } = useAdminBrands();
+  const { attributes: referenceAttributes } = useAdminAttributesReference();
+  const localizedReference = useLocalizedReferenceData(
+    referenceCategories as Category[],
+    referenceBrands as Brand[],
+    referenceAttributes as Attribute[],
+    formState.contentLocale,
+  );
 
   useProductDataLoading({
     isLoggedIn,
@@ -62,12 +78,14 @@ function AddProductPageContent() {
     setHasVariantsToLoad: formState.setHasVariantsToLoad,
     setProductType: formState.setProductType,
     setSimpleProductData: formState.setSimpleProductData,
+    setSlugIsManual: formState.setSlugIsManual,
   });
 
   useProductVariantConversion({
     productId,
     attributes: formState.attributes,
     defaultCurrency: formState.defaultCurrency,
+    hasVariantsToLoad: formState.hasVariantsToLoad,
     setSelectedAttributesForVariants: formState.setSelectedAttributesForVariants,
     setSelectedAttributeValueIds: formState.setSelectedAttributeValueIds,
     setGeneratedVariants: formState.setGeneratedVariants,
@@ -83,6 +101,7 @@ function AddProductPageContent() {
     formDataTitle: formState.formData.title,
     isEditMode,
     productId,
+    hasVariantsToLoad: formState.hasVariantsToLoad,
     setGeneratedVariants: formState.setGeneratedVariants,
   });
 
@@ -98,11 +117,13 @@ function AddProductPageContent() {
   } = useProductFormCallbacks({
     formData: formState.formData,
     contentLocale: formState.contentLocale,
-    categories: formState.categories,
+    categories: referenceCategories as Category[],
     selectedAttributesForVariants: formState.selectedAttributesForVariants,
     selectedAttributeValueIds: formState.selectedAttributeValueIds,
     generatedVariants: formState.generatedVariants,
+    slugIsManual: formState.slugIsManual,
     setFormData: formState.setFormData,
+    setSlugIsManual: formState.setSlugIsManual,
     setSelectedAttributesForVariants: formState.setSelectedAttributesForVariants,
     setSelectedAttributeValueIds: formState.setSelectedAttributeValueIds,
     setGeneratedVariants: formState.setGeneratedVariants,
@@ -201,9 +222,9 @@ function AddProductPageContent() {
             onContentLocaleChange={formState.setContentLocale}
             productType={formState.productType}
             simpleProductData={formState.simpleProductData}
-            categories={formState.categories}
-            brands={formState.brands}
-            attributes={formState.attributes}
+            categories={localizedReference.categories}
+            brands={localizedReference.brands}
+            attributes={localizedReference.attributes}
             defaultCurrency={formState.defaultCurrency}
             isEditMode={isEditMode}
             loading={formState.loading}
@@ -308,7 +329,7 @@ function AddProductPageContent() {
         <ValueSelectionModal
           openValueModal={formState.openValueModal}
           variant={formState.generatedVariants.find((v) => v.id === formState.openValueModal!.variantId)}
-          attribute={formState.attributes.find((a) => a.id === formState.openValueModal!.attributeId)}
+          attribute={localizedReference.attributes.find((a) => a.id === formState.openValueModal!.attributeId)}
           selectedAttributeValueIds={formState.selectedAttributeValueIds}
           onClose={() => formState.setOpenValueModal(null)}
           onVariantUpdate={formState.setGeneratedVariants}

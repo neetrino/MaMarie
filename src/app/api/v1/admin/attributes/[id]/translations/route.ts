@@ -33,7 +33,8 @@ export async function PATCH(
 
     const result = await adminService.updateAttributeTranslation(attributeId, {
       name: body.name,
-      locale: body.locale || "en",
+      locale: body.locale,
+      translations: body.translations,
     });
 
     return NextResponse.json({ data: result }, { status: 200 });

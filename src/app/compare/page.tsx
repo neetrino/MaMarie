@@ -12,6 +12,7 @@ import { useTranslation } from '../../lib/i18n-client';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { CompareProductsTable, type CompareProduct } from './CompareProductsTable';
 import { showToast } from '../../components/Toast';
+import { dispatchCartUpdated } from '../../lib/cart-events';
 
 interface CompareSection {
   sectionKey: string;
@@ -247,7 +248,7 @@ export default function ComparePage() {
       );
 
       // Trigger cart update event
-      window.dispatchEvent(new Event('cart-updated'));
+      dispatchCartUpdated();
     } catch (error: any) {
       console.error('Error adding to cart:', error);
       if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {

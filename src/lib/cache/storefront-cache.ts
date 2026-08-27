@@ -1,5 +1,13 @@
 import { cacheService } from "@/lib/services/cache.service";
+import { invalidateServerReadCachePrefix } from "@/lib/cache/server-read-cache";
 import { logger } from "@/lib/utils/logger";
+
+/** Next.js `unstable_cache` / `revalidateTag` tag for catalog product list + filters. */
+export const STOREFRONT_PRODUCTS_CACHE_TAG = "products";
+
+/** In-process server-read cache key prefixes for storefront catalog. */
+export const STOREFRONT_PRODUCTS_SERVER_READ_PREFIX = "storefront:products:";
+export const STOREFRONT_FILTERS_SERVER_READ_PREFIX = "storefront:filters:";
 
 /**
  * Central TTLs (seconds) for public storefront HTTP responses stored in Redis / in-memory fallback.
@@ -29,7 +37,7 @@ export const STOREFRONT_CACHE_KEYS = {
   categoryBySlug: (lang: string, slug: string) => `categories:slug:${lang}:${slug}`,
   navigationPreviews: (lang: string) => `categories:navigation-previews:${lang}`,
   currencyRates: () => "settings:currency-rates",
-  productsFilters: (stableQuery: string) => `products:filters:v2:${stableQuery}`,
+  productsFilters: (stableQuery: string) => `products:filters:v4:${stableQuery}`,
   productsPriceRange: (stableQuery: string) => `products:price-range:${stableQuery}`,
   productsList: (stableQuery: string) => `products:list:${stableQuery}`,
   productVisual: (lang: string, slug: string) => `product:visual:${lang}:${slug}`,
@@ -102,6 +110,8 @@ export async function invalidateCurrencyRatesCache(): Promise<void> {
  * Clears nav previews and filter aggregates.
  */
 export async function invalidateStorefrontProductRelatedCaches(): Promise<void> {
+  invalidateServerReadCachePrefix(STOREFRONT_PRODUCTS_SERVER_READ_PREFIX);
+  invalidateServerReadCachePrefix(STOREFRONT_FILTERS_SERVER_READ_PREFIX);
   await Promise.all([
     cacheService.deletePattern("categories:navigation-previews:*"),
     invalidateStorefrontProductFilterCaches(),

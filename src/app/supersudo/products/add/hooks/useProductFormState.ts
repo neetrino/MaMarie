@@ -61,6 +61,8 @@ export function useProductFormState() {
   const [generatedVariants, setGeneratedVariants] = useState<GeneratedVariant[]>([]);
   const [hasVariantsToLoad, setHasVariantsToLoad] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<ProductFormFieldErrors>({});
+  /** Once true, title changes no longer overwrite slug (edit mode or manual slug edit). */
+  const [slugIsManual, setSlugIsManual] = useState(false);
 
   return {
     // Loading states
@@ -140,6 +142,8 @@ export function useProductFormState() {
     setHasVariantsToLoad,
     fieldErrors,
     setFieldErrors,
+    slugIsManual,
+    setSlugIsManual,
   };
 }
 

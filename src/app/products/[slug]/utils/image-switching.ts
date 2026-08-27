@@ -119,17 +119,23 @@ export function switchToVariantImage(
   images: string[],
   setCurrentImageIndex: (index: number) => void
 ): void {
-  if (!variant || !variant.imageUrl || !product) {
+  if (!variant || !product) {
     return;
   }
 
-  const splitUrls = smartSplitUrls(variant.imageUrl);
-  if (splitUrls.length === 0) {
+  const candidateUrls =
+    Array.isArray(variant.images) && variant.images.length > 0
+      ? variant.images
+      : variant.imageUrl
+        ? smartSplitUrls(variant.imageUrl)
+        : [];
+
+  if (candidateUrls.length === 0) {
     return;
   }
 
-  // Try to find the first variant image in the images array
-  for (const url of splitUrls) {
+  // Prefer exact match against the active gallery (often variant-scoped).
+  for (const url of candidateUrls) {
     if (!url || url.trim() === '') continue;
 
     const processedUrl = processImageUrl(url);
@@ -137,7 +143,6 @@ export function switchToVariantImage(
       continue;
     }
 
-    // If this variant image is an attribute value image, skip it
     if (isAttributeValueImage(processedUrl, product)) {
       continue;
     }
@@ -150,26 +155,34 @@ export function switchToVariantImage(
     }
   }
 
+  // Variant-scoped gallery: first image is always index 0.
+  if (images.length > 0 && candidateUrls.some((url) => images.includes(url))) {
+    setCurrentImageIndex(0);
+    return;
+  }
+
   // Fallback: If variant image not found, try to find any variant with the same color
   if (product?.variants) {
     const variantColor = getOptionValue(variant.options, 'color');
     if (variantColor) {
       const colorVariants = product.variants.filter((v) => {
-        return variantHasColor(v, variantColor) && v.imageUrl;
+        return variantHasColor(v, variantColor) && (v.imageUrl || (v.images && v.images.length > 0));
       });
 
-      // Try to find image from any variant with the same color
       for (const colorVariant of colorVariants) {
-        if (!colorVariant.imageUrl) continue;
+        const colorSplitUrls =
+          Array.isArray(colorVariant.images) && colorVariant.images.length > 0
+            ? colorVariant.images
+            : colorVariant.imageUrl
+              ? smartSplitUrls(colorVariant.imageUrl)
+              : [];
 
-        const colorSplitUrls = smartSplitUrls(colorVariant.imageUrl);
         for (const colorUrl of colorSplitUrls) {
           if (!colorUrl || colorUrl.trim() === '') continue;
 
           const processedColorUrl = processImageUrl(colorUrl);
           if (!processedColorUrl) continue;
 
-          // Skip attribute value images
           if (isAttributeValueImage(processedColorUrl, product)) continue;
 
           const colorImageIndex = findImageIndex(colorUrl, images, processedColorUrl);

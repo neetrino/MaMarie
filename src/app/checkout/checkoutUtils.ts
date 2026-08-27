@@ -1,15 +1,18 @@
 import { apiClient } from '../../lib/api-client';
 import type { Cart, CartItem } from './types';
-
-const CART_KEY = 'shop_cart_guest';
+import { dispatchCartUpdated } from '../../lib/cart-events';
+import {
+  clearGuestCartItems,
+  readGuestCartItems,
+  writeGuestCartItems,
+} from '../../lib/guest-cart-storage';
 
 export async function fetchCartForGuest(): Promise<Cart | null> {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  const stored = localStorage.getItem(CART_KEY);
-  const guestCart: Array<{ productId: string; productSlug?: string; variantId: string; quantity: number }> = stored ? JSON.parse(stored) : [];
+  const guestCart = readGuestCartItems();
 
   if (guestCart.length === 0) {
     return null;
@@ -35,7 +38,7 @@ export async function fetchCartForGuest(): Promise<Cart | null> {
           }>;
         }>(`/api/v1/products/${item.productSlug}`);
 
-        const variant = productData.variants?.find(v => 
+        const variant = productData.variants?.find(v =>
           (v._id?.toString() || v.id) === item.variantId
         ) || productData.variants?.[0];
 
@@ -44,9 +47,9 @@ export async function fetchCartForGuest(): Promise<Cart | null> {
         }
 
         const translation = productData.translations?.[0];
-        const imageUrl = productData.media?.[0] 
-          ? (typeof productData.media[0] === 'string' 
-              ? productData.media[0] 
+        const imageUrl = productData.media?.[0]
+          ? (typeof productData.media[0] === 'string'
+              ? productData.media[0]
               : productData.media[0].url || productData.media[0].src)
           : null;
 
@@ -83,16 +86,21 @@ export async function fetchCartForGuest(): Promise<Cart | null> {
   const itemsToRemove = itemsWithDetails
     .map((result, index) => result.shouldRemove ? index : -1)
     .filter(index => index !== -1);
-  
+
   if (itemsToRemove.length > 0) {
     const updatedCart = guestCart.filter((_, index) => !itemsToRemove.includes(index));
-    localStorage.setItem(CART_KEY, JSON.stringify(updatedCart));
+    writeGuestCartItems(updatedCart);
+  }
+
+  const currentItems = readGuestCartItems();
+  if (currentItems.length === 0) {
+    return null;
   }
 
   const validItems = itemsWithDetails
     .map(result => result.item)
     .filter((item): item is CartItem => item !== null);
-  
+
   if (validItems.length === 0) {
     return null;
   }
@@ -116,9 +124,6 @@ export async function fetchCartForGuest(): Promise<Cart | null> {
 }
 
 export function clearGuestCart(): void {
-  localStorage.removeItem(CART_KEY);
-  window.dispatchEvent(new Event('cart-updated'));
+  clearGuestCartItems();
+  dispatchCartUpdated();
 }
-
-
-

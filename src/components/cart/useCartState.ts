@@ -8,10 +8,12 @@ import type { CartUpdatedDetail } from '../../lib/cart-events';
 import { CART_UPDATED_EVENT, dispatchCartUpdated } from '../../lib/cart-events';
 import { getStoredCurrency, DEFAULT_CURRENCY } from '../../lib/currency';
 import {
+  filterRemovedCartItems,
   getInstantCartDisplay,
   getGuestCartFromStorage,
   readCartSnapshot,
   writeCartSnapshot,
+  clearGuestCartItems,
 } from '../../lib/guest-cart-storage';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
@@ -100,6 +102,7 @@ export function useCartState({ enabled }: UseCartStateOptions) {
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const cartLoadRequestRef = useRef(0);
   const hasPendingOptimisticCartRef = useRef(false);
+  const pendingRemovedItemIdsRef = useRef(new Set<string>());
 
   const syncCartFromLocal = useCallback(() => {
     const localCart = getInstantCartDisplay(isLoggedIn, productLabel);
@@ -115,6 +118,26 @@ export function useCartState({ enabled }: UseCartStateOptions) {
     return null;
   }, [isLoggedIn, productLabel]);
 
+
+  const applyServerCart = useCallback((cartData: Cart) => {
+    const filtered = filterRemovedCartItems(cartData, pendingRemovedItemIdsRef.current);
+    for (const id of [...pendingRemovedItemIdsRef.current]) {
+      if (!cartData.items.some((item) => item.id === id)) {
+        pendingRemovedItemIdsRef.current.delete(id);
+      }
+    }
+    clearGuestCartItems();
+    setCart(filtered);
+    writeCartSnapshot(filtered);
+    dispatchCartUpdated({
+      localOnly: true,
+      cartSummary: {
+        itemsCount: filtered.itemsCount,
+        total: filtered.totals.total,
+      },
+    });
+  }, []);
+
   const loadCart = useCallback(
     async (silent = false, skipInstantSync = false) => {
       const requestId = cartLoadRequestRef.current + 1;
@@ -124,12 +147,8 @@ export function useCartState({ enabled }: UseCartStateOptions) {
       if (!isLoggedIn) {
         syncCartFromLocal();
 
-        if (silent) {
-          return;
-        }
-
         const instantCart = getGuestCartFromStorage(productLabel);
-        if (!instantCart) {
+        if (!silent && !instantCart) {
           setLoading(true);
         }
 
@@ -141,8 +160,16 @@ export function useCartState({ enabled }: UseCartStateOptions) {
 
           if (cartData) {
             setCart(cartData);
+            dispatchCartUpdated({
+              localOnly: true,
+              cartSummary: {
+                itemsCount: cartData.itemsCount,
+                total: cartData.totals.total,
+              },
+            });
           } else {
-            syncCartFromLocal();
+            setCart(null);
+            dispatchCartUpdated({ localOnly: true, cartSummary: { itemsCount: 0, total: 0 } });
           }
         } catch {
           if (!isCurrentRequest()) {
@@ -151,8 +178,10 @@ export function useCartState({ enabled }: UseCartStateOptions) {
 
           syncCartFromLocal();
         } finally {
-          if (isCurrentRequest()) {
+          if (!silent && isCurrentRequest()) {
             setLoading(false);
+          }
+          if (isCurrentRequest()) {
             hasPendingOptimisticCartRef.current = false;
           }
         }
@@ -175,18 +204,11 @@ export function useCartState({ enabled }: UseCartStateOptions) {
         }
 
         if (cartData) {
-          setCart(cartData);
-          writeCartSnapshot(cartData);
-          dispatchCartUpdated({ localOnly: true, cartSummary: {
-            itemsCount: cartData.itemsCount,
-            total: cartData.totals.total,
-          } });
-        } else if (instantCart) {
-          setCart(instantCart);
+          applyServerCart(cartData);
         } else {
           writeCartSnapshot(null);
+          setCart(null);
           dispatchCartUpdated({ localOnly: true, cartSummary: { itemsCount: 0, total: 0 } });
-          syncCartFromLocal();
         }
       } catch {
         if (!isCurrentRequest()) {
@@ -207,7 +229,7 @@ export function useCartState({ enabled }: UseCartStateOptions) {
         }
       }
     },
-    [isLoggedIn, productLabel, syncCartFromLocal, t],
+    [applyServerCart, isLoggedIn, productLabel, syncCartFromLocal, t],
   );
 
   const refreshCart = useCallback((silent = true) => {
@@ -217,9 +239,7 @@ export function useCartState({ enabled }: UseCartStateOptions) {
     }
 
     const instantCart = syncCartFromLocal();
-    if (isLoggedIn) {
-      void loadCart(silent && Boolean(instantCart));
-    }
+    void loadCart(silent && Boolean(instantCart));
   }, [isLoggedIn, loadCart, syncCartFromLocal]);
 
   useEffect(() => {
@@ -289,8 +309,12 @@ export function useCartState({ enabled }: UseCartStateOptions) {
   }, [enabled, isLoggedIn, productLabel, loadCart, syncCartFromLocal]);
 
   const onRemoveItem = async (itemId: string) => {
+    pendingRemovedItemIdsRef.current.add(itemId);
     cartLoadRequestRef.current += 1;
-    await handleRemoveItem(itemId, isLoggedIn, setCart, () => loadCart(true), productLabel);
+    const removed = await handleRemoveItem(itemId, isLoggedIn, setCart, () => loadCart(true), productLabel);
+    if (!removed) {
+      pendingRemovedItemIdsRef.current.delete(itemId);
+    }
   };
 
   const onUpdateQuantity = (itemId: string, quantity: number) => {

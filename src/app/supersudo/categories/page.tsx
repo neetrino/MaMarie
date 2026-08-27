@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { Card, Button, Input } from '@shop/ui';
 import { useTranslation } from '../../../lib/i18n-client';
+import { localizeCategoriesForDisplay } from '@/lib/admin/reference-locale-display';
+import { AttributeLocaleSwitcher } from '../attributes/AttributeLocaleSwitcher';
 import { useCategories } from './hooks/useCategories';
 import { useCategoryActions } from './hooks/useCategoryActions';
 import { CategoriesList } from './components/CategoriesList';
@@ -24,12 +26,16 @@ export default function CategoriesPage() {
     pendingDeleteCategory,
     editingCategory,
     formData,
+    contentLocale,
     saving,
     imageUploading,
     deleting,
     setShowAddModal,
     setShowEditModal,
     setFormData,
+    setContentLocale,
+    handleTitleChange,
+    handleSlugChange,
     handleImageUpload,
     removeImage,
     handleAddCategory,
@@ -49,6 +55,11 @@ export default function CategoriesPage() {
       }
     }
   }, [isLoggedIn, isAdmin, isLoading, router]);
+
+  const displayCategories = useMemo(
+    () => localizeCategoriesForDisplay(categories, contentLocale),
+    [categories, contentLocale],
+  );
 
   if (isLoading) {
     return (
@@ -84,7 +95,7 @@ export default function CategoriesPage() {
             {t('admin.categories.addCategory')}
           </Button>
         </div>
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap items-end gap-4">
           <Input
             type="text"
             value={searchQuery}
@@ -92,6 +103,7 @@ export default function CategoriesPage() {
             placeholder={t('admin.categories.categoryTitlePlaceholder')}
             className="max-w-md"
           />
+          <AttributeLocaleSwitcher value={contentLocale} onChange={setContentLocale} />
         </div>
 
         {loading ? (
@@ -101,7 +113,7 @@ export default function CategoriesPage() {
           </div>
         ) : (
           <CategoriesList
-            categories={categories}
+            categories={displayCategories}
             searchQuery={searchQuery}
             onEdit={handleEditCategory}
             onDelete={handleDeleteCategory}
@@ -112,6 +124,7 @@ export default function CategoriesPage() {
       <AddCategoryModal
         isOpen={showAddModal}
         formData={formData}
+        contentLocale={contentLocale}
         categories={categories}
         saving={saving}
         imageUploading={imageUploading}
@@ -119,6 +132,9 @@ export default function CategoriesPage() {
           setShowAddModal(false);
           resetForm();
         }}
+        onContentLocaleChange={setContentLocale}
+        onTitleChange={handleTitleChange}
+        onSlugChange={handleSlugChange}
         onFormDataChange={setFormData}
         onImageUpload={handleImageUpload}
         onRemoveImage={removeImage}
@@ -129,6 +145,7 @@ export default function CategoriesPage() {
         isOpen={showEditModal}
         editingCategory={editingCategory}
         formData={formData}
+        contentLocale={contentLocale}
         categories={categories}
         saving={saving}
         imageUploading={imageUploading}
@@ -136,6 +153,9 @@ export default function CategoriesPage() {
           setShowEditModal(false);
           resetForm();
         }}
+        onContentLocaleChange={setContentLocale}
+        onTitleChange={handleTitleChange}
+        onSlugChange={handleSlugChange}
         onFormDataChange={setFormData}
         onImageUpload={handleImageUpload}
         onRemoveImage={removeImage}

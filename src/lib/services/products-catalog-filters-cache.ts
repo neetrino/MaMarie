@@ -1,4 +1,5 @@
 import { unstable_cache } from 'next/cache';
+import { STOREFRONT_PRODUCTS_CACHE_TAG } from '@/lib/cache/storefront-cache';
 
 const CATALOG_FILTERS_REVALIDATE_SECONDS = 60;
 
@@ -52,7 +53,7 @@ async function loadCatalogFilters(
 const getCatalogFiltersCachedInner = unstable_cache(
   loadCatalogFilters,
   ['products-catalog-filters-v1'],
-  { revalidate: CATALOG_FILTERS_REVALIDATE_SECONDS }
+  { revalidate: CATALOG_FILTERS_REVALIDATE_SECONDS, tags: [STOREFRONT_PRODUCTS_CACHE_TAG] }
 );
 
 /** SSR + edge cache for catalog sidebar filters. */

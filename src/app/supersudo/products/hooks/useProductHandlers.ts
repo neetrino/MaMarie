@@ -5,6 +5,7 @@ import { showToast } from '../../../../components/Toast';
 import type { Product } from '../types';
 import { logger } from "@/lib/utils/logger";
 import { useAdminDialogs } from '../../context/AdminDialogsContext';
+import { clearCatalogClientCache } from '@/lib/products-catalog-client-cache';
 
 interface UseProductHandlersProps {
   products: Product[];
@@ -85,6 +86,7 @@ export function useProductHandlers({
       );
       const failed = results.filter(r => r.status === 'rejected');
       setSelectedIds(new Set());
+      clearCatalogClientCache();
       await fetchProducts();
       showToast(
         t('admin.products.bulkDeleteFinished')
@@ -110,6 +112,7 @@ export function useProductHandlers({
         `/api/v1/admin/products/${productId}/duplicate`,
         {}
       );
+      clearCatalogClientCache();
       await fetchProducts();
       showToast(t('admin.products.duplicateSuccess'), 'success');
     } catch (err: unknown) {
@@ -136,6 +139,7 @@ export function useProductHandlers({
     try {
       await apiClient.delete(`/api/v1/admin/products/${productId}`);
       logger.debug('✅ [ADMIN] Product deleted successfully');
+      clearCatalogClientCache();
       fetchProducts();
       showToast(t('admin.products.deletedSuccess'), 'success');
     } catch (err: unknown) {
@@ -164,6 +168,7 @@ export function useProductHandlers({
       logger.debug(`🔄 [ADMIN] Updating product status to ${newStatus ? 'published' : 'draft'}`);
       await apiClient.put(`/api/v1/admin/products/${productId}`, { published: newStatus });
       logger.debug(`✅ [ADMIN] Product ${newStatus ? 'published' : 'unpublished'} successfully`);
+      clearCatalogClientCache();
 
       showToast(
         newStatus

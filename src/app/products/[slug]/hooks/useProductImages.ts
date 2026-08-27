@@ -5,60 +5,79 @@ import {
   normalizeUrlForComparison,
   cleanImageUrls,
 } from '../../../../lib/utils/image-utils';
-import type { Product } from '../types';
+import { sortVariantsForPresentation } from '@/lib/products/select-default-variant';
+import type { Product, ProductVariant } from '../types';
+
+function collectUniqueImages(urls: string[]): string[] {
+  const cleaned = cleanImageUrls(urls);
+  const result: string[] = [];
+  const seen = new Set<string>();
+
+  cleaned.forEach((img) => {
+    const processed = processImageUrl(img) || img;
+    const normalized = normalizeUrlForComparison(processed);
+    if (!seen.has(normalized)) {
+      result.push(img);
+      seen.add(normalized);
+    }
+  });
+
+  return result;
+}
+
+function collectVariantImages(variant: ProductVariant): string[] {
+  if (Array.isArray(variant.images) && variant.images.length > 0) {
+    return collectUniqueImages(variant.images);
+  }
+  if (variant.imageUrl) {
+    return collectUniqueImages(smartSplitUrls(variant.imageUrl));
+  }
+  return [];
+}
 
 /**
- * Process and combine product images from media and variants
+ * Full product gallery — Main Variant images first, then other variants, then media fallback.
  */
 export function useProductImages(product: Product | null): string[] {
   return useMemo(() => {
     if (!product) return [];
-    
+
     const mainImages = Array.isArray(product.media) ? product.media : [];
-    const cleanedMain = cleanImageUrls(mainImages);
     const variantImages: string[] = [];
-    
+
     if (product.variants && Array.isArray(product.variants)) {
-      const sortedVariants = [...product.variants].sort((a, b) => {
-        const aPos = ('position' in a && typeof a.position === 'number') ? a.position : 0;
-        const bPos = ('position' in b && typeof b.position === 'number') ? b.position : 0;
-        return aPos - bPos;
-      });
-      
+      const sortedVariants = sortVariantsForPresentation(
+        product.variants.map((v) => ({
+          ...v,
+          isMain: v.isMain === true,
+        }))
+      );
+
       sortedVariants.forEach((v) => {
-        if (v.imageUrl) {
-          const urls = smartSplitUrls(v.imageUrl);
-          variantImages.push(...urls);
-        }
+        variantImages.push(...collectVariantImages(v));
       });
     }
-    
-    const cleanedVariantImages = cleanImageUrls(variantImages);
-    const allImages: string[] = [];
-    const seenNormalized = new Set<string>();
-    
-    cleanedMain.forEach((img) => {
-      const processed = processImageUrl(img) || img;
-      const normalized = normalizeUrlForComparison(processed);
-      if (!seenNormalized.has(normalized)) {
-        allImages.push(img);
-        seenNormalized.add(normalized);
-      }
-    });
-    
-    cleanedVariantImages.forEach((img) => {
-      const processed = processImageUrl(img) || img;
-      const normalized = normalizeUrlForComparison(processed);
-      if (!seenNormalized.has(normalized)) {
-        allImages.push(img);
-        seenNormalized.add(normalized);
-      }
-    });
-    
-    return allImages;
+
+    return collectUniqueImages([
+      ...variantImages,
+      ...mainImages.map((item) =>
+        typeof item === 'string' ? item : (item as { url?: string }).url || ''
+      ).filter(Boolean),
+    ]);
   }, [product]);
 }
 
+/**
+ * Gallery for the currently selected variant (falls back to full product gallery).
+ */
+export function resolveVariantGalleryImages(
+  variant: ProductVariant | null,
+  fallbackImages: string[]
+): string[] {
+  if (!variant) {
+    return fallbackImages;
+  }
 
-
-
+  const variantOnly = collectVariantImages(variant);
+  return variantOnly.length > 0 ? variantOnly : fallbackImages;
+}

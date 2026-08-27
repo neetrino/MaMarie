@@ -1,5 +1,8 @@
 import { db } from "@white-shop/db";
-import { resolveCatalogProductCardImage } from "../catalog-product-card-image";
+import {
+  resolveCatalogProductCardImage,
+  resolveCatalogProductCardImages,
+} from "../catalog-product-card-image";
 import {
   collectProductColors,
   collectProductSizes,
@@ -9,6 +12,7 @@ import {
 import type { ProductWithRelations } from "../products-find-query/types";
 import { reviewsService } from "../reviews.service";
 import { pickProductContentTranslation } from "@/constants/product-content-locales";
+import { selectDefaultVariant } from "../../products/select-default-variant";
 
 /** Prisma `select` shape for related carousel (minimal joins). */
 export interface RelatedProductRow {
@@ -29,6 +33,8 @@ export interface RelatedProductRow {
     stock: number;
     sku: string | null;
     imageUrl?: string | null;
+    isMain?: boolean | null;
+    position?: number | null;
     attributes: unknown;
     options?: Array<{
       value: string | null;
@@ -68,6 +74,7 @@ export interface RelatedCardPayload {
   compareAtPrice: number | null;
   discountPercent: number | null;
   image: string | null;
+  images?: string[];
   inStock: boolean;
   brand: { id: string; name: string } | null;
   categories: Array<{ id: string; slug: string; title: string }>;
@@ -148,7 +155,7 @@ export async function transformRelatedProductRows(
     const brandTr = product.brand
       ? pickTranslation(product.brand.translations, lang)
       : null;
-    const variant = product.variants[0];
+    const variant = selectDefaultVariant(product.variants);
     const productDiscount = product.discountPercent || 0;
     const appliedDiscount = pickAppliedDiscount(
       productDiscount,
@@ -174,11 +181,18 @@ export async function transformRelatedProductRows(
       };
     });
 
-    const image = resolveCatalogProductCardImage(
+    const cardImages = resolveCatalogProductCardImages(
       product.id,
       Array.isArray(product.media) ? product.media : [],
       product.variants,
     );
+    const image =
+      cardImages[0] ??
+      resolveCatalogProductCardImage(
+        product.id,
+        Array.isArray(product.media) ? product.media : [],
+        product.variants,
+      );
 
     const productForAttributes = product as unknown as ProductWithRelations;
     const reviewStats = reviewStatsByProductId.get(product.id) ?? {
@@ -195,14 +209,19 @@ export async function transformRelatedProductRows(
       compareAtPrice: variant?.compareAtPrice ?? null,
       discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
       image,
+      images: cardImages,
       inStock: (variant?.stock ?? 0) > 0,
       brand: product.brand
         ? { id: product.brand.id, name: brandTr?.name ?? "" }
         : null,
       categories,
       defaultVariantId: variant?.id ?? null,
-      colors: collectProductColors(productForAttributes, lang),
-      sizes: collectProductSizes(productForAttributes, lang),
+      colors: collectProductColors(productForAttributes, lang, {
+        variants: (variant ? [variant] : []) as ProductWithRelations['variants'],
+      }),
+      sizes: collectProductSizes(productForAttributes, lang, {
+        variants: (variant ? [variant] : []) as ProductWithRelations['variants'],
+      }),
       averageRating: reviewStats.averageRating,
       reviewsCount: reviewStats.reviewsCount,
     };

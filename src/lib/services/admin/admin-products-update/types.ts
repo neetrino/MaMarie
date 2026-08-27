@@ -33,6 +33,7 @@ export interface UpdateProductData {
     color?: string;
     size?: string;
     imageUrl?: string;
+    isMain?: boolean;
     published?: boolean;
     options?: Array<{
       attributeKey: string;

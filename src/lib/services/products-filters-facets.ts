@@ -11,8 +11,6 @@ import type {
 import {
   COLOR_ATTRIBUTE_KEY,
   SIZE_ATTRIBUTE_KEY,
-  loadFilterableAttributes,
-  mergeDefinedAttributeValues,
   pickFacetTranslation,
   readColorHex,
   sortSizeFacetOptions,
@@ -114,22 +112,27 @@ function assembleAttributeFacets(
       continue;
     }
 
-    const rawValue =
-      pickFacetTranslation(row.attributeValue?.translations ?? [], lang, '') ||
+    const stableValue = (
       row.attributeValue?.value ||
       row.value ||
-      '';
-    const label = rawValue.trim();
-    if (!label) {
+      pickFacetTranslation(row.attributeValue?.translations ?? [], lang, '')
+    ).trim();
+    if (!stableValue) {
       continue;
     }
 
+    const displayLabel = pickFacetTranslation(
+      row.attributeValue?.translations ?? [],
+      lang,
+      stableValue,
+    );
+
     if (key === COLOR_ATTRIBUTE_KEY) {
-      const mapKey = label.toLowerCase();
+      const mapKey = stableValue.toLowerCase();
       const existing = colorMap.get(mapKey);
       colorMap.set(mapKey, {
         value: mapKey,
-        label: existing?.label ?? label,
+        label: displayLabel,
         count: (existing?.count ?? 0) + 1,
         imageUrl: row.attributeValue?.imageUrl ?? existing?.imageUrl ?? null,
         colors: readColorHex(row.attributeValue?.colors ?? null) ?? existing?.colors ?? null,
@@ -138,7 +141,8 @@ function assembleAttributeFacets(
     }
 
     if (key === SIZE_ATTRIBUTE_KEY) {
-      sizeMap.set(label, (sizeMap.get(label) ?? 0) + 1);
+      const normalized = stableValue.toUpperCase();
+      sizeMap.set(normalized, (sizeMap.get(normalized) ?? 0) + 1);
       continue;
     }
 
@@ -151,11 +155,14 @@ function assembleAttributeFacets(
       name: pickFacetTranslation(attribute?.translations ?? [], lang, key),
       values: [],
     };
-    const existingValue = group.values.find((item) => item.value.toLowerCase() === label.toLowerCase());
+    const existingValue = group.values.find(
+      (item) => item.value.toLowerCase() === stableValue.toLowerCase(),
+    );
     if (existingValue) {
       existingValue.count += 1;
+      existingValue.label = displayLabel;
     } else {
-      group.values.push({ value: label, label, count: 1 });
+      group.values.push({ value: stableValue, label: displayLabel, count: 1 });
     }
     groups.set(key, group);
   }
@@ -179,28 +186,68 @@ function assembleAttributeFacets(
   };
 }
 
-/** Loads complete catalog facets from DB (no product-row sample cap). */
+async function loadUsedCategoryIds(
+  productWhere: Prisma.ProductWhereInput
+): Promise<string[]> {
+  const products = await db.product.findMany({
+    where: productWhere,
+    select: { categoryIds: true, primaryCategoryId: true },
+  });
+
+  const directIds = new Set<string>();
+  for (const product of products) {
+    for (const id of product.categoryIds) {
+      if (id) {
+        directIds.add(id);
+      }
+    }
+    if (product.primaryCategoryId) {
+      directIds.add(product.primaryCategoryId);
+    }
+  }
+
+  if (directIds.size === 0) {
+    return [];
+  }
+
+  const categories = await db.category.findMany({
+    where: { id: { in: Array.from(directIds) }, deletedAt: null },
+    select: { id: true, parentIds: true },
+  });
+
+  const withAncestors = new Set<string>(directIds);
+  for (const category of categories) {
+    for (const parentId of category.parentIds) {
+      if (parentId) {
+        withAncestors.add(parentId);
+      }
+    }
+  }
+
+  return Array.from(withAncestors);
+}
+
+/** Loads catalog facets only from values actually used by matching products. */
 export async function loadCatalogFilterFacets(
   productWhere: Prisma.ProductWhereInput,
-  lang: string
+  lang: string,
+  categoryScopeWhere?: Prisma.ProductWhereInput
 ): Promise<CatalogFilterAggregation> {
-  const [brands, optionRows, priceAgg, definedAttributes] = await Promise.all([
+  const categoryWhere = categoryScopeWhere ?? productWhere;
+  const [brands, optionRows] = await Promise.all([
     loadBrands(productWhere, lang),
     loadUsedVariantOptions(productWhere),
+  ]);
+  const [priceAgg, categoryIds] = await Promise.all([
     db.productVariant.aggregate({
       where: { published: true, product: productWhere },
       _min: { price: true },
       _max: { price: true },
     }),
-    loadFilterableAttributes(),
+    loadUsedCategoryIds(categoryWhere),
   ]);
 
-  const usedFacets = assembleAttributeFacets(optionRows, lang);
-  const { colors, sizes, attributes } = mergeDefinedAttributeValues(
-    usedFacets,
-    definedAttributes,
-    lang
-  );
+  const { colors, sizes, attributes } = assembleAttributeFacets(optionRows, lang);
   const minPrice = priceAgg._min.price;
   const maxPrice = priceAgg._max.price;
 
@@ -209,6 +256,7 @@ export async function loadCatalogFilterFacets(
     sizes,
     brands,
     attributes,
+    categoryIds,
     priceMin: minPrice == null ? 0 : Math.floor(minPrice / PRICE_BUCKET) * PRICE_BUCKET,
     priceMax: maxPrice == null || maxPrice === 0
       ? 100000

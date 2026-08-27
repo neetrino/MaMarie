@@ -8,6 +8,12 @@ import { updateAttributeValueImageUrls } from "./attribute-value-updater";
 import { buildAttributeValueLookupCache } from "./variant-processor";
 import { invalidateAdminProductsListCache } from "../admin-products-read/list-cache";
 import { isProductFlagOnlyUpdate, updateProductFlagsOnly } from "./product-flag-update";
+import { normalizeVariantIsMainFlags } from "../../../products/normalize-variant-is-main";
+import { ensureProductVariantIsMainColumn } from "../../../utils/db-ensure";
+import {
+  persistInlineImageUrlsToR2,
+  persistMediaInlineImagesToR2,
+} from "../../persist-inline-images-to-r2";
 
 const PRODUCT_UPDATE_TX_TIMEOUT_MS = 60000;
 const PRODUCT_UPDATE_TX_MAX_WAIT_MS = 5000;
@@ -25,6 +31,23 @@ export async function updateProduct(
 
   try {
     logger.info('Updating product', { productId });
+    await ensureProductVariantIsMainColumn();
+
+    // Upload any inline images to R2 before the DB transaction (avoids long locks).
+    const dataToPersist: UpdateProductData = { ...data };
+    if (Array.isArray(dataToPersist.variants)) {
+      dataToPersist.variants = await Promise.all(
+        dataToPersist.variants.map(async (variant) => ({
+          ...variant,
+          imageUrl: await persistInlineImageUrlsToR2(variant.imageUrl),
+        }))
+      );
+    }
+    if (dataToPersist.media !== undefined) {
+      dataToPersist.media = await persistMediaInlineImagesToR2(
+        dataToPersist.media as unknown[]
+      );
+    }
     
     // Check if product exists
     const existing = await db.product.findUnique({
@@ -45,7 +68,6 @@ export async function updateProduct(
 
     // Execute everything in a transaction for atomicity and speed
     const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
-      const dataToPersist: UpdateProductData = { ...data };
       const allVariantImages = await collectVariantImages(dataToPersist.variants, productId, tx);
       const updateData = buildProductUpdateData(dataToPersist, allVariantImages, existing);
       await upsertProductTranslations(productId, dataToPersist, tx);
@@ -87,6 +109,7 @@ export async function updateProduct(
         const verifiedExternalSkus = new Set<string>();
 
         if (dataToPersist.variants.length > 0) {
+          dataToPersist.variants = normalizeVariantIsMainFlags(dataToPersist.variants);
           for (const variant of dataToPersist.variants) {
             const variantId = await updateOrCreateVariant(
               variant,

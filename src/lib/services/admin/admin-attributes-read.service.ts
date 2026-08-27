@@ -1,59 +1,31 @@
-import { db } from "@white-shop/db";
-import { logger } from "@/lib/utils/logger";
+import { db } from '@white-shop/db';
+import { PRIMARY_PRODUCT_CONTENT_LOCALE } from '@/constants/product-content-locales';
 import {
-  withAdminAttributesCache,
-} from "@/lib/cache/admin-reference-cache";
+  resolveDisplayLabel,
+  resolveDisplayName,
+} from '@/lib/admin/attribute-locale-helpers';
+import { logger } from '@/lib/utils/logger';
+import { withAdminAttributesCache } from '@/lib/cache/admin-reference-cache';
+import { parseColors } from './admin-attributes-write/utils';
 
 type AttributeValueRow = {
   id: string;
   value: string;
   colors?: unknown;
   imageUrl?: string | null;
-  translations?: Array<{ label: string }>;
+  translations?: Array<{ locale: string; label: string }>;
 };
-
-function parseColorsArray(colorsData: unknown): string[] {
-  if (!colorsData) {
-    return [];
-  }
-
-  if (Array.isArray(colorsData)) {
-    return colorsData.filter((color): color is string => typeof color === "string");
-  }
-
-  if (typeof colorsData === "string") {
-    try {
-      const parsed: unknown = JSON.parse(colorsData);
-      return Array.isArray(parsed)
-        ? parsed.filter((color): color is string => typeof color === "string")
-        : [];
-    } catch (error: unknown) {
-      logger.warn("[ADMIN ATTRIBUTES READ SERVICE] Failed to parse colors JSON", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return [];
-    }
-  }
-
-  if (typeof colorsData === "object") {
-    return Array.isArray(colorsData)
-      ? colorsData.filter((color): color is string => typeof color === "string")
-      : [];
-  }
-
-  return [];
-}
 
 function mapAttributeValue(value: AttributeValueRow) {
   const valueTranslations = Array.isArray(value.translations) ? value.translations : [];
-  const valueTranslation = valueTranslations[0] ?? null;
 
   return {
     id: value.id,
     value: value.value,
-    label: valueTranslation?.label || value.value,
-    colors: parseColorsArray(value.colors),
+    label: resolveDisplayLabel(valueTranslations, value.value),
+    colors: parseColors(value.colors),
     imageUrl: value.imageUrl || null,
+    translations: valueTranslations,
   };
 }
 
@@ -66,39 +38,40 @@ class AdminAttributesReadService {
   private async fetchAttributes() {
     const attributes = await db.attribute.findMany({
       include: {
-        translations: {
-          where: { locale: "en" },
-          take: 1,
-        },
+        translations: true,
         values: {
           include: {
-            translations: {
-              where: { locale: "en" },
-              take: 1,
-            },
+            translations: true,
           },
           orderBy: {
-            position: "asc",
+            position: 'asc',
           },
         },
       },
       orderBy: {
-        position: "asc",
+        position: 'asc',
       },
+    });
+
+    logger.debug('[ADMIN ATTRIBUTES READ] Loaded attributes with all locales', {
+      count: attributes.length,
+      primaryLocale: PRIMARY_PRODUCT_CONTENT_LOCALE,
     });
 
     return {
       data: attributes.map((attribute) => {
-        const translations = Array.isArray(attribute.translations) ? attribute.translations : [];
-        const translation = translations[0] ?? null;
+        const translations = Array.isArray(attribute.translations)
+          ? attribute.translations
+          : [];
         const values = Array.isArray(attribute.values) ? attribute.values : [];
 
         return {
           id: attribute.id,
           key: attribute.key,
-          name: translation?.name || attribute.key,
+          name: resolveDisplayName(translations, attribute.key),
           type: attribute.type,
           filterable: attribute.filterable,
+          translations,
           values: values.map((value) => mapAttributeValue(value)),
         };
       }),

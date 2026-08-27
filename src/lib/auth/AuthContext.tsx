@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient, ApiError } from '../api-client';
+import { clearCartSnapshot } from '../guest-cart-storage';
 import { logger } from "@/lib/utils/logger";
 
 /**
@@ -312,6 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear auth data
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_USER_KEY);
+    clearCartSnapshot();
 
     setToken(null);
     setUser(null);

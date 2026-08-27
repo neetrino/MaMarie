@@ -5,9 +5,27 @@ export function isInlineDataImageUrl(url: string): boolean {
   return url.startsWith('data:image/');
 }
 
+const INLINE_COUNT_PREFIX = '__INLINE__:';
+
 /** Public variant image endpoint — serves DB image without bloating PDP JSON. */
-export function variantImageApiPath(variantId: string): string {
-  return `/api/v1/products/variants/${variantId}/image`;
+export function variantImageApiPath(variantId: string, index = 0): string {
+  if (index <= 0) {
+    return `/api/v1/products/variants/${variantId}/image`;
+  }
+  return `/api/v1/products/variants/${variantId}/image?index=${index}`;
+}
+
+/** Marker written by hydrate when variant images are inline base64 (count only). */
+export function variantInlineImageCountMarker(count: number): string {
+  return `${INLINE_COUNT_PREFIX}${Math.max(1, count)}`;
+}
+
+export function parseVariantInlineImageCountMarker(raw: string): number | null {
+  if (!raw.startsWith(INLINE_COUNT_PREFIX)) {
+    return null;
+  }
+  const count = Number.parseInt(raw.slice(INLINE_COUNT_PREFIX.length), 10);
+  return Number.isFinite(count) && count > 0 ? count : null;
 }
 
 /** Public product.media endpoint — serves DB bytes without bloating catalog/PDP JSON. */
@@ -55,15 +73,27 @@ export function mapProductMediaToStorefrontUrls(
 }
 
 /**
- * Maps a variant `imageUrl` column to a storefront-safe URL.
- * Base64 values are replaced with the variant image API route.
+ * Maps a variant `imageUrl` column to ordered storefront-safe gallery URLs.
+ * Inline base64 → `/api/v1/products/variants/:id/image?index=N` (one URL per image).
  */
-export function toVariantStorefrontImageUrl(
+export function toVariantStorefrontImageUrls(
   variantId: string,
   raw: string | null | undefined,
-): string | null {
+): string[] {
   if (!raw) {
-    return null;
+    return [];
+  }
+
+  const inlineCount = parseVariantInlineImageCountMarker(raw);
+  if (inlineCount !== null) {
+    return Array.from({ length: inlineCount }, (_, index) =>
+      variantImageApiPath(variantId, index)
+    );
+  }
+
+  // Already hydrated to one or more API paths (comma-separated).
+  if (raw.includes(`/api/v1/products/variants/${variantId}/image`)) {
+    return smartSplitUrls(raw).filter(Boolean);
   }
 
   const processed = smartSplitUrls(raw)
@@ -71,14 +101,22 @@ export function toVariantStorefrontImageUrl(
     .filter((url): url is string => url !== null);
 
   if (processed.length === 0) {
-    return null;
+    return [];
   }
 
-  if (processed.some(isInlineDataImageUrl)) {
-    return variantImageApiPath(variantId);
-  }
+  return processed.map((url, index) =>
+    isInlineDataImageUrl(url) ? variantImageApiPath(variantId, index) : url
+  );
+}
 
-  return processed.join(',');
+/**
+ * Maps a variant `imageUrl` column to the primary storefront-safe URL.
+ */
+export function toVariantStorefrontImageUrl(
+  variantId: string,
+  raw: string | null | undefined,
+): string | null {
+  return toVariantStorefrontImageUrls(variantId, raw)[0] ?? null;
 }
 
 /** Drops inline data images from gallery arrays returned by the API. */

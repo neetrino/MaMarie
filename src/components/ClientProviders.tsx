@@ -1,5 +1,6 @@
 'use client';
 
+import '../lib/dev/performance-measure-patch';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../lib/auth/AuthContext';

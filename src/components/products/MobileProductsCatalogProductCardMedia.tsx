@@ -1,7 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   MOBILE_PRODUCTS_CATALOG_CARD_HEART_HEIGHT_PX,
   MOBILE_PRODUCTS_CATALOG_CARD_HEART_RIGHT_PX,
@@ -20,11 +22,14 @@ import {
 import { mobileProductsCatalogCardLayoutPx } from '../../lib/mobile-products-catalog-card-layout';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { ProductImagePlaceholder } from '../ProductImagePlaceholder';
+import { HomeProductCardImageGallery } from '../home/HomeProductCardImageGallery';
 
 interface MobileProductsCatalogProductCardMediaProps {
   slug: string;
+  productHref: string;
   title: string;
   imageSrc: string | null;
+  images?: string[];
   imagePriority: boolean;
   layoutWidthPx: number;
   isInWishlist: boolean;
@@ -35,17 +40,31 @@ interface MobileProductsCatalogProductCardMediaProps {
 /** Figma `167:619` — product photo frame and wishlist control. */
 export function MobileProductsCatalogProductCardMedia({
   slug,
+  productHref,
   title,
   imageSrc,
+  images,
   imagePriority,
   layoutWidthPx,
   isInWishlist,
   onWishlistToggle,
   onBeforeNavigate,
 }: MobileProductsCatalogProductCardMediaProps) {
+  const galleryImages =
+    images && images.length > 0 ? images : imageSrc ? [imageSrc] : [];
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setGalleryIndex(0);
+    setImageError(false);
+  }, [slug, galleryImages.join('|')]);
+
+  const activeImage =
+    galleryImages[Math.min(galleryIndex, Math.max(galleryImages.length - 1, 0))] ?? null;
+  const showProductImage = Boolean(activeImage) && !imageError;
+  const hasMultipleImages = galleryImages.length > 1;
   const lp = (value: number) => mobileProductsCatalogCardLayoutPx(value, layoutWidthPx);
-  const showProductImage = Boolean(imageSrc) && !imageError;
 
   return (
     <div
@@ -59,7 +78,7 @@ export function MobileProductsCatalogProductCardMedia({
       }}
     >
       <Link
-        href={`/products/${slug}`}
+        href={productHref}
         className="absolute overflow-hidden"
         onFocus={onBeforeNavigate}
         onPointerDown={onBeforeNavigate}
@@ -79,9 +98,9 @@ export function MobileProductsCatalogProductCardMedia({
             top: '-26.24%',
           }}
         >
-          {showProductImage && imageSrc ? (
+          {showProductImage && activeImage ? (
             <Image
-              src={imageSrc}
+              src={activeImage}
               alt={title}
               fill
               priority={imagePriority}
@@ -97,12 +116,25 @@ export function MobileProductsCatalogProductCardMedia({
         </div>
       </Link>
 
+      {hasMultipleImages ? (
+        <div className="pointer-events-auto absolute inset-0 z-10">
+          <HomeProductCardImageGallery
+            images={galleryImages}
+            activeIndex={galleryIndex}
+            onIndexChange={(next) => {
+              setGalleryIndex(next);
+              setImageError(false);
+            }}
+          />
+        </div>
+      ) : null}
+
       <button
         type="button"
         onClick={onWishlistToggle}
         aria-pressed={isInWishlist}
         aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-        className={`absolute z-10 flex items-center justify-center transition-opacity hover:opacity-80 ${
+        className={`absolute z-20 flex items-center justify-center transition-opacity hover:opacity-80 ${
           isInWishlist ? 'text-brand-pink' : ''
         }`}
         style={{

@@ -249,6 +249,7 @@ export function MobileBottomNavBar() {
             height={MOBILE_BOTTOM_NAV_CIRCLE_NOTCH_HEIGHT_PX}
             aria-hidden
             className={styles.circleNotch}
+            style={{ width: 'auto', height: 'auto' }}
           />
         ) : null}
 

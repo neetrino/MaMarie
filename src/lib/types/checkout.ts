@@ -9,12 +9,15 @@ export interface CheckoutData {
     productId: string;
     quantity: number;
   }>;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   shippingMethod?: string;
   shippingAddress?: {
     firstName?: string;
     lastName?: string;
+    address?: string;
     addressLine1?: string;
     addressLine2?: string;
     city?: string;

@@ -100,8 +100,8 @@ export function useVariantConversionToFormData({
             }
           });
           
-          if (variant.image) {
-            colorData.images.push(variant.image);
+          if (variant.images.length > 0) {
+            colorData.images.push(...variant.images);
           }
           
           colors.push(colorData);
@@ -137,8 +137,8 @@ export function useVariantConversionToFormData({
               });
             });
             
-            if (variant.image) {
-              colorData.images.push(variant.image);
+            if (variant.images.length > 0) {
+              colorData.images.push(...variant.images);
             }
             
             if (colorData.images.length > 0 || variant.stock) {
@@ -147,10 +147,12 @@ export function useVariantConversionToFormData({
           }
         }
         
-        if (variant.image && colors.length > 0) {
+        if (variant.images.length > 0 && colors.length > 0) {
           const firstColor = colors[0];
-          if (!firstColor.images.includes(variant.image)) {
-            firstColor.images.push(variant.image);
+          for (const img of variant.images) {
+            if (!firstColor.images.includes(img)) {
+              firstColor.images.push(img);
+            }
           }
         }
         

@@ -158,11 +158,24 @@ function readJsonAttributeValues(
 /**
  * Collects unique color options from product variants and product attributes.
  */
+export interface CollectProductAttributesOptions {
+  /**
+   * Limit attribute collection to these variants.
+   * Product cards pass only the Main/default variant so other variants' color/size are hidden.
+   */
+  variants?: ProductWithRelations['variants'];
+}
+
 export function collectProductColors(
   product: ProductWithRelations,
-  lang: string
+  lang: string,
+  options?: CollectProductAttributesOptions
 ): ProductColorOption[] {
-  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const variants = Array.isArray(options?.variants)
+    ? options.variants
+    : Array.isArray(product.variants)
+      ? product.variants
+      : [];
   const colorMap = new Map<string, ProductColorOption>();
 
   variants.forEach((variant) => {
@@ -305,9 +318,14 @@ function sortSizes(sizes: ProductSizeOption[]): ProductSizeOption[] {
  */
 export function collectProductSizes(
   product: ProductWithRelations,
-  lang: string
+  lang: string,
+  options?: CollectProductAttributesOptions
 ): ProductSizeOption[] {
-  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const variants = Array.isArray(options?.variants)
+    ? options.variants
+    : Array.isArray(product.variants)
+      ? product.variants
+      : [];
   const sizeMap = new Map<string, ProductSizeOption>();
 
   variants.forEach((variant) => {

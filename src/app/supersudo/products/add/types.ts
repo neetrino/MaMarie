@@ -2,6 +2,7 @@ export interface Brand {
   id: string;
   name: string;
   slug: string;
+  translations?: Array<{ locale: string; name: string }>;
 }
 
 export interface Category {
@@ -11,6 +12,7 @@ export interface Category {
   parentId: string | null;
   parentIds?: string[];
   requiresSizes?: boolean;
+  translations?: Array<{ locale: string; title: string; slug?: string }>;
 }
 
 export interface Attribute {
@@ -19,12 +21,14 @@ export interface Attribute {
   name: string;
   type: string;
   filterable?: boolean;
+  translations?: Array<{ locale: string; name: string }>;
   values: Array<{
     id: string;
     value: string;
     label: string;
     colors?: string[];
     imageUrl?: string | null;
+    translations?: Array<{ locale: string; label: string }>;
   }>;
 }
 
@@ -108,8 +112,19 @@ export interface GeneratedVariant {
   compareAtPrice: string;
   stock: string;
   sku: string;
-  image: string | null;
+  /** Ordered gallery images for this variant (persisted as comma-separated imageUrl). */
+  images: string[];
   isMain?: boolean;
+}
+
+/** Primary preview image for a generated variant. */
+export function getGeneratedVariantPrimaryImage(variant: GeneratedVariant): string | null {
+  return variant.images[0] ?? null;
+}
+
+/** Join variant images for API payload (existing CSV imageUrl storage). */
+export function joinGeneratedVariantImages(variant: GeneratedVariant): string | undefined {
+  return variant.images.length > 0 ? variant.images.join(',') : undefined;
 }
 
 

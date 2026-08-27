@@ -10,6 +10,7 @@ import {
 import type { OrderDetails, OrderListItem, ProfileTab } from '../types';
 import { createOrderDetailsPreview, type OrderDetailsClickPreview } from '../order-details-preview';
 import { logger } from "@/lib/utils/logger";
+import { dispatchCartUpdated } from '../../../lib/cart-events';
 
 interface OrdersMeta {
   total: number;
@@ -148,7 +149,7 @@ export function useOrders({
         }
       }
 
-      window.dispatchEvent(new Event('cart-updated'));
+      dispatchCartUpdated();
 
       if (addedCount > 0) {
         const skippedText = skippedCount > 0 ? `, ${skippedCount} ${t('profile.orderDetails.skipped')}` : '';

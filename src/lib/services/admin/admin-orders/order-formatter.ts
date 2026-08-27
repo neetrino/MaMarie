@@ -1,5 +1,50 @@
 import type { Prisma } from "@white-shop/db";
 
+type AddressContact = {
+  firstName?: string;
+  lastName?: string;
+};
+
+/**
+ * Read first/last name from order address JSON (guest checkout contact).
+ */
+function readAddressContact(value: Prisma.JsonValue | null | undefined): AddressContact {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+  const record = value as Record<string, unknown>;
+  const firstName =
+    typeof record.firstName === "string" && record.firstName.trim()
+      ? record.firstName.trim()
+      : undefined;
+  const lastName =
+    typeof record.lastName === "string" && record.lastName.trim()
+      ? record.lastName.trim()
+      : undefined;
+  return { firstName, lastName };
+}
+
+function resolveCustomerName(params: {
+  userFirstName?: string | null;
+  userLastName?: string | null;
+  billingAddress?: Prisma.JsonValue | null;
+  shippingAddress?: Prisma.JsonValue | null;
+}): { firstName: string; lastName: string } {
+  const fromBilling = readAddressContact(params.billingAddress);
+  const fromShipping = readAddressContact(params.shippingAddress);
+  const firstName =
+    params.userFirstName?.trim() ||
+    fromBilling.firstName ||
+    fromShipping.firstName ||
+    "";
+  const lastName =
+    params.userLastName?.trim() ||
+    fromBilling.lastName ||
+    fromShipping.lastName ||
+    "";
+  return { firstName, lastName };
+}
+
 /**
  * Format order for list response
  */
@@ -17,6 +62,8 @@ export function formatOrderForList(order: {
   currency: string | null;
   customerEmail: string | null;
   customerPhone: string | null;
+  billingAddress?: Prisma.JsonValue | null;
+  shippingAddress?: Prisma.JsonValue | null;
   createdAt: Date;
   items?: Array<unknown>;
   _count?: { items: number };
@@ -29,8 +76,12 @@ export function formatOrderForList(order: {
   } | null;
 }) {
   const customer = order.user || null;
-  const firstName = customer?.firstName || '';
-  const lastName = customer?.lastName || '';
+  const { firstName, lastName } = resolveCustomerName({
+    userFirstName: customer?.firstName,
+    userLastName: customer?.lastName,
+    billingAddress: order.billingAddress,
+    shippingAddress: order.shippingAddress,
+  });
 
   return {
     id: order.id,
@@ -243,6 +294,14 @@ export function formatOrderForDetail(order: {
   const payments = Array.isArray(order.payments) ? order.payments : [];
   const primaryPayment = payments[0] || null;
   const formattedItems = order.items.map(formatOrderItem);
+  const { firstName, lastName } = resolveCustomerName({
+    userFirstName: user?.firstName,
+    userLastName: user?.lastName,
+    billingAddress: order.billingAddress,
+    shippingAddress: order.shippingAddress,
+  });
+  const customerEmail = order.customerEmail || user?.email || undefined;
+  const customerPhone = order.customerPhone || user?.phone || undefined;
 
   return {
     id: order.id,
@@ -260,8 +319,8 @@ export function formatOrderForDetail(order: {
       total: Number(order.total || 0),
       currency: order.currency || "AMD",
     },
-    customerEmail: order.customerEmail || user?.email || undefined,
-    customerPhone: order.customerPhone || user?.phone || undefined,
+    customerEmail,
+    customerPhone,
     billingAddress: order.billingAddress || null,
     shippingAddress: order.shippingAddress || null,
     shippingMethod: order.shippingMethod || null,
@@ -281,15 +340,16 @@ export function formatOrderForDetail(order: {
           cardBrand: primaryPayment.cardBrand,
         }
       : null,
-    customer: user
-      ? {
-          id: user.id,
-          email: user.email,
-          phone: user.phone,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        }
-      : null,
+    customer:
+      user || firstName || lastName || customerEmail || customerPhone
+        ? {
+            id: user?.id ?? "",
+            email: customerEmail ?? null,
+            phone: customerPhone ?? null,
+            firstName: firstName || null,
+            lastName: lastName || null,
+          }
+        : null,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt?.toISOString?.() ?? undefined,
     items: formattedItems,

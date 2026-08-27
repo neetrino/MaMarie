@@ -10,6 +10,7 @@ export interface ProductsCatalogProduct {
   price: number;
   compareAtPrice: number | null;
   image: string | null;
+  images?: string[];
   inStock: boolean;
   brand: {
     id: string;

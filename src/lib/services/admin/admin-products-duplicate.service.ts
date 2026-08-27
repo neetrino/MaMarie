@@ -91,6 +91,7 @@ export async function duplicateProductAsDraft(sourceProductId: string): Promise<
       price: 0,
       stock: 0,
       imageUrl: v.imageUrl || undefined,
+      isMain: v.isMain === true,
       published: true,
       ...(v.color ? { color: v.color } : {}),
       ...(v.size ? { size: v.size } : {}),
@@ -99,7 +100,7 @@ export async function duplicateProductAsDraft(sourceProductId: string): Promise<
   });
 
   if (variantsPayload.length === 0) {
-    variantsPayload.push({ price: 0, stock: 0, imageUrl: undefined, published: true });
+    variantsPayload.push({ price: 0, stock: 0, imageUrl: undefined, isMain: true, published: true });
   }
 
   const created = await adminProductsCreateService.createProduct({

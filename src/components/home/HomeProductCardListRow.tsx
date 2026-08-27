@@ -34,6 +34,7 @@ import { formatPrice } from '../../lib/currency';
 import { ProductImagePlaceholder } from '../ProductImagePlaceholder';
 import { homeProductCardLayoutPx, resolveHomeProductCardTypography } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
+import { buildProductDetailHref } from '../../lib/products/build-product-detail-href';
 import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { useAddToCart } from '../hooks/useAddToCart';
 import { useCurrency } from '../hooks/useCurrency';
@@ -76,6 +77,7 @@ function HomeProductCardListRowComponent({
     product.averageRating ?? 0,
     product.reviewsCount ?? 0,
   );
+  const productHref = buildProductDetailHref(product.slug, product.defaultVariantId);
 
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -183,7 +185,7 @@ function HomeProductCardListRowComponent({
           }}
         >
           <Link
-            href={`/products/${product.slug}`}
+            href={productHref}
             className="relative block h-full w-full overflow-hidden"
           >
             {showProductImage && product.image ? (
@@ -234,7 +236,7 @@ function HomeProductCardListRowComponent({
         >
           <div className="flex min-w-0 flex-1 flex-col" style={{ gap: lp(3) }}>
             <Link
-              href={`/products/${product.slug}`}
+              href={productHref}
               className="truncate font-bold"
               style={{
                 color: HOME_PRODUCT_CARD_TEXT_DARK,

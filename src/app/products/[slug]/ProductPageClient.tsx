@@ -14,8 +14,17 @@ import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { ProductPageFrame } from './ProductPageFrame';
 import { ProductPageShell } from './ProductPageShell';
 import { useProductPage } from './useProductPage';
-import { readGuestCartItems, writeGuestCartItems } from '../../../lib/guest-cart-storage';
-import type { GuestCartItem } from '../../../app/cart/types';
+import { dispatchCartUpdated } from '../../../lib/cart-events';
+import {
+  clearCartSnapshot,
+  clearGuestCartItems,
+  readCartSnapshot,
+  readGuestCartItems,
+  upsertCartSnapshotItem,
+  writeCartSnapshot,
+  writeGuestCartItems,
+} from '../../../lib/guest-cart-storage';
+import type { CartItem, GuestCartItem } from '../../../app/cart/types';
 import { playCartFlyAnimation } from '../../../lib/cart-fly-animation';
 import {
   PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX,
@@ -40,7 +49,7 @@ export function ProductPageClient({
   serverLang,
   relatedSection,
 }: ProductPageClientProps) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuth();
   const {
     product,
     loading,
@@ -99,6 +108,10 @@ export function ProductPageClient({
   }, [product?.id]);
 
   const handleAddToCart = async () => {
+    if (isAuthLoading) {
+      return;
+    }
+
     const requiresColorSelection = colorGroups.length > 0 && colorGroups.some((group) => group.stock > 0);
     if (requiresColorSelection && !selectedColor) {
       setShowMessage(t(language, 'product.selectColor'));
@@ -145,14 +158,55 @@ export function ProductPageClient({
           cart.push(newItem);
         }
         writeGuestCartItems(cart);
+        clearCartSnapshot();
+        const itemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const total = cart.reduce((sum, item) => sum + (item.price ?? 0) * item.quantity, 0);
+        dispatchCartUpdated({ cartSummary: { itemsCount, total } });
       } else {
-        await apiClient.post('/api/v1/cart/items', {
+        type AddCartItemResponse = {
+          item: { id: string; variantId: string; quantity: number; price: number };
+          cartSummary: { itemsCount: number; total: number };
+        };
+
+        const response = await apiClient.post<AddCartItemResponse>('/api/v1/cart/items', {
           productId: product.id,
           variantId: currentVariant.id,
           quantity,
         });
+
+        const optimisticItem: CartItem = {
+          id: response.item.id,
+          variant: {
+            id: currentVariant.id,
+            sku: currentVariant.sku ?? '',
+            stock: maxQuantity,
+            product: {
+              id: product.id,
+              title: product.title,
+              slug: product.slug,
+              image: imageUrl,
+            },
+          },
+          quantity: response.item.quantity,
+          price: response.item.price,
+          originalPrice: originalPrice ?? compareAtPrice ?? null,
+          total: response.item.price * response.item.quantity,
+          selectedColor: selectedColor ?? null,
+          selectedSize: selectedSize ?? null,
+        };
+
+        const nextSnapshot = upsertCartSnapshotItem(
+          readCartSnapshot(),
+          optimisticItem,
+          response.cartSummary.itemsCount,
+        );
+        writeCartSnapshot(nextSnapshot);
+        clearGuestCartItems();
+        dispatchCartUpdated({
+          optimisticItem,
+          cartSummary: response.cartSummary,
+        });
       }
-      window.dispatchEvent(new Event('cart-updated'));
     } catch {
       setShowMessage(t(language, 'product.errorAddingToCart'));
       setTimeout(() => setShowMessage(null), 2000);

@@ -93,8 +93,12 @@ class ProductsFindFilterService {
           const getColorValue = (opt: any, lang: string = 'en'): string | null => {
             // New format: Use AttributeValue if available
             if (opt.attributeValue && opt.attributeValue.attribute?.key === "color") {
+              const valueSlug = (opt.attributeValue.value || "").trim().toLowerCase();
+              if (valueSlug) {
+                return valueSlug;
+              }
               const translation = opt.attributeValue.translations?.find((t: { locale: string }) => t.locale === lang) || opt.attributeValue.translations?.[0];
-              return (translation?.label || opt.attributeValue.value || "").trim().toLowerCase();
+              return (translation?.label || "").trim().toLowerCase();
             }
             // Old format: check attributeKey, key, or attribute
             if (opt.attributeKey === "color" || opt.key === "color" || opt.attribute === "color") {

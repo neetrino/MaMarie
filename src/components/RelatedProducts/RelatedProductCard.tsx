@@ -21,6 +21,7 @@ export interface RelatedProductCardData {
   compareAtPrice: number | null;
   discountPercent?: number | null;
   image: string | null;
+  images?: string[];
   inStock: boolean;
   brand?: {
     id: string;
@@ -50,6 +51,7 @@ export function mapRelatedProductToHomeProductCard(
     compareAtPrice: product.compareAtPrice,
     originalPrice: product.originalPrice,
     image: product.image,
+    images: product.images,
     inStock: product.inStock,
     brand: product.brand ? { name: product.brand.name } : null,
     defaultVariantId: product.defaultVariantId,

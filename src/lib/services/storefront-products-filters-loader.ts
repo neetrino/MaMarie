@@ -7,9 +7,11 @@ import {
   writeJsonCache,
   STOREFRONT_CACHE_KEYS,
   STOREFRONT_CACHE_TTL,
+  STOREFRONT_PRODUCTS_CACHE_TAG,
   stableSearchParamsKey,
 } from '@/lib/cache/storefront-cache';
 import { productsFiltersService } from './products-filters.service';
+import { hasLoadedFilterFacets } from '@/lib/products/has-loaded-filter-facets';
 
 const SERVER_READ_CACHE_TTL_MS = 60_000;
 const UNSTABLE_REVALIDATE_SECONDS = 60;
@@ -58,7 +60,7 @@ async function fetchFiltersPayload(
   const stableKey = stableSearchParamsKey(buildFiltersSearchParams(input));
   const cacheKey = STOREFRONT_CACHE_KEYS.productsFilters(stableKey);
   const cached = await readJsonCache<StorefrontProductsFiltersResult>(cacheKey);
-  if (cached !== null) {
+  if (cached !== null && hasLoadedFilterFacets(cached)) {
     return cached;
   }
 
@@ -66,7 +68,9 @@ async function fetchFiltersPayload(
     productsFiltersService.getFilters(input)
   );
 
-  await writeJsonCache(cacheKey, STOREFRONT_CACHE_TTL.productsFilters, result);
+  if (hasLoadedFilterFacets(result)) {
+    await writeJsonCache(cacheKey, STOREFRONT_CACHE_TTL.productsFilters, result);
+  }
   return result;
 }
 
@@ -79,8 +83,8 @@ const fetchFiltersByStableKey = unstable_cache(
       () => fetchFiltersPayload(input)
     );
   },
-  ['storefront-products-filters-v2'],
-  { revalidate: UNSTABLE_REVALIDATE_SECONDS }
+  ['storefront-products-filters-v5'],
+  { revalidate: UNSTABLE_REVALIDATE_SECONDS, tags: [STOREFRONT_PRODUCTS_CACHE_TAG] }
 );
 
 /** Cached storefront catalog filters — Redis first, shared by SSR and API. */

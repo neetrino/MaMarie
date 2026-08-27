@@ -379,3 +379,63 @@ export async function ensureProductVariantAttributesColumn(): Promise<boolean> {
   }
 }
 
+let isMainColumnChecked = false;
+let isMainColumnExists = false;
+
+/**
+ * Ensures product_variants.isMain exists (fallback when migrations lag on deploy).
+ */
+export async function ensureProductVariantIsMainColumn(): Promise<boolean> {
+  if (isMainColumnChecked && isMainColumnExists) {
+    return true;
+  }
+
+  try {
+    await db.$queryRaw`SELECT "isMain" FROM "product_variants" LIMIT 1`;
+    isMainColumnChecked = true;
+    isMainColumnExists = true;
+    return true;
+  } catch (error: unknown) {
+    const prismaError = error as { code?: string; message?: string };
+    if (
+      prismaError?.code === 'P2022' ||
+      prismaError?.message?.includes('does not exist') ||
+      prismaError?.message?.includes('product_variants.isMain') ||
+      (prismaError?.message?.includes('column') && prismaError?.message?.includes('isMain'))
+    ) {
+      logger.info('product_variants.isMain column not found, creating...');
+      try {
+        await db.$executeRaw`
+          ALTER TABLE "product_variants"
+          ADD COLUMN IF NOT EXISTS "isMain" BOOLEAN NOT NULL DEFAULT false
+        `;
+        await db.$executeRaw`
+          CREATE INDEX IF NOT EXISTS "product_variants_productId_isMain_idx"
+          ON "product_variants"("productId", "isMain")
+        `;
+        logger.info('product_variants.isMain column created successfully');
+        isMainColumnChecked = true;
+        isMainColumnExists = true;
+        return true;
+      } catch (createError: unknown) {
+        const prismaCreateError = createError as { message?: string; code?: string };
+        logger.error('Failed to create product_variants.isMain column', {
+          message: prismaCreateError?.message,
+          code: prismaCreateError?.code,
+        });
+        isMainColumnChecked = true;
+        isMainColumnExists = false;
+        return false;
+      }
+    }
+
+    logger.error('Unexpected error checking product_variants.isMain column', {
+      message: prismaError?.message,
+      code: prismaError?.code,
+    });
+    isMainColumnChecked = true;
+    isMainColumnExists = false;
+    return false;
+  }
+}
+

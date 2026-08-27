@@ -43,6 +43,7 @@ interface Product {
   compareAtPrice: number | null;
   originalPrice?: number | null;
   image: string | null;
+  images?: string[];
   inStock: boolean;
   brand: {
     id: string;

@@ -54,8 +54,7 @@ export function buildGroupsFromProductAttributes({
       options.forEach((option) => {
         const valueId = option.valueId || '';
         const value = option.value || '';
-        // Get label from AttributeValue if available, otherwise use value
-        let label = option.value || '';
+        let label = option.label?.trim() || option.value || '';
         if (valueId && productAttr.attribute.values) {
           const attrValue = (productAttr.attribute.values as Array<{ id?: string; label?: string; value?: string }>).find(
             (v) => v.id === valueId
@@ -147,7 +146,7 @@ export function buildGroupsFromProductAttributes({
           options.forEach((option) => {
             const valueId = option.valueId || '';
             const value = option.value || '';
-            const label = option.value || '';
+            const label = option.label?.trim() || option.value || '';
 
             const mapKey = valueId || value;
             if (!valueMap.has(mapKey)) {

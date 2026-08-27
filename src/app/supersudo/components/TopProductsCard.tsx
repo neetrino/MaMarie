@@ -6,7 +6,7 @@ import {
   PROFILE_DESKTOP_INNER_CARD_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
 } from '../../../constants/admin-desktop-page';
-import { formatCurrency } from '../utils/dashboardUtils';
+import { formatDashboardAmdFromUsd } from '../utils/dashboardUtils';
 import { AdminClaySectionCard } from './AdminClaySectionCard';
 
 interface TopProduct {
@@ -84,7 +84,7 @@ export function TopProductsCard({ topProducts, topProductsLoading }: TopProducts
               </div>
               <div className="shrink-0 text-right">
                 <p className="text-sm font-semibold text-gray-900">
-                  {formatCurrency(product.totalRevenue, 'USD')}
+                  {formatDashboardAmdFromUsd(product.totalRevenue)}
                 </p>
               </div>
             </button>

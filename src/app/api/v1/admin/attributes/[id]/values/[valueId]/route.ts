@@ -35,7 +35,8 @@ export async function PATCH(
       label: body.label,
       colors: body.colors,
       imageUrl: body.imageUrl,
-      locale: body.locale || "en",
+      locale: body.locale,
+      translations: body.translations,
     });
 
     return NextResponse.json({ data: result }, { status: 200 });

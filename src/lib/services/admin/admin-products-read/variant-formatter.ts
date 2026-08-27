@@ -8,6 +8,7 @@ export function formatVariantForAdmin(variant: {
   stock: number;
   sku: string | null;
   imageUrl: string | null;
+  isMain?: boolean | null;
   published: boolean | null;
   attributes: unknown;
   options?: Array<{
@@ -101,6 +102,7 @@ export function formatVariantForAdmin(variant: {
     color: color, // First color for backward compatibility
     size: size, // First size for backward compatibility
     imageUrl: variant.imageUrl || "",
+    isMain: variant.isMain === true,
     published: variant.published || false,
     attributes: attributes, // JSONB attributes with all values - IMPORTANT: This is the main field
     options: options, // Keep options for backward compatibility

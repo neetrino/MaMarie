@@ -105,7 +105,7 @@
   top: calc(var(--bottom-nav-notch-top-px) * 1px);
   left: calc(100% * var(--bottom-nav-notch-left) / var(--bottom-nav-design-width));
   width: calc(100% * var(--bottom-nav-notch-width) / var(--bottom-nav-design-width));
-  height: calc(var(--bottom-nav-notch-height-px) * 1px);
+  height: auto;
   pointer-events: none;
   transition: var(--bottom-nav-transition);
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
-import { getStoredLanguage } from '../lib/language';
 import { getColorHex } from '../lib/colorMap';
 import { useTranslation } from '../lib/i18n-client';
 import { useProductsFilters, readCachedProductsFilters, writeCachedProductsFilters } from './ProductsFiltersProvider';
@@ -44,31 +43,31 @@ export function ColorFilter({
   const filtersContext = useProductsFilters();
   const catalog = useOptionalProductsCatalog();
   const { applyPatch } = useProductsCatalogFilterNavigation();
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [colors, setColors] = useState<ColorOption[]>([]);
   const [loading, setLoading] = useState(true);
   const activeSelected = catalog?.selectedColors ?? selectedColors;
   const [selected, setSelected] = useState<string[]>(activeSelected);
 
   useEffect(() => {
-    if (filtersContext?.data?.colors) {
+    if (filtersContext?.data && Array.isArray(filtersContext.data.colors)) {
       setColors(filtersContext.data.colors);
-      setLoading(false);
+      setLoading(filtersContext.loading);
       return;
     }
     if (filtersContext === null) {
-      fetchColors();
+      void fetchColors();
     } else {
       setLoading(filtersContext.loading);
     }
-  }, [category, search, minPrice, maxPrice, filtersContext?.data?.colors, filtersContext?.loading, filtersContext === null]);
+  }, [category, search, minPrice, maxPrice, filtersContext?.data?.colors, filtersContext?.loading, filtersContext === null, lang]);
 
   useEffect(() => {
     setSelected(activeSelected);
   }, [activeSelected]);
 
   const fetchColors = async () => {
-    const cached = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+    const cached = readCachedProductsFilters({ lang, category, search, minPrice, maxPrice });
     if (cached) {
       setColors(cached.colors);
       setLoading(false);
@@ -77,7 +76,7 @@ export function ColorFilter({
 
     try {
       setLoading(true);
-      const language = getStoredLanguage();
+      const language = lang;
       const params: Record<string, string> = {
         lang: language,
       };
@@ -87,15 +86,20 @@ export function ColorFilter({
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
 
-      const response = await apiClient.get<{ colors: ColorOption[]; sizes: any[] }>('/api/v1/products/filters', { params });
-      const existing = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+      const response = await apiClient.get<{
+        colors: ColorOption[];
+        sizes?: Array<{ value: string; count: number }>;
+        categoryIds?: string[];
+      }>('/api/v1/products/filters', { params });
+      const existing = readCachedProductsFilters({ lang, category, search, minPrice, maxPrice });
       writeCachedProductsFilters(
-        { category, search, minPrice, maxPrice },
+        { lang, category, search, minPrice, maxPrice },
         {
           colors: response.colors || [],
           sizes: response.sizes || existing?.sizes || [],
           brands: existing?.brands || [],
           attributes: existing?.attributes || [],
+          categoryIds: existing?.categoryIds || response.categoryIds || [],
           priceRange: existing?.priceRange || {
             min: 0,
             max: 100000,
@@ -178,18 +182,33 @@ export function ColorFilter({
               onClick={() => handleColorToggle(color.value)}
               aria-pressed={isSelected}
               aria-label={color.label}
-              className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-105 ${
-                isSelected ? 'border-[#57423b] ring-2 ring-[#57423b]/20' : 'border-[#e8e8e8]'
-              }`}
-              style={hasImage ? undefined : { backgroundColor: colorHex }}
+              className="flex flex-col items-center gap-1"
             >
-              {hasImage ? (
-                <img
-                  src={color.imageUrl!}
-                  alt=""
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : null}
+              <span
+                className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-105 ${
+                  isSelected ? 'border-[#57423b] ring-2 ring-[#57423b]/20' : 'border-[#e8e8e8]'
+                }`}
+                style={hasImage ? undefined : { backgroundColor: colorHex }}
+              >
+                {hasImage ? (
+                  <img
+                    src={color.imageUrl!}
+                    alt=""
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                ) : null}
+              </span>
+              <span
+                className={`line-clamp-2 text-center ${
+                  isSelected ? 'font-medium text-[#57423b]' : 'text-[#555]'
+                }`}
+                style={{
+                  fontSize: PRODUCTS_CATALOG_FILTER_LABEL_SIZE_PX,
+                  lineHeight: `${PRODUCTS_CATALOG_FILTER_LABEL_LINE_HEIGHT_PX}px`,
+                }}
+              >
+                {color.label}
+              </span>
             </button>
           );
         })}
