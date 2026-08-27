@@ -19,7 +19,7 @@ import {
 } from '../products-catalog-params';
 
 const PREFETCH_COOLDOWN_MS = 5_000;
-const PRODUCTS_LIST_SCOPE = 'products';
+const PRODUCTS_LIST_SCOPE = 'products-v2';
 const PRODUCTS_FILTERS_SCOPE = 'filters';
 
 const lastPrefetchAt = new Map<string, number>();

@@ -10,7 +10,6 @@ import {
   HOME_PRODUCT_CARD_SIZE_SOLD_OUT_BG,
   HOME_PRODUCT_CARD_SIZE_SOLD_OUT_BORDER,
   HOME_PRODUCT_CARD_SIZE_SOLD_OUT_TEXT,
-  HOME_PRODUCT_CARD_SIZES_LEFT_PX,
   HOME_PRODUCT_CARD_SIZES_TOP_PX,
 } from '../../constants/home-sections';
 import { homeProductCardLayoutPx } from '../../lib/home-product-card-layout';
@@ -67,9 +66,8 @@ export function HomeProductCardSizeBadges({
 
   return (
     <div
-      className="home-product-card-sizes pointer-events-none absolute z-20 flex items-center opacity-0"
+      className="home-product-card-sizes pointer-events-none absolute left-1/2 z-20 flex -translate-x-1/2 items-center opacity-0"
       style={{
-        left: lp(HOME_PRODUCT_CARD_SIZES_LEFT_PX),
         top: lp(HOME_PRODUCT_CARD_SIZES_TOP_PX),
         gap: lp(HOME_PRODUCT_CARD_SIZE_BADGE_GAP_PX),
       }}

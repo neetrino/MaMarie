@@ -183,7 +183,7 @@ async function fetchCatalogProducts(
   });
 }
 
-const PRODUCTS_LIST_CLIENT_CACHE_SCOPE = 'products';
+const PRODUCTS_LIST_CLIENT_CACHE_SCOPE = 'products-v2';
 
 function buildProductsListClientCacheKey(params: ProductsCatalogParams): string {
   return buildCatalogClientCacheKey(PRODUCTS_LIST_CLIENT_CACHE_SCOPE, {

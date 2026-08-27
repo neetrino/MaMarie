@@ -2,15 +2,27 @@
 
 import { useEffect, useState } from 'react';
 
+/**
+ * True when the primary input cannot hover (phones / most tablets).
+ * MacBooks report maxTouchPoints > 0 for the trackpad — that alone must not
+ * disable desktop product-card hover UI.
+ */
 function detectTouchDevice(): boolean {
   if (typeof window === 'undefined') {
     return false;
   }
 
+  const canHoverFinePointer = window.matchMedia(
+    '(hover: hover) and (pointer: fine)'
+  ).matches;
+  if (canHoverFinePointer) {
+    return false;
+  }
+
   return (
-    'ontouchstart' in window ||
+    window.matchMedia('(pointer: coarse)').matches ||
     navigator.maxTouchPoints > 0 ||
-    window.matchMedia('(pointer: coarse)').matches
+    'ontouchstart' in window
   );
 }
 
