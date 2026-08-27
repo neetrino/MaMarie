@@ -1,5 +1,6 @@
 import { BRAND_COLORS } from './brand';
 import { HOME_SECTION_MAX_WIDTH_PX } from './home-sections';
+import { LEGAL_POLICY_ITEMS } from './legal-policy-links';
 import { STORE_EMAIL_HREF, STORE_INSTAGRAM_HREF, STORE_PHONE_HREF } from './store-contact';
 
 /** Figma node `51:428` — site footer. */
@@ -170,12 +171,10 @@ export const FOOTER_COMPANY_LINKS: FooterNavLink[] = [
   { labelKey: 'common.footer.company.contact', href: '/contact' },
 ];
 
-export const FOOTER_POLICY_LINKS: FooterNavLink[] = [
-  { labelKey: 'common.footer.privacyPolicy', href: '/privacy' },
-  { labelKey: 'common.footer.termsOfService', href: '/terms' },
-  { labelKey: 'common.footer.refundPolicy', href: '/refund-policy' },
-  { labelKey: 'common.footer.deliveryTerms', href: '/delivery-terms' },
-];
+/** Policy column — same 4 links as the mobile legal hub. */
+export const FOOTER_POLICY_LINKS: FooterNavLink[] = LEGAL_POLICY_ITEMS.map(
+  (item) => ({ labelKey: item.labelKey, href: item.href }),
+);
 
 export interface FooterSocialLink {
   href: string;

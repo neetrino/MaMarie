@@ -1,54 +1,49 @@
 {
-  "title": "Refund Policy",
+  "title": "Return and Exchange Policy",
   "lastUpdated": "Last Updated:",
-  "overview": {
-    "title": "Overview",
-    "description": "We want you to be satisfied with every purchase. This policy explains how returns and refunds work, including timelines and eligibility requirements."
+  "subtitle": "Mamaria children's clothing store",
+  "exchanges": {
+    "title": "1. Exchanges",
+    "p1": "Clothing, footwear, and accessories may be exchanged within 14 calendar days from the purchase date or the date the order is received, except for the non-returnable items listed below.",
+    "p2": "An exchange is available only if the item has not been worn, washed, damaged, or altered, shows no signs of use, stains, or odors, and all original tags and labels remain attached.",
+    "p3": "Size or color exchanges are subject to availability. If the requested option is unavailable, an alternative item or a return may be offered.",
+    "p4": "A receipt, electronic invoice, or order confirmation is required."
   },
-  "eligibility": {
-    "title": "Refund Eligibility",
-    "description": "To be eligible for a refund, please ensure that:",
+  "returns": {
+    "title": "2. Returns",
+    "p1": "Returns are accepted within 14 days of receiving the order only at a Mamaria store and with the cash-register receipt. Otherwise, no return is accepted.",
+    "p2": "If Mamaria delivers an incorrect, defective, or damaged item, the customer may return it or exchange it for the correct item without an additional delivery charge.",
+    "p3": "After the returned item is received, Mamaria will inspect its condition and notify the customer whether the return has been approved or declined."
+  },
+  "refunds": {
+    "title": "3. Refunds",
+    "p1": "For an approved return, the refund will be issued to the original payment method or another method agreed by the parties.",
+    "p2": "Card refunds are processed within up to 7 business days. The final posting time may vary depending on the bank.",
+    "p3": "Delivery fees are non-refundable unless the delivered item was incorrect, defective, or damaged."
+  },
+  "cancellation": {
+    "title": "4. Order Cancellation",
+    "p1": "An order may be canceled before it is handed over to the delivery service.",
+    "p2": "Once the order has been shipped, it cannot be canceled, but it may be returned after delivery under this policy."
+  },
+  "personalized": {
+    "title": "5. Personalized Orders",
+    "p1": "Items made with a name, initials, embroidery, custom sizing, or another personalized modification cannot be returned or exchanged unless they are defective or were produced incorrectly."
+  },
+  "nonReturnable": {
+    "title": "6. Non-Returnable or Non-Exchangeable Items",
     "items": {
-      "condition": "The item is unused, in original condition and in original packaging.",
-      "timeline": "The return request is submitted within 14 days of delivery, unless otherwise stated.",
-      "proof": "Proof of purchase is provided (order number or receipt).",
-      "excluded": "Items marked as final sale or non-returnable are excluded."
+      "underwear": "Underwear and bodysuits if the hygienic or factory packaging has been opened or the item has been tried on.",
+      "socks": "Socks and tights if the packaging has been opened.",
+      "swimwear": "Swimwear if the hygienic protective seal has been removed.",
+      "giftCards": "Gift cards and personalized items.",
+      "other": "Other items whose return is restricted by applicable law for hygiene or safety reasons."
     }
   },
-  "howToInitiate": {
-    "title": "How to Initiate a Return",
-    "steps": {
-      "contact": "Contact our support team with your order number and reason for return.",
-      "authorization": "Receive return authorization and instructions.",
-      "ship": "Ship the item via trackable method; include all original accessories and tags."
-    },
-    "description": "After receiving and inspecting the item, we will confirm refund approval or denial."
+  "specialNote": {
+    "title": "Special note",
+    "p1": "If an item is damaged, incorrect, or affected during delivery, please contact Mamaria as soon as possible and keep the original packaging.",
+    "p2": "This policy does not limit any mandatory consumer rights provided by applicable law."
   },
-  "refundMethod": {
-    "title": "Refund Method and Timing",
-    "items": {
-      "method": "Approved refunds are issued to the original payment method.",
-      "timing": "Processing time is typically 5–10 business days after approval; bank times may vary.",
-      "shipping": "Shipping fees are not refunded unless the return is due to our error or a defective item."
-    }
-  },
-  "nonRefundable": {
-    "title": "Non-Refundable Items",
-    "items": {
-      "giftCards": "Gift cards and digital items after delivery.",
-      "personalized": "Personalized or custom-made items, unless defective.",
-      "unauthorized": "Items returned without prior authorization.",
-      "condition": "Items not in original condition, damaged or with missing parts for reasons not due to our error."
-    }
-  },
-  "contact": {
-    "title": "Contact Us",
-    "description": "For questions about this Refund Policy or to initiate a return, write to us at"
-  }
+  "brand": "MAMARIA"
 }
-
-
-
-
-
-

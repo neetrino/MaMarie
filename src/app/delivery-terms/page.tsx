@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@shop/ui';
-import { STORE_EMAIL, STORE_EMAIL_HREF } from '@/constants/store-contact';
+import { DeliveryTermsSheetContent } from '@/components/legal/DeliveryTermsSheetContent';
 import { useTranslation } from '../../lib/i18n-client';
 
 /**
@@ -15,68 +15,19 @@ export default function DeliveryTermsPage() {
         <h1 className="text-4xl font-bold text-gray-900">{t('delivery-terms.title')}</h1>
         <p className="text-gray-600">
           {t('delivery-terms.lastUpdated')}{' '}
-          {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+          {new Date().toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
         </p>
 
         <div className="mt-8 space-y-6">
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.overview.title')}</h2>
-            <p className="text-gray-600">
-              {t('delivery-terms.overview.description')}
-            </p>
-
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.shippingOptions.title')}</h2>
-            <p className="text-gray-600">{t('delivery-terms.shippingOptions.description')}</p>
-            <ul className="list-disc list-inside text-gray-600 ml-4">
-              <li>{t('delivery-terms.shippingOptions.options.standard')}</li>
-              <li>{t('delivery-terms.shippingOptions.options.express')}</li>
-              <li>{t('delivery-terms.shippingOptions.options.pickup')}</li>
-            </ul>
-
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.processingTimes.title')}</h2>
-            <ul className="list-disc list-inside text-gray-600 ml-4">
-              <li>{t('delivery-terms.processingTimes.items.typical')}</li>
-              <li>{t('delivery-terms.processingTimes.items.weekends')}</li>
-              <li>{t('delivery-terms.processingTimes.items.preorder')}</li>
-            </ul>
-
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.deliveryTimeframes.title')}</h2>
-            <p className="text-gray-600">
-              {t('delivery-terms.deliveryTimeframes.description')}
-            </p>
-
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.shippingFees.title')}</h2>
-            <ul className="list-disc list-inside text-gray-600 ml-4">
-              <li>{t('delivery-terms.shippingFees.items.costs')}</li>
-              <li>
-                {t('delivery-terms.shippingFees.items.duties')}
-              </li>
-              <li>{t('delivery-terms.shippingFees.items.promotional')}</li>
-            </ul>
-
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.delaysDamageLoss.title')}</h2>
-            <ul className="list-disc list-inside text-gray-600 ml-4">
-              <li>{t('delivery-terms.delaysDamageLoss.items.delays')}</li>
-              <li>
-                {t('delivery-terms.delaysDamageLoss.items.damage')}
-              </li>
-              <li>
-                {t('delivery-terms.delaysDamageLoss.items.loss')}
-              </li>
-            </ul>
-
-            <h2 className="text-2xl font-semibold text-gray-900">{t('delivery-terms.contact.title')}</h2>
-            <p className="text-gray-600">
-              {t('delivery-terms.contact.description')}{' '}
-              <a href={STORE_EMAIL_HREF} className="text-blue-600 hover:underline">
-                {STORE_EMAIL}
-              </a>
-              .
-            </p>
+            <DeliveryTermsSheetContent />
           </Card>
         </div>
       </div>
     </div>
   );
 }
-
