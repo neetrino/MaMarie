@@ -35,6 +35,7 @@ interface UseProductEditModeProps {
   setHasVariantsToLoad: (has: boolean) => void;
   setProductType: (type: 'simple' | 'variable') => void;
   setSimpleProductData: (data: any) => void;
+  setSlugIsManual: (value: boolean) => void;
 }
 
 export function useProductEditMode({
@@ -52,6 +53,7 @@ export function useProductEditMode({
   setHasVariantsToLoad,
   setProductType,
   setSimpleProductData,
+  setSlugIsManual,
 }: UseProductEditModeProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -186,6 +188,7 @@ export function useProductEditMode({
             ...prev,
             ...formData,
           }));
+          setSlugIsManual(true);
 
           setUseNewBrand(false);
           setUseNewCategory(false);
@@ -302,6 +305,7 @@ export function useProductEditMode({
     setHasVariantsToLoad,
     setProductType,
     setSimpleProductData,
+    setSlugIsManual,
     t,
   ]);
 }

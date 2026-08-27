@@ -231,11 +231,15 @@ export function useAdminCategories() {
     ADMIN_QUERY_KEYS.categories,
     refetchCategories
   );
+  const refetchCategoriesForced = useCallback(
+    () => refetchCategories(true),
+    [refetchCategories]
+  );
 
   return {
     categories,
     loading,
-    refetchCategories: () => refetchCategories(true),
+    refetchCategories: refetchCategoriesForced,
   };
 }
 
@@ -247,11 +251,15 @@ export function useAdminBrands() {
     ADMIN_QUERY_KEYS.brands,
     refetchBrands
   );
+  const refetchBrandsForced = useCallback(
+    () => refetchBrands(true),
+    [refetchBrands]
+  );
 
   return {
     brands,
     loading,
-    refetchBrands: () => refetchBrands(true),
+    refetchBrands: refetchBrandsForced,
   };
 }
 
@@ -263,11 +271,15 @@ export function useAdminAttributesReference() {
     ADMIN_QUERY_KEYS.attributes,
     refetchAttributes
   );
+  const refetchAttributesForced = useCallback(
+    () => refetchAttributes(true),
+    [refetchAttributes]
+  );
 
   return {
     attributes,
     loading,
-    refetchAttributes: () => refetchAttributes(true),
+    refetchAttributes: refetchAttributesForced,
   };
 }
 
@@ -279,10 +291,14 @@ export function useAdminSettingsReference() {
     ADMIN_QUERY_KEYS.settings,
     refetchSettings
   );
+  const refetchSettingsForced = useCallback(
+    () => refetchSettings(true),
+    [refetchSettings]
+  );
 
   return {
     settings,
     loading,
-    refetchSettings: () => refetchSettings(true),
+    refetchSettings: refetchSettingsForced,
   };
 }

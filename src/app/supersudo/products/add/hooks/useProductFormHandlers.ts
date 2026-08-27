@@ -2,6 +2,7 @@ import type { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { convertPrice, type CurrencyCode } from '@/lib/currency';
 import type { Attribute, Variant, GeneratedVariant } from '../types';
+import { joinGeneratedVariantImages } from '../types';
 import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
 import { useBrandAndCategoryCreation } from './useBrandAndCategoryCreation';
 import { useVariantConversionToFormData } from './useVariantConversionToFormData';
@@ -258,7 +259,8 @@ export function useProductFormHandlers({
                 compareAtPrice: variantCompareAtPriceUSD,
                 stock: parseInt(genVariant.stock || '0') || 0,
                 sku: uniqueSku,
-                imageUrl: genVariant.image || undefined,
+                imageUrl: joinGeneratedVariantImages(genVariant),
+                isMain: genVariant.isMain === true,
                 published: true,
               });
             } else {
@@ -314,7 +316,8 @@ export function useProductFormHandlers({
                   compareAtPrice: variantCompareAtPriceUSD,
                   stock: parseInt(genVariant.stock || '0') || 0,
                   sku: uniqueSku,
-                  imageUrl: genVariant.image || undefined,
+                  imageUrl: joinGeneratedVariantImages(genVariant),
+                  isMain: genVariant.isMain === true && comboIndex === 0,
                   published: true,
                   options: variantOptions.length > 0 ? variantOptions : undefined,
                 });
@@ -429,7 +432,7 @@ export function useProductFormHandlers({
         productType === 'variable'
           ? generatedVariants.find((v) => v.isMain) ?? generatedVariants[0]
           : undefined;
-      const mainVariantImage = mainVariant?.image ?? null;
+      const mainVariantImage = mainVariant?.images[0] ?? null;
 
       const { finalMedia, mainImage, processedVariants } = processImagesForSubmit({
         imageUrls: productType === 'variable' ? [] : currentFormData.imageUrls,

@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { DEFAULT_LANGUAGE } from '@/lib/language';
+import { parseProductSlugParam } from '@/lib/products/parse-product-slug-param';
 import { ProductPageClient } from './ProductPageClient';
 import { ProductRelatedFallback } from './ProductRelatedFallback';
 import { ProductRelatedSection } from './ProductRelatedSection';
@@ -16,8 +17,7 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug: rawSlug } = await params;
-  const slugParts = rawSlug.includes(':') ? rawSlug.split(':') : [rawSlug];
-  const slug = slugParts[0] ?? '';
+  const { slug } = parseProductSlugParam(rawSlug);
 
   if (!slug) {
     notFound();

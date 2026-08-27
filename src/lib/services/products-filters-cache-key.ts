@@ -1,3 +1,5 @@
+import { DEFAULT_LANGUAGE } from '@/lib/language';
+
 const FILTERS_CACHE_PREFIX = 'storefront:catalog-filters';
 
 export function buildStorefrontFiltersCacheKey(filters: {
@@ -10,8 +12,8 @@ export function buildStorefrontFiltersCacheKey(filters: {
 }): string {
   return [
     FILTERS_CACHE_PREFIX,
-    'v2',
-    filters.lang ?? 'en',
+    'v5',
+    filters.lang ?? DEFAULT_LANGUAGE,
     filters.category ?? '',
     filters.categoryScope ?? '',
     filters.search ?? '',

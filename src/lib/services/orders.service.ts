@@ -98,6 +98,8 @@ class OrdersService {
       const {
         cartId,
         items: guestItems,
+        firstName,
+        lastName,
         email,
         phone,
         shippingMethod = 'pickup',
@@ -108,7 +110,19 @@ class OrdersService {
       } = data;
       // shippingAmount is ignored — computed server-side from shippingMethod and address
 
+      const trimmedFirstName = firstName?.trim() ?? '';
+      const trimmedLastName = lastName?.trim() ?? '';
+
       // Validate required fields
+      if (!trimmedFirstName || !trimmedLastName) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/validation-error",
+          title: "Validation Error",
+          detail: "First name and last name are required",
+        };
+      }
+
       if (!email || !phone) {
         throw {
           status: 400,
@@ -117,6 +131,22 @@ class OrdersService {
           detail: "Email and phone are required",
         };
       }
+
+      const contactAddress = {
+        firstName: trimmedFirstName,
+        lastName: trimmedLastName,
+        phone,
+        email,
+      };
+
+      const persistedShippingAddress = shippingAddress
+        ? {
+            ...shippingAddress,
+            firstName: shippingAddress.firstName?.trim() || trimmedFirstName,
+            lastName: shippingAddress.lastName?.trim() || trimmedLastName,
+            phone: shippingAddress.phone || phone,
+          }
+        : null;
 
       const allowedCashChangeFor = new Set([
         'none',
@@ -381,8 +411,16 @@ class OrdersService {
             customerPhone: phone,
             customerLocale: 'en', // TODO: Get from request
             shippingMethod,
-            shippingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
-            billingAddress: shippingAddress ? JSON.parse(JSON.stringify(shippingAddress)) : null,
+            shippingAddress: persistedShippingAddress
+              ? JSON.parse(JSON.stringify(persistedShippingAddress))
+              : null,
+            // Always store checkout contact (incl. guest name) for admin display
+            billingAddress: JSON.parse(
+              JSON.stringify({
+                ...contactAddress,
+                ...(persistedShippingAddress ?? {}),
+              })
+            ),
             notes: notes ?? null,
             items: {
               create: cartItems.map((item) => ({

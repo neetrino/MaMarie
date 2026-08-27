@@ -1,6 +1,7 @@
 import { apiClient } from '@/lib/api-client';
 import { logger } from '@/lib/utils/logger';
 import { PRIMARY_PRODUCT_CONTENT_LOCALE } from '@/constants/product-content-locales';
+import { clearCatalogClientCache } from '@/lib/products-catalog-client-cache';
 import { pickPrimaryFormFields, translationsPayloadFromForm } from '../utils/product-locale-fields';
 import type { ProductTranslationsByLocale } from '../utils/product-locale-fields';
 import type { ProductLabel } from '../types';
@@ -78,7 +79,7 @@ export async function createAndSubmitPayload({
     brandId: finalBrandIds.length > 0 ? finalBrandIds[0] : undefined,
     primaryCategoryId: finalPrimaryCategoryId || undefined,
     categoryIds: formData.categoryIds.length > 0 ? formData.categoryIds : undefined,
-    published: isEditMode ? formData.published : true,
+    published: formData.published,
     featured: formData.featured,
     locale: PRIMARY_PRODUCT_CONTENT_LOCALE,
     translations,
@@ -114,6 +115,7 @@ export async function createAndSubmitPayload({
       logger.debug('✅ [ADMIN] Product created:', product);
     }
 
+    clearCatalogClientCache();
     const extra = creationMessages.length ? `\n\n${creationMessages.join('\n')}` : '';
     onSuccess(`${successMessage}${extra}`);
   } catch (err: any) {

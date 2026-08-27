@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import {
   HOME_PRODUCT_CARD_ASSETS,
   HOME_PRODUCT_CARD_CART_BG,
@@ -39,11 +39,13 @@ import {
 } from '../../lib/home-product-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
+import { buildProductDetailHref } from '../../lib/products/build-product-detail-href';
 import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { WishlistIcon } from '../icons/WishlistIcon';
 import { buildHomeProductCardCssVars, resolveComparePrice } from './home-product-card-shared';
 import { HomeProductCardColorSwatches } from './HomeProductCardColorSwatches';
 import { HomeProductCardSizeBadges } from './HomeProductCardSizeBadges';
+import { HomeProductCardImageGallery } from './HomeProductCardImageGallery';
 import type {
   ProductColorOption,
   ProductSizeOption,
@@ -58,6 +60,8 @@ export interface HomeProductCardData {
   compareAtPrice?: number | null;
   originalPrice?: number | null;
   image: string | null;
+  /** Main Variant gallery images (card pagination). */
+  images?: string[];
   inStock: boolean;
   defaultVariantId?: string | null;
   colors?: ProductColorOption[];
@@ -108,6 +112,7 @@ function areHomeProductCardPropsEqual(
     prevProduct.compareAtPrice !== nextProduct.compareAtPrice ||
     prevProduct.originalPrice !== nextProduct.originalPrice ||
     prevProduct.image !== nextProduct.image ||
+    (prevProduct.images?.join('|') ?? '') !== (nextProduct.images?.join('|') ?? '') ||
     prevProduct.inStock !== nextProduct.inStock ||
     prevProduct.defaultVariantId !== nextProduct.defaultVariantId ||
     prevProduct.averageRating !== nextProduct.averageRating ||
@@ -164,8 +169,23 @@ function HomeProductCardComponent({
     image: product.image,
     originalPrice: product.originalPrice ?? product.compareAtPrice,
   });
+  const galleryImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.image
+        ? [product.image]
+        : [];
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
-  const showProductImage = Boolean(product.image) && !imageError;
+
+  useEffect(() => {
+    setGalleryIndex(0);
+    setImageError(false);
+  }, [product.id, galleryImages.join('|')]);
+
+  const activeImage = galleryImages[Math.min(galleryIndex, Math.max(galleryImages.length - 1, 0))] ?? null;
+  const showProductImage = Boolean(activeImage) && !imageError;
+  const hasMultipleImages = galleryImages.length > 1;
   const comparePrice = resolveComparePrice(product);
   const subtitle = product.subtitle?.trim() || product.title;
   const ratingLabel = formatProductRatingLabel(
@@ -186,6 +206,7 @@ function HomeProductCardComponent({
     reviewsCount: product.reviewsCount,
     inStock: product.inStock,
   });
+  const productHref = buildProductDetailHref(product.slug, product.defaultVariantId);
 
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -198,7 +219,7 @@ function HomeProductCardComponent({
     event.preventDefault();
     event.stopPropagation();
     const origin = event.currentTarget;
-    addToCart({ origin, imageUrl: product.image });
+    addToCart({ origin, imageUrl: activeImage ?? product.image });
     event.currentTarget.blur();
   };
 
@@ -287,7 +308,7 @@ function HomeProductCardComponent({
 
   const titleLine = (
     <Link
-      href={`/products/${product.slug}`}
+      href={productHref}
       className="truncate font-bold"
       onFocus={saveSnapshot}
       onPointerDown={saveSnapshot}
@@ -366,38 +387,52 @@ function HomeProductCardComponent({
         className="home-product-card-surface relative h-full w-full overflow-visible"
         style={{ borderRadius: lp(HOME_PRODUCT_CARD_RADIUS_PX) }}
       >
-        <Link
-          href={`/products/${product.slug}`}
-          className="home-product-card-image-wrap absolute overflow-hidden"
-          onFocus={saveSnapshot}
-          onPointerDown={saveSnapshot}
-        >
-          <div
-            className="pointer-events-none absolute relative max-w-none"
-            style={{
-              height: '133.2%',
-              width: '107.38%',
-              left: '-3.69%',
-              top: '-21.48%',
-            }}
+        <div className="home-product-card-image-wrap absolute overflow-hidden">
+          <Link
+            href={productHref}
+            className="absolute inset-0 block"
+            onFocus={saveSnapshot}
+            onPointerDown={saveSnapshot}
           >
-            {showProductImage && product.image ? (
-              <Image
-                src={product.image}
-                alt={product.title}
-                fill
-                priority={imagePriority}
-                loading={imagePriority ? 'eager' : 'lazy'}
-                sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
-                className="object-contain"
-                unoptimized
-                onError={() => setImageError(true)}
+            <div
+              className="pointer-events-none absolute relative max-w-none"
+              style={{
+                height: '133.2%',
+                width: '107.38%',
+                left: '-3.69%',
+                top: '-21.48%',
+              }}
+            >
+              {showProductImage && activeImage ? (
+                <Image
+                  src={activeImage}
+                  alt={product.title}
+                  fill
+                  priority={imagePriority}
+                  loading={imagePriority ? 'eager' : 'lazy'}
+                  sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
+                  className="object-contain"
+                  unoptimized
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
+              )}
+            </div>
+          </Link>
+          {hasMultipleImages ? (
+            <div className="pointer-events-auto absolute inset-0 z-10">
+              <HomeProductCardImageGallery
+                images={galleryImages}
+                activeIndex={galleryIndex}
+                onIndexChange={(next) => {
+                  setGalleryIndex(next);
+                  setImageError(false);
+                }}
               />
-            ) : (
-              <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
-            )}
-          </div>
-        </Link>
+            </div>
+          ) : null}
+        </div>
 
         {!disableHoverEffects ? (
           <HomeProductCardSizeBadges sizes={product.sizes} layoutWidthPx={layoutWidthPx} />

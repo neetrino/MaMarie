@@ -25,7 +25,8 @@
     "db:migrate": "pnpm --filter @white-shop/db db:migrate",
     "db:studio": "pnpm --filter @white-shop/db db:studio",
     "db:seed": "node shared/db/prisma/seed.cjs",
-    "db:migrate:deploy": "node src/scripts/run-migrations.js"
+    "db:migrate:deploy": "node src/scripts/run-migrations.js",
+    "db:migrate-variant-images-r2": "node scripts/migrate-variant-images-to-r2.cjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.995.0",

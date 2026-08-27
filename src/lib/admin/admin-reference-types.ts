@@ -6,6 +6,7 @@ export interface AdminReferenceCategory {
   parentIds?: string[];
   requiresSizes?: boolean;
   published?: boolean;
+  translations?: Array<{ locale: string; title: string; slug?: string }>;
 }
 
 export interface AdminReferenceBrand {
@@ -14,6 +15,7 @@ export interface AdminReferenceBrand {
   slug?: string;
   logoUrl?: string | null;
   published?: boolean;
+  translations?: Array<{ locale: string; name: string }>;
 }
 
 export interface AdminReferenceAttributeValue {
@@ -22,6 +24,7 @@ export interface AdminReferenceAttributeValue {
   label: string;
   colors?: string[];
   imageUrl?: string | null;
+  translations?: Array<{ locale: string; label: string }>;
 }
 
 export interface AdminReferenceAttribute {
@@ -30,6 +33,7 @@ export interface AdminReferenceAttribute {
   name: string;
   type: string;
   filterable: boolean;
+  translations?: Array<{ locale: string; name: string }>;
   values: AdminReferenceAttributeValue[];
 }
 

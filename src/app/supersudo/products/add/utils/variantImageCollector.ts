@@ -2,6 +2,7 @@
  * Utilities for collecting variant images
  */
 
+import { smartSplitUrls } from '@/lib/utils/image-utils';
 import type { ColorData } from '../types';
 
 /**
@@ -23,37 +24,41 @@ export function collectVariantImagesFromColors(colors: ColorData[]): Set<string>
   return variantImages;
 }
 
+function addUrlVariants(target: Set<string>, url: string): void {
+  if (!url) {
+    return;
+  }
+  target.add(url);
+  if (url.startsWith('data:')) {
+    return;
+  }
+  const normalizedWithSlash = url.startsWith('/') ? url : `/${url}`;
+  const normalizedWithoutSlash = url.startsWith('/') ? url.substring(1) : url;
+  target.add(normalizedWithSlash);
+  target.add(normalizedWithoutSlash);
+  const urlWithoutQuery = url.split('?')[0];
+  if (urlWithoutQuery !== url) {
+    target.add(urlWithoutQuery);
+    target.add(urlWithoutQuery.startsWith('/') ? urlWithoutQuery : `/${urlWithoutQuery}`);
+  }
+}
+
 /**
  * Collects variant images from product variants
  */
 export function collectVariantImagesFromProductVariants(variants: unknown[]): Set<string> {
   const variantImages = new Set<string>();
 
-  variants.forEach((variant: any) => {
-    if (variant.imageUrl) {
-      if (typeof variant.imageUrl === 'string' && variant.imageUrl.startsWith('data:')) {
-        variantImages.add(variant.imageUrl);
-      } else {
-        const imageUrls =
-          typeof variant.imageUrl === 'string'
-            ? variant.imageUrl.split(',').map((url: string) => url.trim()).filter(Boolean)
-            : [];
-        imageUrls.forEach((url: string) => {
-          if (url) {
-            variantImages.add(url);
-            const normalizedWithSlash = url.startsWith('/') ? url : `/${url}`;
-            const normalizedWithoutSlash = url.startsWith('/') ? url.substring(1) : url;
-            variantImages.add(normalizedWithSlash);
-            variantImages.add(normalizedWithoutSlash);
-            const urlWithoutQuery = url.split('?')[0];
-            if (urlWithoutQuery !== url) {
-              variantImages.add(urlWithoutQuery);
-              const normalizedWithoutQuery = urlWithoutQuery.startsWith('/') ? urlWithoutQuery : `/${urlWithoutQuery}`;
-              variantImages.add(normalizedWithoutQuery);
-            }
-          }
-        });
-      }
+  variants.forEach((variant: unknown) => {
+    if (!variant || typeof variant !== 'object') {
+      return;
+    }
+    const imageUrl = (variant as { imageUrl?: unknown }).imageUrl;
+    if (typeof imageUrl !== 'string' || !imageUrl.trim()) {
+      return;
+    }
+    for (const url of smartSplitUrls(imageUrl)) {
+      addUrlVariants(variantImages, url);
     }
   });
 

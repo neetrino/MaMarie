@@ -9,6 +9,8 @@ import {
   type StorefrontProductsFiltersInput,
 } from "@/lib/services/storefront-products-filters-loader";
 import { logger } from "@/lib/utils/logger";
+import { DEFAULT_LANGUAGE } from "@/lib/language";
+import { hasLoadedFilterFacets } from "@/lib/products/has-loaded-filter-facets";
 
 function parseFiltersInput(searchParams: URLSearchParams): StorefrontProductsFiltersInput {
   return {
@@ -21,7 +23,7 @@ function parseFiltersInput(searchParams: URLSearchParams): StorefrontProductsFil
     maxPrice: searchParams.get("maxPrice")
       ? parseFloat(searchParams.get("maxPrice")!)
       : undefined,
-    lang: searchParams.get("lang") || "en",
+    lang: searchParams.get("lang") || DEFAULT_LANGUAGE,
   };
 }
 
@@ -47,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     const cacheKey = STOREFRONT_CACHE_KEYS.productsFilters(stableSearchParamsKey(searchParams));
     const cached = await readJsonCache<unknown>(cacheKey);
-    if (cached !== null) {
+    if (cached !== null && hasLoadedFilterFacets(cached as { colors: unknown[]; sizes: unknown[]; brands: unknown[]; attributes: Array<{ values: unknown[] }>; categoryIds: unknown[] })) {
       return NextResponse.json(cached, { headers: { "X-Cache": "HIT" } });
     }
 

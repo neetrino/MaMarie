@@ -46,6 +46,7 @@ export interface CatalogFilterAggregation {
   sizes: CatalogFilterSizeOption[];
   brands: CatalogFilterBrandOption[];
   attributes: CatalogFilterAttributeGroup[];
+  categoryIds: string[];
   priceMin: number;
   priceMax: number;
 }
@@ -145,6 +146,7 @@ export function aggregateCatalogFilters(
     sizes,
     brands,
     attributes: [],
+    categoryIds: [],
     priceMin: rangeMin === Infinity ? 0 : Math.floor(rangeMin / 1000) * 1000,
     priceMax: rangeMax === 0 ? 100000 : Math.ceil(rangeMax / 1000) * 1000,
   };

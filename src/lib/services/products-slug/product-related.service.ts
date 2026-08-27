@@ -40,7 +40,7 @@ const relatedProductSelect = {
   },
   variants: {
     where: { published: true },
-    orderBy: { price: "asc" as const },
+    orderBy: [{ isMain: "desc" as const }, { position: "asc" as const }],
     select: {
       id: true,
       price: true,
@@ -49,6 +49,8 @@ const relatedProductSelect = {
       sku: true,
       attributes: true,
       imageUrl: true,
+      isMain: true,
+      position: true,
     },
   },
   categories: {

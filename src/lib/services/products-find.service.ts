@@ -36,7 +36,7 @@ class ProductsFindService {
         : filteredProducts.slice(start, start + limit);
 
     // Step 4: Transform products to response format
-    const data = await productsFindTransformService.transformProducts(paginatedProducts, lang);
+    const data = await productsFindTransformService.transformProducts(paginatedProducts, lang, filters);
 
     return {
       data,

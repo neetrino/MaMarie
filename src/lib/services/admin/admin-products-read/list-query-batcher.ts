@@ -17,6 +17,9 @@ export type AdminProductListRow = {
     stock: number;
     compareAtPrice: number | null;
     imageUrl: string | null;
+    isMain: boolean;
+    position: number;
+    published: boolean;
   }>;
   categories: Array<{ id: string; translations: Array<{ title: string }> }>;
 };
@@ -32,38 +35,46 @@ type BaseProductRow = {
   categoryIds: string[];
 };
 
-type CheapestVariantRow = {
+type DefaultVariantRow = {
   productId: string;
   price: number;
   stock: number;
   compareAtPrice: number | null;
   imageUrl: string | null;
+  isMain: boolean;
+  position: number;
+  published: boolean;
 };
 
-/** One cheapest published variant per product (index-friendly DISTINCT ON). */
-async function fetchCheapestVariantsByProduct(
+/**
+ * One default variant per product: Main first, then lowest position (never cheapest price).
+ */
+async function fetchDefaultVariantsByProduct(
   productIds: string[]
-): Promise<CheapestVariantRow[]> {
+): Promise<DefaultVariantRow[]> {
   if (productIds.length === 0) {
     return [];
   }
 
-  return db.$queryRaw<CheapestVariantRow[]>(Prisma.sql`
+  return db.$queryRaw<DefaultVariantRow[]>(Prisma.sql`
     SELECT DISTINCT ON ("productId")
       "productId",
       price,
       stock,
       "compareAtPrice",
-      "imageUrl"
+      "imageUrl",
+      "isMain",
+      position,
+      published
     FROM product_variants
     WHERE "productId" IN (${Prisma.join(productIds)})
       AND published = true
-    ORDER BY "productId", price ASC
+    ORDER BY "productId", "isMain" DESC, position ASC, "createdAt" ASC
   `);
 }
 
 function mapVariantsByProduct(
-  variants: CheapestVariantRow[]
+  variants: DefaultVariantRow[]
 ): Map<string, AdminProductListRow['variants'][number]> {
   return new Map(
     variants.map((variant) => [
@@ -73,6 +84,9 @@ function mapVariantsByProduct(
         stock: variant.stock,
         compareAtPrice: variant.compareAtPrice,
         imageUrl: variant.imageUrl,
+        isMain: variant.isMain,
+        position: variant.position,
+        published: variant.published,
       },
     ])
   );
@@ -81,7 +95,7 @@ function mapVariantsByProduct(
 function assembleProductListRows(
   baseProducts: BaseProductRow[],
   translations: Array<{ productId: string; slug: string; title: string }>,
-  variants: CheapestVariantRow[],
+  variants: DefaultVariantRow[],
   categories: Array<{ id: string; translations: Array<{ title: string }> }>
 ): AdminProductListRow[] {
   const translationsByProduct = new Map(
@@ -147,7 +161,7 @@ export async function fetchAdminProductListRows(
       where: { productId: { in: productIds }, locale: EN_LOCALE },
       select: { productId: true, slug: true, title: true },
     }),
-    fetchCheapestVariantsByProduct(productIds),
+    fetchDefaultVariantsByProduct(productIds),
     categoryIds.length > 0
       ? db.category.findMany({
           where: { id: { in: categoryIds } },

@@ -1,3 +1,5 @@
+import type { CategoryLocaleTitleMap } from '@/lib/admin/category-locale-helpers';
+
 export interface Category {
   id: string;
   slug: string;
@@ -7,6 +9,7 @@ export interface Category {
   requiresSizes?: boolean;
   imageUrl?: string | null;
   published?: boolean;
+  translations?: Array<{ locale: string; title: string; slug?: string }>;
   children?: Category[];
 }
 
@@ -17,7 +20,8 @@ export interface CategoryWithLevel extends Category {
 }
 
 export interface CategoryFormData {
-  title: string;
+  titles: CategoryLocaleTitleMap;
+  slug: string;
   parentIds: string[];
   requiresSizes: boolean;
   subcategoryIds: string[];

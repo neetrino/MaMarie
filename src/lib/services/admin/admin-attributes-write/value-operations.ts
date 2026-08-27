@@ -1,50 +1,121 @@
-import { db } from "@white-shop/db";
-import { invalidateAdminAttributesCache } from "@/lib/cache/admin-reference-cache";
-import { logger } from "../../../utils/logger";
-import { ensureColorsColumnsExist } from "./migration";
-import { formatAttribute, parseColors } from "./utils";
+import { db } from '@white-shop/db';
+import {
+  PRIMARY_PRODUCT_CONTENT_LOCALE,
+  isProductContentLocale,
+  type ProductContentLocale,
+} from '@/constants/product-content-locales';
+import { slugifyAttributeValue } from '@/lib/admin/attribute-locale-helpers';
+import { invalidateAdminAttributesCache } from '@/lib/cache/admin-reference-cache';
+import { logger } from '../../../utils/logger';
+import { ensureColorsColumnsExist } from './migration';
+import { formatAttribute } from './utils';
+
+type LabelTranslationInput = { locale: string; label: string };
+
+function normalizeLabelTranslations(data: {
+  label?: string;
+  locale?: string;
+  translations?: LabelTranslationInput[];
+}): Array<{ locale: ProductContentLocale; label: string }> {
+  if (Array.isArray(data.translations) && data.translations.length > 0) {
+    const rows: Array<{ locale: ProductContentLocale; label: string }> = [];
+    for (const row of data.translations) {
+      if (!isProductContentLocale(row.locale) || !row.label?.trim()) {
+        continue;
+      }
+      rows.push({ locale: row.locale, label: row.label.trim() });
+    }
+    return rows;
+  }
+
+  if (data.label?.trim()) {
+    const rawLocale = data.locale || '';
+    const locale: ProductContentLocale = isProductContentLocale(rawLocale)
+      ? rawLocale
+      : PRIMARY_PRODUCT_CONTENT_LOCALE;
+    return [{ locale, label: data.label.trim() }];
+  }
+
+  return [];
+}
+
+async function loadFormattedAttribute(attributeId: string) {
+  const updatedAttribute = await db.attribute.findUnique({
+    where: { id: attributeId },
+    include: {
+      translations: true,
+      values: {
+        include: {
+          translations: true,
+        },
+        orderBy: { position: 'asc' },
+      },
+    },
+  });
+
+  if (!updatedAttribute) {
+    throw {
+      status: 500,
+      type: 'https://api.shop.am/problems/internal-error',
+      title: 'Internal Server Error',
+      detail: 'Failed to retrieve updated attribute',
+    };
+  }
+
+  return formatAttribute(updatedAttribute);
+}
 
 /**
- * Add attribute value
+ * Add attribute value with one or more locale labels.
  */
 export async function addAttributeValue(
   attributeId: string,
-  data: { label: string; locale?: string }
+  data: {
+    label?: string;
+    locale?: string;
+    translations?: LabelTranslationInput[];
+  },
 ) {
-  logger.info('Adding attribute value', { attributeId, label: data.label });
+  const labelRows = normalizeLabelTranslations(data);
+  if (labelRows.length === 0) {
+    throw {
+      status: 400,
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Validation Error',
+      detail: 'At least one value label translation is required',
+    };
+  }
 
-  const attribute = await db.attribute.findUnique({
-    where: { id: attributeId },
+  logger.info('Adding attribute value', {
+    attributeId,
+    locales: labelRows.map((row) => row.locale),
   });
 
+  const attribute = await db.attribute.findUnique({ where: { id: attributeId } });
   if (!attribute) {
     throw {
       status: 404,
-      type: "https://api.shop.am/problems/not-found",
-      title: "Attribute not found",
+      type: 'https://api.shop.am/problems/not-found',
+      title: 'Attribute not found',
       detail: `Attribute with id '${attributeId}' does not exist`,
     };
   }
 
-  const locale = data.locale || "en";
+  const primaryLabel =
+    labelRows.find((row) => row.locale === PRIMARY_PRODUCT_CONTENT_LOCALE)?.label ||
+    labelRows[0].label;
+  const value = slugifyAttributeValue(primaryLabel);
 
-  // Use label as value (normalized)
-  const value = data.label.trim().toLowerCase().replace(/\s+/g, '-');
-
-  // Check if value already exists
   const existing = await db.attributeValue.findFirst({
-    where: {
-      attributeId,
-      value,
-    },
+    where: { attributeId, value },
   });
 
   if (existing) {
     throw {
       status: 400,
-      type: "https://api.shop.am/problems/validation-error",
-      title: "Value already exists",
-      detail: `Value '${data.label}' already exists for this attribute`,
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Value already exists',
+      detail: `Value '${primaryLabel}' already exists for this attribute`,
     };
   }
 
@@ -53,47 +124,17 @@ export async function addAttributeValue(
       attributeId,
       value,
       translations: {
-        create: {
-          locale,
-          label: data.label.trim(),
-        },
+        create: labelRows,
       },
     },
   });
-
-  // Return updated attribute with all values
-  const updatedAttribute = await db.attribute.findUnique({
-    where: { id: attributeId },
-    include: {
-      translations: {
-        where: { locale },
-      },
-      values: {
-        include: {
-          translations: {
-            where: { locale },
-          },
-        },
-        orderBy: { position: "asc" },
-      },
-    },
-  });
-
-  if (!updatedAttribute) {
-    throw {
-      status: 500,
-      type: "https://api.shop.am/problems/internal-error",
-      title: "Internal Server Error",
-      detail: "Failed to retrieve updated attribute",
-    };
-  }
 
   invalidateAdminAttributesCache();
-  return formatAttribute(updatedAttribute, locale);
+  return loadFormattedAttribute(attributeId);
 }
 
 /**
- * Update attribute value
+ * Update attribute value (labels, colors, image).
  */
 export async function updateAttributeValue(
   attributeId: string,
@@ -103,17 +144,17 @@ export async function updateAttributeValue(
     colors?: string[];
     imageUrl?: string | null;
     locale?: string;
-  }
+    translations?: LabelTranslationInput[];
+  },
 ) {
-  logger.info('Updating attribute value', { attributeId, valueId, data });
+  logger.info('Updating attribute value', { attributeId, valueId });
 
-  // Ensure colors and imageUrl columns exist (runtime migration)
   try {
     await ensureColorsColumnsExist();
   } catch (migrationError: unknown) {
-    const errorMessage = migrationError instanceof Error ? migrationError.message : String(migrationError);
+    const errorMessage =
+      migrationError instanceof Error ? migrationError.message : String(migrationError);
     logger.warn('Migration check failed', { error: errorMessage });
-    // Continue anyway - might already exist
   }
 
   const attributeValue = await db.attributeValue.findUnique({
@@ -127,8 +168,8 @@ export async function updateAttributeValue(
   if (!attributeValue) {
     throw {
       status: 404,
-      type: "https://api.shop.am/problems/not-found",
-      title: "Attribute value not found",
+      type: 'https://api.shop.am/problems/not-found',
+      title: 'Attribute value not found',
       detail: `Attribute value with id '${valueId}' does not exist`,
     };
   }
@@ -136,107 +177,54 @@ export async function updateAttributeValue(
   if (attributeValue.attributeId !== attributeId) {
     throw {
       status: 400,
-      type: "https://api.shop.am/problems/validation-error",
-      title: "Validation Error",
-      detail: "Attribute value does not belong to the specified attribute",
+      type: 'https://api.shop.am/problems/validation-error',
+      title: 'Validation Error',
+      detail: 'Attribute value does not belong to the specified attribute',
     };
   }
 
-  const locale = data.locale || "en";
+  const labelRows = normalizeLabelTranslations(data);
   const updateData: {
     colors?: string[];
     imageUrl?: string | null;
   } = {};
 
-  // Update colors if provided
   if (data.colors !== undefined) {
-    // Ensure colors is always an array (even if empty)
-    // Prisma JSONB field expects an array format
     updateData.colors = Array.isArray(data.colors) ? data.colors : [];
-    logger.debug('Setting colors', { 
-      valueId, 
-      colors: updateData.colors, 
-      colorsType: typeof updateData.colors,
-      isArray: Array.isArray(updateData.colors)
-    });
   }
 
-  // Update imageUrl if provided
   if (data.imageUrl !== undefined) {
     updateData.imageUrl = data.imageUrl || null;
   }
 
-  // Update translation label if provided
-  if (data.label !== undefined) {
-    const existingTranslation = attributeValue.translations.find(
-      (t: { locale: string }) => t.locale === locale
+  if (labelRows.length > 0) {
+    await db.$transaction(
+      labelRows.map((row) => {
+        const existing = attributeValue.translations.find((t) => t.locale === row.locale);
+        if (existing) {
+          return db.attributeValueTranslation.update({
+            where: { id: existing.id },
+            data: { label: row.label },
+          });
+        }
+        return db.attributeValueTranslation.create({
+          data: {
+            attributeValueId: valueId,
+            locale: row.locale,
+            label: row.label,
+          },
+        });
+      }),
     );
-
-    if (existingTranslation) {
-      await db.attributeValueTranslation.update({
-        where: { id: existingTranslation.id },
-        data: { label: data.label.trim() },
-      });
-    } else {
-      await db.attributeValueTranslation.create({
-        data: {
-          attributeValueId: valueId,
-          locale,
-          label: data.label.trim(),
-        },
-      });
-    }
   }
 
-  // Update attribute value if colors or imageUrl changed
   if (Object.keys(updateData).length > 0) {
-    logger.debug('Updating attribute value in database', { 
-      valueId, 
-      updateData,
-      updateDataKeys: Object.keys(updateData)
-    });
-    const updatedValue = await db.attributeValue.update({
+    await db.attributeValue.update({
       where: { id: valueId },
       data: updateData,
     });
-    logger.debug('Attribute value updated', { 
-      valueId, 
-      savedColors: updatedValue.colors,
-      savedColorsType: typeof updatedValue.colors
-    });
-  }
-
-  // Return updated attribute with all values
-  const updatedAttribute = await db.attribute.findUnique({
-    where: { id: attributeId },
-    include: {
-      translations: {
-        where: { locale },
-      },
-      values: {
-        include: {
-          translations: {
-            where: { locale },
-          },
-        },
-        orderBy: { position: "asc" },
-      },
-    },
-  });
-
-  if (!updatedAttribute) {
-    throw {
-      status: 500,
-      type: "https://api.shop.am/problems/internal-error",
-      title: "Internal Server Error",
-      detail: "Failed to retrieve updated attribute",
-    };
   }
 
   invalidateAdminAttributesCache();
-  return formatAttribute(updatedAttribute, locale);
+  return loadFormattedAttribute(attributeId);
 }
-
-
-
-

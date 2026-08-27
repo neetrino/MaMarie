@@ -45,10 +45,36 @@ export function useProductDataLoading({
   setBrandsExpanded,
 }: UseProductDataLoadingProps) {
   const router = useRouter();
-  const { brands, loading: brandsLoading } = useAdminBrands();
-  const { categories, loading: categoriesLoading } = useAdminCategories();
-  const { attributes, loading: attributesLoading } = useAdminAttributesReference();
+  const { brands, loading: brandsLoading, refetchBrands } = useAdminBrands();
+  const { categories, loading: categoriesLoading, refetchCategories } = useAdminCategories();
+  const { attributes, loading: attributesLoading, refetchAttributes } = useAdminAttributesReference();
   const { settings, loading: settingsLoading } = useAdminSettingsReference();
+
+  useEffect(() => {
+    if (!isLoggedIn || !isAdmin) {
+      return;
+    }
+
+    void refetchCategories();
+    void refetchBrands();
+    void refetchAttributes();
+  }, [isLoggedIn, isAdmin, refetchCategories, refetchBrands, refetchAttributes]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !isAdmin || !categoriesExpanded) {
+      return;
+    }
+
+    void refetchCategories();
+  }, [categoriesExpanded, isLoggedIn, isAdmin, refetchCategories]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !isAdmin || !brandsExpanded) {
+      return;
+    }
+
+    void refetchBrands();
+  }, [brandsExpanded, isLoggedIn, isAdmin, refetchBrands]);
 
   useEffect(() => {
     if (!isLoading) {

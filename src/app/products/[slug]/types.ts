@@ -13,6 +13,8 @@ export interface VariantOption {
   attribute: string;
   value: string;
   key: string;
+  /** Localized display label from AttributeValueTranslation (falls back to value). */
+  label?: string;
   valueId?: string; // New format: AttributeValue ID
   attributeId?: string; // New format: Attribute ID
 }
@@ -29,6 +31,9 @@ export interface ProductVariant {
   productDiscount?: number | null;
   globalDiscount?: number | null;
   imageUrl?: string;
+  /** Ordered gallery for this variant (storefront-safe URLs). */
+  images?: string[];
+  isMain?: boolean;
 }
 
 export interface ProductLabel {

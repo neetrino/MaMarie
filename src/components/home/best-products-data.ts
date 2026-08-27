@@ -12,6 +12,7 @@ interface CatalogProduct {
   compareAtPrice?: number | null;
   originalPrice?: number | null;
   image: string | null;
+  images?: string[];
   inStock: boolean;
   brand?: { name: string } | null;
   defaultVariantId?: string | null;
@@ -31,6 +32,7 @@ export function mapToHomeProductCard(product: CatalogProduct): HomeProductCardDa
     compareAtPrice: product.compareAtPrice,
     originalPrice: product.originalPrice,
     image: product.image,
+    images: product.images ?? (product.image ? [product.image] : []),
     inStock: product.inStock,
     defaultVariantId: product.defaultVariantId,
     colors: product.colors ?? [],

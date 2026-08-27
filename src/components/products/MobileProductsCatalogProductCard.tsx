@@ -53,6 +53,7 @@ import {
 } from '../../lib/mobile-products-catalog-card-layout';
 import { formatProductRatingLabel } from '../../lib/product-rating';
 import { writeProductPageSnapshotFromCard } from '../../lib/product-page-snapshot';
+import { buildProductDetailHref } from '../../lib/products/build-product-detail-href';
 import { buildWishlistSnapshotFromHomeCard } from '../../lib/wishlist-product-cache';
 import { resolveComparePrice } from '../home/home-product-card-shared';
 import type { HomeProductCardData } from '../home/HomeProductCard';
@@ -131,6 +132,7 @@ function MobileProductsCatalogProductCardComponent({
     reviewsCount: product.reviewsCount,
     inStock: product.inStock,
   });
+  const productHref = buildProductDetailHref(product.slug, product.defaultVariantId);
 
   const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -159,8 +161,10 @@ function MobileProductsCatalogProductCardComponent({
     >
       <MobileProductsCatalogProductCardMedia
         slug={product.slug}
+        productHref={productHref}
         title={product.title}
         imageSrc={product.image}
+        images={product.images}
         imagePriority={imagePriority}
         layoutWidthPx={cardWidthPx}
         isInWishlist={isInWishlist}
@@ -179,7 +183,7 @@ function MobileProductsCatalogProductCardComponent({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <Link
-              href={`/products/${product.slug}`}
+              href={productHref}
               className="block truncate font-medium"
               onFocus={saveSnapshot}
               onPointerDown={saveSnapshot}

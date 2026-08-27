@@ -12,10 +12,12 @@ import {
   toAttributeValueStorefrontImageUrl,
   toProductMediaStorefrontUrl,
   toVariantStorefrontImageUrl,
+  toVariantStorefrontImageUrls,
 } from "../../utils/storefront-image-url";
 import { logger } from "../../utils/logger";
 import { getOutOfStockLabel, pickTranslationByLocale } from "./utils";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
+import { sortVariantsForPresentation } from "../../products/select-default-variant";
 
 const DISCOUNT_SETTINGS_CACHE_TTL_MS = 30_000;
 const DISCOUNT_SETTINGS_REVALIDATE_SECONDS = 60;
@@ -211,6 +213,10 @@ function transformVariantImageUrl(variant: ProductVariantWithOptions): string | 
   return toVariantStorefrontImageUrl(variant.id, variant.imageUrl);
 }
 
+function transformVariantImageUrls(variant: ProductVariantWithOptions): string[] {
+  return toVariantStorefrontImageUrls(variant.id, variant.imageUrl);
+}
+
 /**
  * Transform product variants
  */
@@ -221,8 +227,7 @@ function transformVariants(
   productDiscount: number,
   lang: string
 ) {
-  return variants
-    .sort((a: { price: number }, b: { price: number }) => a.price - b.price)
+  return sortVariantsForPresentation(variants)
     .map((variant: ProductVariantWithOptions) => {
       const originalPrice = variant.price;
       let finalPrice = originalPrice;
@@ -233,7 +238,8 @@ function transformVariants(
         finalPrice = originalPrice * (1 - actualDiscount / 100);
       }
 
-      const variantImageUrl = transformVariantImageUrl(variant);
+      const variantImages = transformVariantImageUrls(variant);
+      const variantImageUrl = variantImages[0] ?? transformVariantImageUrl(variant);
 
       return {
         id: variant.id,
@@ -245,28 +251,34 @@ function transformVariants(
         productDiscount: productDiscount > 0 ? productDiscount : null,
         stock: variant.stock,
         imageUrl: variantImageUrl,
+        images: variantImages,
+        isMain: variant.isMain === true,
         options: Array.isArray(variant.options) ? variant.options.map((opt: ProductVariantWithOptions['options'][number]) => {
           // Support both new format (AttributeValue) and old format (attributeKey/value)
           if (opt.attributeValue) {
-            // New format: use AttributeValue
             const attrValue = opt.attributeValue;
             const attr = attrValue.attribute;
-            const translation = attrValue.translations?.find((t: { locale: string }) => t.locale === lang) || attrValue.translations?.[0];
+            const translation =
+              pickTranslationByLocale(attrValue.translations ?? [], lang) ??
+              attrValue.translations?.[0];
+            const stableValue = attrValue.value || "";
+            const label = translation?.label?.trim() || stableValue;
             return {
               attribute: attr?.key || "",
-              value: translation?.label || attrValue.value || "",
+              value: stableValue,
+              label,
               key: attr?.key || "",
               valueId: attrValue.id,
               attributeId: attr?.id,
             };
-          } else {
-            // Old format: use attributeKey/value
-            return {
-              attribute: opt.attributeKey || "",
-              value: opt.value || "",
-              key: opt.attributeKey || "",
-            };
           }
+
+          return {
+            attribute: opt.attributeKey || "",
+            value: opt.value || "",
+            label: opt.value || "",
+            key: opt.attributeKey || "",
+          };
         }) : [],
         available: variant.stock > 0,
       };
@@ -301,7 +313,8 @@ function transformProductAttributes(
     
     const mapped = (productAttrs as ProductAttribute[]).map((pa) => {
       const attr = pa.attribute;
-      const attrTranslation = attr.translations?.find((t: { locale: string }) => t.locale === lang) || attr.translations?.[0];
+      const attrTranslation =
+        pickTranslationByLocale(attr.translations ?? [], lang) ?? attr.translations?.[0];
       
       return {
         id: pa.id,
@@ -316,7 +329,8 @@ function transformProductAttributes(
             imageUrl: string | null;
             colors: string | null;
           }) => {
-            const valTranslation = val.translations?.find((t: { locale: string }) => t.locale === lang) || val.translations?.[0];
+            const valTranslation =
+              pickTranslationByLocale(val.translations ?? [], lang) ?? val.translations?.[0];
             return {
               id: val.id,
               value: val.value,

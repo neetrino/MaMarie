@@ -19,6 +19,7 @@ type CatalogVariantRow = {
   compareAtPrice: number | null;
   stock: number;
   imageUrl: string | null;
+  isMain: boolean;
   position: number;
   attributes: Prisma.JsonValue | null;
 };
@@ -193,10 +194,11 @@ export async function fetchStorefrontCatalogProducts(
         compareAtPrice: true,
         stock: true,
         imageUrl: true,
+        isMain: true,
         position: true,
         attributes: true,
       },
-      orderBy: { position: 'asc' },
+      orderBy: [{ isMain: 'desc' }, { position: 'asc' }],
     }),
     db.productLabel.findMany({
       where: { productId: { in: productIds } },

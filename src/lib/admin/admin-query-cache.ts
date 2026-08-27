@@ -14,6 +14,8 @@ interface CacheEntry<T> {
 const cache = new Map<string, CacheEntry<unknown>>();
 const inflight = new Map<string, Promise<unknown>>();
 const listeners = new Map<string, Set<(data: unknown) => void>>();
+/** Bumped on invalidate so late in-flight responses cannot overwrite fresh data. */
+const cacheGeneration = new Map<string, number>();
 
 let hydratedFromStorage = false;
 
@@ -72,10 +74,14 @@ async function fetchAndStore<T>(key: string, fetcher: () => Promise<T>): Promise
     return existing as Promise<T>;
   }
 
+  const generationAtStart = cacheGeneration.get(key) ?? 0;
+
   const promise = (async () => {
     try {
       const data = await fetcher();
-      writeCacheEntry(key, data);
+      if ((cacheGeneration.get(key) ?? 0) === generationAtStart) {
+        writeCacheEntry(key, data);
+      }
       return data;
     } finally {
       inflight.delete(key);
@@ -179,6 +185,17 @@ export function invalidateAdminQuery(key: string): void {
   cache.delete(key);
   inflight.delete(key);
   removePersistedAdminQueryEntry(key);
+  cacheGeneration.set(key, (cacheGeneration.get(key) ?? 0) + 1);
+}
+
+/**
+ * Patch cached admin query data (e.g. after a mutation) and notify subscribers.
+ */
+export function patchAdminQueryData<T>(key: string, patch: (current: T | null) => T): void {
+  hydrateAdminQueryCacheFromStorage();
+  const entry = cache.get(key);
+  const next = patch(entry ? (entry.data as T) : null);
+  writeCacheEntry(key, next);
 }
 
 export function invalidateAdminQueryPrefix(prefix: string): void {

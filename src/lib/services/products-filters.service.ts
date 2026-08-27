@@ -1,4 +1,6 @@
-import { withServerReadCache } from '@/lib/cache/server-read-cache';
+import { withServerReadCache, invalidateServerReadCache } from '@/lib/cache/server-read-cache';
+import { DEFAULT_LANGUAGE } from '@/lib/language';
+import { hasLoadedFilterFacets } from '@/lib/products/has-loaded-filter-facets';
 import { adminService } from './admin.service';
 import { loadCatalogFilterFacets } from './products-filters-facets';
 import { buildStorefrontFiltersCacheKey } from './products-filters-cache-key';
@@ -16,6 +18,7 @@ const EMPTY_FILTERS = {
     name: string;
     values: Array<{ value: string; label: string; count: number }>;
   }>,
+  categoryIds: [] as string[],
   priceRange: { min: 0, max: 100000, stepSize: null as number | null, stepSizePerCurrency: null as Record<string, number> | null },
 };
 
@@ -30,52 +33,68 @@ type StorefrontFiltersInput = {
 
 class ProductsFiltersService {
   async getFilters(filters: StorefrontFiltersInput) {
-    return withServerReadCache(
-      buildStorefrontFiltersCacheKey(filters),
-      FILTERS_PROCESS_CACHE_TTL_MS,
-      () => this.fetchFiltersUncached(filters)
-    );
+    const cacheKey = buildStorefrontFiltersCacheKey({
+      ...filters,
+      lang: filters.lang || DEFAULT_LANGUAGE,
+    });
+    try {
+      const result = await withServerReadCache(
+        cacheKey,
+        FILTERS_PROCESS_CACHE_TTL_MS,
+        () => this.fetchFiltersUncached(filters)
+      );
+      if (!hasLoadedFilterFacets(result)) {
+        invalidateServerReadCache(cacheKey);
+      }
+      return result;
+    } catch (error) {
+      invalidateServerReadCache(cacheKey);
+      logger.error('Products filters aggregation failed', { error, filters });
+      throw error;
+    }
   }
 
   private async fetchFiltersUncached(filters: StorefrontFiltersInput) {
-    try {
-      const lang = filters.lang || 'en';
-      const { where } = await buildWhereClause({
+    const lang = filters.lang || DEFAULT_LANGUAGE;
+    const shared = {
+      search: filters.search,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+      lang,
+      page: 1,
+      limit: 1,
+    };
+    const [{ where }, { where: whereWithoutCategory }] = await Promise.all([
+      buildWhereClause({
+        ...shared,
         category: filters.category,
         categoryScope: filters.categoryScope,
-        search: filters.search,
-        minPrice: filters.minPrice,
-        maxPrice: filters.maxPrice,
-        lang,
-        page: 1,
-        limit: 1,
-      });
+      }),
+      buildWhereClause(shared),
+    ]);
 
-      if (where === null) {
-        return EMPTY_FILTERS;
-      }
-
-      const [aggregated, priceSettings] = await Promise.all([
-        loadCatalogFilterFacets(where, lang),
-        this.loadPriceFilterSettings(),
-      ]);
-
-      return {
-        colors: aggregated.colors,
-        sizes: aggregated.sizes,
-        brands: aggregated.brands,
-        attributes: aggregated.attributes,
-        priceRange: {
-          min: aggregated.priceMin,
-          max: aggregated.priceMax,
-          stepSize: priceSettings.stepSize,
-          stepSizePerCurrency: priceSettings.stepSizePerCurrency,
-        },
-      };
-    } catch (error) {
-      logger.error('Products filters aggregation failed', { error, filters });
+    if (where === null) {
       return EMPTY_FILTERS;
     }
+
+    const [aggregated, priceSettings] = await Promise.all([
+      loadCatalogFilterFacets(where, lang, whereWithoutCategory ?? where),
+      this.loadPriceFilterSettings(),
+    ]);
+
+    return {
+      colors: aggregated.colors,
+      sizes: aggregated.sizes,
+      brands: aggregated.brands,
+      attributes: aggregated.attributes,
+      categoryIds: aggregated.categoryIds,
+      priceRange: {
+        min: aggregated.priceMin,
+        max: aggregated.priceMax,
+        stepSize: priceSettings.stepSize,
+        stepSizePerCurrency: priceSettings.stepSizePerCurrency,
+      },
+    };
   }
 
   private async loadPriceFilterSettings(): Promise<{

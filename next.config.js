@@ -24,6 +24,28 @@ const DEV_LAN_ALLOWED_ORIGINS = [
   '*.local',
 ];
 
+function resolveR2ImageRemotePattern() {
+  const raw = process.env.R2_PUBLIC_URL;
+  if (!raw) {
+    return null;
+  }
+  try {
+    const { protocol, hostname } = new URL(raw);
+    if (protocol !== 'http:' && protocol !== 'https:') {
+      return null;
+    }
+    return {
+      protocol: protocol.replace(':', ''),
+      hostname,
+      pathname: '/**',
+    };
+  } catch {
+    return null;
+  }
+}
+
+const r2ImageRemotePattern = resolveR2ImageRemotePattern();
+
 const nextConfig = {
   reactStrictMode: true,
   allowedDevOrigins: DEV_LAN_ALLOWED_ORIGINS,
@@ -64,6 +86,7 @@ const nextConfig = {
   // This ensures type safety in production builds
   images: {
     remotePatterns: [
+      ...(r2ImageRemotePattern ? [r2ImageRemotePattern] : []),
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',

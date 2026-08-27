@@ -4,7 +4,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { CurrencyCode } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
-import { getCheckoutPaymentMethodKey, getPaymentStatusColor, translateAdminPaymentStatus } from '../utils/orderUtils';
+import { getCheckoutPaymentMethodKey, getPaymentStatusColor, translateAdminPaymentStatus, computeOrderTotalAmd } from '../utils/orderUtils';
 
 interface OrderDetailsAddressesProps {
   orderDetails: OrderDetails;
@@ -99,7 +99,17 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
               {t('admin.orders.orderDetails.amount')}
             </dt>
             <dd className="tabular-nums">
-              {formatCurrency(orderDetails.payment.amount, orderDetails.payment.currency || 'AMD', 'AMD')}
+              {orderDetails.totals
+                ? formatCurrency(
+                    computeOrderTotalAmd(orderDetails.totals),
+                    orderDetails.payment.currency || 'AMD',
+                    'AMD',
+                  )
+                : formatCurrency(
+                    orderDetails.payment.amount,
+                    orderDetails.payment.currency || 'AMD',
+                    'USD',
+                  )}
             </dd>
             <dt className="font-medium text-gray-500 whitespace-nowrap">
               {t('admin.orders.orderDetails.status')}

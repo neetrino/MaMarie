@@ -5,7 +5,7 @@ import {
   getClayPrimaryButtonCompactStyle,
 } from '../../../constants/clay-primary-button';
 import { HERO_GENDER_BUTTON_BOYS_BG_COLOR } from '../../../constants/hero';
-import { getAttributeLabel, t } from '../../../lib/i18n';
+import { t } from '../../../lib/i18n';
 import type {
   ProductPageSnapshotColor,
   ProductPageSnapshotSize,
@@ -14,6 +14,7 @@ import type { LanguageCode } from '../../../lib/language';
 import { getColorHex } from '../../../lib/colorMap';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX } from './constants';
+import { resolveAttributeValueDisplayLabel } from './utils/attribute-display-label';
 
 interface ProductPageSnapshotAttributesProps {
   colors?: ProductPageSnapshotColor[];
@@ -35,6 +36,12 @@ function SnapshotColorOptions({
         {colors.map((color) => {
           const processedImageUrl = color.imageUrl ? processImageUrl(color.imageUrl) : null;
           const colorHex = color.colors?.[0] ?? getColorHex(color.value);
+          const colorLabel = resolveAttributeValueDisplayLabel(
+            language,
+            'color',
+            color.value,
+            color.label,
+          );
 
           return (
             <div key={color.value} className="flex flex-col items-center gap-0.5">
@@ -43,16 +50,19 @@ function SnapshotColorOptions({
                 disabled
                 className="h-10 w-10 overflow-hidden rounded-full border-2 border-gray-300 transition-all disabled:cursor-default"
                 style={processedImageUrl ? undefined : { backgroundColor: colorHex }}
-                title={getAttributeLabel(language, 'color', color.value)}
+                title={colorLabel}
               >
                 {processedImageUrl ? (
                   <img
                     src={processedImageUrl}
-                    alt={getAttributeLabel(language, 'color', color.value)}
+                    alt={colorLabel}
                     className="h-full w-full object-cover"
                   />
                 ) : null}
               </button>
+              <span className="max-w-[2.5rem] text-center text-xs leading-tight text-gray-700 line-clamp-2">
+                {colorLabel}
+              </span>
             </div>
           );
         })}
@@ -75,7 +85,12 @@ function SnapshotSizeOptions({
         <div className="flex flex-wrap items-center gap-1.5">
         {sizes.map((size) => {
           const isUnavailable = size.inStock === false;
-          const label = size.label ?? getAttributeLabel(language, 'size', size.value);
+          const label = resolveAttributeValueDisplayLabel(
+            language,
+            'size',
+            size.value,
+            size.label,
+          );
 
           return (
             <button

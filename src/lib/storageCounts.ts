@@ -93,7 +93,7 @@ export function getCartCount(): number {
     );
 
     if (isClientLoggedIn()) {
-      return readCartSnapshot()?.itemsCount ?? guestCount;
+      return readCartSnapshot()?.itemsCount ?? 0;
     }
 
     return guestCount;

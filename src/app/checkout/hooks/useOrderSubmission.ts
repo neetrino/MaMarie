@@ -59,8 +59,11 @@ export function useOrderSubmission({
         data.shippingAddress && 
         data.shippingCity
         ? {
+            firstName: data.firstName,
+            lastName: data.lastName,
             address: data.shippingAddress,
             city: data.shippingCity,
+            phone: data.phone,
           }
         : undefined;
 

@@ -7,6 +7,7 @@ const SNAPSHOT_MAX_AGE_MS = 2 * 60 * 1000;
 
 export interface ProductPageSnapshotColor {
   value: string;
+  label?: string;
   imageUrl?: string | null;
   colors?: string[] | null;
 }

@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
         variants: {
           where: { published: true },
           take: 1,
-          orderBy: { price: 'asc' },
+          orderBy: [{ isMain: 'desc' }, { position: 'asc' }],
         },
         categories: {
           include: {

@@ -4,6 +4,8 @@ import { dispatchCartUpdated } from '../../lib/cart-events';
 import { logger } from '../../lib/utils/logger';
 import {
   buildCartFromGuestStorage,
+  clearCartSnapshot,
+  clearGuestCartItems,
   readGuestCartItems,
   writeCartSnapshot,
   writeGuestCartItems,
@@ -14,46 +16,23 @@ import { showToast } from '../../components/Toast';
 type SetCartState = Dispatch<SetStateAction<Cart | null>>;
 
 /**
- * Parse guest cart line id (`${productId}-${variantId}-${index}`).
- * Uses the last segment as index and splits product/variant on the previous dash.
+ * Resolve guest cart line by composite id `${productId}-${variantId}-${index}`.
+ * Exact match first — product/variant ids must not be re-parsed (cuid-safe).
  */
-function parseGuestCartLineId(itemId: string): { productId: string; variantId: string } | null {
-  const lastDash = itemId.lastIndexOf('-');
-  if (lastDash <= 0) {
-    return null;
-  }
-
-  const indexPart = itemId.slice(lastDash + 1);
-  if (!/^\d+$/.test(indexPart)) {
-    return null;
-  }
-
-  const withoutIndex = itemId.slice(0, lastDash);
-  const variantDash = withoutIndex.lastIndexOf('-');
-  if (variantDash <= 0) {
-    return null;
-  }
-
-  return {
-    productId: withoutIndex.slice(0, variantDash),
-    variantId: withoutIndex.slice(variantDash + 1),
-  };
-}
-
 function resolveGuestLineIndex(guestCart: GuestCartItem[], itemId: string): number {
-  const parsed = parseGuestCartLineId(itemId);
-  if (parsed) {
-    const matchedIndex = guestCart.findIndex(
-      (item) => item.productId === parsed.productId && item.variantId === parsed.variantId,
-    );
-    if (matchedIndex >= 0) {
-      return matchedIndex;
-    }
-  }
-
-  return guestCart.findIndex(
+  const exactIndex = guestCart.findIndex(
     (item, index) => `${item.productId}-${item.variantId}-${index}` === itemId,
   );
+  if (exactIndex >= 0) {
+    return exactIndex;
+  }
+
+  // Legacy fallback: match by product+variant when only one line exists for that pair.
+  const candidates = guestCart
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => itemId.startsWith(`${item.productId}-${item.variantId}-`));
+
+  return candidates.length === 1 ? candidates[0].index : -1;
 }
 
 function syncGuestCartState(
@@ -165,19 +144,25 @@ export async function handleRemoveItem(
   setCart: SetCartState,
   fetchCart: () => Promise<void>,
   productLabel: string,
-): Promise<void> {
+): Promise<boolean> {
   if (!isLoggedIn) {
     if (!removeFromGuestCart(itemId)) {
-      return;
+      return false;
     }
 
-    syncGuestCartState(setCart, productLabel);
-    dispatchCartUpdated({ localOnly: true });
-    return;
+    const guestCart = syncGuestCartState(setCart, productLabel);
+    clearCartSnapshot();
+    dispatchCartUpdated({
+      localOnly: true,
+      cartSummary: {
+        itemsCount: guestCart?.itemsCount ?? 0,
+        total: guestCart?.totals.total ?? 0,
+      },
+    });
+    return true;
   }
 
-  let itemFound = false;
-  let nextCart: Cart | null = null;
+  let removedCart: Cart | null = null;
 
   setCart((prevCart) => {
     if (!prevCart) {
@@ -189,32 +174,41 @@ export async function handleRemoveItem(
       return prevCart;
     }
 
-    itemFound = true;
     const updatedItems = prevCart.items.filter((item) => item.id !== itemId);
     const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    nextCart = {
+    removedCart = {
       ...prevCart,
       items: updatedItems,
       totals: calculateCartTotals(updatedItems, prevCart.totals),
       itemsCount: newItemsCount,
     };
 
-    return nextCart;
+    return removedCart;
   });
 
-  if (!itemFound) {
-    return;
+  if (!removedCart) {
+    return false;
   }
 
-  writeCartSnapshot(nextCart);
+  const cartAfterRemove: Cart = removedCart;
+  clearGuestCartItems();
+  writeCartSnapshot(cartAfterRemove);
+  dispatchCartUpdated({
+    localOnly: true,
+    cartSummary: {
+      itemsCount: cartAfterRemove.itemsCount,
+      total: cartAfterRemove.totals.total,
+    },
+  });
 
   try {
     await apiClient.delete(`/api/v1/cart/items/${itemId}`);
-    dispatchCartUpdated({ localOnly: true });
+    return true;
   } catch (error: unknown) {
     logger.error('Error removing item', { error, itemId });
     await fetchCart();
+    return false;
   }
 }
 
@@ -250,8 +244,15 @@ export function handleUpdateQuantity(
       return;
     }
 
-    syncGuestCartState(setCart, productLabel);
-    dispatchCartUpdated({ localOnly: true });
+    const guestCart = syncGuestCartState(setCart, productLabel);
+    clearCartSnapshot();
+    dispatchCartUpdated({
+      localOnly: true,
+      cartSummary: {
+        itemsCount: guestCart?.itemsCount ?? 0,
+        total: guestCart?.totals.total ?? 0,
+      },
+    });
     return;
   }
 
@@ -273,6 +274,7 @@ export function handleUpdateQuantity(
     };
 
     writeCartSnapshot(updatedCart);
+    clearGuestCartItems();
     return updatedCart;
   });
 

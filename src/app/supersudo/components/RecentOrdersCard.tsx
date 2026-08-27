@@ -6,7 +6,7 @@ import {
   PROFILE_DESKTOP_INNER_CARD_CLASS,
   PROFILE_DESKTOP_SECTION_TITLE_CLASS,
 } from '../../../constants/admin-desktop-page';
-import { formatCurrency, formatDate } from '../utils/dashboardUtils';
+import { formatDashboardAmdFromUsd, formatDate } from '../utils/dashboardUtils';
 import { getPaymentStatusColor, translateAdminPaymentStatus } from '../orders/utils/orderUtils';
 import { AdminClaySectionCard } from './AdminClaySectionCard';
 
@@ -93,7 +93,7 @@ export function RecentOrdersCard({ recentOrders, recentOrdersLoading }: RecentOr
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-sm font-semibold text-gray-900">
-                    {formatCurrency(order.total, order.currency)}
+                    {formatDashboardAmdFromUsd(order.total)}
                   </p>
                 </div>
               </div>

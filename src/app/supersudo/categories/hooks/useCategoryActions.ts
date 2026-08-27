@@ -4,6 +4,20 @@ import { getEffectiveParentIds } from '../../../../lib/categories/category-paren
 import { logger } from '../../../../lib/utils/logger';
 import { showToast } from '../../../../components/Toast';
 import { useTranslation } from '../../../../lib/i18n-client';
+import { patchAdminQueryData } from '@/lib/admin/admin-query-cache';
+import { ADMIN_QUERY_KEYS } from '@/lib/admin/admin-query-keys';
+import {
+  DEFAULT_PRODUCT_CONTENT_LOCALE,
+  PRIMARY_PRODUCT_CONTENT_LOCALE,
+  type ProductContentLocale,
+} from '@/constants/product-content-locales';
+import {
+  categoryLocaleTitleMapFromRows,
+  emptyCategoryLocaleTitleMap,
+  pickPrimaryCategoryTitle,
+  resolveCategorySlug,
+  toCategoryTranslationRows,
+} from '@/lib/admin/category-locale-helpers';
 import type { Category, CategoryFormData } from '../types';
 
 interface UseCategoryActionsReturn {
@@ -12,12 +26,16 @@ interface UseCategoryActionsReturn {
   pendingDeleteCategory: { id: string; title: string } | null;
   editingCategory: Category | null;
   formData: CategoryFormData;
+  contentLocale: ProductContentLocale;
   saving: boolean;
   imageUploading: boolean;
   deleting: boolean;
   setShowAddModal: (show: boolean) => void;
   setShowEditModal: (show: boolean) => void;
   setFormData: (data: CategoryFormData) => void;
+  setContentLocale: (locale: ProductContentLocale) => void;
+  handleTitleChange: (locale: ProductContentLocale, value: string) => void;
+  handleSlugChange: (value: string) => void;
   handleImageUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   removeImage: () => void;
   handleAddCategory: (fetchCategories: () => Promise<void>) => Promise<void>;
@@ -30,13 +48,45 @@ interface UseCategoryActionsReturn {
 }
 
 const initialFormData: CategoryFormData = {
-  title: '',
+  titles: emptyCategoryLocaleTitleMap(),
+  slug: '',
   parentIds: [],
   requiresSizes: false,
   subcategoryIds: [],
   imageUrl: '',
   published: 'published',
 };
+
+function upsertCategoryInCache(category: Category): void {
+  patchAdminQueryData<Category[]>(ADMIN_QUERY_KEYS.categories, (current) => {
+    const list = current ?? [];
+    const index = list.findIndex((item) => item.id === category.id);
+    if (index === -1) {
+      return [...list, category];
+    }
+    const next = [...list];
+    next[index] = category;
+    return next;
+  });
+}
+
+function removeCategoryFromCache(categoryId: string): void {
+  patchAdminQueryData<Category[]>(ADMIN_QUERY_KEYS.categories, (current) =>
+    (current ?? []).filter((item) => item.id !== categoryId),
+  );
+}
+
+function buildTitlesFromCategory(category: Category) {
+  if (category.translations?.length) {
+    return categoryLocaleTitleMapFromRows(
+      category.translations.map((row) => ({ locale: row.locale, text: row.title })),
+    );
+  }
+
+  const map = emptyCategoryLocaleTitleMap();
+  map[PRIMARY_PRODUCT_CONTENT_LOCALE] = category.title;
+  return map;
+}
 
 /**
  * Hook for category CRUD operations
@@ -48,6 +98,10 @@ export function useCategoryActions(): UseCategoryActionsReturn {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [pendingDeleteCategory, setPendingDeleteCategory] = useState<{ id: string; title: string } | null>(null);
   const [formData, setFormData] = useState<CategoryFormData>(initialFormData);
+  const [contentLocale, setContentLocale] = useState<ProductContentLocale>(
+    DEFAULT_PRODUCT_CONTENT_LOCALE,
+  );
+  const [slugIsManual, setSlugIsManual] = useState(false);
   const [saving, setSaving] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -62,26 +116,59 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
   const resetForm = () => {
     setFormData(initialFormData);
+    setContentLocale(DEFAULT_PRODUCT_CONTENT_LOCALE);
+    setSlugIsManual(false);
   };
 
+  const handleTitleChange = (locale: ProductContentLocale, value: string) => {
+    setFormData((current) => {
+      const titles = { ...current.titles, [locale]: value };
+      return {
+        ...current,
+        titles,
+        slug: resolveCategorySlug(titles, current.slug, slugIsManual),
+      };
+    });
+  };
+
+  const handleSlugChange = (value: string) => {
+    setSlugIsManual(value.trim().length > 0);
+    setFormData((current) => ({ ...current, slug: value }));
+  };
+
+  const buildPayload = () => ({
+    translations: toCategoryTranslationRows(formData.titles, formData.slug).map((row) => ({
+      locale: row.locale,
+      title: row.title,
+    })),
+    slug: formData.slug.trim(),
+    parentIds: Array.from(new Set(formData.parentIds)),
+    requiresSizes: formData.requiresSizes,
+    imageUrl: formData.imageUrl.trim() || null,
+    published: formData.published === 'published',
+  });
+
   const handleAddCategory = async (fetchCategories: () => Promise<void>) => {
-    if (!formData.title.trim()) {
+    const primaryTitle = pickPrimaryCategoryTitle(formData.titles);
+    if (!primaryTitle) {
       showToast(t('admin.categories.titleRequired'), 'warning');
+      setContentLocale(PRIMARY_PRODUCT_CONTENT_LOCALE);
+      return;
+    }
+    if (!formData.slug.trim()) {
+      showToast(t('admin.categories.slugRequired'), 'warning');
       return;
     }
 
     setSaving(true);
     try {
-      const sanitizedParentIds = Array.from(new Set(formData.parentIds));
-
-      await apiClient.post('/api/v1/admin/categories', {
-        title: formData.title.trim(),
-        parentIds: sanitizedParentIds,
-        requiresSizes: formData.requiresSizes,
-        imageUrl: formData.imageUrl.trim() || undefined,
-        published: formData.published === 'published',
-        locale: 'en',
-      });
+      const response = await apiClient.post<{ data: Category }>(
+        '/api/v1/admin/categories',
+        buildPayload(),
+      );
+      if (response.data) {
+        upsertCategoryInCache(response.data);
+      }
       setShowAddModal(false);
       resetForm();
       await fetchCategories();
@@ -101,23 +188,25 @@ export function useCategoryActions(): UseCategoryActionsReturn {
 
   const handleEditCategory = async (category: Category) => {
     setEditingCategory(category);
-    
+
     try {
       const response = await apiClient.get<{ data: Category }>(`/api/v1/admin/categories/${category.id}`);
       const categoryWithChildren = response.data;
-      
+
       setFormData({
-        title: category.title,
+        titles: buildTitlesFromCategory(categoryWithChildren),
+        slug: categoryWithChildren.slug,
         parentIds: getEffectiveParentIds(categoryWithChildren),
-        requiresSizes: category.requiresSizes || false,
-        subcategoryIds: categoryWithChildren.children?.map(child => child.id) || [],
-        imageUrl: category.imageUrl || '',
-        published: category.published ? 'published' : 'draft',
+        requiresSizes: categoryWithChildren.requiresSizes || false,
+        subcategoryIds: categoryWithChildren.children?.map((child) => child.id) || [],
+        imageUrl: categoryWithChildren.imageUrl || '',
+        published: categoryWithChildren.published ? 'published' : 'draft',
       });
     } catch (err: unknown) {
       logger.error('Error fetching category children', { error: err });
       setFormData({
-        title: category.title,
+        titles: buildTitlesFromCategory(category),
+        slug: category.slug,
         parentIds: getEffectiveParentIds(category),
         requiresSizes: category.requiresSizes || false,
         subcategoryIds: [],
@@ -125,13 +214,21 @@ export function useCategoryActions(): UseCategoryActionsReturn {
         published: category.published ? 'published' : 'draft',
       });
     }
-    
+
+    setContentLocale(DEFAULT_PRODUCT_CONTENT_LOCALE);
+    setSlugIsManual(true);
     setShowEditModal(true);
   };
 
   const handleUpdateCategory = async (fetchCategories: () => Promise<void>) => {
-    if (!editingCategory || !formData.title.trim()) {
+    const primaryTitle = pickPrimaryCategoryTitle(formData.titles);
+    if (!editingCategory || !primaryTitle) {
       showToast(t('admin.categories.titleRequired'), 'warning');
+      setContentLocale(PRIMARY_PRODUCT_CONTENT_LOCALE);
+      return;
+    }
+    if (!formData.slug.trim()) {
+      showToast(t('admin.categories.slugRequired'), 'warning');
       return;
     }
 
@@ -140,17 +237,20 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       const sanitizedParentIds = Array.from(new Set(formData.parentIds));
       const sanitizedSubcategoryIds = sanitizedParentIds.length
         ? []
-        : Array.from(new Set(formData.subcategoryIds)).filter((subcategoryId) => subcategoryId !== editingCategory.id);
+        : Array.from(new Set(formData.subcategoryIds)).filter(
+            (subcategoryId) => subcategoryId !== editingCategory.id,
+          );
 
-      await apiClient.put(`/api/v1/admin/categories/${editingCategory.id}`, {
-        title: formData.title.trim(),
-        parentIds: sanitizedParentIds,
-        requiresSizes: formData.requiresSizes,
-        subcategoryIds: sanitizedSubcategoryIds,
-        imageUrl: formData.imageUrl.trim() || null,
-        published: formData.published === 'published',
-        locale: 'en',
-      });
+      const response = await apiClient.put<{ data: Category }>(
+        `/api/v1/admin/categories/${editingCategory.id}`,
+        {
+          ...buildPayload(),
+          subcategoryIds: sanitizedSubcategoryIds,
+        },
+      );
+      if (response.data) {
+        upsertCategoryInCache(response.data);
+      }
       setShowEditModal(false);
       setEditingCategory(null);
       resetForm();
@@ -226,6 +326,7 @@ export function useCategoryActions(): UseCategoryActionsReturn {
       });
       await apiClient.delete(`/api/v1/admin/categories/${pendingDeleteCategory.id}`);
       logger.info('Category deleted successfully');
+      removeCategoryFromCache(pendingDeleteCategory.id);
       await fetchCategories();
       setPendingDeleteCategory(null);
       showToast(t('admin.categories.deletedSuccess'), 'success');
@@ -258,12 +359,16 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     pendingDeleteCategory,
     editingCategory,
     formData,
+    contentLocale,
     saving,
     imageUploading,
     deleting,
     setShowAddModal,
     setShowEditModal,
     setFormData,
+    setContentLocale,
+    handleTitleChange,
+    handleSlugChange,
     handleImageUpload,
     removeImage,
     handleAddCategory,
@@ -275,7 +380,3 @@ export function useCategoryActions(): UseCategoryActionsReturn {
     resetForm,
   };
 }
-
-
-
-

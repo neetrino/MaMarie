@@ -92,6 +92,14 @@ export function OrderRow({
           >
             {order.customerPhone ? order.customerPhone : '—'}
           </div>
+          {order.customerEmail ? (
+            <div
+              className="min-w-0 max-w-full truncate text-left text-xs text-gray-500"
+              title={order.customerEmail}
+            >
+              {order.customerEmail}
+            </div>
+          ) : null}
         </div>
       </td>
       <td

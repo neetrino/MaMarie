@@ -1,7 +1,6 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
-import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
-import { invalidateAdminProductsListCache } from "./admin-products-read/list-cache";
+import { revalidateProductCache } from "./admin-products-update/cache-revalidator";
 
 class AdminProductsDeleteService {
   /**
@@ -10,6 +9,9 @@ class AdminProductsDeleteService {
   async deleteProduct(productId: string) {
     const product = await db.product.findUnique({
       where: { id: productId },
+      include: {
+        translations: { select: { slug: true }, take: 1 },
+      },
     });
 
     if (!product) {
@@ -21,6 +23,8 @@ class AdminProductsDeleteService {
       };
     }
 
+    const productSlug = product.translations[0]?.slug;
+
     await db.product.update({
       where: { id: productId },
       data: {
@@ -29,8 +33,7 @@ class AdminProductsDeleteService {
       },
     });
 
-    invalidateAdminProductsListCache();
-    invalidateHomeFeaturedProductsCache();
+    await revalidateProductCache(productId, productSlug);
 
     return { success: true };
   }
@@ -74,7 +77,7 @@ class AdminProductsDeleteService {
       discountPercent: updated.discountPercent,
     });
 
-    invalidateAdminProductsListCache();
+    await revalidateProductCache(productId, undefined);
 
     return { success: true, discountPercent: updated.discountPercent };
   }

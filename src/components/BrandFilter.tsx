@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Input } from '@shop/ui';
 import { apiClient } from '../lib/api-client';
-import { getStoredLanguage } from '../lib/language';
 import { useTranslation } from '../lib/i18n-client';
 import { BRAND_CHECKBOX_ACCENT } from '../constants/brand';
 import {
@@ -86,7 +85,7 @@ export function BrandFilter({
   const catalog = useOptionalProductsCatalog();
   const { applyPatch } = useProductsCatalogFilterNavigation();
   const activeSelected = catalog?.selectedBrands ?? selectedBrands;
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [brands, setBrands] = useState<BrandOption[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<BrandOption[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -98,10 +97,10 @@ export function BrandFilter({
   }, [activeSelected]);
 
   useEffect(() => {
-    if (filtersContext?.data?.brands) {
+    if (filtersContext?.data && Array.isArray(filtersContext.data.brands)) {
       setBrands(filtersContext.data.brands);
       setFilteredBrands(filtersContext.data.brands);
-      setLoading(false);
+      setLoading(filtersContext.loading);
       return;
     }
     if (filtersContext === null) {
@@ -109,7 +108,7 @@ export function BrandFilter({
     } else {
       setLoading(filtersContext.loading);
     }
-  }, [category, search, minPrice, maxPrice, filtersContext?.data?.brands, filtersContext?.loading, filtersContext === null]);
+  }, [category, search, minPrice, maxPrice, filtersContext?.data?.brands, filtersContext?.loading, filtersContext === null, lang]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -123,7 +122,7 @@ export function BrandFilter({
   }, [searchQuery, brands]);
 
   const fetchBrands = async () => {
-    const cached = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+    const cached = readCachedProductsFilters({ lang, category, search, minPrice, maxPrice });
     if (cached) {
       setBrands(cached.brands);
       setFilteredBrands(cached.brands);
@@ -133,22 +132,25 @@ export function BrandFilter({
 
     try {
       setLoading(true);
-      const language = getStoredLanguage();
-      const params: Record<string, string> = { lang: language };
+      const params: Record<string, string> = { lang };
       if (category) params.category = category;
       if (search) params.search = search;
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
-      const response = await apiClient.get<{ brands: BrandOption[] }>('/api/v1/products/filters', { params });
+      const response = await apiClient.get<{ brands: BrandOption[]; categoryIds?: string[] }>(
+        '/api/v1/products/filters',
+        { params }
+      );
       const list = response.brands ?? [];
-      const existing = readCachedProductsFilters({ category, search, minPrice, maxPrice });
+      const existing = readCachedProductsFilters({ lang, category, search, minPrice, maxPrice });
       writeCachedProductsFilters(
-        { category, search, minPrice, maxPrice },
+        { lang, category, search, minPrice, maxPrice },
         {
           colors: existing?.colors || [],
           sizes: existing?.sizes || [],
           brands: list,
           attributes: existing?.attributes || [],
+          categoryIds: existing?.categoryIds || response.categoryIds || [],
           priceRange: existing?.priceRange || {
             min: 0,
             max: 100000,

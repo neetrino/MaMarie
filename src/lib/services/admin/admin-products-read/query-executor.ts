@@ -59,9 +59,10 @@ const getProductDetailInclude = () => ({
         },
       },
     },
-    orderBy: {
-      position: "asc" as const,
-    },
+    orderBy: [
+      { isMain: "desc" as const },
+      { position: "asc" as const },
+    ],
   },
   labels: true,
 });

@@ -96,4 +96,32 @@ describe('admin-query-cache', () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
+
+  it('ignores stale in-flight responses after invalidation', async () => {
+    let resolveStale: (value: { count: number }) => void = () => undefined;
+    const staleFetcher = vi.fn(
+      () =>
+        new Promise<{ count: number }>((resolve) => {
+          resolveStale = resolve;
+        }),
+    );
+    const freshFetcher = vi.fn(async () => ({ count: 2 }));
+
+    const stalePromise = fetchAdminQuery('test:invalidate', staleFetcher, {
+      staleTimeMs: 0,
+      force: true,
+    });
+    invalidateAdminQuery('test:invalidate');
+    const freshPromise = fetchAdminQuery('test:invalidate', freshFetcher, {
+      staleTimeMs: 0,
+      force: true,
+    });
+
+    resolveStale({ count: 1 });
+    await stalePromise;
+    const fresh = await freshPromise;
+
+    expect(fresh).toEqual({ count: 2 });
+    expect(peekAdminQuery<{ count: number }>('test:invalidate')).toEqual({ count: 2 });
+  });
 });

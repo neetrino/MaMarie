@@ -5,82 +5,126 @@ import {
   invalidateAdminBrandsCache,
   withAdminBrandsCache,
 } from "@/lib/cache/admin-reference-cache";
+import {
+  brandLocaleNameMapFromRows,
+  pickPrimaryBrandName,
+  resolveBrandSlugSource,
+  toBrandTranslationRows,
+  type BrandLocaleNameMap,
+} from "@/lib/admin/brand-locale-helpers";
+import {
+  PRIMARY_PRODUCT_CONTENT_LOCALE,
+  isProductContentLocale,
+} from "@/constants/product-content-locales";
+import { resolveDisplayName } from "@/lib/admin/attribute-locale-helpers";
+
+type BrandTranslationRow = { id: string; locale: string; name: string };
+
+interface BrandWriteInput {
+  name?: string;
+  locale?: string;
+  translations?: Array<{ locale: string; name: string }>;
+  slug?: string;
+  logoUrl?: string | null;
+  published?: boolean;
+}
+
+function namesMapFromInput(data: BrandWriteInput): BrandLocaleNameMap {
+  if (data.translations && data.translations.length > 0) {
+    return brandLocaleNameMapFromRows(
+      data.translations.map((row) => ({ locale: row.locale, text: row.name })),
+    );
+  }
+
+  const map = brandLocaleNameMapFromRows([]);
+  const locale =
+    data.locale && isProductContentLocale(data.locale)
+      ? data.locale
+      : PRIMARY_PRODUCT_CONTENT_LOCALE;
+  if (data.name?.trim()) {
+    map[locale] = data.name.trim();
+  }
+  return map;
+}
+
+async function allocateUniqueBrandSlug(
+  baseSlug: string,
+  excludeBrandId?: string,
+): Promise<string> {
+  const safeBase = baseSlug || "brand";
+  let slug = safeBase;
+  let counter = 1;
+
+  while (counter <= 1000) {
+    const existing = await db.brand.findUnique({ where: { slug } });
+    if (!existing || (excludeBrandId && existing.id === excludeBrandId)) {
+      return slug;
+    }
+    slug = `${safeBase}-${counter}`;
+    counter += 1;
+  }
+
+  throw {
+    status: 500,
+    type: "https://api.shop.am/problems/internal-error",
+    title: "Unable to generate unique slug",
+    detail: "Could not generate a unique slug for the brand after many attempts",
+  };
+}
+
+function formatBrandResponse(brand: {
+  id: string;
+  slug: string;
+  logoUrl: string | null;
+  published: boolean | null;
+  translations?: BrandTranslationRow[];
+}) {
+  const translations = Array.isArray(brand.translations) ? brand.translations : [];
+  return {
+    id: brand.id,
+    name: resolveDisplayName(translations, brand.slug),
+    slug: brand.slug,
+    logoUrl: brand.logoUrl,
+    published: Boolean(brand.published),
+    translations: translations.map((row) => ({
+      locale: row.locale,
+      name: row.name,
+    })),
+  };
+}
 
 class AdminBrandsService {
-  /**
-   * Get brands for admin
-   */
   async getBrands() {
     return withAdminBrandsCache(async () => {
       const brands = await db.brand.findMany({
-        where: {
-          deletedAt: null,
-        },
-        include: {
-          translations: {
-            where: { locale: "en" },
-            take: 1,
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        where: { deletedAt: null },
+        include: { translations: true },
+        orderBy: { createdAt: "desc" },
       });
 
       return {
-        data: brands.map((brand: { id: string; slug: string; logoUrl: string | null; published: boolean | null; translations?: Array<{ name: string }> }) => {
-          const translations = Array.isArray(brand.translations) ? brand.translations : [];
-          const translation = translations[0] || null;
-          return {
-            id: brand.id,
-            name: translation?.name || "",
-            slug: brand.slug,
-            logoUrl: brand.logoUrl,
-            published: Boolean(brand.published),
-          };
-        }),
+        data: brands.map((brand) => formatBrandResponse(brand)),
       };
     });
   }
 
-  /**
-   * Create brand
-   */
-  async createBrand(data: {
-    name: string;
-    locale?: string;
-    logoUrl?: string;
-    published?: boolean;
-  }) {
-    const locale = data.locale || "en";
-    
-    // Generate base slug from name (ReDoS-safe)
-    const baseSlug = toSlug(data.name);
-
-    // Generate unique slug by appending number if needed
-    let slug = baseSlug;
-    let counter = 1;
-    let existing = await db.brand.findUnique({
-      where: { slug },
-    });
-
-    while (existing) {
-      slug = `${baseSlug}-${counter}`;
-      counter++;
-      existing = await db.brand.findUnique({
-        where: { slug },
-      });
-      
-      // Safety check to prevent infinite loop
-      if (counter > 1000) {
-        throw {
-          status: 500,
-          type: "https://api.shop.am/problems/internal-error",
-          title: "Unable to generate unique slug",
-          detail: "Could not generate a unique slug for the brand after many attempts",
-        };
-      }
+  async createBrand(data: BrandWriteInput) {
+    const namesMap = namesMapFromInput(data);
+    const primaryName = pickPrimaryBrandName(namesMap);
+    if (!primaryName) {
+      throw {
+        status: 400,
+        type: "https://api.shop.am/problems/bad-request",
+        title: "Collection name required",
+        detail: "At least one locale name is required",
+      };
     }
+
+    const requestedSlug = data.slug?.trim()
+      ? toSlug(data.slug)
+      : toSlug(resolveBrandSlugSource(namesMap));
+    const slug = await allocateUniqueBrandSlug(requestedSlug || "brand");
+    const translationRows = toBrandTranslationRows(namesMap);
 
     const brand = await db.brand.create({
       data: {
@@ -88,53 +132,22 @@ class AdminBrandsService {
         logoUrl: data.logoUrl || undefined,
         published: data.published ?? true,
         translations: {
-          create: {
-            locale,
-            name: data.name,
-          },
+          create: translationRows,
         },
       },
-      include: {
-        translations: true,
-      },
+      include: { translations: true },
     });
 
-    // Безопасное получение translation с проверкой на существование массива
-    const brandTranslations = Array.isArray(brand.translations) ? brand.translations : [];
-    const translation = brandTranslations.find((t: { locale: string }) => t.locale === locale) || brandTranslations[0] || null;
-
     invalidateAdminBrandsCache();
-
-    return {
-      data: {
-        id: brand.id,
-        name: translation?.name || "",
-        slug: brand.slug,
-        logoUrl: brand.logoUrl,
-        published: Boolean(brand.published),
-      },
-    };
+    return { data: formatBrandResponse(brand) };
   }
 
-  /**
-   * Update brand
-   */
-  async updateBrand(
-    brandId: string,
-    data: {
-      name?: string;
-      locale?: string;
-      logoUrl?: string;
-      published?: boolean;
-    }
-  ) {
-    logger.debug('🔄 [ADMIN SERVICE] updateBrand called:', brandId, data);
-    
+  async updateBrand(brandId: string, data: BrandWriteInput) {
+    logger.debug("🔄 [ADMIN SERVICE] updateBrand called:", brandId, data);
+
     const brand = await db.brand.findUnique({
       where: { id: brandId },
-      include: {
-        translations: true,
-      },
+      include: { translations: true },
     });
 
     if (!brand) {
@@ -146,44 +159,73 @@ class AdminBrandsService {
       };
     }
 
-    const locale = data.locale || "en";
-    const updateData: any = {};
+    const updateData: {
+      logoUrl?: string | null;
+      published?: boolean;
+      slug?: string;
+    } = {};
 
-    // Update logo URL if provided
     if (data.logoUrl !== undefined) {
       updateData.logoUrl = data.logoUrl || null;
     }
-
     if (data.published !== undefined) {
       updateData.published = data.published;
     }
 
-    // Update translation if name is provided
-    if (data.name !== undefined) {
-      const brandTranslations = Array.isArray(brand.translations) ? brand.translations : [];
-      const existingTranslation = brandTranslations.find(
-        (t: { locale: string }) => t.locale === locale
+    const hasTranslationsPayload =
+      (data.translations && data.translations.length > 0) || data.name !== undefined;
+
+    if (hasTranslationsPayload) {
+      const namesMap = namesMapFromInput(data);
+      const primaryName = pickPrimaryBrandName(namesMap);
+      if (!primaryName) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/bad-request",
+          title: "Collection name required",
+          detail: "At least one locale name is required",
+        };
+      }
+
+      const existingByLocale = new Map(
+        (Array.isArray(brand.translations) ? brand.translations : []).map((row) => [
+          row.locale,
+          row,
+        ]),
       );
 
-      if (existingTranslation) {
-        // Update existing translation
-        await db.brandTranslation.update({
-          where: { id: existingTranslation.id },
-          data: { name: data.name },
-        });
-      } else {
-        // Create new translation
-        await db.brandTranslation.create({
-          data: {
-            brandId: brand.id,
-            locale,
-            name: data.name,
-          },
-        });
+      for (const row of toBrandTranslationRows(namesMap)) {
+        const existing = existingByLocale.get(row.locale);
+        if (existing) {
+          await db.brandTranslation.update({
+            where: { id: existing.id },
+            data: { name: row.name },
+          });
+        } else {
+          await db.brandTranslation.create({
+            data: {
+              brandId: brand.id,
+              locale: row.locale,
+              name: row.name,
+            },
+          });
+        }
       }
     }
 
-    // Update brand base data if needed
+    if (data.slug !== undefined) {
+      const nextSlug = toSlug(data.slug.trim());
+      if (!nextSlug) {
+        throw {
+          status: 400,
+          type: "https://api.shop.am/problems/bad-request",
+          title: "Invalid slug",
+          detail: "Slug must contain Latin letters or digits",
+        };
+      }
+      updateData.slug = await allocateUniqueBrandSlug(nextSlug, brandId);
+    }
+
     if (Object.keys(updateData).length > 0) {
       await db.brand.update({
         where: { id: brandId },
@@ -191,41 +233,18 @@ class AdminBrandsService {
       });
     }
 
-    // Fetch updated brand with translations
     const updatedBrand = await db.brand.findUnique({
       where: { id: brandId },
-      include: {
-        translations: {
-          where: { locale },
-          take: 1,
-        },
-      },
+      include: { translations: true },
     });
 
-    const brandTranslations = Array.isArray(updatedBrand?.translations) 
-      ? updatedBrand.translations 
-      : [];
-    const translation = brandTranslations[0] || null;
-
     invalidateAdminBrandsCache();
-
-    return {
-      data: {
-        id: updatedBrand!.id,
-        name: translation?.name || "",
-        slug: updatedBrand!.slug,
-        logoUrl: updatedBrand!.logoUrl,
-        published: Boolean(updatedBrand!.published),
-      },
-    };
+    return { data: formatBrandResponse(updatedBrand!) };
   }
 
-  /**
-   * Delete brand (soft delete)
-   */
   async deleteBrand(brandId: string) {
-    logger.debug('🗑️ [ADMIN SERVICE] deleteBrand called:', brandId);
-    
+    logger.debug("🗑️ [ADMIN SERVICE] deleteBrand called:", brandId);
+
     const brand = await db.brand.findUnique({
       where: { id: brandId },
     });
@@ -239,7 +258,6 @@ class AdminBrandsService {
       };
     }
 
-    // Check if brand has products (using count for better performance)
     const productsCount = await db.product.count({
       where: {
         brandId: brandId,
@@ -252,7 +270,7 @@ class AdminBrandsService {
         status: 400,
         type: "https://api.shop.am/problems/bad-request",
         title: "Cannot delete brand",
-        detail: `This brand has ${productsCount} associated product${productsCount > 1 ? 's' : ''}. Please remove or change brand for these products first.`,
+        detail: `This brand has ${productsCount} associated product${productsCount > 1 ? "s" : ""}. Please remove or change brand for these products first.`,
         productsCount,
       };
     }
@@ -265,13 +283,10 @@ class AdminBrandsService {
       },
     });
 
-    logger.debug('✅ [ADMIN SERVICE] Brand deleted:', brandId);
+    logger.debug("✅ [ADMIN SERVICE] Brand deleted:", brandId);
     invalidateAdminBrandsCache();
     return { success: true };
   }
 }
 
 export const adminBrandsService = new AdminBrandsService();
-
-
-

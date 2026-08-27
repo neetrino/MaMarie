@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BRAND_LOADING_SPINNER_CLASS } from '../../constants/brand';
 import { useAuth } from '../../lib/auth/AuthContext';
+import { initializeCurrencyRates } from '../../lib/currency';
 import { useTranslation } from '../../lib/i18n-client';
 import { StatsGrid } from './components/StatsGrid';
 import { RecentOrdersCard } from './components/RecentOrdersCard';
@@ -32,6 +33,10 @@ export default function AdminPanel() {
     isAdmin,
     isLoading,
   });
+
+  useEffect(() => {
+    initializeCurrencyRates().catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {

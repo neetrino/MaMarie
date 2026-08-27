@@ -1,4 +1,5 @@
 import { processImageUrl, smartSplitUrls } from "../../../utils/image-utils";
+import { selectDefaultVariant } from "../../../products/select-default-variant";
 
 function categoryTitleFromTranslations(
   translations: Array<{ title: string }> | undefined
@@ -57,6 +58,9 @@ export function formatProductForList(product: {
     stock: number;
     compareAtPrice: number | null;
     imageUrl?: string | null;
+    isMain?: boolean | null;
+    position?: number | null;
+    published?: boolean | null;
   }>;
   media?: unknown[];
   categories?: Array<{
@@ -70,15 +74,17 @@ export function formatProductForList(product: {
     : null;
   
   const variants = Array.isArray(product.variants) ? product.variants : [];
-  const variant =
-    variants.length > 0
-      ? variants.reduce((cheapest, current) =>
-          current.price < cheapest.price ? current : cheapest
-        )
-      : null;
+  const variant = selectDefaultVariant(
+    variants.map((v, index) => ({
+      ...v,
+      id: `admin-list-${index}`,
+    }))
+  );
 
   const image =
-    extractImageFromMedia(product.media) ?? extractImageFromVariants(variants);
+    extractImageFromMedia(product.media) ?? extractImageFromVariants(
+      variant ? [variant] : variants
+    );
 
   return {
     id: product.id,

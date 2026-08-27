@@ -2,7 +2,8 @@
 
 import type { ChangeEvent } from 'react';
 import { processImageFile } from '../../../../../lib/utils/image-utils';
-import type { Variant, ColorData } from '../types';
+import { uploadImagesToR2Client } from '../../../../../lib/admin/upload-images-to-r2-client';
+import type { Variant } from '../types';
 import type { GeneratedVariant } from '../types';
 import { logger } from "@/lib/utils/logger";
 
@@ -186,9 +187,10 @@ export function useImageHandling({
         return;
       }
 
+      const publicUrls = await uploadImagesToR2Client(uploadedImages);
+
       setImageUrls((prev) => {
-        const newImageUrls = [...prev, ...uploadedImages];
-        const newFeaturedIdx = prev.length === 0 ? 0 : featuredImageIndex;
+        const newImageUrls = [...prev, ...publicUrls];
         if (prev.length === 0 && newImageUrls.length > 0) {
           setFeaturedImageIndex(0);
           setMainProductImage(newImageUrls[0]);
@@ -212,9 +214,9 @@ export function useImageHandling({
       return;
     }
 
-    const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      setImageUploadError(`"${file.name}" is not an image file`);
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      setImageUploadError(`No valid image files selected`);
       if (event.target) {
         event.target.value = '';
       }
@@ -224,24 +226,42 @@ export function useImageHandling({
     setImageUploadLoading(true);
     setImageUploadError(null);
     try {
-      logger.debug('🖼️ [VARIANT IMAGE] Processing variant image:', {
+      const compressed = await Promise.all(
+        imageFiles.map(async (file, index) => {
+          logger.debug('🖼️ [VARIANT IMAGE] Processing variant image:', {
+            variantId,
+            fileName: file.name,
+            index: index + 1,
+            total: imageFiles.length,
+            originalSize: `${Math.round(file.size / 1024)}KB`,
+          });
+
+          return processImageFile(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            initialQuality: 0.8,
+          });
+        })
+      );
+
+      const publicUrls = await uploadImagesToR2Client(compressed);
+
+      setGeneratedVariants((prev) =>
+        prev.map((v) =>
+          v.id === variantId
+            ? { ...v, images: [...v.images, ...publicUrls] }
+            : v
+        )
+      );
+      logger.debug('✅ [VARIANT BUILDER] Variant images uploaded:', {
         variantId,
-        fileName: file.name,
-        originalSize: `${Math.round(file.size / 1024)}KB`,
+        count: publicUrls.length,
       });
-
-      const base64 = await processImageFile(file, {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        initialQuality: 0.8,
-      });
-
-      setGeneratedVariants((prev) => prev.map((v) => (v.id === variantId ? { ...v, image: base64 } : v)));
-      logger.debug('✅ [VARIANT BUILDER] Variant image uploaded and processed for variant:', variantId);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error('❌ [VARIANT IMAGE] Error processing variant image:', error);
-      setImageUploadError(error?.message || t('admin.products.add.failedToProcessImage'));
+      setImageUploadError(message || t('admin.products.add.failedToProcessImage'));
     } finally {
       setImageUploadLoading(false);
       if (event.target) {
@@ -272,33 +292,32 @@ export function useImageHandling({
       setImageUploadLoading(true);
       logger.debug('📤 [ADMIN] Starting upload for color:', colorImageTarget.colorValue, 'Files:', imageFiles.length);
 
-      const uploadedImages = await Promise.all(
+      const compressed = await Promise.all(
         imageFiles.map(async (file, index) => {
           logger.debug(`🖼️ [COLOR IMAGE] Processing image ${index + 1}/${imageFiles.length}:`, {
             fileName: file.name,
             originalSize: `${Math.round(file.size / 1024)}KB`,
           });
 
-          const base64 = await processImageFile(file, {
+          return processImageFile(file, {
             maxSizeMB: 2,
             maxWidthOrHeight: 1920,
             useWebWorker: true,
             initialQuality: 0.8,
           });
-
-          logger.debug(`✅ [COLOR IMAGE] Image ${index + 1}/${imageFiles.length} processed, base64 length:`, base64.length);
-          return base64;
         })
       );
 
-      logger.debug('📥 [ADMIN] All images processed, adding to variant:', {
+      const publicUrls = await uploadImagesToR2Client(compressed);
+
+      logger.debug('📥 [ADMIN] All images uploaded to R2, adding to variant:', {
         variantId: colorImageTarget.variantId,
         colorValue: colorImageTarget.colorValue,
-        imagesCount: uploadedImages.length,
+        imagesCount: publicUrls.length,
       });
 
-      addColorImages(colorImageTarget.variantId, colorImageTarget.colorValue, uploadedImages);
-      logger.debug('✅ [ADMIN] Color images added to state:', uploadedImages.length);
+      addColorImages(colorImageTarget.variantId, colorImageTarget.colorValue, publicUrls);
+      logger.debug('✅ [ADMIN] Color images added to state:', publicUrls.length);
     } catch (error: any) {
       console.error('❌ [ADMIN] Error uploading color images:', error);
       setImageUploadError(error?.message || t('admin.products.add.failedToProcessImages'));

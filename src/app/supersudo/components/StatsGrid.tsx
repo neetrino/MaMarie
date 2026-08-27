@@ -4,7 +4,7 @@ import type { ReactElement } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '../../../lib/i18n-client';
 import { ADMIN_DASHBOARD_STAT_CONFIG } from '../../../constants/admin-desktop-page';
-import { formatCurrency } from '../utils/dashboardUtils';
+import { formatDashboardAmdFromUsd } from '../utils/dashboardUtils';
 import { AdminStatCard } from './AdminStatCard';
 
 interface Stats {
@@ -85,7 +85,7 @@ function formatStatValue(
   }
 
   if (key === 'revenue') {
-    return formatCurrency(stats.revenue.total, stats.revenue.currency);
+    return formatDashboardAmdFromUsd(stats.revenue.total);
   }
 
   if (key === 'users') {

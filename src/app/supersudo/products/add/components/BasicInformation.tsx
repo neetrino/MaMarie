@@ -85,19 +85,6 @@ export function BasicInformation({
           </div>
         </div>
 
-        <div data-field-error={slugError ? 'true' : undefined}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t('admin.products.add.slug')} *
-          </label>
-          <Input
-            type="text"
-            value={slug}
-            onChange={onSlugChange}
-            placeholder={t('admin.products.add.productSlugPlaceholder')}
-            error={slugError}
-          />
-        </div>
-
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
             {t('admin.products.add.contentLanguage')}
@@ -124,6 +111,19 @@ export function BasicInformation({
             onChange={onTitleChange}
             placeholder={t('admin.products.add.productTitlePlaceholder')}
             error={titleError}
+          />
+        </div>
+
+        <div data-field-error={slugError ? 'true' : undefined}>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('admin.products.add.slug')} *
+          </label>
+          <Input
+            type="text"
+            value={slug}
+            onChange={onSlugChange}
+            placeholder={t('admin.products.add.productSlugPlaceholder')}
+            error={slugError}
           />
         </div>
 

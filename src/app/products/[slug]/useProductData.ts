@@ -14,6 +14,7 @@ import {
   cleanImageUrls,
 } from '../../../lib/utils/image-utils';
 import { logger } from "@/lib/utils/logger";
+import { parseProductSlugParam } from '@/lib/products/parse-product-slug-param';
 
 interface UseProductDataProps {
   params: Promise<{ slug?: string }>;
@@ -54,9 +55,7 @@ export function useProductData({
 
   const resolvedParams = use(params);
   const rawSlug = resolvedParams?.slug ?? '';
-  const slugParts = rawSlug.includes(':') ? rawSlug.split(':') : [rawSlug];
-  const slug = slugParts[0];
-  const variantIdFromUrl = slugParts.length > 1 ? slugParts[1] : null;
+  const { slug, variantId: variantIdFromUrl } = parseProductSlugParam(rawSlug);
 
   // Get images array from product - using unified utilities
   // Note: product.media is already cleaned and separated from variant images by findBySlug

@@ -4,6 +4,7 @@ import { useTranslation } from '../../../../lib/i18n-client';
 import { Card } from '@shop/ui';
 import { convertPrice, formatPriceInCurrency, type CurrencyCode } from '../../../../lib/currency';
 import type { OrderDetails } from '../useOrders';
+import { computeOrderTotalAmd } from '../utils/orderUtils';
 
 interface OrderDetailsTotalsProps {
   orderDetails: OrderDetails;
@@ -65,11 +66,7 @@ export function OrderDetailsTotals({
             <span>{t('orders.orderSummary.total')}</span>
             <span>
               {(() => {
-                const subtotalAMD = convertPrice(orderDetails.totals.subtotal, 'USD', 'AMD');
-                const discountAMD = convertPrice(orderDetails.totals.discount, 'USD', 'AMD');
-                const shippingAMD = orderDetails.totals.shipping;
-                const taxAMD = convertPrice(orderDetails.totals.tax, 'USD', 'AMD');
-                const totalAMD = subtotalAMD - discountAMD + shippingAMD + taxAMD;
+                const totalAMD = computeOrderTotalAmd(orderDetails.totals);
                 const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
                 return formatPriceInCurrency(totalDisplay, currency as CurrencyCode);
               })()}

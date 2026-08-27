@@ -147,3 +147,32 @@ export function writeCatalogClientCache<T>(
 export function hasFreshCatalogClientCache(key: string): boolean {
   return readCatalogClientCache(key) !== null;
 }
+
+/** Clears in-memory + sessionStorage catalog caches (list + filters). */
+export function clearCatalogClientCache(): void {
+  memoryCache.clear();
+  if (!isBrowser()) {
+    return;
+  }
+  try {
+    const index = readStorageIndex();
+    for (const key of index) {
+      window.sessionStorage.removeItem(`${CATALOG_CACHE_STORAGE_PREFIX}${key}`);
+    }
+    window.sessionStorage.removeItem(CATALOG_CACHE_INDEX_KEY);
+
+    // Remove any leftover keys with our prefix (index may be incomplete).
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < window.sessionStorage.length; i += 1) {
+      const storageKey = window.sessionStorage.key(i);
+      if (storageKey?.startsWith(CATALOG_CACHE_STORAGE_PREFIX)) {
+        keysToRemove.push(storageKey);
+      }
+    }
+    for (const storageKey of keysToRemove) {
+      window.sessionStorage.removeItem(storageKey);
+    }
+  } catch {
+    // sessionStorage unavailable
+  }
+}

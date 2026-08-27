@@ -1,6 +1,5 @@
 'use client';
 
-import { Input } from '@shop/ui';
 import { type ChangeEvent } from 'react';
 import { useTranslation } from '../../../../lib/i18n-client';
 import type { Category, CategoryFormData } from '../types';
@@ -12,14 +11,23 @@ import {
   AdminSideSheetFooter,
   AdminSideSheetPrimaryButton,
 } from '../../components/AdminSideSheetActions';
+import {
+  canSubmitCategoryForm,
+  CategoryFormFields,
+} from './CategoryFormFields';
+import type { ProductContentLocale } from '@/constants/product-content-locales';
 
 interface AddCategoryModalProps {
   isOpen: boolean;
   formData: CategoryFormData;
+  contentLocale: ProductContentLocale;
   categories: Category[];
   saving: boolean;
   imageUploading: boolean;
   onClose: () => void;
+  onContentLocaleChange: (locale: ProductContentLocale) => void;
+  onTitleChange: (locale: ProductContentLocale, value: string) => void;
+  onSlugChange: (value: string) => void;
   onFormDataChange: (data: CategoryFormData) => void;
   onImageUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onRemoveImage: () => void;
@@ -29,16 +37,21 @@ interface AddCategoryModalProps {
 export function AddCategoryModal({
   isOpen,
   formData,
+  contentLocale,
   categories,
   saving,
   imageUploading,
   onClose,
+  onContentLocaleChange,
+  onTitleChange,
+  onSlugChange,
   onFormDataChange,
   onImageUpload,
   onRemoveImage,
   onSubmit,
 }: AddCategoryModalProps) {
   const { t } = useTranslation();
+  const canSubmit = canSubmitCategoryForm(formData.titles, formData.slug);
 
   const footer = (
     <AdminSideSheetFooter>
@@ -47,7 +60,7 @@ export function AddCategoryModal({
       </AdminSideSheetCancelButton>
       <AdminSideSheetPrimaryButton
         onClick={onSubmit}
-        disabled={saving || imageUploading || !formData.title.trim()}
+        disabled={saving || imageUploading || !canSubmit}
       >
         {saving ? t('admin.categories.creating') : t('admin.categories.createCategory')}
       </AdminSideSheetPrimaryButton>
@@ -63,18 +76,14 @@ export function AddCategoryModal({
       footer={footer}
     >
       <div className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            {t('admin.categories.categoryTitle')} *
-          </label>
-          <Input
-            type="text"
-            value={formData.title}
-            onChange={(e) => onFormDataChange({ ...formData, title: e.target.value })}
-            placeholder={t('admin.categories.categoryTitlePlaceholder')}
-            className="w-full"
-          />
-        </div>
+        <CategoryFormFields
+          titles={formData.titles}
+          slug={formData.slug}
+          contentLocale={contentLocale}
+          onContentLocaleChange={onContentLocaleChange}
+          onTitleChange={onTitleChange}
+          onSlugChange={onSlugChange}
+        />
         <ParentCategorySelector
           categories={categories}
           selectedParentIds={formData.parentIds}

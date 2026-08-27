@@ -23,7 +23,9 @@ interface UseProductFormCallbacksProps {
   selectedAttributesForVariants: Set<string>;
   selectedAttributeValueIds: Record<string, string[]>;
   generatedVariants: GeneratedVariant[];
+  slugIsManual: boolean;
   setFormData: (updater: (prev: any) => any) => void;
+  setSlugIsManual: (value: boolean) => void;
   setSelectedAttributesForVariants: (value: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setSelectedAttributeValueIds: (value: Record<string, string[]> | ((prev: Record<string, string[]>) => Record<string, string[]>)) => void;
   setGeneratedVariants: (value: GeneratedVariant[] | ((prev: GeneratedVariant[]) => GeneratedVariant[])) => void;
@@ -38,7 +40,9 @@ export function useProductFormCallbacks({
   selectedAttributesForVariants,
   selectedAttributeValueIds,
   generatedVariants,
+  slugIsManual,
   setFormData,
+  setSlugIsManual,
   setSelectedAttributesForVariants,
   setSelectedAttributeValueIds,
   setGeneratedVariants,
@@ -57,13 +61,14 @@ export function useProductFormCallbacks({
         ...prev,
         translations,
         title: primary.title,
-        slug: resolveSharedSlug(prev.slug, title),
+        slug: resolveSharedSlug(prev.slug, title, slugIsManual),
       };
     });
   };
 
   const handleSlugChange = (e: ChangeEvent<HTMLInputElement>) => {
     const slug = e.target.value;
+    setSlugIsManual(slug.trim().length > 0);
     setFormData((prev) => ({
       ...prev,
       slug,
@@ -130,7 +135,7 @@ export function useProductFormCallbacks({
       compareAtPrice: '0.00',
       stock: '0',
       sku: baseSlug.toUpperCase(),
-      image: null,
+      images: [],
       isMain: false,
     };
     setGeneratedVariants((prev) => {

@@ -1,10 +1,18 @@
 import { db } from "@white-shop/db";
 import { translations } from "../translations";
-import { resolveCatalogProductCardImage } from "./catalog-product-card-image";
+import {
+  resolveCatalogProductCardImage,
+  resolveCatalogProductCardImages,
+} from "./catalog-product-card-image";
 import { collectProductColors, collectProductSizes } from "./product-variant-attributes";
 import { reviewsService } from "./reviews.service";
 import { ProductWithRelations } from "./products-find-query.service";
 import { pickProductContentTranslation } from "@/constants/product-content-locales";
+import {
+  parseCatalogPresentationFilters,
+  selectCatalogPresentationVariant,
+} from "../products/catalog-presentation-variant";
+import type { ProductFilters } from "./products-find-query.service";
 
 const DISCOUNT_SETTINGS_CACHE_TTL_MS = 60_000;
 
@@ -75,8 +83,16 @@ class ProductsFindTransformService {
    */
   async transformProducts(
     products: ProductWithRelations[],
-    lang: string = "en"
+    lang: string = "en",
+    filters?: Pick<
+      ProductFilters,
+      "colors" | "sizes" | "attrs" | "minPrice" | "maxPrice" | "lang"
+    >
   ): Promise<any[]> {
+    const presentationFilters = parseCatalogPresentationFilters({
+      ...filters,
+      lang: filters?.lang ?? lang,
+    });
     const [{ globalDiscount, categoryDiscounts, brandDiscounts }, reviewStatsByProductId] =
       await Promise.all([
         getDiscountSettingsSnapshot(),
@@ -97,14 +113,14 @@ class ProductsFindTransformService {
         ? brandTranslations.find((t: { locale: string }) => t.locale === lang) || brandTranslations[0]
         : null;
       
-      // Безопасное получение variant
+      // Безопасное получение variant — Main Variant preferred (never cheapest-by-price).
       const variants = Array.isArray(product.variants) ? product.variants : [];
-      const variant = variants.length > 0
-        ? variants.sort((a: { price: number }, b: { price: number }) => a.price - b.price)[0]
-        : null;
+      const variant = selectCatalogPresentationVariant(variants, presentationFilters);
+      const cardVariants = variant ? [variant] : [];
 
-      const availableColors = collectProductColors(product, lang);
-      const availableSizes = collectProductSizes(product, lang);
+      // Cards show only Main variant attributes — never borrow color/size from other variants.
+      const availableColors = collectProductColors(product, lang, { variants: cardVariants });
+      const availableSizes = collectProductSizes(product, lang, { variants: cardVariants });
       const reviewStats = reviewStatsByProductId.get(product.id) ?? {
         averageRating: 0,
         reviewsCount: 0,
@@ -149,6 +165,13 @@ class ProductsFindTransformService {
         };
       }) : [];
 
+      const cardImages = resolveCatalogProductCardImages(
+        product.id,
+        Array.isArray(product.media) ? product.media : [],
+        variants,
+        variant,
+      );
+
       return {
         id: product.id,
         slug: translation?.slug || "",
@@ -166,11 +189,13 @@ class ProductsFindTransformService {
         originalPrice: appliedDiscount > 0 ? originalPrice : variant?.compareAtPrice || null,
         compareAtPrice: variant?.compareAtPrice || null,
         discountPercent: appliedDiscount > 0 ? appliedDiscount : null,
-        image: resolveCatalogProductCardImage(
+        image: cardImages[0] ?? resolveCatalogProductCardImage(
           product.id,
           Array.isArray(product.media) ? product.media : [],
           variants,
+          variant,
         ),
+        images: cardImages,
         inStock: (variant?.stock || 0) > 0,
         labels: (() => {
           // Map existing labels

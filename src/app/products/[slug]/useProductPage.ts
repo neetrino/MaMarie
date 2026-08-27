@@ -7,7 +7,7 @@ import { t } from '../../../lib/i18n';
 import { buildWishlistProductSnapshot } from '../../../lib/wishlist-product-cache';
 import type { Review } from '../../../components/ProductReviews/utils';
 import { useAttributeGroups } from './useAttributeGroups';
-import { useProductImages } from './hooks/useProductImages';
+import { useProductImages, resolveVariantGalleryImages } from './hooks/useProductImages';
 import { useProductFetch } from './hooks/useProductFetch';
 import { useWishlistCompare } from './hooks/useWishlistCompare';
 import { useProductReviews } from './hooks/useProductReviews';
@@ -16,6 +16,7 @@ import { useProductActions } from './hooks/useProductActions';
 import { useProductQuantity } from './hooks/useProductQuantity';
 import { useProductCalculations } from './hooks/useProductCalculations';
 import type { Product } from './types';
+import { parseProductSlugParam } from '@/lib/products/parse-product-slug-param';
 
 interface UseProductPageOptions {
   slugParam: string;
@@ -25,11 +26,8 @@ interface UseProductPageOptions {
 }
 
 function parseSlugParam(rawSlug: string): { slug: string; variantIdFromUrl: string | null } {
-  const slugParts = rawSlug.includes(':') ? rawSlug.split(':') : [rawSlug];
-  return {
-    slug: slugParts[0] ?? '',
-    variantIdFromUrl: slugParts.length > 1 ? slugParts[1] : null,
-  };
+  const { slug, variantId } = parseProductSlugParam(rawSlug);
+  return { slug, variantIdFromUrl: variantId };
 }
 
 export function useProductPage({
@@ -57,7 +55,7 @@ export function useProductPage({
     serverLang,
   });
 
-  const images = useProductImages(product);
+  const allProductImages = useProductImages(product);
 
   const {
     selectedVariant,
@@ -72,9 +70,19 @@ export function useProductPage({
     handleAttributeValueSelect,
   } = useVariantSelection({
     product,
-    images,
+    images: allProductImages,
     setCurrentImageIndex,
+    initialVariantId: variantIdFromUrl,
   });
+
+  const images = useMemo(
+    () => resolveVariantGalleryImages(currentVariant, allProductImages),
+    [currentVariant, allProductImages]
+  );
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [currentVariant?.id]);
 
   const attributeGroups = useAttributeGroups({
     product,
@@ -188,16 +196,6 @@ export function useProductPage({
       setCurrentImageIndex(0);
     }
   }, [images.length, currentImageIndex]);
-
-  useEffect(() => {
-    if (product && product.variants && product.variants.length > 0 && variantIdFromUrl) {
-      const variantById = product.variants.find(v => v.id === variantIdFromUrl || v.id.endsWith(variantIdFromUrl));
-      const variantByIndex = product.variants[parseInt(variantIdFromUrl) - 1];
-      const initialVariant = variantById || variantByIndex || product.variants[0];
-      setSelectedVariant(initialVariant);
-      setCurrentImageIndex(0);
-    }
-  }, [product, variantIdFromUrl, setSelectedVariant]);
 
   const scrollToReviews = useCallback(() => {
     const reviewsElement = document.getElementById('product-reviews');

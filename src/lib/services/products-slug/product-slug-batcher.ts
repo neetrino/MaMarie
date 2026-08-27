@@ -13,6 +13,8 @@ type PdpVariantCore = {
   compareAtPrice: number | null;
   stock: number;
   published: boolean;
+  isMain?: boolean;
+  position?: number;
   imageUrl?: string | null;
 };
 
@@ -60,6 +62,7 @@ async function fetchProductAttributes(productId: string, lang: string): Promise<
                 id: true,
                 value: true,
                 colors: true,
+                imageUrl: true,
                 translations: { where: { locale: localeFilter } },
               },
             },
@@ -188,8 +191,10 @@ export async function fetchProductBySlugBatched(
             compareAtPrice: true,
             stock: true,
             published: true,
+            isMain: true,
+            position: true,
           },
-          orderBy: { price: "asc" },
+          orderBy: [{ isMain: "desc" }, { position: "asc" }],
         }),
         db.productLabel.findMany({ where: { productId } }),
         categoryIds.length > 0

@@ -7,6 +7,7 @@ import {
   writeJsonCache,
   STOREFRONT_CACHE_KEYS,
   STOREFRONT_CACHE_TTL,
+  STOREFRONT_PRODUCTS_CACHE_TAG,
   stableSearchParamsKey,
 } from '@/lib/cache/storefront-cache';
 import {
@@ -154,8 +155,8 @@ const fetchProductsListByStableKey = unstable_cache(
       () => fetchProductsListPayload(filters)
     );
   },
-  ['storefront-products-list-v3'],
-  { revalidate: UNSTABLE_REVALIDATE_SECONDS }
+  ['storefront-products-list-v1'],
+  { revalidate: UNSTABLE_REVALIDATE_SECONDS, tags: [STOREFRONT_PRODUCTS_CACHE_TAG] }
 );
 
 /** Cached storefront catalog list — Redis first, shared by SSR and API. */

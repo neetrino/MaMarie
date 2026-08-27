@@ -36,8 +36,16 @@ export function pickPrimaryFormFields(
   return picked ?? translations.hy;
 }
 
-export function resolveSharedSlug(currentSlug: string, title: string): string {
-  if (currentSlug.trim()) {
+/**
+ * Shared product slug: keep following the title until the user edits slug manually.
+ * In edit mode pass `slugIsManual: true` so an existing slug is never overwritten.
+ */
+export function resolveSharedSlug(
+  currentSlug: string,
+  title: string,
+  slugIsManual = false,
+): string {
+  if (slugIsManual) {
     return currentSlug;
   }
   return generateSlug(title);

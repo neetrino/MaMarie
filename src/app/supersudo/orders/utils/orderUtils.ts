@@ -2,7 +2,22 @@
  * Order utilities - helper functions for order status colors and formatting
  */
 
+import { convertPrice } from '../../../../lib/currency';
+
 export type CheckoutPaymentMethodKey = 'cashOnDelivery' | 'idram' | 'arca';
+
+/** Subtotal/discount/tax are USD; shipping is AMD. Returns grand total in AMD. */
+export function computeOrderTotalAmd(totals: {
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  tax: number;
+}): number {
+  const subtotalAmd = convertPrice(totals.subtotal, 'USD', 'AMD');
+  const discountAmd = convertPrice(totals.discount, 'USD', 'AMD');
+  const taxAmd = convertPrice(totals.tax, 'USD', 'AMD');
+  return subtotalAmd - discountAmd + totals.shipping + taxAmd;
+}
 
 /** i18n segment under `checkout.payment.*`, or empty if unknown (caller shows raw method). */
 export function getCheckoutPaymentMethodKey(

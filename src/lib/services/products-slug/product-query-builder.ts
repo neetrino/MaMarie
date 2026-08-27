@@ -1,4 +1,5 @@
 import { db } from "@white-shop/db";
+import { normalizeProductSlug } from "@/lib/products/parse-product-slug-param";
 import { logger } from "../../utils/logger";
 import { fetchProductBySlugBatched } from "./product-slug-batcher";
 import { resolvePublishedProductIdBySlug } from "./resolve-published-product-slug";
@@ -29,10 +30,11 @@ export async function buildProductQuery(
   slug: string,
   lang: string = "en",
 ): Promise<ProductWithFullRelations | null> {
-  const product = await fetchProductBySlugBatched(slug, lang);
+  const productSlug = normalizeProductSlug(slug);
+  const product = await fetchProductBySlugBatched(productSlug, lang);
 
   if (!product) {
-    await logProductNotFoundDiagnostics(slug, lang);
+    await logProductNotFoundDiagnostics(productSlug, lang);
     return null;
   }
 
