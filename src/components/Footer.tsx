@@ -18,15 +18,20 @@ import { FooterBunnyDecoration, FooterStrawberryDecoration } from './footer/Foot
 import { FooterSiteContent } from './footer/FooterSiteContent';
 
 interface FooterProps {
-  /** White strip above yellow body — `0` on `/login` (Figma `222:654`). */
+  /** Strip above yellow body — `0` on `/login` (Figma `222:654`). */
   topGapPx?: number;
+  /** Gap strip color above the yellow body (default white). */
+  gapBgColor?: string;
 }
 
 /**
  * Site footer — Figma node `51:428`.
- * `FOOTER_TOP_GAP_PX` keeps white space above the yellow rounded body; strawberry may overlap it.
+ * `FOOTER_TOP_GAP_PX` keeps space above the yellow rounded body; strawberry may overlap it.
  */
-export function Footer({ topGapPx = FOOTER_YELLOW_TOP_PX }: FooterProps) {
+export function Footer({
+  topGapPx = FOOTER_YELLOW_TOP_PX,
+  gapBgColor = FOOTER_GAP_BG_COLOR,
+}: FooterProps) {
   const contentPaddingTopPx = topGapPx + FOOTER_PADDING_TOP_PX;
 
   return (
@@ -43,7 +48,7 @@ export function Footer({ topGapPx = FOOTER_YELLOW_TOP_PX }: FooterProps) {
         className="pointer-events-none absolute left-0 right-0 top-0"
         style={{
           height: topGapPx,
-          backgroundColor: FOOTER_GAP_BG_COLOR,
+          backgroundColor: gapBgColor,
           zIndex: FOOTER_DECORATION_Z_INDEX,
         }}
       />

@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { LOGIN_SECTION_FOOTER_OVERLAP_PX } from '../constants/login-page';
 import { SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX } from '../constants/lazy-loading';
+import { PROFILE_DESKTOP_PAGE_BG } from '../constants/profile-desktop-page';
 import { DesktopFluidFrame } from './DesktopFluidFrame';
 import { Footer } from './Footer';
 import { LazyWhenVisible } from './LazyWhenVisible';
@@ -17,6 +18,7 @@ export function ConditionalFooter() {
   }
 
   const isAuthFormPage = pathname === '/login' || pathname === '/register';
+  const isProfilePage = Boolean(pathname?.startsWith('/profile'));
   const scaleOnTablet = pathname === '/about' || pathname?.startsWith('/about/');
   const footerVisibilityClass = scaleOnTablet
     ? 'mt-auto hidden min-[744px]:flex'
@@ -24,9 +26,17 @@ export function ConditionalFooter() {
 
   return (
     <DesktopFluidFrame className={footerVisibilityClass} scaleOnTablet={scaleOnTablet}>
-      <div style={isAuthFormPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined}>
+      <div
+        style={{
+          ...(isAuthFormPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined),
+          ...(isProfilePage ? { backgroundColor: PROFILE_DESKTOP_PAGE_BG } : undefined),
+        }}
+      >
         <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
-          <Footer topGapPx={isAuthFormPage ? 0 : undefined} />
+          <Footer
+            topGapPx={isAuthFormPage ? 0 : undefined}
+            gapBgColor={isProfilePage ? PROFILE_DESKTOP_PAGE_BG : undefined}
+          />
         </LazyWhenVisible>
       </div>
     </DesktopFluidFrame>
