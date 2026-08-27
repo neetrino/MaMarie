@@ -65,12 +65,18 @@ export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS = 'w-[4.5rem] lg:w-full';
 
-/** Read-only info attributes (e.g. material) — plain description, not selectable chips. */
-export const PRODUCT_PDP_INFO_ATTRIBUTE_LABEL_CLASS =
-  'text-xs font-bold uppercase text-gray-900';
+/** Read-only info attributes (e.g. material) — «Նյութ ' value». */
+export const PRODUCT_PDP_INFO_ATTRIBUTE_ROW_CLASS =
+  'flex w-fit max-w-[28ch] flex-wrap items-baseline gap-x-1 text-sm';
 
-export const PRODUCT_PDP_INFO_ATTRIBUTE_VALUE_CLASS =
-  'rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-normal text-gray-700';
+export const PRODUCT_PDP_INFO_ATTRIBUTE_LABEL_CLASS =
+  'shrink-0 text-xs font-bold uppercase text-blue-600';
+
+export const PRODUCT_PDP_INFO_ATTRIBUTE_SEPARATOR = "'";
+
+export const PRODUCT_PDP_INFO_ATTRIBUTE_SEPARATOR_CLASS = 'shrink-0 text-gray-400';
+
+export const PRODUCT_PDP_INFO_ATTRIBUTE_VALUE_CLASS = 'text-gray-900';
 
 /** Main image prev/next — desktop hover-reveal only (mobile uses swipe). */
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS =

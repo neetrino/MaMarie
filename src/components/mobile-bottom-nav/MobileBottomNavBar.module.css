@@ -63,6 +63,7 @@
   inset-inline: 0;
   bottom: 0;
   height: var(--bottom-nav-shell-height);
+  overflow: hidden;
   transition:
     --bottom-nav-notch-left var(--bottom-nav-transition-ms) var(--bottom-nav-transition-ease),
     --bottom-nav-notch-top-px var(--bottom-nav-transition-ms) var(--bottom-nav-transition-ease),
@@ -105,7 +106,9 @@
   top: calc(var(--bottom-nav-notch-top-px) * 1px);
   left: calc(100% * var(--bottom-nav-notch-left) / var(--bottom-nav-design-width));
   width: calc(100% * var(--bottom-nav-notch-width) / var(--bottom-nav-design-width));
-  height: auto;
+  height: calc(var(--bottom-nav-notch-height-px) * 1px);
+  max-width: calc(100% * var(--bottom-nav-notch-width) / var(--bottom-nav-design-width));
+  object-fit: contain;
   pointer-events: none;
   transition: var(--bottom-nav-transition);
 }

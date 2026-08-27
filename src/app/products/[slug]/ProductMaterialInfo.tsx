@@ -4,6 +4,9 @@ import type { LanguageCode } from '../../../lib/language';
 import { t } from '../../../lib/i18n';
 import {
   PRODUCT_PDP_INFO_ATTRIBUTE_LABEL_CLASS,
+  PRODUCT_PDP_INFO_ATTRIBUTE_ROW_CLASS,
+  PRODUCT_PDP_INFO_ATTRIBUTE_SEPARATOR,
+  PRODUCT_PDP_INFO_ATTRIBUTE_SEPARATOR_CLASS,
   PRODUCT_PDP_INFO_ATTRIBUTE_VALUE_CLASS,
 } from './constants';
 import type { AttributeGroupValue, Product } from './types';
@@ -53,26 +56,30 @@ export function ProductMaterialInfo({
   }
 
   return (
-    <div className="mb-8 space-y-4">
-      {infoEntries.map(([attrKey, groups]) => (
-        <div key={attrKey} className="space-y-1.5">
-          <p className={PRODUCT_PDP_INFO_ATTRIBUTE_LABEL_CLASS}>
-            {resolveInfoAttributeLabel(language, attrKey, product)}:
-          </p>
-          <p className={PRODUCT_PDP_INFO_ATTRIBUTE_VALUE_CLASS}>
-            {groups
-              .map((group) =>
-                resolveAttributeValueDisplayLabel(
-                  language,
-                  attrKey,
-                  group.value,
-                  group.label,
-                ),
-              )
-              .join(', ')}
-          </p>
-        </div>
-      ))}
+    <div className="mb-8 space-y-3">
+      {infoEntries.map(([attrKey, groups]) => {
+        const label = resolveInfoAttributeLabel(language, attrKey, product);
+        const value = groups
+          .map((group) =>
+            resolveAttributeValueDisplayLabel(
+              language,
+              attrKey,
+              group.value,
+              group.label,
+            ),
+          )
+          .join(', ');
+
+        return (
+          <div key={attrKey} className={PRODUCT_PDP_INFO_ATTRIBUTE_ROW_CLASS}>
+            <span className={PRODUCT_PDP_INFO_ATTRIBUTE_LABEL_CLASS}>{label}</span>
+            <span aria-hidden className={PRODUCT_PDP_INFO_ATTRIBUTE_SEPARATOR_CLASS}>
+              {PRODUCT_PDP_INFO_ATTRIBUTE_SEPARATOR}
+            </span>
+            <span className={PRODUCT_PDP_INFO_ATTRIBUTE_VALUE_CLASS}>{value}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
