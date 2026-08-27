@@ -15,8 +15,10 @@ export function BulkSelectionControls({
   bulkDeleting,
 }: BulkSelectionControlsProps) {
   const { t } = useTranslation();
-  const hasSelection = selectedCount > 0;
-  const deleteDisabled = !hasSelection || bulkDeleting;
+
+  if (selectedCount === 0) {
+    return null;
+  }
 
   return (
     <Card className="mb-6 w-full min-w-0 p-4">
@@ -27,9 +29,9 @@ export function BulkSelectionControls({
         <Button
           variant="outline"
           type="button"
-          className="shrink-0"
+          className="shrink-0 !border-red-600 !bg-red-600 !text-white hover:!bg-red-700 hover:!text-white focus:!ring-red-500"
           onClick={onBulkDelete}
-          disabled={deleteDisabled}
+          disabled={bulkDeleting}
         >
           {bulkDeleting ? t('admin.orders.deleting') : t('admin.orders.deleteSelected')}
         </Button>

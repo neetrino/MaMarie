@@ -378,6 +378,7 @@ export default function MessagesPage() {
                 <div className="text-sm text-gray-700">{t('admin.messages.selectedMessages').replace('{count}', selectedIds.size.toString())}</div>
                 <Button
                   variant="outline"
+                  className="!border-red-600 !bg-red-600 !text-white hover:!bg-red-700 hover:!text-white focus:!ring-red-500"
                   onClick={handleBulkDelete}
                   disabled={selectedIds.size === 0 || bulkDeleting}
                 >
