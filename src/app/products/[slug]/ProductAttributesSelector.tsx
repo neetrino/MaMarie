@@ -8,13 +8,22 @@ import { HERO_GENDER_BUTTON_BOYS_BG_COLOR } from '../../../constants/hero';
 import { processImageUrl } from '../../../lib/utils/image-utils';
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
-import { PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX } from './constants';
+import {
+  PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+} from './constants';
 import type { Product, ProductVariant } from './types';
 import { logger } from "@/lib/utils/logger";
 import {
   resolveAttributeNameDisplay,
   resolveAttributeValueDisplayLabel,
 } from './utils/attribute-display-label';
+import { isProductInfoAttribute } from './utils/is-product-info-attribute';
+import {
+  getProductColorSwatchItemClass,
+  getProductColorSwatchLabelClass,
+  getProductColorSwatchRowClass,
+  getProductColorSwatchSizeClass,
+} from './utils/product-color-swatch-classes';
 
 interface AttributeGroupValue {
   valueId?: string;
@@ -164,7 +173,9 @@ export function ProductAttributesSelector({
       {/* Display all attributes from attributeGroups, not just from productAttributes */}
       {useNewFormat ? (
         // Use attributeGroups which contains all attributes (from productAttributes and variants)
-        Array.from(attributeGroups.entries()).map(([attrKey, attrGroups]) => {
+        Array.from(attributeGroups.entries())
+          .filter(([attrKey]) => !isProductInfoAttribute(attrKey))
+          .map(([attrKey, attrGroups]) => {
           // Try to get attribute name from productAttributes if available
           const productAttr = product?.productAttributes?.find((pa: { attribute?: { key?: string; name?: string } }) => pa.attribute?.key === attrKey);
           const attributeName = resolveAttributeNameDisplay(
@@ -209,7 +220,7 @@ export function ProductAttributesSelector({
                 </label>
               )}
               {isColor ? (
-                <div className="flex flex-wrap gap-1.5 items-center">
+                <div className={getProductColorSwatchRowClass(attrGroups.length)}>
                   {attrGroups.map((g) => {
                     const isSelected = selectedColor === g.value?.toLowerCase().trim();
                     // IMPORTANT: Don't disable based on stock - show all colors, even if stock is 0
@@ -228,22 +239,12 @@ export function ProductAttributesSelector({
                       g.label,
                     );
                     
-                    // Dynamic sizing based on number of values
-                    // Keep size consistent for 2 values, reduce for more
                     const totalValues = attrGroups.length;
-                    const sizeClass = totalValues > 6 
-                      ? 'w-8 h-8' 
-                      : totalValues > 3 
-                      ? 'w-9 h-9' 
-                      : 'w-10 h-10';
-                    const labelSizeClass = totalValues > 6
-                      ? 'max-w-[2rem] text-[10px]'
-                      : totalValues > 3
-                        ? 'max-w-[2.25rem] text-[10px]'
-                        : 'max-w-[2.5rem] text-xs';
+                    const sizeClass = getProductColorSwatchSizeClass(totalValues);
+                    const labelSizeClass = getProductColorSwatchLabelClass(totalValues);
                     
                     return (
-                      <div key={g.valueId || g.value} className="flex flex-col items-center gap-0.5">
+                      <div key={g.valueId || g.value} className={getProductColorSwatchItemClass()}>
                         <button 
                           onClick={() => onColorSelect(g.value)}
                           className={`${sizeClass} rounded-full transition-all overflow-hidden ${
@@ -271,9 +272,7 @@ export function ProductAttributesSelector({
                             />
                           ) : null}
                         </button>
-                        <span
-                          className={`${labelSizeClass} text-center leading-tight text-gray-700 line-clamp-2`}
-                        >
+                        <span className={labelSizeClass}>
                           {colorLabel}
                         </span>
                       </div>
@@ -347,7 +346,6 @@ export function ProductAttributesSelector({
                   ) : null}
                 </div>
               ) : (
-                // Generic attribute selector
                 <div className="flex flex-wrap gap-1.5">
                   {attrGroups.map((g) => {
                     const selectedValueId = selectedAttributeValues.get(attrKey);
@@ -442,18 +440,18 @@ export function ProductAttributesSelector({
           {colorGroups.length > 0 && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-blue-600">{t(language, 'product.color')}</label>
-              <div className="flex flex-wrap gap-2 items-center">
+              <div className={getProductColorSwatchRowClass(colorGroups.length)}>
                 {colorGroups.map((g) => {
                   const isSelected = selectedColor === g.color?.toLowerCase().trim();
                   const isDisabled = g.stock <= 0;
                   const colorLabel = resolveAttributeValueDisplayLabel(language, 'color', g.color);
                   
                   return (
-                    <div key={g.color} className="flex flex-col items-center gap-1">
+                    <div key={g.color} className={getProductColorSwatchItemClass()}>
                       <button 
                         onClick={() => !isDisabled && onColorSelect(g.color)}
                         disabled={isDisabled}
-                        className={`w-10 h-10 rounded-full transition-all ${
+                        className={`${getProductColorSwatchSizeClass(colorGroups.length)} rounded-full transition-all ${
                           isSelected 
                             ? 'border-[3px] border-green-500 scale-110' 
                             : isDisabled 
@@ -463,7 +461,7 @@ export function ProductAttributesSelector({
                         style={{ backgroundColor: getColorValue(g.color) }} 
                         title={colorLabel}
                       />
-                      <span className="max-w-[2.5rem] text-center text-xs leading-tight text-gray-700 line-clamp-2">
+                      <span className={getProductColorSwatchLabelClass(colorGroups.length)}>
                         {colorLabel}
                       </span>
                     </div>

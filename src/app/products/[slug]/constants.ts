@@ -28,7 +28,15 @@ export const PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS = 'border-[#5281e1]';
 
 /** Desktop grid — gallery column width (info column takes the remainder). */
 export const PRODUCT_PDP_GRID_CLASS =
-  'grid grid-cols-1 gap-12 items-start lg:grid-cols-[48%_52%] lg:items-stretch';
+  'grid grid-cols-1 gap-12 items-start lg:grid-cols-[48%_52%] lg:items-stretch [&>*]:min-w-0';
+
+/** Product long description — narrow measure for fewer words per line. */
+export const PRODUCT_PDP_DESCRIPTION_CLASS =
+  'prose prose-sm mb-8 min-w-0 max-w-[36ch] break-words text-gray-600 [overflow-wrap:anywhere] [&_*]:max-w-full [&_*]:break-words [&_*]:[overflow-wrap:anywhere]';
+
+/** Info column — allow grid track to shrink so text wraps. */
+export const PRODUCT_PDP_INFO_COLUMN_CLASS =
+  'flex h-full min-h-0 min-w-0 max-w-full flex-col';
 
 /** Responsive `sizes` hint for PDP hero images (matches gallery column width). */
 export const PRODUCT_PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 48vw';
@@ -56,6 +64,13 @@ export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
   'scrollbar-hide flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:justify-start lg:gap-4 lg:max-h-[36rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS = 'w-[4.5rem] lg:w-full';
+
+/** Read-only info attributes (e.g. material) — plain description, not selectable chips. */
+export const PRODUCT_PDP_INFO_ATTRIBUTE_LABEL_CLASS =
+  'text-xs font-bold uppercase text-gray-900';
+
+export const PRODUCT_PDP_INFO_ATTRIBUTE_VALUE_CLASS =
+  'rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-normal text-gray-700';
 
 /** Main image prev/next — desktop hover-reveal only (mobile uses swipe). */
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS =

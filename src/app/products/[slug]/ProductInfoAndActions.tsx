@@ -23,6 +23,8 @@ import {
   PRODUCT_PDP_ACTIONS_ROW_CLASS,
   PRODUCT_PDP_ACTIONS_TOP_ROW_CLASS,
   PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS,
+  PRODUCT_PDP_DESCRIPTION_CLASS,
+  PRODUCT_PDP_INFO_COLUMN_CLASS,
   PRODUCT_PDP_SIZE_GUIDE_ACTION_CLASS,
   PRODUCT_QUANTITY_STEPPER_HEIGHT_PX,
   PRODUCT_QUANTITY_STEPPER_SHELL_CLASS,
@@ -30,6 +32,7 @@ import {
   PRODUCT_QUANTITY_STEPPER_VALUE_CLASS,
 } from './constants';
 import { ProductAttributesSelector } from './ProductAttributesSelector';
+import { ProductMaterialInfo } from './ProductMaterialInfo';
 import { ProductRatingSummary } from './ProductRatingSummary';
 import type { Product, ProductVariant } from './types';
 
@@ -176,7 +179,7 @@ export function ProductInfoAndActions({
     (attributeGroups.get('size')?.length ?? 0) > 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className={PRODUCT_PDP_INFO_COLUMN_CLASS}>
       <div className="flex-1">
         {product.brand && (
           <div className="mb-2 flex items-center gap-2">
@@ -224,7 +227,22 @@ export function ProductInfoAndActions({
             />
           </div>
         </div>
-        <div className="text-gray-600 mb-8 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(getProductText(language, product.id, 'longDescription') || product.description || '') }} />
+        <div
+          className={PRODUCT_PDP_DESCRIPTION_CLASS}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(
+              getProductText(language, product.id, 'longDescription') ||
+                product.description ||
+                '',
+            ),
+          }}
+        />
+
+        <ProductMaterialInfo
+          product={product}
+          attributeGroups={attributeGroups}
+          language={language}
+        />
 
         <div className="mb-4">
           <ProductAttributesSelector

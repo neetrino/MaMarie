@@ -36,6 +36,9 @@ export function resolveAttributeNameDisplay(
   if (attrKey === 'size') {
     return t(language, 'product.size');
   }
+  if (attrKey === 'material') {
+    return t(language, 'product.material');
+  }
 
   if (fromApi) {
     return fromApi;
