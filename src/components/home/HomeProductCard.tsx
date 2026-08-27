@@ -423,6 +423,8 @@ function HomeProductCardComponent({
               <HomeProductCardImageGallery
                 images={galleryImages}
                 activeIndex={galleryIndex}
+                productHref={productHref}
+                onBeforeNavigate={saveSnapshot}
                 onIndexChange={(next) => {
                   setGalleryIndex(next);
                   setImageError(false);

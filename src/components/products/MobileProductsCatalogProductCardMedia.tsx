@@ -25,6 +25,7 @@ import { HomeProductCardImageGallery } from '../home/HomeProductCardImageGallery
 
 interface MobileProductsCatalogProductCardMediaProps {
   slug: string;
+  productHref: string;
   title: string;
   imageSrc: string | null;
   images?: string[];
@@ -32,11 +33,13 @@ interface MobileProductsCatalogProductCardMediaProps {
   layoutWidthPx: number;
   isInWishlist: boolean;
   onWishlistToggle: (event: MouseEvent<HTMLButtonElement>) => void;
+  onBeforeNavigate?: () => void;
 }
 
 /** Figma `167:619` — product photo frame and wishlist control. */
 export function MobileProductsCatalogProductCardMedia({
   slug,
+  productHref,
   title,
   imageSrc,
   images,
@@ -44,6 +47,7 @@ export function MobileProductsCatalogProductCardMedia({
   layoutWidthPx,
   isInWishlist,
   onWishlistToggle,
+  onBeforeNavigate,
 }: MobileProductsCatalogProductCardMediaProps) {
   const galleryImages =
     images && images.length > 0 ? images : imageSrc ? [imageSrc] : [];
@@ -113,6 +117,8 @@ export function MobileProductsCatalogProductCardMedia({
           <HomeProductCardImageGallery
             images={galleryImages}
             activeIndex={galleryIndex}
+            productHref={productHref}
+            onBeforeNavigate={onBeforeNavigate}
             onIndexChange={(next) => {
               setGalleryIndex(next);
               setImageError(false);

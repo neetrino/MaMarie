@@ -167,6 +167,7 @@ function MobileProductsCatalogProductCardComponent({
 
       <MobileProductsCatalogProductCardMedia
         slug={product.slug}
+        productHref={productHref}
         title={product.title}
         imageSrc={product.image}
         images={product.images}
@@ -174,6 +175,7 @@ function MobileProductsCatalogProductCardComponent({
         layoutWidthPx={cardWidthPx}
         isInWishlist={isInWishlist}
         onWishlistToggle={handleWishlist}
+        onBeforeNavigate={saveSnapshot}
       />
 
       <div
