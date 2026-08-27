@@ -26,6 +26,13 @@ export const PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS =
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS = 'border-[#5281e1]';
 
+/** Desktop grid — gallery column width (info column takes the remainder). */
+export const PRODUCT_PDP_GRID_CLASS =
+  'grid grid-cols-1 gap-12 items-start lg:grid-cols-[48%_52%] lg:items-stretch';
+
+/** Responsive `sizes` hint for PDP hero images (matches gallery column width). */
+export const PRODUCT_PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 48vw';
+
 /** Mobile PDP — main image centered, thumbnails in a row below. */
 export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
   'flex flex-col items-center gap-4 lg:flex-row lg:items-start lg:gap-6';
@@ -33,7 +40,7 @@ export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
 export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full lg:order-2 lg:flex-1';
 
 export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
-  'relative mx-auto aspect-square w-full max-w-[min(100%,28rem)] overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-none';
+  'relative mx-auto aspect-square w-full max-w-[min(100%,34rem)] overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-[min(100%,36rem)]';
 
 /** Mobee-style horizontal snap track for PDP main images. */
 export const PRODUCT_PDP_MAIN_IMAGE_CAROUSEL_CLASS =
@@ -46,19 +53,19 @@ export const PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS =
   'order-2 w-full lg:order-1 lg:w-28 lg:flex-shrink-0';
 
 export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
-  'scrollbar-hide flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:justify-start lg:gap-4 lg:max-h-[29.5rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
+  'scrollbar-hide flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:justify-start lg:gap-4 lg:max-h-[36rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS = 'w-[4.5rem] lg:w-full';
 
 /** Main image prev/next — desktop hover-reveal only (mobile uses swipe). */
 export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS =
-  'absolute top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/80 text-gray-800 opacity-0 shadow-[0_2px_8px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-opacity duration-300 hover:bg-white/90 lg:flex lg:group-hover:opacity-100 lg:focus-visible:opacity-100 motion-reduce:transition-none';
+  'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/80 text-gray-800 opacity-0 shadow-[0_2px_8px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-opacity duration-300 hover:bg-white/90 lg:flex lg:group-hover:opacity-100 lg:focus-visible:opacity-100 motion-reduce:transition-none';
 
-export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS = 'left-4';
+export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS = 'left-1.5';
 
-export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS = 'right-4';
+export const PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS = 'right-1.5';
 
-export const PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS = 'h-5 w-5 shrink-0';
+export const PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS = 'h-4 w-4 shrink-0';
 
 /** Below-the-fold related row — reserve space before lazy mount. */
 export const PRODUCT_PDP_RELATED_PLACEHOLDER_MIN_HEIGHT_PX = 420;
