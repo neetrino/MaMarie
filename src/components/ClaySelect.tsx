@@ -49,8 +49,8 @@ export function ClaySelectChevron({ isOpen }: { isOpen: boolean }) {
       viewBox="0 0 16 16"
       fill="none"
       aria-hidden
-      className={`shrink-0 text-gray-500 transition-transform ease-out ${
-        isOpen ? 'rotate-180' : 'rotate-0'
+      className={`shrink-0 transition-transform ease-out ${
+        isOpen ? 'rotate-180 text-current opacity-70' : 'rotate-0 text-current opacity-70'
       }`}
       style={{ transitionDuration: `${CLAY_SELECT_DROPDOWN_ANIMATION_MS}ms` }}
     >
@@ -262,7 +262,7 @@ export function ClaySelect({
       >
         <span
           className={`truncate ${compact ? 'text-xs' : 'text-sm'} ${
-            isPlaceholder ? 'text-gray-400' : 'text-gray-900'
+            isPlaceholder ? 'text-gray-400' : 'text-current'
           }`}
         >
           {displayLabel}
