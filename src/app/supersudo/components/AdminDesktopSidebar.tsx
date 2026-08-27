@@ -120,8 +120,8 @@ export function AdminDesktopSidebar({ tabs, pathname }: AdminDesktopSidebarProps
             collapsed ? 'justify-center px-0 py-1' : 'gap-3 px-3 py-1.5'
           }`}
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fdeef2] text-brand-pink">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#fdeef2] text-brand-pink">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
