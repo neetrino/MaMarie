@@ -11,39 +11,39 @@ export type LegalPolicyKey = (typeof LEGAL_POLICY_KEYS)[number];
 
 export interface LegalPolicyListItem {
   key: LegalPolicyKey;
-  /** Same i18n keys as `FOOTER_POLICY_LINKS` so hub labels match the footer. */
+  /** Document title i18n key — same as page / sheet heading. */
   labelKey: string;
   titleKey: string;
   href: string;
 }
 
 /**
- * Mobile policies hub list — keep in sync with footer policy links
- * (`common.footer.*` labels, same order/hrefs). Do not import `footer.ts`
- * here: it creates a circular dependency via brand → nav-links → this file.
+ * Mobile policies hub list — same order/hrefs as footer.
+ * `labelKey` === document page title so hub / footer / page / sheet always match.
+ * Do not import `footer.ts` here (circular dep via brand → nav-links → this file).
  */
 export const LEGAL_POLICY_ITEMS: readonly LegalPolicyListItem[] = [
   {
     key: 'privacy',
-    labelKey: 'common.footer.privacyPolicy',
+    labelKey: 'privacy.title',
     titleKey: 'privacy.title',
     href: '/privacy',
   },
   {
     key: 'terms',
-    labelKey: 'common.footer.termsOfService',
+    labelKey: 'terms.title',
     titleKey: 'terms.title',
     href: '/terms',
   },
   {
     key: 'refund',
-    labelKey: 'common.footer.refundPolicy',
+    labelKey: 'refund-policy.title',
     titleKey: 'refund-policy.title',
     href: '/refund-policy',
   },
   {
     key: 'delivery',
-    labelKey: 'common.footer.deliveryTerms',
+    labelKey: 'delivery-terms.title',
     titleKey: 'delivery-terms.title',
     href: '/delivery-terms',
   },
