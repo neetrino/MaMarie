@@ -128,7 +128,7 @@ export function MainContent({ children }: MainContentProps) {
   if (pathname.startsWith('/profile')) {
     return (
       <main
-        className="profile-page-main home-main-surface flex-1 w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pt-[var(--header-clearance-desktop)]"
+        className="profile-page-main home-main-surface flex min-h-0 flex-1 flex-col w-full max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pt-[var(--header-clearance-desktop)]"
         style={headerClearanceVars}
       >
         {content}

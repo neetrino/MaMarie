@@ -154,7 +154,7 @@ const fetchProductsListByStableKey = unstable_cache(
       () => fetchProductsListPayload(filters)
     );
   },
-  ['storefront-products-list-v1'],
+  ['storefront-products-list-v3'],
   { revalidate: UNSTABLE_REVALIDATE_SECONDS }
 );
 

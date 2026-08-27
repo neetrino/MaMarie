@@ -95,7 +95,6 @@ export const HOME_PRODUCT_CARD_HOVER_EASING = 'cubic-bezier(0, 0, 0.58, 1)';
 export const HOME_PRODUCT_CARD_HOVER_BG = '#bbaa66';
 export const HOME_PRODUCT_CARD_LIFT_PX = scaleProductCardPx(18);
 
-export const HOME_PRODUCT_CARD_SIZES_LEFT_PX = scaleProductCardPx(68);
 export const HOME_PRODUCT_CARD_SIZES_TOP_PX = scaleProductCardPx(138);
 export const HOME_PRODUCT_CARD_SIZE_BADGE_WIDTH_PX = scaleProductCardPx(46);
 export const HOME_PRODUCT_CARD_SIZE_BADGE_HEIGHT_PX = scaleProductCardPx(34);

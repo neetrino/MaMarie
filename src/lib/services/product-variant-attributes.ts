@@ -31,7 +31,8 @@ interface ProductAttributeWithColor {
 }
 
 const SIZE_LETTER_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'] as const;
-const SIZE_TOKEN_PATTERN = /^(xs|s|m|l|xl|xxl|xxxl|\d+(?:\.\d+)?)$/i;
+/** Letter sizes, numeric sizes, and kids age ranges (`2-3`, `6-7`). */
+const SIZE_TOKEN_PATTERN = /^(xs|s|m|l|xl|xxl|xxxl|\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?)?)$/i;
 
 function isKnownColorName(value: string): boolean {
   return value.toLowerCase().trim() in COLOR_MAP;
@@ -44,6 +45,15 @@ export function isLikelySizeToken(value: string): boolean {
     return false;
   }
   return SIZE_TOKEN_PATTERN.test(trimmed);
+}
+
+function parseSizeSortKey(value: string): number | null {
+  const trimmed = value.trim();
+  const rangeMatch = /^(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?$/.exec(trimmed);
+  if (!rangeMatch) {
+    return null;
+  }
+  return Number(rangeMatch[1]);
 }
 
 function isAttributeOption(opt: VariantOption, attributeKey: 'color' | 'size'): boolean {
@@ -253,11 +263,16 @@ function upsertSize(
   sizeMap: Map<string, ProductSizeOption>,
   value: string,
   label: string,
-  stock: number
+  stock: number,
+  options?: { trustAttributeValue?: boolean }
 ): void {
   const trimmedValue = value.trim();
   const trimmedLabel = label.trim() || trimmedValue;
-  if (!trimmedValue || !isLikelySizeToken(trimmedValue)) {
+  if (!trimmedValue) {
+    return;
+  }
+  // Confirmed size-attribute options are trusted; SKU/JSON heuristics stay gated.
+  if (!options?.trustAttributeValue && !isLikelySizeToken(trimmedValue)) {
     return;
   }
 
@@ -279,9 +294,9 @@ function upsertSize(
 
 function sortSizes(sizes: ProductSizeOption[]): ProductSizeOption[] {
   return [...sizes].sort((a, b) => {
-    const aNum = Number(a.value);
-    const bNum = Number(b.value);
-    if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
+    const aNum = parseSizeSortKey(a.value);
+    const bNum = parseSizeSortKey(b.value);
+    if (aNum !== null && bNum !== null) {
       return aNum - bNum;
     }
 
@@ -321,7 +336,7 @@ export function collectProductSizes(
         sizeOption.value ||
         '';
       const label = resolveOptionLabel(sizeOption, lang, value);
-      upsertSize(sizeMap, value, label, stock);
+      upsertSize(sizeMap, value, label, stock, { trustAttributeValue: true });
     });
 
     if (sizeOptions.length === 0) {

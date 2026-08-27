@@ -6,6 +6,7 @@ import {
   PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX,
   PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
+  PROFILE_MOBILE_ICON_THEMES,
 } from '../../constants/profile-desktop-page';
 import type { ProfileTab, ProfileTabConfig, UserProfile } from './types';
 import { ProfileDesktopTabNav } from './components/ProfileDesktopTabNav';
@@ -53,12 +54,17 @@ function ProfileDesktopContactRow({
   );
 }
 
+/**
+ * Desktop profile sidebar — Kamancha pattern:
+ * avatar/contacts fixed; all options (incl. delete) scroll; logout pinned.
+ */
 export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout, t }: ProfileHeaderProps) {
   const hasSplitName = Boolean(profile?.firstName && profile?.lastName);
+  const logoutTheme = PROFILE_MOBILE_ICON_THEMES.blue;
 
   return (
-    <div
-      className={`relative flex h-full min-h-0 flex-col ${PROFILE_DESKTOP_CARD_CLASS}`}
+    <aside
+      className={`relative flex h-full max-h-full min-h-0 w-full flex-col overflow-hidden ${PROFILE_DESKTOP_CARD_CLASS}`}
       style={{
         paddingTop: PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX,
         paddingRight: PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX,
@@ -103,21 +109,34 @@ export function ProfileHeader({ profile, tabs, activeTab, onTabChange, onLogout,
         </div>
       </div>
 
-      <div className="profile-desktop-sidebar-scroll profile-scroll-area mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-gray-100 pt-4">
-        <ProfileDesktopTabNav tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
-        <button
-          type="button"
-          onClick={onLogout}
-          className="mt-2 flex w-full items-center gap-3 rounded-[15px] border-l-4 border-transparent px-3 py-2.5 text-left transition-colors hover:bg-white/70"
-        >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fdeef2] text-brand-pink">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
-            </svg>
-          </span>
-          <span className="text-sm font-semibold text-brand-pink">{t('common.navigation.logout')}</span>
-        </button>
+      <div className="mt-6 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-gray-100 pt-4">
+        <div className="profile-scroll-area min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <ProfileDesktopTabNav tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
+        </div>
+
+        <div className="mt-auto shrink-0 border-t border-gray-100 pt-1">
+          <button
+            type="button"
+            onClick={onLogout}
+            className="flex w-full items-center gap-3 rounded-[15px] border-l-4 border-transparent px-3 py-2 text-left transition-colors hover:bg-white/70"
+          >
+            <span
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+              style={{
+                backgroundColor: logoutTheme.background,
+                color: logoutTheme.foreground,
+              }}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+              </svg>
+            </span>
+            <span className="text-sm font-semibold" style={{ color: logoutTheme.foreground }}>
+              {t('common.navigation.logout')}
+            </span>
+          </button>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }

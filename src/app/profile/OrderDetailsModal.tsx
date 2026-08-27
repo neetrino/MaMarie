@@ -171,9 +171,6 @@ export function OrderDetailsModal({
                           })}
                         </div>
                       ) : null}
-                      <p className="mt-1 text-xs text-gray-500">
-                        {t('profile.orderDetails.sku')}: {item.sku}
-                      </p>
                       <p className="mt-1 text-xs text-gray-600">
                         {t('profile.orderDetails.quantity')}: {item.quantity} ×{' '}
                         {formatPriceInCurrency(
@@ -250,17 +247,6 @@ export function OrderDetailsModal({
                         (order.shippingAddress?.city
                           ? ` (${order.shippingAddress.city})`
                           : '')}
-                  </span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>{t('profile.orderDetails.tax')}</span>
-                  <span>
-                    {formatPriceInCurrency(
-                      currency === 'AMD'
-                        ? convertPrice(order.totals.tax, 'USD', 'AMD')
-                        : convertPrice(convertPrice(order.totals.tax, 'USD', 'AMD'), 'AMD', currency),
-                      currency,
-                    )}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-gray-100 pt-3 text-base font-bold text-gray-900">

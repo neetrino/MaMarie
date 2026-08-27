@@ -16,12 +16,14 @@ export const PROFILE_DESKTOP_SIDEBAR_WIDTH_PX = 280;
 export const PROFILE_DESKTOP_AVATAR_SIZE_PX = 112;
 /** Sidebar header card — matches `p-5` on sides/bottom; top inset 6px tighter above avatar. */
 export const PROFILE_DESKTOP_HEADER_CARD_PADDING_X_PX = 20;
-export const PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX = 20;
+export const PROFILE_DESKTOP_HEADER_CARD_PADDING_BOTTOM_PX = 12;
 export const PROFILE_DESKTOP_HEADER_CARD_PADDING_TOP_PX = 14;
 /** Avatar → display name — 9px tighter than previous `gap-4` (16px). */
 export const PROFILE_DESKTOP_AVATAR_NAME_GAP_PX = 1;
-export const PROFILE_DESKTOP_SHELL_PADDING_TOP_PX = 12;
-export const PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX = 20;
+/** Equal gaps around sticky band — matches Kamancha `--profile-sticky-gap`. */
+export const PROFILE_DESKTOP_STICKY_GAP_PX = 20;
+export const PROFILE_DESKTOP_SHELL_PADDING_TOP_PX = PROFILE_DESKTOP_STICKY_GAP_PX;
+export const PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX = PROFILE_DESKTOP_STICKY_GAP_PX;
 export const PROFILE_DESKTOP_CONTENT_GAP_PX = 40;
 
 export const PROFILE_DESKTOP_CARD_BASE_CLASS = '!rounded-[15px] bg-white ring-1 ring-gray-100/80';
@@ -130,6 +132,13 @@ export const PROFILE_DESKTOP_TAB_ORDER: readonly ProfileTab[] = [
   'deleteAccount',
 ] as const;
 
+/** Delete-account sidebar row — last item, danger styling. */
+export const PROFILE_DESKTOP_DANGER_TAB_THEME = {
+  background: '#fef2f2',
+  foreground: '#ef4444',
+  activeBackground: '#fee2e2',
+} as const;
+
 /** Desktop content panel enter — vertical slide + fade. */
 export const PROFILE_DESKTOP_TAB_TRANSITION_MS = 380;
 export const PROFILE_DESKTOP_TAB_TRANSITION_OFFSET_PX = 18;
@@ -203,7 +212,7 @@ export const PROFILE_DESKTOP_DEFAULT_BADGE_CLASS =
   'inline-flex rounded-full bg-[#e8f4fd] px-3 py-1 text-xs font-medium text-[#5281e1]';
 
 /** Profile side sheets — cart-style drawer from the right, half screen width. */
-export const PROFILE_SIDE_SHEET_WIDTH_PERCENT = 50;
+export const PROFILE_SIDE_SHEET_WIDTH_PERCENT = 42;
 export const PROFILE_SIDE_SHEET_Z_INDEX = 95;
 export const PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS = 300;
 export const REORDER_SUCCESS_ALERT_DELAY_MS = PROFILE_SIDE_SHEET_PANEL_TRANSITION_MS;

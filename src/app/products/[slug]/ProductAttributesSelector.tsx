@@ -98,15 +98,17 @@ function getSizeCircleButtonClass({
 function SizeGuideButton({
   language,
   onOpenSizeGuide,
+  className = '',
 }: {
   language: LanguageCode;
   onOpenSizeGuide: () => void;
+  className?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onOpenSizeGuide}
-      className={`${CLAY_PRIMARY_BUTTON_CLASS} ml-auto shrink-0 self-center`}
+      className={`${CLAY_PRIMARY_BUTTON_CLASS} ${className}`.trim()}
       style={{
         ...getClayPrimaryButtonCompactStyle(HERO_GENDER_BUTTON_BOYS_BG_COLOR),
         height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
@@ -308,7 +310,11 @@ export function ProductAttributesSelector({
                   })}
                   </div>
                   {showSizeGuide && onOpenSizeGuide ? (
-                    <SizeGuideButton language={language} onOpenSizeGuide={onOpenSizeGuide} />
+                    <SizeGuideButton
+                      language={language}
+                      onOpenSizeGuide={onOpenSizeGuide}
+                      className="ml-auto hidden shrink-0 self-center lg:inline-flex"
+                    />
                   ) : null}
                 </div>
               ) : (
@@ -472,7 +478,11 @@ export function ProductAttributesSelector({
             })}
             </div>
             {showSizeGuide && onOpenSizeGuide ? (
-              <SizeGuideButton language={language} onOpenSizeGuide={onOpenSizeGuide} />
+              <SizeGuideButton
+                language={language}
+                onOpenSizeGuide={onOpenSizeGuide}
+                className="ml-auto hidden shrink-0 self-center lg:inline-flex"
+              />
             ) : null}
           </div>
         </div>

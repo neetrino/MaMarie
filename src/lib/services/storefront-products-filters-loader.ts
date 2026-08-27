@@ -79,7 +79,7 @@ const fetchFiltersByStableKey = unstable_cache(
       () => fetchFiltersPayload(input)
     );
   },
-  ['storefront-products-filters-v2'],
+  ['storefront-products-filters-v3'],
   { revalidate: UNSTABLE_REVALIDATE_SECONDS }
 );
 
