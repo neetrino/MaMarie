@@ -9,6 +9,7 @@ import {
   type CSSProperties,
 } from 'react';
 import {
+  PROFILE_DESKTOP_DANGER_TAB_THEME,
   PROFILE_DESKTOP_TAB_ICON_THEME,
   PROFILE_DESKTOP_TAB_NAV_TRANSITION_MS,
   PROFILE_MOBILE_ICON_THEMES,
@@ -27,6 +28,19 @@ interface IndicatorBox {
   height: number;
 }
 
+interface TabThemeColors {
+  background: string;
+  foreground: string;
+  activeBackground?: string;
+}
+
+function resolveTabTheme(tabId: ProfileTab): TabThemeColors {
+  if (tabId === 'deleteAccount') {
+    return PROFILE_DESKTOP_DANGER_TAB_THEME;
+  }
+  return PROFILE_MOBILE_ICON_THEMES[PROFILE_DESKTOP_TAB_ICON_THEME[tabId]];
+}
+
 /** Desktop sidebar tabs with a sliding active highlight. */
 export function ProfileDesktopTabNav({
   tabs,
@@ -38,7 +52,7 @@ export function ProfileDesktopTabNav({
   const [indicator, setIndicator] = useState<IndicatorBox | null>(null);
   const [slideEnabled, setSlideEnabled] = useState(false);
 
-  const activeTheme = PROFILE_MOBILE_ICON_THEMES[PROFILE_DESKTOP_TAB_ICON_THEME[activeTab]];
+  const activeTheme = resolveTabTheme(activeTab);
 
   const updateIndicator = useCallback(() => {
     const button = buttonRefs.current.get(activeTab);
@@ -103,7 +117,10 @@ export function ProfileDesktopTabNav({
           style={{
             top: indicator.top,
             height: indicator.height,
-            backgroundColor: activeTheme.background,
+            backgroundColor:
+              activeTab === 'deleteAccount'
+                ? (activeTheme.activeBackground ?? activeTheme.background)
+                : activeTheme.background,
             borderLeftColor: activeTheme.foreground,
           }}
         />
@@ -111,7 +128,8 @@ export function ProfileDesktopTabNav({
 
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
-        const theme = PROFILE_MOBILE_ICON_THEMES[PROFILE_DESKTOP_TAB_ICON_THEME[tab.id]];
+        const isDanger = tab.id === 'deleteAccount';
+        const theme = resolveTabTheme(tab.id);
         const isMultilineLabel = tab.label.includes('\n');
 
         return (
@@ -129,7 +147,7 @@ export function ProfileDesktopTabNav({
             aria-selected={isActive}
             onClick={() => onTabChange(tab.id)}
             className={`relative z-10 flex w-full items-center gap-3 rounded-[15px] border-l-4 border-transparent px-3 py-2.5 text-left ${
-              isActive ? '' : 'hover:bg-white/70'
+              isActive ? '' : isDanger ? 'hover:bg-red-50/70' : 'hover:bg-white/70'
             }`}
           >
             <span
@@ -143,9 +161,15 @@ export function ProfileDesktopTabNav({
             </span>
             <span
               className={`${styles.tabLabel} min-w-0 flex-1 text-sm ${
-                isActive ? 'font-semibold' : 'font-medium text-gray-800'
+                isDanger
+                  ? isActive
+                    ? 'font-semibold text-red-600'
+                    : 'font-semibold text-red-500'
+                  : isActive
+                    ? 'font-semibold'
+                    : 'font-medium text-gray-800'
               } ${isMultilineLabel ? 'whitespace-pre-line leading-snug' : ''}`}
-              style={isActive ? { color: theme.foreground } : undefined}
+              style={!isDanger && isActive ? { color: theme.foreground } : undefined}
             >
               {tab.label}
             </span>

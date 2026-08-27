@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, type CSSProperties } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
@@ -9,7 +9,7 @@ import { ProfileHeader } from './ProfileHeader';
 import { ProfileMobilePage } from './ProfileMobilePage';
 import { ProfileDashboard } from './ProfileDashboard';
 import { BRAND_LOADING_SPINNER_CLASS } from '../../constants/brand';
-import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX, PROFILE_DESKTOP_SHELL_PADDING_TOP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX } from '../../constants/profile-desktop-page';
+import { PROFILE_DESKTOP_CONTENT_GAP_PX, PROFILE_DESKTOP_SIDEBAR_WIDTH_PX, PROFILE_DESKTOP_STICKY_GAP_PX } from '../../constants/profile-desktop-page';
 import { AutoDismissAlert } from '../../components/AutoDismissAlert';
 import { ProfilePersonalInfo } from './ProfilePersonalInfo';
 import { ProfileAddresses } from './ProfileAddresses';
@@ -278,33 +278,32 @@ function ProfilePageContent() {
       >
         {tabContent}
       </ProfileMobilePage>
-      <div className="profile-desktop-page hidden lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden">
+      <div
+        className="profile-desktop-page hidden lg:flex lg:flex-1 lg:flex-row lg:items-start"
+        style={
+          {
+            '--profile-sticky-gap': `${PROFILE_DESKTOP_STICKY_GAP_PX}px`,
+            gap: PROFILE_DESKTOP_CONTENT_GAP_PX,
+          } as CSSProperties
+        }
+      >
         <div
-          className="profile-desktop-page__shell mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 lg:px-8"
-          style={{
-            paddingTop: PROFILE_DESKTOP_SHELL_PADDING_TOP_PX,
-            paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX,
-          }}
+          className="profile-desktop-sidebar profile-sticky-band shrink-0"
+          style={{ width: PROFILE_DESKTOP_SIDEBAR_WIDTH_PX }}
         >
-          <div
-            className="profile-desktop-page__layout flex min-h-0 flex-1"
-            style={{ gap: PROFILE_DESKTOP_CONTENT_GAP_PX }}
-          >
-            <aside
-              className="profile-desktop-sidebar h-full shrink-0"
-              style={{ width: PROFILE_DESKTOP_SIDEBAR_WIDTH_PX }}
-            >
-              <ProfileHeader profile={profile} tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} onLogout={logout} t={t} />
-            </aside>
-            <div
-              className="profile-desktop-content profile-scroll-area min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain"
-              style={{ paddingBottom: PROFILE_DESKTOP_SHELL_PADDING_BOTTOM_PX }}
-            >
-              <ProfileDesktopTabTransition activeTab={activeTab}>
-                {tabContent}
-              </ProfileDesktopTabTransition>
-            </div>
-          </div>
+          <ProfileHeader
+            profile={profile}
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onLogout={logout}
+            t={t}
+          />
+        </div>
+        <div className="profile-desktop-content profile-sticky-band profile-scroll-area min-w-0 flex-1">
+          <ProfileDesktopTabTransition activeTab={activeTab}>
+            {tabContent}
+          </ProfileDesktopTabTransition>
         </div>
       </div>
       <OrderDetailsModal
