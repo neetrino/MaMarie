@@ -1,115 +1,116 @@
 'use client';
 
-import { STORE_EMAIL, STORE_EMAIL_HREF } from '@/constants/store-contact';
 import {
   LEGAL_POLICY_SHEET_BODY_CLASS,
   LEGAL_POLICY_SHEET_LIST_CLASS,
   LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS,
   LEGAL_POLICY_SHEET_STACK_CLASS,
-  LEGAL_POLICY_SHEET_SUBSECTION_TITLE_CLASS,
 } from '../../constants/legal-policy-sheet';
 import { useTranslation } from '../../lib/i18n-client';
 
 type TranslateFn = (key: string) => string;
 
+const COLLECTED_DATA_KEYS = ['contact', 'purchase', 'technical', 'cookies'] as const;
+const USE_OF_DATA_KEYS = ['orders', 'support', 'improve', 'legal'] as const;
+const RETENTION_KEYS = ['account', 'purchase', 'marketing'] as const;
+const SECURITY_KEYS = ['ssl', 'access', 'audits'] as const;
+const SHARING_KEYS = ['shipping', 'payment', 'law'] as const;
+const RIGHTS_KEYS = ['copy', 'edit', 'optOut', 'restrict'] as const;
+const COOKIES_KEYS = ['functional', 'analytical', 'marketing'] as const;
+
+function OptionalBody({ text, className }: { text: string; className: string }) {
+  if (!text.trim()) {
+    return null;
+  }
+  return <p className={className}>{text}</p>;
+}
+
 function PrivacySections({ t }: { t: TranslateFn }) {
   return (
     <>
       <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('privacy.introduction.title')}
-        </h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.introduction.description1')}</p>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.introduction.description2')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.intro.p1')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.intro.p2')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.intro.p3')}</p>
       </section>
 
       <section className="flex flex-col gap-3">
         <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('privacy.informationWeCollect.title')}
+          {t('privacy.collectedData.title')}
         </h2>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <h3 className={LEGAL_POLICY_SHEET_SUBSECTION_TITLE_CLASS}>
-              {t('privacy.informationWeCollect.personalInformation.title')}
-            </h3>
-            <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>
-              {t('privacy.informationWeCollect.personalInformation.description')}
-            </p>
-            <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-              <li>{t('privacy.informationWeCollect.personalInformation.items.register')}</li>
-              <li>{t('privacy.informationWeCollect.personalInformation.items.order')}</li>
-              <li>{t('privacy.informationWeCollect.personalInformation.items.newsletter')}</li>
-              <li>{t('privacy.informationWeCollect.personalInformation.items.contact')}</li>
-              <li>{t('privacy.informationWeCollect.personalInformation.items.surveys')}</li>
-            </ul>
-            <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>
-              {t('privacy.informationWeCollect.personalInformation.details')}
-            </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className={LEGAL_POLICY_SHEET_SUBSECTION_TITLE_CLASS}>
-              {t('privacy.informationWeCollect.automaticallyCollected.title')}
-            </h3>
-            <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>
-              {t('privacy.informationWeCollect.automaticallyCollected.description')}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.howWeUse.title')}</h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.howWeUse.description')}</p>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.collectedData.intro')}</p>
         <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-          <li>{t('privacy.howWeUse.items.process')}</li>
-          <li>{t('privacy.howWeUse.items.confirmations')}</li>
-          <li>{t('privacy.howWeUse.items.support')}</li>
-          <li>{t('privacy.howWeUse.items.marketing')}</li>
-          <li>{t('privacy.howWeUse.items.improve')}</li>
-          <li>{t('privacy.howWeUse.items.fraud')}</li>
-          <li>{t('privacy.howWeUse.items.legal')}</li>
+          {COLLECTED_DATA_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.collectedData.items.${key}`)}</li>
+          ))}
         </ul>
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>
-          {t('privacy.informationSharing.title')}
-        </h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.informationSharing.description')}</p>
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.useOfData.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.useOfData.intro')}</p>
         <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-          <li>{t('privacy.informationSharing.items.providers')}</li>
-          <li>{t('privacy.informationSharing.items.law')}</li>
-          <li>{t('privacy.informationSharing.items.transfer')}</li>
-          <li>{t('privacy.informationSharing.items.consent')}</li>
+          {USE_OF_DATA_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.useOfData.items.${key}`)}</li>
+          ))}
         </ul>
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.dataSecurity.title')}</h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.dataSecurity.description')}</p>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.yourRights.title')}</h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.yourRights.description')}</p>
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.retention.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.retention.intro')}</p>
         <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
-          <li>{t('privacy.yourRights.items.access')}</li>
-          <li>{t('privacy.yourRights.items.correct')}</li>
-          <li>{t('privacy.yourRights.items.delete')}</li>
-          <li>{t('privacy.yourRights.items.object')}</li>
-          <li>{t('privacy.yourRights.items.portability')}</li>
-          <li>{t('privacy.yourRights.items.withdraw')}</li>
+          {RETENTION_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.retention.items.${key}`)}</li>
+          ))}
         </ul>
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.contact.title')}</h2>
-        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>
-          {t('privacy.contact.description')}{' '}
-          <a href={STORE_EMAIL_HREF} className="text-brand-pink hover:underline">
-            {STORE_EMAIL}
-          </a>
-        </p>
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.security.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.security.intro')}</p>
+        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
+          {SECURITY_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.security.items.${key}`)}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.sharing.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.sharing.intro')}</p>
+        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
+          {SHARING_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.sharing.items.${key}`)}</li>
+          ))}
+        </ul>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.sharing.outro')}</p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.rights.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.rights.intro')}</p>
+        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
+          {RIGHTS_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.rights.items.${key}`)}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.cookies.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.cookies.intro')}</p>
+        <ul className={LEGAL_POLICY_SHEET_LIST_CLASS}>
+          {COOKIES_KEYS.map((key) => (
+            <li key={key}>{t(`privacy.cookies.items.${key}`)}</li>
+          ))}
+        </ul>
+        <OptionalBody text={t('privacy.cookies.outro')} className={LEGAL_POLICY_SHEET_BODY_CLASS} />
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className={LEGAL_POLICY_SHEET_SECTION_TITLE_CLASS}>{t('privacy.changes.title')}</h2>
+        <p className={LEGAL_POLICY_SHEET_BODY_CLASS}>{t('privacy.changes.p1')}</p>
       </section>
     </>
   );
