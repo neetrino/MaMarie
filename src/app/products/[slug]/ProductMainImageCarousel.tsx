@@ -17,7 +17,7 @@ interface ProductMainImageCarouselProps {
   mainImagePriority: boolean;
   onImageIndexChange: (index: number) => void;
   onImageError: (src: string) => void;
-  onImageLoad: (src: string) => void;
+  onImageLoad: (src: string, naturalWidth: number, naturalHeight: number) => void;
 }
 
 /** Horizontal snap carousel — swipe/scroll images like Mobee PDP. */
@@ -107,12 +107,18 @@ export function ProductMainImageCarousel({
                 src={image}
                 alt={index === currentImageIndex ? alt : ''}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                 loading={mainImagePriority && index === 0 ? 'eager' : 'lazy'}
                 unoptimized
                 draggable={false}
-                onLoad={() => onImageLoad(image)}
+                onLoad={(event) => {
+                  onImageLoad(
+                    image,
+                    event.currentTarget.naturalWidth,
+                    event.currentTarget.naturalHeight,
+                  );
+                }}
                 onError={() => onImageError(image)}
               />
             )}

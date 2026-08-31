@@ -5,10 +5,16 @@ import {
   PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX,
   PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX,
 } from '../../../constants/products-catalog';
+import {
+  PRODUCT_PDP_CONTENT_INSET_X_DESKTOP_PX,
+  PRODUCT_PDP_CONTENT_INSET_X_MOBILE_PX,
+} from './constants';
 
 const productPageOffsetStyle = {
   ['--products-catalog-offset-mobile']: `${PRODUCTS_CATALOG_OFFSET_TOP_MOBILE_PX}px`,
   ['--products-catalog-offset-desktop']: `calc(${PRODUCTS_CATALOG_OFFSET_TOP_DESKTOP_PX}px * var(--desktop-layout-scale, 1))`,
+  ['--product-pdp-content-inset-mobile']: `${PRODUCT_PDP_CONTENT_INSET_X_MOBILE_PX}px`,
+  ['--product-pdp-content-inset-desktop']: `${PRODUCT_PDP_CONTENT_INSET_X_DESKTOP_PX}px`,
 } as CSSProperties;
 
 interface ProductPageFrameProps {
@@ -24,7 +30,11 @@ export function ProductPageFrame({ children, className = '' }: ProductPageFrameP
       style={productPageOffsetStyle}
     >
       <DesktopFluidFrame>
-        <HeaderContentFrame>{children}</HeaderContentFrame>
+        <HeaderContentFrame>
+          <div className="px-[var(--product-pdp-content-inset-mobile)] lg:px-[var(--product-pdp-content-inset-desktop)]">
+            {children}
+          </div>
+        </HeaderContentFrame>
       </DesktopFluidFrame>
     </div>
   );

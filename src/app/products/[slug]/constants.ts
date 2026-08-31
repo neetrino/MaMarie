@@ -1,4 +1,5 @@
 import { PRODUCTS_CATALOG_FILTER_ACCENT } from '../../../constants/products-catalog';
+import { DEFAULT_IMAGE_ASPECT_RATIO } from '../../../lib/resolve-image-aspect-ratio';
 
 // Reserved routes that should not be treated as product slugs
 export const RESERVED_ROUTES = [
@@ -18,9 +19,9 @@ export const PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT = 2;
 /** PDP gallery vertical thumbnail frame — brand blue. */
 export const PRODUCT_PDP_THUMBNAIL_BORDER_COLOR = PRODUCTS_CATALOG_FILTER_ACCENT;
 
-/** Same aspect as main PDP image (`aspect-square`). */
+/** Matches active main image aspect once measured; falls back to square. */
 export const PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS =
-  'relative aspect-square shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
+  'relative shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS =
   'border-gray-200 hover:border-gray-300';
@@ -29,7 +30,7 @@ export const PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS = 'border-[#5281e1]';
 
 /** Desktop grid — gallery column width (info column takes the remainder). */
 export const PRODUCT_PDP_GRID_CLASS =
-  'grid grid-cols-1 gap-12 items-start lg:grid-cols-[48%_52%] lg:items-stretch [&>*]:min-w-0';
+  'grid grid-cols-1 gap-6 items-start lg:grid-cols-[48%_52%] lg:gap-3 lg:items-stretch [&>*]:min-w-0';
 
 /** Product long description — narrow measure for fewer words per line. */
 export const PRODUCT_PDP_DESCRIPTION_CLASS =
@@ -48,8 +49,24 @@ export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
 
 export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full min-w-0 lg:order-2 lg:flex-1';
 
+/** Main photo — keeps natural aspect, capped so tall shots stay compact. */
 export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
-  'relative mx-auto aspect-square w-full max-w-[min(100%,34rem)] overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-[min(100%,36rem)]';
+  'relative mx-auto w-full max-w-full overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0';
+
+/** Desktop max box for the main PDP photo (px). */
+export const PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX = 480;
+export const PRODUCT_PDP_MAIN_IMAGE_MAX_HEIGHT_PX = 560;
+
+/** Mobile max box — slightly tighter than desktop. */
+export const PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_WIDTH_PX = 400;
+export const PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_HEIGHT_PX = 520;
+
+/** Extra inset inside the logo-to-login track — more breathing room from page edges. */
+export const PRODUCT_PDP_CONTENT_INSET_X_MOBILE_PX = 8;
+export const PRODUCT_PDP_CONTENT_INSET_X_DESKTOP_PX = 32;
+
+/** Fallback until the active photo reports its natural size. */
+export const PRODUCT_PDP_MAIN_IMAGE_DEFAULT_ASPECT_RATIO = DEFAULT_IMAGE_ASPECT_RATIO;
 
 /** Mobee-style horizontal snap track for PDP main images. */
 export const PRODUCT_PDP_MAIN_IMAGE_CAROUSEL_CLASS =

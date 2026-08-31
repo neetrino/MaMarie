@@ -9,10 +9,19 @@ import { WishlistIcon } from '../../../components/icons/WishlistIcon';
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { readProductPageSnapshot } from '../../../lib/product-page-snapshot';
+import {
+  DEFAULT_IMAGE_ASPECT_RATIO,
+  resolveImageAspectRatio,
+} from '../../../lib/resolve-image-aspect-ratio';
+import { resolveContainedFrameSizePx } from '../../../lib/resolve-contained-frame-size';
 import type { Product } from './types';
 import {
   PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_MAX_HEIGHT_PX,
+  PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX,
+  PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_HEIGHT_PX,
+  PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_WIDTH_PX,
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS,
@@ -57,12 +66,24 @@ export function ProductImageGallery({
   const [failedSources, setFailedSources] = useState<Set<string>>(new Set());
   const [snapshotSrc, setSnapshotSrc] = useState<string | undefined>(() => images[currentImageIndex]);
   const [mainImageHeightPx, setMainImageHeightPx] = useState<number | null>(null);
+  const [aspectBySrc, setAspectBySrc] = useState<Record<string, number>>({});
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
 
   const markFailed = (src: string | undefined) => {
     if (!src) {
       return;
     }
     setFailedSources((prev) => new Set(prev).add(src));
+  };
+
+  const rememberAspectRatio = (src: string, naturalWidth: number, naturalHeight: number) => {
+    const nextRatio = resolveImageAspectRatio(naturalWidth, naturalHeight);
+    setAspectBySrc((prev) => {
+      if (prev[src] === nextRatio) {
+        return prev;
+      }
+      return { ...prev, [src]: nextRatio };
+    });
   };
 
   const currentSrc = images[currentImageIndex];
@@ -72,6 +93,19 @@ export function ProductImageGallery({
   const canShowSnapshot = Boolean(snapshotSrc && !snapshotFailed);
   const canShowMainImage = Boolean(currentSrc && !mainImageFailed);
   const hasMultipleImages = images.length >= PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT;
+  const imageAspectRatio =
+    (currentSrc ? aspectBySrc[currentSrc] : undefined) ??
+    (snapshotSrc ? aspectBySrc[snapshotSrc] : undefined) ??
+    DEFAULT_IMAGE_ASPECT_RATIO;
+  const frameSize = resolveContainedFrameSizePx(
+    imageAspectRatio,
+    isDesktopViewport
+      ? PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX
+      : PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_WIDTH_PX,
+    isDesktopViewport
+      ? PRODUCT_PDP_MAIN_IMAGE_MAX_HEIGHT_PX
+      : PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_HEIGHT_PX,
+  );
 
   useEffect(() => {
     const entrySnapshot = readProductPageSnapshot(product.slug);
@@ -79,6 +113,16 @@ export function ProductImageGallery({
       setSnapshotSrc(entrySnapshot.imageUrl);
     }
   }, [product.slug]);
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+    const syncViewport = () => {
+      setIsDesktopViewport(desktopQuery.matches);
+    };
+    syncViewport();
+    desktopQuery.addEventListener('change', syncViewport);
+    return () => desktopQuery.removeEventListener('change', syncViewport);
+  }, []);
 
   useEffect(() => {
     const frame = mainFrameRef.current;
@@ -106,7 +150,7 @@ export function ProductImageGallery({
       observer.disconnect();
       desktopQuery.removeEventListener('change', syncHeight);
     };
-  }, [hasMultipleImages]);
+  }, [hasMultipleImages, imageAspectRatio]);
 
   const showPreviousImage = () => {
     onImageIndexChange((currentImageIndex - 1 + images.length) % images.length);
@@ -124,6 +168,11 @@ export function ProductImageGallery({
             ref={mainFrameRef}
             data-product-fly-origin
             className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}
+            style={{
+              width: frameSize.widthPx,
+              height: frameSize.heightPx,
+              aspectRatio: String(imageAspectRatio),
+            }}
           >
             {hasMultipleImages ? (
               <ProductMainImageCarousel
@@ -134,7 +183,10 @@ export function ProductImageGallery({
                 mainImagePriority={mainImagePriority}
                 onImageIndexChange={onImageIndexChange}
                 onImageError={markFailed}
-                onImageLoad={(src) => setSnapshotSrc(src)}
+                onImageLoad={(src, naturalWidth, naturalHeight) => {
+                  setSnapshotSrc(src);
+                  rememberAspectRatio(src, naturalWidth, naturalHeight);
+                }}
               />
             ) : canShowMainImage || canShowSnapshot ? (
               <>
@@ -142,9 +194,16 @@ export function ProductImageGallery({
                   <img
                     src={snapshotSrc}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-contain"
                     aria-hidden
                     decoding="async"
+                    onLoad={(event) => {
+                      rememberAspectRatio(
+                        snapshotSrc,
+                        event.currentTarget.naturalWidth,
+                        event.currentTarget.naturalHeight,
+                      );
+                    }}
                   />
                 ) : null}
                 {currentSrc && !mainImageFailed ? (
@@ -152,11 +211,18 @@ export function ProductImageGallery({
                     src={currentSrc}
                     alt={product.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain transition-transform duration-500 group-hover:scale-105"
                     sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                     loading={mainImagePriority ? 'eager' : 'lazy'}
                     unoptimized
-                    onLoad={() => setSnapshotSrc(currentSrc)}
+                    onLoad={(event) => {
+                      setSnapshotSrc(currentSrc);
+                      rememberAspectRatio(
+                        currentSrc,
+                        event.currentTarget.naturalWidth,
+                        event.currentTarget.naturalHeight,
+                      );
+                    }}
                     onError={() => markFailed(currentSrc)}
                   />
                 ) : null}
@@ -241,6 +307,7 @@ export function ProductImageGallery({
             currentImageIndex={currentImageIndex}
             failedSources={failedSources}
             mainImageHeightPx={mainImageHeightPx}
+            imageAspectRatio={imageAspectRatio}
             onImageIndexChange={onImageIndexChange}
             onImageError={markFailed}
           />

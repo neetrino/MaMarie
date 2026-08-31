@@ -29,7 +29,7 @@ export function ProductPageShell() {
 
   return (
     <ProductPageFrame className="min-h-[min(100dvh,720px)]" aria-busy="true" aria-label="Product loading">
-      <div className="grid grid-cols-1 gap-12 items-start lg:grid-cols-[55%_45%] lg:items-stretch">
+      <div className="grid grid-cols-1 gap-6 items-start lg:grid-cols-[55%_45%] lg:gap-3 lg:items-stretch">
         {snapshot ? (
           <ProductPageSnapshotGallery snapshot={snapshot} />
         ) : (
