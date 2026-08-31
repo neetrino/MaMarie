@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { ProductLabels } from '../../../components/ProductLabels';
 import { t } from '../../../lib/i18n';
 import type { ProductPageSnapshot } from '../../../lib/product-page-snapshot';
-import { resolveContainedFrameSizePx } from '../../../lib/resolve-contained-frame-size';
 import {
   DEFAULT_IMAGE_ASPECT_RATIO,
   resolveImageAspectRatio,
@@ -13,57 +12,35 @@ import {
 import {
   PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS,
-  PRODUCT_PDP_MAIN_IMAGE_MAX_HEIGHT_PX,
-  PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX,
-  PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_HEIGHT_PX,
-  PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_WIDTH_PX,
+  PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS,
 } from './constants';
+import { usePdpMainImageFrameSize } from './usePdpMainImageFrameSize';
 
 interface ProductPageSnapshotGalleryProps {
   snapshot: ProductPageSnapshot;
 }
 
 export function ProductPageSnapshotGallery({ snapshot }: ProductPageSnapshotGalleryProps) {
+  const mainWrapperRef = useRef<HTMLDivElement>(null);
   const [imageAspectRatio, setImageAspectRatio] = useState(DEFAULT_IMAGE_ASPECT_RATIO);
-  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
-
-  useEffect(() => {
-    const desktopQuery = window.matchMedia('(min-width: 1024px)');
-    const syncViewport = () => {
-      setIsDesktopViewport(desktopQuery.matches);
-    };
-    syncViewport();
-    desktopQuery.addEventListener('change', syncViewport);
-    return () => desktopQuery.removeEventListener('change', syncViewport);
-  }, []);
-
-  const frameSize = resolveContainedFrameSizePx(
-    imageAspectRatio,
-    isDesktopViewport
-      ? PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX
-      : PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_WIDTH_PX,
-    isDesktopViewport
-      ? PRODUCT_PDP_MAIN_IMAGE_MAX_HEIGHT_PX
-      : PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_HEIGHT_PX,
-  );
+  const frameSize = usePdpMainImageFrameSize(mainWrapperRef, imageAspectRatio);
 
   return (
     <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
-      <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
+      <div ref={mainWrapperRef} className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
         <div
           data-product-fly-origin
           className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}
           style={{
             width: frameSize.widthPx,
             height: frameSize.heightPx,
-            aspectRatio: String(imageAspectRatio),
           }}
         >
           <img
             src={snapshot.imageUrl}
             alt={snapshot.title}
-            className="absolute inset-0 h-full w-full object-contain"
+            className={`absolute inset-0 h-full w-full ${PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS}`}
             decoding="async"
             onLoad={(event) => {
               setImageAspectRatio(

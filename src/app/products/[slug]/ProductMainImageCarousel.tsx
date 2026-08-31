@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { ProductImagePlaceholder } from '../../../components/ProductImagePlaceholder';
 import {
   PRODUCT_PDP_MAIN_IMAGE_CAROUSEL_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_SIZES,
   PRODUCT_PDP_MAIN_IMAGE_SLIDE_CLASS,
 } from './constants';
@@ -107,7 +108,7 @@ export function ProductMainImageCarousel({
                 src={image}
                 alt={index === currentImageIndex ? alt : ''}
                 fill
-                className="object-contain"
+                className={PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS}
                 sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                 loading={mainImagePriority && index === 0 ? 'eager' : 'lazy'}
                 unoptimized

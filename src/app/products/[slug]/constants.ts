@@ -51,7 +51,10 @@ export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full min-w-0 lg:o
 
 /** Main photo — keeps natural aspect, capped so tall shots stay compact. */
 export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
-  'relative mx-auto w-full max-w-full overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0';
+  'relative mx-auto w-full max-w-full overflow-hidden rounded-lg bg-transparent shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:bg-white';
+
+/** Mobile fills the frame (no letterbox); desktop keeps full photo via contain. */
+export const PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS = 'object-cover lg:object-contain';
 
 /** Desktop max box for the main PDP photo (px). */
 export const PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX = 480;
