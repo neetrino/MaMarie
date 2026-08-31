@@ -30,42 +30,51 @@ export function ProductThumbnailRail({
   onImageError,
 }: ProductThumbnailRailProps) {
   const railRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const activeThumbRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const activeThumb = activeThumbRef.current;
-    const rail = railRef.current;
     if (!activeThumb) {
       return;
     }
 
     const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-    if (!isDesktop) {
-      activeThumb.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'start',
-      });
+    const scrollContainer = isDesktop ? railRef.current : listRef.current;
+    if (!scrollContainer) {
       return;
     }
 
-    if (!rail) {
+    if (!isDesktop) {
+      const thumbLeft = activeThumb.offsetLeft;
+      const thumbRight = thumbLeft + activeThumb.offsetWidth;
+      const visibleLeft = scrollContainer.scrollLeft;
+      const visibleRight = visibleLeft + scrollContainer.clientWidth;
+
+      if (thumbLeft >= visibleLeft && thumbRight <= visibleRight) {
+        return;
+      }
+
+      const nextScrollLeft =
+        thumbRight > visibleRight ? thumbRight - scrollContainer.clientWidth : thumbLeft;
+
+      scrollContainer.scrollTo({ left: Math.max(0, nextScrollLeft), behavior: 'smooth' });
       return;
     }
 
     const thumbTop = activeThumb.offsetTop;
     const thumbBottom = thumbTop + activeThumb.offsetHeight;
-    const visibleTop = rail.scrollTop;
-    const visibleBottom = visibleTop + rail.clientHeight;
+    const visibleTop = scrollContainer.scrollTop;
+    const visibleBottom = visibleTop + scrollContainer.clientHeight;
 
     if (thumbTop >= visibleTop && thumbBottom <= visibleBottom) {
       return;
     }
 
     const nextScrollTop =
-      thumbBottom > visibleBottom ? thumbBottom - rail.clientHeight : thumbTop;
+      thumbBottom > visibleBottom ? thumbBottom - scrollContainer.clientHeight : thumbTop;
 
-    rail.scrollTo({ top: Math.max(0, nextScrollTop), behavior: 'smooth' });
+    scrollContainer.scrollTo({ top: Math.max(0, nextScrollTop), behavior: 'smooth' });
   }, [currentImageIndex, mainImageHeightPx]);
 
   const railStyle: CSSProperties | undefined =
@@ -73,7 +82,7 @@ export function ProductThumbnailRail({
 
   return (
     <div ref={railRef} className={PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS} style={railStyle}>
-      <div className={PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS}>
+      <div ref={listRef} className={PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS}>
         {images.map((image, index) => {
           const isActive = index === currentImageIndex;
           return (

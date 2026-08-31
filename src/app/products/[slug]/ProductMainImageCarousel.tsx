@@ -21,6 +21,8 @@ interface ProductMainImageCarouselProps {
   onImageLoad: (src: string, naturalWidth: number, naturalHeight: number) => void;
 }
 
+const PROGRAMMATIC_SCROLL_RELEASE_MS = 450;
+
 /** Horizontal snap carousel — swipe/scroll images like Mobee PDP. */
 export function ProductMainImageCarousel({
   images,
@@ -34,27 +36,50 @@ export function ProductMainImageCarousel({
 }: ProductMainImageCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScrollRef = useRef(false);
+  const currentIndexRef = useRef(currentImageIndex);
+  const releaseTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  currentIndexRef.current = currentImageIndex;
+
+  const lockProgrammaticScroll = () => {
+    isProgrammaticScrollRef.current = true;
+    if (releaseTimerRef.current !== null) {
+      window.clearTimeout(releaseTimerRef.current);
+    }
+    releaseTimerRef.current = window.setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+      releaseTimerRef.current = null;
+    }, PROGRAMMATIC_SCROLL_RELEASE_MS);
+  };
+
+  const syncScrollToIndex = (index: number, behavior: ScrollBehavior) => {
     const container = scrollRef.current;
     if (!container) {
       return;
     }
 
-    const targetLeft = currentImageIndex * container.clientWidth;
+    const width = container.clientWidth;
+    if (width <= 0) {
+      return;
+    }
+
+    const targetLeft = index * width;
     if (Math.abs(container.scrollLeft - targetLeft) < 2) {
       return;
     }
 
-    isProgrammaticScrollRef.current = true;
-    container.scrollTo({ left: targetLeft, behavior: 'smooth' });
+    lockProgrammaticScroll();
+    container.scrollTo({ left: targetLeft, behavior });
+  };
 
-    const releaseTimer = window.setTimeout(() => {
-      isProgrammaticScrollRef.current = false;
-    }, 400);
+  useEffect(() => {
+    syncScrollToIndex(currentImageIndex, 'smooth');
 
     return () => {
-      window.clearTimeout(releaseTimer);
+      if (releaseTimerRef.current !== null) {
+        window.clearTimeout(releaseTimerRef.current);
+        releaseTimerRef.current = null;
+      }
     };
   }, [currentImageIndex]);
 
@@ -79,16 +104,25 @@ export function ProductMainImageCarousel({
         Math.max(0, Math.round(container.scrollLeft / width)),
       );
 
-      if (nextIndex !== currentImageIndex) {
+      if (nextIndex !== currentIndexRef.current) {
         onImageIndexChange(nextIndex);
       }
     };
 
+    const handleResize = () => {
+      // Frame size follows image aspect — keep the active slide pinned.
+      syncScrollToIndex(currentIndexRef.current, 'auto');
+    };
+
     container.addEventListener('scroll', handleScroll, { passive: true });
+    const observer = new ResizeObserver(handleResize);
+    observer.observe(container);
+
     return () => {
       container.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
     };
-  }, [currentImageIndex, images.length, onImageIndexChange]);
+  }, [images.length, onImageIndexChange]);
 
   return (
     <div
