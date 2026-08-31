@@ -201,7 +201,7 @@ export function ProductInfoAndActions({
           </div>
         )}
         <div className="mb-4 lg:mb-6">
-          <h1 className="min-w-0 text-4xl font-bold text-gray-900">
+          <h1 className="min-w-0 text-3xl font-bold text-gray-900 lg:text-4xl">
             {getProductText(language, product.id, 'title') || product.title}
           </h1>
         </div>

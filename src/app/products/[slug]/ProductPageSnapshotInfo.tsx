@@ -114,7 +114,7 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
         ) : null}
 
         <div className="mb-6">
-          <h1 className="min-w-0 text-4xl font-bold text-gray-900">{snapshot.title}</h1>
+          <h1 className="min-w-0 text-3xl font-bold text-gray-900 lg:text-4xl">{snapshot.title}</h1>
         </div>
 
         <div className="mb-6 w-full">
