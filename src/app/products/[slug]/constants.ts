@@ -99,6 +99,10 @@ export const PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX = 280;
 /** PDP action row — Add to cart / size guide height (`h-12`). */
 export const PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX = 48;
 
+/** Add-to-cart label — slightly larger than compact clay default (14px). */
+export const PRODUCT_PDP_ADD_TO_CART_FONT_SIZE_PX = 16;
+export const PRODUCT_PDP_ADD_TO_CART_LINE_HEIGHT_PX = 22;
+
 /** Mobile PDP — wishlist control overlaid on the main image (Kamancha-style). */
 export const PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX = 44;
 export const PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX = 12;

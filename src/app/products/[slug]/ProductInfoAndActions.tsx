@@ -23,6 +23,8 @@ import {
   PRODUCT_PDP_ACTIONS_ROW_CLASS,
   PRODUCT_PDP_ACTIONS_TOP_ROW_CLASS,
   PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS,
+  PRODUCT_PDP_ADD_TO_CART_FONT_SIZE_PX,
+  PRODUCT_PDP_ADD_TO_CART_LINE_HEIGHT_PX,
   PRODUCT_PDP_DESCRIPTION_CLASS,
   PRODUCT_PDP_INFO_COLUMN_CLASS,
   PRODUCT_PDP_SIZE_GUIDE_ACTION_CLASS,
@@ -302,10 +304,12 @@ export function ProductInfoAndActions({
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 
-            className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS} !text-gray-900`}
+            className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS}`}
             style={{
               ...getClayPrimaryButtonCompactStyle(HOME_PRODUCT_CARD_CART_BG),
               height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+              fontSize: PRODUCT_PDP_ADD_TO_CART_FONT_SIZE_PX,
+              lineHeight: `${PRODUCT_PDP_ADD_TO_CART_LINE_HEIGHT_PX}px`,
             }}
             onClick={onAddToCart}
           >
