@@ -34,7 +34,7 @@ export const PRODUCT_PDP_GRID_CLASS =
 
 /** Product long description — narrow measure for fewer words per line. */
 export const PRODUCT_PDP_DESCRIPTION_CLASS =
-  'prose prose-sm mb-8 min-w-0 max-w-[36ch] break-words text-gray-600 [overflow-wrap:anywhere] [&_*]:max-w-full [&_*]:break-words [&_*]:[overflow-wrap:anywhere]';
+  'prose prose-sm mb-8 min-w-0 max-w-[48ch] break-words text-gray-600 [overflow-wrap:anywhere] [&_*]:max-w-full [&_*]:break-words [&_*]:[overflow-wrap:anywhere]';
 
 /** Info column — allow grid track to shrink so text wraps. */
 export const PRODUCT_PDP_INFO_COLUMN_CLASS =

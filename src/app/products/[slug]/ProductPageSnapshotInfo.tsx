@@ -120,7 +120,7 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
         <div className="mb-6 w-full">
           <div className="grid w-full grid-cols-[1fr_auto] items-center gap-4">
             <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-              <p className="text-3xl font-bold text-gray-900">
+              <p className="text-3xl font-bold text-blue-600">
                 {formatPrice(snapshot.price, currency)}
               </p>
               {showRegularPrice ? (
