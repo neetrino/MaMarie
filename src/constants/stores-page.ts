@@ -1,5 +1,6 @@
 /** Partner stores page layout tokens — match wishlist page chrome. */
 import { BRAND_COLORS } from './brand';
+import { MOBILE_HOME_BG } from './mobile-home';
 import { MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX } from './mobile-wishlist';
 import {
   WISHLIST_PAGE_CONTENT_WIDTH_PX,
@@ -19,7 +20,8 @@ export const STORES_PAGE_MAX_WIDTH_PX =
   WISHLIST_PAGE_CONTENT_WIDTH_PX + STORES_PAGE_HORIZONTAL_PADDING_PX * 2;
 export const STORES_PAGE_VERTICAL_PADDING_PX = 48;
 export const STORES_PAGE_BG = '#ffffff';
-export const STORES_PAGE_MOBILE_BG = '#ffffff';
+/** Same gray as home / wishlist / products mobile shell. */
+export const STORES_PAGE_MOBILE_BG = MOBILE_HOME_BG;
 export const STORES_PAGE_MOBILE_PADDING_PX = MOBILE_WISHLIST_PAGE_HORIZONTAL_PADDING_PX;
 export const STORES_PAGE_COLUMN_GAP_PX = 24;
 export const STORES_PAGE_CARD_RADIUS_PX = 24;

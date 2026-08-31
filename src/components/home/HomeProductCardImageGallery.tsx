@@ -32,8 +32,8 @@ function resolveSwipeDirection(start: TouchPoint, end: TouchPoint): 'previous' |
 }
 
 /**
- * Card gallery controls — Main Variant images only (prev/next + dots).
- * Mobile: swipe (no arrows). Desktop: arrow buttons.
+ * Card gallery controls — Main Variant images only.
+ * Mobile: swipe + dots. Desktop: dots only (no arrows).
  */
 export function HomeProductCardImageGallery({
   images,
@@ -50,18 +50,6 @@ export function HomeProductCardImageGallery({
   }
 
   const safeIndex = Math.min(Math.max(activeIndex, 0), images.length - 1);
-
-  const goPrev = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onIndexChange((safeIndex - 1 + images.length) % images.length);
-  };
-
-  const goNext = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onIndexChange((safeIndex + 1) % images.length);
-  };
 
   const handleTouchStart = (event: TouchEvent<HTMLElement>) => {
     const touch = event.touches[0];
@@ -126,22 +114,6 @@ export function HomeProductCardImageGallery({
         />
       )}
 
-      <button
-        type="button"
-        onClick={goPrev}
-        aria-label="Previous image"
-        className="pointer-events-auto absolute left-1 top-1/2 z-20 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-base font-semibold text-gray-800 shadow-md hover:bg-white lg:flex"
-      >
-        ‹
-      </button>
-      <button
-        type="button"
-        onClick={goNext}
-        aria-label="Next image"
-        className="pointer-events-auto absolute right-1 top-1/2 z-20 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-base font-semibold text-gray-800 shadow-md hover:bg-white lg:flex"
-      >
-        ›
-      </button>
       <div className="pointer-events-none absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 gap-1.5">
         {images.map((_, dotIndex) => (
           <button

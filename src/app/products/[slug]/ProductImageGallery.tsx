@@ -21,17 +21,12 @@ import {
   PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
   PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
   PRODUCT_PDP_MOBILE_WISHLIST_ICON_SIZE_PX,
-  PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS,
-  PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_SIZES,
   PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT,
-  PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
 } from './constants';
 import { ProductImageZoomOverlay } from './ProductImageZoomOverlay';
 import { ProductMainImageCarousel } from './ProductMainImageCarousel';
+import { ProductThumbnailRail } from './ProductThumbnailRail';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -46,72 +41,6 @@ interface ProductImageGalleryProps {
   onAddToWishlist: (e: MouseEvent) => void;
 }
 
-interface ProductThumbnailRailProps {
-  images: string[];
-  currentImageIndex: number;
-  failedSources: Set<string>;
-  onImageIndexChange: (index: number) => void;
-  onImageError: (src: string) => void;
-}
-
-function ProductThumbnailRail({
-  images,
-  currentImageIndex,
-  failedSources,
-  onImageIndexChange,
-  onImageError,
-}: ProductThumbnailRailProps) {
-  const activeThumbRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (window.matchMedia('(min-width: 1024px)').matches) {
-      return;
-    }
-
-    activeThumbRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'start',
-    });
-  }, [currentImageIndex]);
-
-  return (
-    <div className={PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS}>
-      <div className={PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS}>
-        {images.map((image, index) => {
-          const isActive = index === currentImageIndex;
-          return (
-            <button
-              key={index}
-              ref={isActive ? activeThumbRef : undefined}
-              type="button"
-              onClick={() => onImageIndexChange(index)}
-              className={`${PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS} ${PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS} ${
-                isActive
-                  ? PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS
-                  : PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS
-              }`}
-            >
-              {failedSources.has(image) ? (
-                <ProductImagePlaceholder className="h-full w-full" aria-label="" />
-              ) : (
-                <img
-                  src={image}
-                  alt=""
-                  className="h-full w-full object-contain transition-transform duration-300"
-                  loading="lazy"
-                  decoding="async"
-                  onError={() => onImageError(image)}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function ProductImageGallery({
   images,
   product,
@@ -123,9 +52,11 @@ export function ProductImageGallery({
   isInWishlist,
   onAddToWishlist,
 }: ProductImageGalleryProps) {
+  const mainFrameRef = useRef<HTMLDivElement>(null);
   const [showZoom, setShowZoom] = useState(false);
   const [failedSources, setFailedSources] = useState<Set<string>>(new Set());
   const [snapshotSrc, setSnapshotSrc] = useState<string | undefined>(() => images[currentImageIndex]);
+  const [mainImageHeightPx, setMainImageHeightPx] = useState<number | null>(null);
 
   const markFailed = (src: string | undefined) => {
     if (!src) {
@@ -149,6 +80,34 @@ export function ProductImageGallery({
     }
   }, [product.slug]);
 
+  useEffect(() => {
+    const frame = mainFrameRef.current;
+    if (!frame || !hasMultipleImages) {
+      setMainImageHeightPx(null);
+      return;
+    }
+
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+
+    const syncHeight = () => {
+      if (!desktopQuery.matches) {
+        setMainImageHeightPx(null);
+        return;
+      }
+      const nextHeight = Math.round(frame.getBoundingClientRect().height);
+      setMainImageHeightPx(nextHeight > 0 ? nextHeight : null);
+    };
+
+    syncHeight();
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(frame);
+    desktopQuery.addEventListener('change', syncHeight);
+    return () => {
+      observer.disconnect();
+      desktopQuery.removeEventListener('change', syncHeight);
+    };
+  }, [hasMultipleImages]);
+
   const showPreviousImage = () => {
     onImageIndexChange((currentImageIndex - 1 + images.length) % images.length);
   };
@@ -161,7 +120,11 @@ export function ProductImageGallery({
     <>
       <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
         <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
-          <div data-product-fly-origin className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}>
+          <div
+            ref={mainFrameRef}
+            data-product-fly-origin
+            className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}
+          >
             {hasMultipleImages ? (
               <ProductMainImageCarousel
                 images={images}
@@ -277,6 +240,7 @@ export function ProductImageGallery({
             images={images}
             currentImageIndex={currentImageIndex}
             failedSources={failedSources}
+            mainImageHeightPx={mainImageHeightPx}
             onImageIndexChange={onImageIndexChange}
             onImageError={markFailed}
           />
