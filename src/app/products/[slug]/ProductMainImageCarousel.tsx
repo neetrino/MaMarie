@@ -107,7 +107,7 @@ export function ProductMainImageCarousel({
                 src={image}
                 alt={index === currentImageIndex ? alt : ''}
                 fill
-                className="object-contain"
+                className="object-cover"
                 sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                 loading={mainImagePriority && index === 0 ? 'eager' : 'lazy'}
                 unoptimized

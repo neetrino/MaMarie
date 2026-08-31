@@ -142,7 +142,7 @@ export function ProductImageGallery({
                   <img
                     src={snapshotSrc}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-contain"
+                    className="absolute inset-0 h-full w-full object-cover"
                     aria-hidden
                     decoding="async"
                   />
@@ -152,7 +152,7 @@ export function ProductImageGallery({
                     src={currentSrc}
                     alt={product.title}
                     fill
-                    className="object-contain transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                     loading={mainImagePriority ? 'eager' : 'lazy'}
                     unoptimized
