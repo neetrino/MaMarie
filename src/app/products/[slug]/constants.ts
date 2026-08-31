@@ -18,8 +18,9 @@ export const PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT = 2;
 /** PDP gallery vertical thumbnail frame — brand blue. */
 export const PRODUCT_PDP_THUMBNAIL_BORDER_COLOR = PRODUCTS_CATALOG_FILTER_ACCENT;
 
+/** Same aspect as main PDP image (`aspect-square`). */
 export const PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS =
-  'relative aspect-[3/4] shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
+  'relative aspect-square shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS =
   'border-gray-200 hover:border-gray-300';
