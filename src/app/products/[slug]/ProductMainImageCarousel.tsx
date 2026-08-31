@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { ProductImagePlaceholder } from '../../../components/ProductImagePlaceholder';
 import {
   PRODUCT_PDP_MAIN_IMAGE_CAROUSEL_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_SIZES,
   PRODUCT_PDP_MAIN_IMAGE_SLIDE_CLASS,
 } from './constants';
@@ -17,8 +18,10 @@ interface ProductMainImageCarouselProps {
   mainImagePriority: boolean;
   onImageIndexChange: (index: number) => void;
   onImageError: (src: string) => void;
-  onImageLoad: (src: string) => void;
+  onImageLoad: (src: string, naturalWidth: number, naturalHeight: number) => void;
 }
+
+const PROGRAMMATIC_SCROLL_RELEASE_MS = 450;
 
 /** Horizontal snap carousel — swipe/scroll images like Mobee PDP. */
 export function ProductMainImageCarousel({
@@ -33,27 +36,49 @@ export function ProductMainImageCarousel({
 }: ProductMainImageCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScrollRef = useRef(false);
+  const currentIndexRef = useRef(currentImageIndex);
+  const releaseTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  const lockProgrammaticScroll = () => {
+    isProgrammaticScrollRef.current = true;
+    if (releaseTimerRef.current !== null) {
+      window.clearTimeout(releaseTimerRef.current);
+    }
+    releaseTimerRef.current = window.setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+      releaseTimerRef.current = null;
+    }, PROGRAMMATIC_SCROLL_RELEASE_MS);
+  };
+
+  const syncScrollToIndex = (index: number, behavior: ScrollBehavior) => {
     const container = scrollRef.current;
     if (!container) {
       return;
     }
 
-    const targetLeft = currentImageIndex * container.clientWidth;
+    const width = container.clientWidth;
+    if (width <= 0) {
+      return;
+    }
+
+    const targetLeft = index * width;
     if (Math.abs(container.scrollLeft - targetLeft) < 2) {
       return;
     }
 
-    isProgrammaticScrollRef.current = true;
-    container.scrollTo({ left: targetLeft, behavior: 'smooth' });
+    lockProgrammaticScroll();
+    container.scrollTo({ left: targetLeft, behavior });
+  };
 
-    const releaseTimer = window.setTimeout(() => {
-      isProgrammaticScrollRef.current = false;
-    }, 400);
+  useEffect(() => {
+    currentIndexRef.current = currentImageIndex;
+    syncScrollToIndex(currentImageIndex, 'smooth');
 
     return () => {
-      window.clearTimeout(releaseTimer);
+      if (releaseTimerRef.current !== null) {
+        window.clearTimeout(releaseTimerRef.current);
+        releaseTimerRef.current = null;
+      }
     };
   }, [currentImageIndex]);
 
@@ -78,16 +103,25 @@ export function ProductMainImageCarousel({
         Math.max(0, Math.round(container.scrollLeft / width)),
       );
 
-      if (nextIndex !== currentImageIndex) {
+      if (nextIndex !== currentIndexRef.current) {
         onImageIndexChange(nextIndex);
       }
     };
 
+    const handleResize = () => {
+      // Frame size follows image aspect — keep the active slide pinned.
+      syncScrollToIndex(currentIndexRef.current, 'auto');
+    };
+
     container.addEventListener('scroll', handleScroll, { passive: true });
+    const observer = new ResizeObserver(handleResize);
+    observer.observe(container);
+
     return () => {
       container.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
     };
-  }, [currentImageIndex, images.length, onImageIndexChange]);
+  }, [images.length, onImageIndexChange]);
 
   return (
     <div
@@ -107,12 +141,18 @@ export function ProductMainImageCarousel({
                 src={image}
                 alt={index === currentImageIndex ? alt : ''}
                 fill
-                className="object-cover"
+                className={PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS}
                 sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                 loading={mainImagePriority && index === 0 ? 'eager' : 'lazy'}
                 unoptimized
                 draggable={false}
-                onLoad={() => onImageLoad(image)}
+                onLoad={(event) => {
+                  onImageLoad(
+                    image,
+                    event.currentTarget.naturalWidth,
+                    event.currentTarget.naturalHeight,
+                  );
+                }}
                 onError={() => onImageError(image)}
               />
             )}

@@ -6,9 +6,10 @@ import { SiteHeader } from './SiteHeader';
 
 interface ConditionalHeaderProps {
   navLinks: readonly NavLinkItem[];
+  mobileNavLinks: readonly NavLinkItem[];
 }
 
-export function ConditionalHeader({ navLinks }: ConditionalHeaderProps) {
+export function ConditionalHeader({ navLinks, mobileNavLinks }: ConditionalHeaderProps) {
   const pathname = usePathname();
   if (pathname?.startsWith('/supersudo') || pathname?.startsWith('/admin')) {
     return null;
@@ -16,9 +17,9 @@ export function ConditionalHeader({ navLinks }: ConditionalHeaderProps) {
   if (pathname?.startsWith('/profile')) {
     return (
       <div className="profile-route-header">
-        <SiteHeader navLinks={navLinks} />
+        <SiteHeader navLinks={navLinks} mobileNavLinks={mobileNavLinks} />
       </div>
     );
   }
-  return <SiteHeader navLinks={navLinks} />;
+  return <SiteHeader navLinks={navLinks} mobileNavLinks={mobileNavLinks} />;
 }

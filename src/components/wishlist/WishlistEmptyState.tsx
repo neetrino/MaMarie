@@ -39,7 +39,13 @@ export function WishlistEmptyState({ t }: WishlistEmptyStateProps) {
           gap: WISHLIST_EMPTY_ILLUSTRATION_TO_COPY_GAP_PX,
         }}
       >
-        <div className="w-full">
+        <div
+          className="mx-auto"
+          style={{
+            width: WISHLIST_EMPTY_ILLUSTRATION_WIDTH_PX,
+            maxWidth: '100%',
+          }}
+        >
           <Image
             src={WISHLIST_EMPTY_ASSETS.illustration}
             alt=""
@@ -70,7 +76,7 @@ export function WishlistEmptyState({ t }: WishlistEmptyStateProps) {
             </h2>
 
             <p
-              className="text-center leading-[1.5] tracking-[0.07px]"
+              className="hidden text-center leading-[1.5] tracking-[0.07px] lg:block"
               style={{
                 color: WISHLIST_EMPTY_SUBTITLE_COLOR,
                 fontSize: WISHLIST_EMPTY_SUBTITLE_FONT_SIZE_PX,

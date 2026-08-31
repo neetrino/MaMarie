@@ -2,31 +2,28 @@
 
 import NextImage from 'next/image';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
-import { ProductLabels } from '../../../components/ProductLabels';
 import { ProductImagePlaceholder } from '../../../components/ProductImagePlaceholder';
-import { WishlistIcon } from '../../../components/icons/WishlistIcon';
 import { t } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
 import { readProductPageSnapshot } from '../../../lib/product-page-snapshot';
+import {
+  DEFAULT_IMAGE_ASPECT_RATIO,
+  resolveImageAspectRatio,
+} from '../../../lib/resolve-image-aspect-ratio';
 import type { Product } from './types';
 import {
   PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS,
-  PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS,
-  PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS,
-  PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS,
-  PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS,
-  PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS,
-  PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
-  PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
-  PRODUCT_PDP_MOBILE_WISHLIST_ICON_SIZE_PX,
+  PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_SIZES,
+  PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS,
   PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT,
 } from './constants';
 import { ProductImageZoomOverlay } from './ProductImageZoomOverlay';
 import { ProductMainImageCarousel } from './ProductMainImageCarousel';
+import { ProductMainImageControls } from './ProductMainImageControls';
 import { ProductThumbnailRail } from './ProductThumbnailRail';
+import { usePdpMainImageFrameSize } from './usePdpMainImageFrameSize';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -52,17 +49,29 @@ export function ProductImageGallery({
   isInWishlist,
   onAddToWishlist,
 }: ProductImageGalleryProps) {
+  const mainWrapperRef = useRef<HTMLDivElement>(null);
   const mainFrameRef = useRef<HTMLDivElement>(null);
   const [showZoom, setShowZoom] = useState(false);
   const [failedSources, setFailedSources] = useState<Set<string>>(new Set());
   const [snapshotSrc, setSnapshotSrc] = useState<string | undefined>(() => images[currentImageIndex]);
   const [mainImageHeightPx, setMainImageHeightPx] = useState<number | null>(null);
+  const [aspectBySrc, setAspectBySrc] = useState<Record<string, number>>({});
 
   const markFailed = (src: string | undefined) => {
     if (!src) {
       return;
     }
     setFailedSources((prev) => new Set(prev).add(src));
+  };
+
+  const rememberAspectRatio = (src: string, naturalWidth: number, naturalHeight: number) => {
+    const nextRatio = resolveImageAspectRatio(naturalWidth, naturalHeight);
+    setAspectBySrc((prev) => {
+      if (prev[src] === nextRatio) {
+        return prev;
+      }
+      return { ...prev, [src]: nextRatio };
+    });
   };
 
   const currentSrc = images[currentImageIndex];
@@ -72,6 +81,11 @@ export function ProductImageGallery({
   const canShowSnapshot = Boolean(snapshotSrc && !snapshotFailed);
   const canShowMainImage = Boolean(currentSrc && !mainImageFailed);
   const hasMultipleImages = images.length >= PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT;
+  const imageAspectRatio =
+    (currentSrc ? aspectBySrc[currentSrc] : undefined) ??
+    (snapshotSrc ? aspectBySrc[snapshotSrc] : undefined) ??
+    DEFAULT_IMAGE_ASPECT_RATIO;
+  const frameSize = usePdpMainImageFrameSize(mainWrapperRef, imageAspectRatio);
 
   useEffect(() => {
     const entrySnapshot = readProductPageSnapshot(product.slug);
@@ -88,7 +102,6 @@ export function ProductImageGallery({
     }
 
     const desktopQuery = window.matchMedia('(min-width: 1024px)');
-
     const syncHeight = () => {
       if (!desktopQuery.matches) {
         setMainImageHeightPx(null);
@@ -106,7 +119,7 @@ export function ProductImageGallery({
       observer.disconnect();
       desktopQuery.removeEventListener('change', syncHeight);
     };
-  }, [hasMultipleImages]);
+  }, [hasMultipleImages, imageAspectRatio]);
 
   const showPreviousImage = () => {
     onImageIndexChange((currentImageIndex - 1 + images.length) % images.length);
@@ -119,11 +132,15 @@ export function ProductImageGallery({
   return (
     <>
       <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
-        <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
+        <div ref={mainWrapperRef} className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
           <div
             ref={mainFrameRef}
             data-product-fly-origin
             className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}
+            style={{
+              width: frameSize.widthPx,
+              height: frameSize.heightPx,
+            }}
           >
             {hasMultipleImages ? (
               <ProductMainImageCarousel
@@ -134,7 +151,10 @@ export function ProductImageGallery({
                 mainImagePriority={mainImagePriority}
                 onImageIndexChange={onImageIndexChange}
                 onImageError={markFailed}
-                onImageLoad={(src) => setSnapshotSrc(src)}
+                onImageLoad={(src, naturalWidth, naturalHeight) => {
+                  setSnapshotSrc(src);
+                  rememberAspectRatio(src, naturalWidth, naturalHeight);
+                }}
               />
             ) : canShowMainImage || canShowSnapshot ? (
               <>
@@ -142,9 +162,16 @@ export function ProductImageGallery({
                   <img
                     src={snapshotSrc}
                     alt=""
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className={`absolute inset-0 h-full w-full ${PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS}`}
                     aria-hidden
                     decoding="async"
+                    onLoad={(event) => {
+                      rememberAspectRatio(
+                        snapshotSrc,
+                        event.currentTarget.naturalWidth,
+                        event.currentTarget.naturalHeight,
+                      );
+                    }}
                   />
                 ) : null}
                 {currentSrc && !mainImageFailed ? (
@@ -152,11 +179,18 @@ export function ProductImageGallery({
                     src={currentSrc}
                     alt={product.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className={`${PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS} transition-transform duration-500 group-hover:scale-105`}
                     sizes={PRODUCT_PDP_MAIN_IMAGE_SIZES}
                     loading={mainImagePriority ? 'eager' : 'lazy'}
                     unoptimized
-                    onLoad={() => setSnapshotSrc(currentSrc)}
+                    onLoad={(event) => {
+                      setSnapshotSrc(currentSrc);
+                      rememberAspectRatio(
+                        currentSrc,
+                        event.currentTarget.naturalWidth,
+                        event.currentTarget.naturalHeight,
+                      );
+                    }}
                     onError={() => markFailed(currentSrc)}
                   />
                 ) : null}
@@ -168,70 +202,17 @@ export function ProductImageGallery({
               />
             )}
 
-            {discountPercent ? (
-              <div className="pointer-events-none absolute top-4 left-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
-                -{discountPercent}%
-              </div>
-            ) : null}
-
-            {product.labels ? <ProductLabels labels={product.labels} /> : null}
-
-            <button
-              type="button"
-              onClick={onAddToWishlist}
-              aria-pressed={isInWishlist}
-              aria-label={
-                isInWishlist
-                  ? t(language, 'common.ariaLabels.removeFromWishlist')
-                  : t(language, 'common.ariaLabels.addToWishlist')
-              }
-              className={`absolute z-20 flex items-center justify-center rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.12)] transition-colors hover:bg-white/90 lg:hidden ${
-                isInWishlist ? 'text-brand-pink' : 'text-gray-800'
-              }`}
-              style={{
-                top: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
-                right: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX,
-                width: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
-                height: PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX,
-              }}
-            >
-              <WishlistIcon
-                isActive={isInWishlist}
-                size={PRODUCT_PDP_MOBILE_WISHLIST_ICON_SIZE_PX}
-              />
-            </button>
-
-            {hasMultipleImages ? (
-              <>
-                <button
-                  type="button"
-                  onClick={showPreviousImage}
-                  className={`${PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS} ${PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_LEFT_CLASS}`}
-                  aria-label={t(language, 'common.ariaLabels.previousImage')}
-                >
-                  <ChevronLeft aria-hidden className={PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS} />
-                </button>
-                <button
-                  type="button"
-                  onClick={showNextImage}
-                  className={`${PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_BASE_CLASS} ${PRODUCT_PDP_MAIN_IMAGE_NAV_BUTTON_RIGHT_CLASS}`}
-                  aria-label={t(language, 'common.ariaLabels.nextImage')}
-                >
-                  <ChevronRight aria-hidden className={PRODUCT_PDP_MAIN_IMAGE_NAV_ICON_CLASS} />
-                </button>
-              </>
-            ) : null}
-
-            <div className="absolute bottom-4 left-4 z-10 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => setShowZoom(true)}
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-300 hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-                aria-label={t(language, 'common.ariaLabels.fullscreenImage')}
-              >
-                <Maximize2 className="h-5 w-5 text-gray-800" />
-              </button>
-            </div>
+            <ProductMainImageControls
+              product={product}
+              discountPercent={discountPercent}
+              language={language}
+              hasMultipleImages={hasMultipleImages}
+              isInWishlist={isInWishlist}
+              onAddToWishlist={onAddToWishlist}
+              onPreviousImage={showPreviousImage}
+              onNextImage={showNextImage}
+              onOpenZoom={() => setShowZoom(true)}
+            />
           </div>
         </div>
 

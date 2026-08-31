@@ -1,29 +1,55 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { ProductLabels } from '../../../components/ProductLabels';
 import { t } from '../../../lib/i18n';
 import type { ProductPageSnapshot } from '../../../lib/product-page-snapshot';
 import {
+  DEFAULT_IMAGE_ASPECT_RATIO,
+  resolveImageAspectRatio,
+} from '../../../lib/resolve-image-aspect-ratio';
+import {
   PRODUCT_PDP_GALLERY_LAYOUT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS,
+  PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS,
   PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS,
 } from './constants';
+import { usePdpMainImageFrameSize } from './usePdpMainImageFrameSize';
 
 interface ProductPageSnapshotGalleryProps {
   snapshot: ProductPageSnapshot;
 }
 
 export function ProductPageSnapshotGallery({ snapshot }: ProductPageSnapshotGalleryProps) {
+  const mainWrapperRef = useRef<HTMLDivElement>(null);
+  const [imageAspectRatio, setImageAspectRatio] = useState(DEFAULT_IMAGE_ASPECT_RATIO);
+  const frameSize = usePdpMainImageFrameSize(mainWrapperRef, imageAspectRatio);
+
   return (
     <div className={PRODUCT_PDP_GALLERY_LAYOUT_CLASS}>
-      <div className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
-        <div data-product-fly-origin className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}>
+      <div ref={mainWrapperRef} className={PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS}>
+        <div
+          data-product-fly-origin
+          className={PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS}
+          style={{
+            width: frameSize.widthPx,
+            height: frameSize.heightPx,
+          }}
+        >
           <img
             src={snapshot.imageUrl}
             alt={snapshot.title}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={`absolute inset-0 h-full w-full ${PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS}`}
             decoding="async"
+            onLoad={(event) => {
+              setImageAspectRatio(
+                resolveImageAspectRatio(
+                  event.currentTarget.naturalWidth,
+                  event.currentTarget.naturalHeight,
+                ),
+              );
+            }}
           />
           {snapshot.discountPercent ? (
             <div className="absolute top-4 right-4 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-[0_2px_8px_rgba(37,99,235,0.3)]">

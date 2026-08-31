@@ -1,4 +1,5 @@
 import { PRODUCTS_CATALOG_FILTER_ACCENT } from '../../../constants/products-catalog';
+import { DEFAULT_IMAGE_ASPECT_RATIO } from '../../../lib/resolve-image-aspect-ratio';
 
 // Reserved routes that should not be treated as product slugs
 export const RESERVED_ROUTES = [
@@ -18,7 +19,7 @@ export const PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT = 2;
 /** PDP gallery vertical thumbnail frame — brand blue. */
 export const PRODUCT_PDP_THUMBNAIL_BORDER_COLOR = PRODUCTS_CATALOG_FILTER_ACCENT;
 
-/** Same aspect as main PDP image (`aspect-square`). */
+/** Thumbnail tiles — fixed square, same size for every photo. */
 export const PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS =
   'relative aspect-square shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
 
@@ -29,11 +30,11 @@ export const PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS = 'border-[#5281e1]';
 
 /** Desktop grid — gallery column width (info column takes the remainder). */
 export const PRODUCT_PDP_GRID_CLASS =
-  'grid grid-cols-1 gap-12 items-start lg:grid-cols-[48%_52%] lg:items-stretch [&>*]:min-w-0';
+  'grid grid-cols-1 gap-6 items-start lg:grid-cols-[48%_52%] lg:gap-3 lg:items-stretch [&>*]:min-w-0';
 
 /** Product long description — narrow measure for fewer words per line. */
 export const PRODUCT_PDP_DESCRIPTION_CLASS =
-  'prose prose-sm mb-8 min-w-0 max-w-[36ch] break-words text-gray-600 [overflow-wrap:anywhere] [&_*]:max-w-full [&_*]:break-words [&_*]:[overflow-wrap:anywhere]';
+  'prose prose-sm mb-8 min-w-0 max-w-[48ch] break-words text-gray-600 [overflow-wrap:anywhere] [&_*]:max-w-full [&_*]:break-words [&_*]:[overflow-wrap:anywhere]';
 
 /** Info column — allow grid track to shrink so text wraps. */
 export const PRODUCT_PDP_INFO_COLUMN_CLASS =
@@ -48,8 +49,27 @@ export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
 
 export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full min-w-0 lg:order-2 lg:flex-1';
 
+/** Main photo — keeps natural aspect, capped so tall shots stay compact. */
 export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
-  'relative mx-auto aspect-square w-full max-w-[min(100%,34rem)] overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-[min(100%,36rem)]';
+  'relative mx-auto w-full max-w-full overflow-hidden rounded-lg bg-transparent shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:bg-white';
+
+/** Mobile fills the frame (no letterbox); desktop keeps full photo via contain. */
+export const PRODUCT_PDP_MAIN_IMAGE_OBJECT_CLASS = 'object-cover lg:object-contain';
+
+/** Desktop max box for the main PDP photo (px). */
+export const PRODUCT_PDP_MAIN_IMAGE_MAX_WIDTH_PX = 480;
+export const PRODUCT_PDP_MAIN_IMAGE_MAX_HEIGHT_PX = 560;
+
+/** Mobile max box — slightly tighter than desktop. */
+export const PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_WIDTH_PX = 400;
+export const PRODUCT_PDP_MAIN_IMAGE_MOBILE_MAX_HEIGHT_PX = 520;
+
+/** Extra inset inside the logo-to-login track — more breathing room from page edges. */
+export const PRODUCT_PDP_CONTENT_INSET_X_MOBILE_PX = 8;
+export const PRODUCT_PDP_CONTENT_INSET_X_DESKTOP_PX = 32;
+
+/** Fallback until the active photo reports its natural size. */
+export const PRODUCT_PDP_MAIN_IMAGE_DEFAULT_ASPECT_RATIO = DEFAULT_IMAGE_ASPECT_RATIO;
 
 /** Mobee-style horizontal snap track for PDP main images. */
 export const PRODUCT_PDP_MAIN_IMAGE_CAROUSEL_CLASS =
@@ -66,6 +86,10 @@ export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS =
   'w-[4.5rem] lg:w-full lg:snap-start';
+
+/** Fill the square frame so every thumb looks the same size. */
+export const PRODUCT_PDP_THUMBNAIL_IMAGE_CLASS =
+  'h-full w-full object-cover transition-transform duration-300';
 
 /** Read-only info attributes (e.g. material) — «Նյութ ' value». */
 export const PRODUCT_PDP_INFO_ATTRIBUTE_ROW_CLASS =

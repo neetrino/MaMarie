@@ -43,4 +43,6 @@ export interface AdminReferenceSettings {
   categoryDiscounts?: Record<string, number>;
   brandDiscounts?: Record<string, number>;
   currencyRates?: Record<string, number>;
+  /** When false, storefront hides the partner stores page and nav entry. */
+  storesPageEnabled?: boolean;
 }

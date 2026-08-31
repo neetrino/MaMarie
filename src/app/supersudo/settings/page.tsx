@@ -20,6 +20,7 @@ interface Settings {
   categoryDiscounts?: Record<string, number>;
   brandDiscounts?: Record<string, number>;
   currencyRates?: Record<string, number>;
+  storesPageEnabled?: boolean;
 }
 
 const DEFAULT_CURRENCY_RATES = {
@@ -40,6 +41,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>({
     defaultCurrency: 'AMD',
     currencyRates: DEFAULT_CURRENCY_RATES,
+    storesPageEnabled: true,
   });
 
   useEffect(() => {
@@ -62,6 +64,7 @@ export default function SettingsPage() {
       categoryDiscounts: sharedSettings.categoryDiscounts,
       brandDiscounts: sharedSettings.brandDiscounts,
       currencyRates: sharedSettings.currencyRates || DEFAULT_CURRENCY_RATES,
+      storesPageEnabled: sharedSettings.storesPageEnabled ?? true,
     });
     logger.debug('✅ [ADMIN] Settings loaded from reference provider:', sharedSettings);
   }, [sharedSettings]);
@@ -83,6 +86,7 @@ export default function SettingsPage() {
       await apiClient.put('/api/v1/admin/settings', {
         defaultCurrency: settings.defaultCurrency,
         currencyRates: currencyRatesToSave,
+        storesPageEnabled: settings.storesPageEnabled ?? true,
       });
 
       invalidateAdminQuery(ADMIN_QUERY_KEYS.settings);
@@ -151,6 +155,42 @@ export default function SettingsPage() {
                 defaultValue={t('admin.settings.siteDescriptionPlaceholder')}
               />
             </div>
+          </div>
+        </Card>
+
+        <Card className="mb-6 p-6">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            {t('admin.settings.pagesVisibility')}
+          </h2>
+          <div className="flex items-center justify-between gap-4">
+            <span className="min-w-0">
+              <span className="block text-sm font-medium text-gray-700">
+                {t('admin.settings.storesPageEnabled')}
+              </span>
+              <span className="mt-1 block text-xs text-gray-500">
+                {t('admin.settings.storesPageEnabledHint')}
+              </span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={settings.storesPageEnabled ?? true}
+              onClick={() =>
+                setSettings({
+                  ...settings,
+                  storesPageEnabled: !(settings.storesPageEnabled ?? true),
+                })
+              }
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                settings.storesPageEnabled ?? true ? 'bg-brand-pink' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  settings.storesPageEnabled ?? true ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
           </div>
         </Card>
 

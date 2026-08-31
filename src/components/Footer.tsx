@@ -22,6 +22,8 @@ interface FooterProps {
   topGapPx?: number;
   /** Gap strip color above the yellow body (default white). */
   gapBgColor?: string;
+  /** When false, hide the partner stores footer link. */
+  storesPageEnabled?: boolean;
 }
 
 /**
@@ -31,6 +33,7 @@ interface FooterProps {
 export function Footer({
   topGapPx = FOOTER_YELLOW_TOP_PX,
   gapBgColor = FOOTER_GAP_BG_COLOR,
+  storesPageEnabled = true,
 }: FooterProps) {
   const contentPaddingTopPx = topGapPx + FOOTER_PADDING_TOP_PX;
 
@@ -88,7 +91,7 @@ export function Footer({
         }}
       >
         <div className="mx-auto w-full" style={{ maxWidth: FOOTER_CONTENT_MAX_WIDTH_PX }}>
-          <FooterSiteContent />
+          <FooterSiteContent storesPageEnabled={storesPageEnabled} />
         </div>
       </div>
 

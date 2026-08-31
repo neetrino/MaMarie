@@ -59,3 +59,14 @@ export function isNavLinkActive(labelKey: NavLinkKey, pathname: string): boolean
   }
   return false;
 }
+
+/** Drop stores nav entry when the admin toggle hides the partners page. */
+export function filterNavLinksByStoresPageEnabled(
+  links: readonly NavLinkItem[],
+  storesPageEnabled: boolean,
+): NavLinkItem[] {
+  if (storesPageEnabled) {
+    return [...links];
+  }
+  return links.filter((link) => link.labelKey !== 'stores');
+}

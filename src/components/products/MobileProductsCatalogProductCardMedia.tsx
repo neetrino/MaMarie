@@ -36,7 +36,7 @@ interface MobileProductsCatalogProductCardMediaProps {
   onBeforeNavigate?: () => void;
 }
 
-/** Figma `167:619` — product photo frame and wishlist control. */
+/** Product photo frame and wishlist control — matches mobile wishlist card media. */
 export function MobileProductsCatalogProductCardMedia({
   slug,
   productHref,
@@ -85,31 +85,21 @@ export function MobileProductsCatalogProductCardMedia({
           height: lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_HEIGHT_PX),
         }}
       >
-        <div
-          className="pointer-events-none absolute max-w-none"
-          style={{
-            height: '138.41%',
-            width: '107.38%',
-            left: '-3.69%',
-            top: '-26.24%',
-          }}
-        >
-          {showProductImage && activeImage ? (
-            <Image
-              src={activeImage}
-              alt={title}
-              fill
-              priority={imagePriority}
-              loading={imagePriority ? 'eager' : 'lazy'}
-              sizes={`${lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_WIDTH_PX)}px`}
-              className="object-contain"
-              unoptimized
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <ProductImagePlaceholder className="h-full w-full" aria-label={title} />
-          )}
-        </div>
+        {showProductImage && activeImage ? (
+          <Image
+            src={activeImage}
+            alt={title}
+            fill
+            priority={imagePriority}
+            loading={imagePriority ? 'eager' : 'lazy'}
+            sizes={`${lp(MOBILE_PRODUCTS_CATALOG_CARD_IMAGE_INNER_WIDTH_PX)}px`}
+            className="object-cover object-top"
+            unoptimized
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <ProductImagePlaceholder className="h-full w-full" aria-label={title} />
+        )}
       </div>
 
       {hasMultipleImages ? (
