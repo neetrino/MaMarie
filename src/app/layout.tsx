@@ -27,6 +27,17 @@ const notoSansArmenian = Noto_Sans_Armenian({
 export const metadata: Metadata = {
   title: 'MaMarie',
   description: 'MaMarie — handmade clay art & gifts',
+  openGraph: {
+    title: 'MaMarie',
+    description: 'MaMarie — handmade clay art & gifts',
+    type: 'website',
+    siteName: 'MaMarie',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MaMarie',
+    description: 'MaMarie — handmade clay art & gifts',
+  },
 };
 
 export const viewport: Viewport = {

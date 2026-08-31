@@ -23,10 +23,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const title = product.title || DEFAULT_TITLE;
     const description = product.description || null;
-    const firstImage =
-      Array.isArray(product.media) && product.media.length > 0
-        ? String(typeof product.media[0] === 'string' ? product.media[0] : product.media[0]?.url ?? '')
-        : null;
 
     return {
       title: `${title} | ${SITE_NAME}`,
@@ -34,14 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title,
         description: description ?? undefined,
-        ...(firstImage && { images: [{ url: firstImage, alt: title }] }),
         type: 'website',
+        siteName: SITE_NAME,
       },
       twitter: {
         card: 'summary_large_image',
         title,
         description: description ?? undefined,
-        ...(firstImage && { images: [firstImage] }),
       },
     };
   } catch {
