@@ -46,7 +46,7 @@ export const PRODUCT_PDP_MAIN_IMAGE_SIZES = '(max-width: 1024px) 100vw, 48vw';
 export const PRODUCT_PDP_GALLERY_LAYOUT_CLASS =
   'flex flex-col items-center gap-4 lg:flex-row lg:items-start lg:gap-6';
 
-export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full lg:order-2 lg:flex-1';
+export const PRODUCT_PDP_MAIN_IMAGE_WRAPPER_CLASS = 'order-1 w-full min-w-0 lg:order-2 lg:flex-1';
 
 export const PRODUCT_PDP_MAIN_IMAGE_FRAME_CLASS =
   'relative mx-auto aspect-square w-full max-w-[min(100%,34rem)] overflow-hidden rounded-lg bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] group lg:mx-0 lg:max-w-[min(100%,36rem)]';
@@ -59,12 +59,13 @@ export const PRODUCT_PDP_MAIN_IMAGE_SLIDE_CLASS =
   'relative h-full w-full shrink-0 snap-center snap-always';
 
 export const PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS =
-  'order-2 w-full lg:order-1 lg:w-28 lg:flex-shrink-0';
+  'order-2 w-full lg:order-1 lg:w-28 lg:flex-shrink-0 lg:overflow-y-auto lg:overscroll-y-contain lg:scrollbar-hide lg:snap-y lg:snap-mandatory';
 
 export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
-  'scrollbar-hide flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:justify-start lg:gap-4 lg:max-h-[36rem] lg:overflow-y-auto lg:overflow-x-visible lg:py-0';
+  'scrollbar-hide flex w-full flex-row justify-center gap-3 overflow-x-auto overscroll-contain py-1 lg:flex-col lg:justify-start lg:gap-4 lg:overflow-visible lg:py-0';
 
-export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS = 'w-[4.5rem] lg:w-full';
+export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS =
+  'w-[4.5rem] lg:w-full lg:snap-start';
 
 /** Read-only info attributes (e.g. material) — «Նյութ ' value». */
 export const PRODUCT_PDP_INFO_ATTRIBUTE_ROW_CLASS =
