@@ -2,7 +2,7 @@
 
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { SizeGuideSideSheet } from '../../../components/size-guide/SizeGuideSideSheet';
 import {
@@ -13,7 +13,7 @@ import {
   HERO_GENDER_BUTTON_BOYS_BG_COLOR,
   HERO_GENDER_BUTTON_GIRLS_BG_COLOR,
 } from '../../../constants/hero';
-import { MOBILE_PRODUCTS_CATALOG_CARD_ASSETS } from '../../../constants/mobile-products-catalog';
+import { HOME_PRODUCT_CARD_CART_BG } from '../../../constants/home-sections';
 import { formatPrice, type CurrencyCode } from '../../../lib/currency';
 import { t, getProductText } from '../../../lib/i18n';
 import type { LanguageCode } from '../../../lib/language';
@@ -302,24 +302,17 @@ export function ProductInfoAndActions({
           </div>
           <button 
             disabled={!canAddToCart || isAddingToCart} 
-            className={PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS}
-            style={{ height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX }}
+            className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS} !text-gray-900`}
+            style={{
+              ...getClayPrimaryButtonCompactStyle(HOME_PRODUCT_CARD_CART_BG),
+              height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+            }}
             onClick={onAddToCart}
           >
-            <span className="relative block h-full w-full">
-              <span className="absolute inset-y-0 left-0 right-[2.625rem] flex translate-x-[3px] items-center justify-center whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
-                {mobileFormattedActionLabel}
-              </span>
-              <span className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white">
-                <Image
-                  src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.cart}
-                  alt=""
-                  width={20}
-                  height={20}
-                  aria-hidden
-                />
-              </span>
+            <span className="whitespace-pre-line text-center leading-[1.05] md:whitespace-normal md:leading-normal">
+              {mobileFormattedActionLabel}
             </span>
+            <ShoppingCart className="h-5 w-5 shrink-0" aria-hidden />
           </button>
           <button 
             onClick={onAddToWishlist} 

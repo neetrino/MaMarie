@@ -127,7 +127,7 @@ export const PRODUCT_PDP_ACTIONS_TOP_ROW_CLASS =
 export const PRODUCT_PDP_SIZE_GUIDE_ACTION_CLASS =
   'min-w-0 flex-1 lg:hidden';
 export const PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS =
-  'w-full rounded-full bg-brand-cart font-bold text-gray-900 transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 lg:flex-1';
+  'w-full gap-2 disabled:cursor-not-allowed lg:flex-1';
 
 /**
  * PDP image zoom modal — above header (80), bottom nav (70), cart (90),
