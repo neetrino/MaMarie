@@ -10,6 +10,7 @@ import {
   HERO_GENDER_BUTTON_BOYS_BG_COLOR,
   HERO_GENDER_BUTTON_GIRLS_BG_COLOR,
 } from '../../../constants/hero';
+import { HOME_PRODUCT_CARD_CART_BG } from '../../../constants/home-sections';
 import { formatPrice } from '../../../lib/currency';
 import { t } from '../../../lib/i18n';
 import type { ProductPageSnapshot } from '../../../lib/product-page-snapshot';
@@ -19,6 +20,8 @@ import {
   PRODUCT_PDP_ACTIONS_ROW_CLASS,
   PRODUCT_PDP_ACTIONS_TOP_ROW_CLASS,
   PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS,
+  PRODUCT_PDP_ADD_TO_CART_FONT_SIZE_PX,
+  PRODUCT_PDP_ADD_TO_CART_LINE_HEIGHT_PX,
   PRODUCT_PDP_SIZE_GUIDE_ACTION_CLASS,
   PRODUCT_QUANTITY_STEPPER_SHELL_CLASS,
   PRODUCT_QUANTITY_STEPPER_SIDE_BUTTON_CLASS,
@@ -176,8 +179,13 @@ export function ProductPageSnapshotInfo({ snapshot }: ProductPageSnapshotInfoPro
           <button
             type="button"
             disabled
-            className={PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS}
-            style={{ height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX }}
+            className={`${CLAY_PRIMARY_BUTTON_CLASS} ${PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS}`}
+            style={{
+              ...getClayPrimaryButtonCompactStyle(HOME_PRODUCT_CARD_CART_BG),
+              height: PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX,
+              fontSize: PRODUCT_PDP_ADD_TO_CART_FONT_SIZE_PX,
+              lineHeight: `${PRODUCT_PDP_ADD_TO_CART_LINE_HEIGHT_PX}px`,
+            }}
           >
             {actionLabel}
           </button>

@@ -13,7 +13,7 @@ import {
   CART_DRAWER_ITEM_THUMB_RADIUS_PX,
   CART_DRAWER_ITEM_THUMB_SIZE_PX,
 } from '../../constants/cart-drawer';
-import { HOME_PRODUCT_CARD_ASSETS, HOME_PRODUCT_CARD_BG } from '../../constants/home-sections';
+import { HOME_PRODUCT_CARD_ASSETS } from '../../constants/home-sections';
 import type { CurrencyCode } from '../../lib/currency';
 import { closeCartDrawer } from '../../lib/cart-drawer';
 import { resolveColorSwatch } from '../../lib/resolve-color-swatch';
@@ -78,19 +78,18 @@ export function CartDrawerItemRow({
         <Link
           href={productHref}
           onClick={handleProductNavigate}
-          className="relative block shrink-0 self-stretch overflow-hidden"
+          className="relative block shrink-0 self-stretch overflow-hidden bg-white"
           style={{
             width: CART_DRAWER_ITEM_THUMB_SIZE_PX,
             minHeight: CART_DRAWER_ITEM_THUMB_SIZE_PX,
             borderRadius: CART_DRAWER_ITEM_THUMB_RADIUS_PX,
-            backgroundColor: HOME_PRODUCT_CARD_BG,
           }}
         >
           <Image
             src={imageSrc}
             alt={item.variant.product.title}
             fill
-            className="object-contain p-0.5"
+            className="object-cover"
             sizes={`${CART_DRAWER_ITEM_THUMB_SIZE_PX}px`}
             unoptimized
             onError={() => setImageError(true)}

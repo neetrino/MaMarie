@@ -99,6 +99,10 @@ export const PRODUCT_PDP_REVIEWS_PLACEHOLDER_MIN_HEIGHT_PX = 280;
 /** PDP action row — Add to cart / size guide height (`h-12`). */
 export const PRODUCT_PDP_ACTION_BUTTON_HEIGHT_PX = 48;
 
+/** Add-to-cart label — slightly larger than compact clay default (14px). */
+export const PRODUCT_PDP_ADD_TO_CART_FONT_SIZE_PX = 16;
+export const PRODUCT_PDP_ADD_TO_CART_LINE_HEIGHT_PX = 22;
+
 /** Mobile PDP — wishlist control overlaid on the main image (Kamancha-style). */
 export const PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_SIZE_PX = 44;
 export const PRODUCT_PDP_MOBILE_WISHLIST_BUTTON_INSET_PX = 12;
@@ -127,7 +131,7 @@ export const PRODUCT_PDP_ACTIONS_TOP_ROW_CLASS =
 export const PRODUCT_PDP_SIZE_GUIDE_ACTION_CLASS =
   'min-w-0 flex-1 lg:hidden';
 export const PRODUCT_PDP_ADD_TO_CART_BUTTON_CLASS =
-  'w-full rounded-full bg-brand-cart font-bold text-gray-900 transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 lg:flex-1';
+  'w-full gap-2 disabled:cursor-not-allowed lg:flex-1';
 
 /**
  * PDP image zoom modal — above header (80), bottom nav (70), cart (90),

@@ -33,7 +33,7 @@ function resolveSwipeDirection(start: TouchPoint, end: TouchPoint): 'previous' |
 
 /**
  * Card gallery controls — Main Variant images only.
- * Mobile: swipe + dots. Desktop: dots only (no arrows).
+ * Mobile: swipe between images. Desktop: no gallery chrome (first image).
  */
 export function HomeProductCardImageGallery({
   images,
@@ -91,46 +91,28 @@ export function HomeProductCardImageGallery({
     didSwipeRef.current = false;
   };
 
-  return (
-    <>
-      {productHref ? (
-        <Link
-          href={productHref}
-          aria-hidden
-          tabIndex={-1}
-          className="pointer-events-auto absolute inset-0 z-10 lg:hidden"
-          onFocus={onBeforeNavigate}
-          onPointerDown={onBeforeNavigate}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onClick={handleMobileLinkClick}
-        />
-      ) : (
-        <div
-          aria-hidden
-          className="pointer-events-auto absolute inset-0 z-10 lg:hidden"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        />
-      )}
+  if (!productHref) {
+    return (
+      <div
+        aria-hidden
+        className="pointer-events-auto absolute inset-0 z-10 lg:hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      />
+    );
+  }
 
-      <div className="pointer-events-none absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 gap-1.5">
-        {images.map((_, dotIndex) => (
-          <button
-            key={`dot-${dotIndex}`}
-            type="button"
-            aria-label={`Image ${dotIndex + 1}`}
-            className={`pointer-events-auto h-2 w-2 rounded-full ${
-              dotIndex === safeIndex ? 'bg-brand-pink' : 'bg-brand-pink/40'
-            }`}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onIndexChange(dotIndex);
-            }}
-          />
-        ))}
-      </div>
-    </>
+  return (
+    <Link
+      href={productHref}
+      aria-hidden
+      tabIndex={-1}
+      className="pointer-events-auto absolute inset-0 z-10 lg:hidden"
+      onFocus={onBeforeNavigate}
+      onPointerDown={onBeforeNavigate}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onClick={handleMobileLinkClick}
+    />
   );
 }

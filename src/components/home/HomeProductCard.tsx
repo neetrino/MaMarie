@@ -381,7 +381,7 @@ function HomeProductCardComponent({
       style={{ width: cardWidth, height: cardHeight, ...buildHomeProductCardCssVars(layoutWidthPx) }}
     >
       <div
-        className="home-product-card-surface relative h-full w-full overflow-visible"
+        className="home-product-card-surface relative h-full w-full overflow-hidden"
         style={{ borderRadius: lp(HOME_PRODUCT_CARD_RADIUS_PX) }}
       >
         <ProductCardStretchedLink
@@ -391,33 +391,21 @@ function HomeProductCardComponent({
         />
 
         <div className="home-product-card-image-wrap pointer-events-none absolute overflow-hidden">
-          <div className="absolute inset-0 block">
-            <div
-              className="pointer-events-none absolute relative max-w-none"
-              style={{
-                height: '133.2%',
-                width: '107.38%',
-                left: '-3.69%',
-                top: '-21.48%',
-              }}
-            >
-              {showProductImage && activeImage ? (
-                <Image
-                  src={activeImage}
-                  alt={product.title}
-                  fill
-                  priority={imagePriority}
-                  loading={imagePriority ? 'eager' : 'lazy'}
-                  sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
-                  className="object-contain"
-                  unoptimized
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
-              )}
-            </div>
-          </div>
+          {showProductImage && activeImage ? (
+            <Image
+              src={activeImage}
+              alt={product.title}
+              fill
+              priority={imagePriority}
+              loading={imagePriority ? 'eager' : 'lazy'}
+              sizes={`${lp(HOME_PRODUCT_CARD_IMAGE_WIDTH_PX)}px`}
+              className="object-cover"
+              unoptimized
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <ProductImagePlaceholder className="h-full w-full" aria-label={product.title} />
+          )}
           {hasMultipleImages ? (
             <div className="pointer-events-none absolute inset-0 z-10">
               <HomeProductCardImageGallery
