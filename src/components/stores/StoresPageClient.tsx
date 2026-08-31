@@ -113,7 +113,7 @@ export function StoresPageClient() {
   };
 
   const pageInsetClassName =
-    'max-lg:bg-[var(--stores-page-mobile-bg)] max-lg:px-[var(--stores-page-padding-x-mobile)] lg:bg-[var(--stores-page-bg)] lg:pl-[var(--stores-page-padding-left)] lg:pr-[var(--stores-page-padding-right)]';
+    'mobile-stores-page max-lg:bg-[var(--stores-page-mobile-bg)] max-lg:px-[var(--stores-page-padding-x-mobile)] lg:bg-[var(--stores-page-bg)] lg:pl-[var(--stores-page-padding-left)] lg:pr-[var(--stores-page-padding-right)]';
 
   if (loading) {
     return (

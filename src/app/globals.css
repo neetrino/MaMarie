@@ -624,6 +624,7 @@
   .layout-shell-mobile-bottom-clearance:has(.mobile-contact-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-products-catalog-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-product-page),
+  .layout-shell-mobile-bottom-clearance:has(.mobile-stores-page),
   .layout-shell-mobile-bottom-clearance:has(.order-page),
   .layout-shell-mobile-bottom-clearance:has(.checkout-page),
   .layout-shell-mobile-bottom-clearance:has(.mobile-legal-page) {
