@@ -222,7 +222,6 @@ export function ProductImageGallery({
             currentImageIndex={currentImageIndex}
             failedSources={failedSources}
             mainImageHeightPx={mainImageHeightPx}
-            imageAspectRatio={imageAspectRatio}
             onImageIndexChange={onImageIndexChange}
             onImageError={markFailed}
           />

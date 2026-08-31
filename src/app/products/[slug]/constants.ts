@@ -19,9 +19,9 @@ export const PRODUCT_PDP_THUMBNAIL_MIN_IMAGE_COUNT = 2;
 /** PDP gallery vertical thumbnail frame — brand blue. */
 export const PRODUCT_PDP_THUMBNAIL_BORDER_COLOR = PRODUCTS_CATALOG_FILTER_ACCENT;
 
-/** Matches active main image aspect once measured; falls back to square. */
+/** Thumbnail tiles — fixed square, same size for every photo. */
 export const PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS =
-  'relative shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
+  'relative aspect-square shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-300';
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS =
   'border-gray-200 hover:border-gray-300';
@@ -86,6 +86,10 @@ export const PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS =
 
 export const PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS =
   'w-[4.5rem] lg:w-full lg:snap-start';
+
+/** Fill the square frame so every thumb looks the same size. */
+export const PRODUCT_PDP_THUMBNAIL_IMAGE_CLASS =
+  'h-full w-full object-cover transition-transform duration-300';
 
 /** Read-only info attributes (e.g. material) — «Նյութ ' value». */
 export const PRODUCT_PDP_INFO_ATTRIBUTE_ROW_CLASS =

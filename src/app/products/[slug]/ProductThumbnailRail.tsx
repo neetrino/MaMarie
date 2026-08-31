@@ -7,6 +7,7 @@ import {
   PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS,
   PRODUCT_PDP_THUMBNAIL_FRAME_INACTIVE_CLASS,
   PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS,
+  PRODUCT_PDP_THUMBNAIL_IMAGE_CLASS,
   PRODUCT_PDP_THUMBNAIL_LIST_MOBILE_CLASS,
   PRODUCT_PDP_THUMBNAIL_RAIL_WRAPPER_CLASS,
 } from './constants';
@@ -16,7 +17,6 @@ interface ProductThumbnailRailProps {
   currentImageIndex: number;
   failedSources: Set<string>;
   mainImageHeightPx: number | null;
-  imageAspectRatio: number;
   onImageIndexChange: (index: number) => void;
   onImageError: (src: string) => void;
 }
@@ -26,7 +26,6 @@ export function ProductThumbnailRail({
   currentImageIndex,
   failedSources,
   mainImageHeightPx,
-  imageAspectRatio,
   onImageIndexChange,
   onImageError,
 }: ProductThumbnailRailProps) {
@@ -83,7 +82,6 @@ export function ProductThumbnailRail({
               ref={isActive ? activeThumbRef : undefined}
               type="button"
               onClick={() => onImageIndexChange(index)}
-              style={{ aspectRatio: String(imageAspectRatio) }}
               className={`${PRODUCT_PDP_THUMBNAIL_FRAME_BASE_CLASS} ${PRODUCT_PDP_THUMBNAIL_FRAME_SIZE_CLASS} ${
                 isActive
                   ? PRODUCT_PDP_THUMBNAIL_FRAME_ACTIVE_CLASS
@@ -96,7 +94,7 @@ export function ProductThumbnailRail({
                 <img
                   src={image}
                   alt=""
-                  className="h-full w-full object-contain transition-transform duration-300"
+                  className={PRODUCT_PDP_THUMBNAIL_IMAGE_CLASS}
                   loading="lazy"
                   decoding="async"
                   onError={() => onImageError(image)}

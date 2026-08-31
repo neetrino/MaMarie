@@ -35,9 +35,9 @@ export function ProductPageShell() {
         ) : (
           <div className="flex gap-6 items-start">
             <div className="flex flex-col gap-4 w-28 flex-shrink-0" aria-hidden>
-              <div className="aspect-[3/4] w-full rounded-lg bg-neutral-100" />
-              <div className="aspect-[3/4] w-full rounded-lg bg-neutral-100" />
-              <div className="aspect-[3/4] w-full rounded-lg bg-neutral-100" />
+              <div className="aspect-square w-full rounded-lg bg-neutral-100" />
+              <div className="aspect-square w-full rounded-lg bg-neutral-100" />
+              <div className="aspect-square w-full rounded-lg bg-neutral-100" />
             </div>
             <div className="flex-1">
               <div className="relative aspect-square w-full max-w-[560px] mx-auto lg:mx-0 rounded-lg bg-neutral-100" aria-hidden />
