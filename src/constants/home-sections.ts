@@ -37,9 +37,9 @@ export const BEST_PRODUCTS_GRID_OFFSET_TOP_PX = 100;
 export const BEST_PRODUCTS_CARD_GAP_PX = 8;
 export const BEST_PRODUCTS_CARD_COUNT = 4;
 
-/** Figma node `1:73` — product card (scaled to fit content row). */
+/** Figma node `352:645` — product card (scaled to fit content row). */
 export const HOME_PRODUCT_CARD_DESIGN_WIDTH_PX = 344;
-export const HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX = 371;
+export const HOME_PRODUCT_CARD_DESIGN_HEIGHT_PX = 497;
 export const HOME_PRODUCT_CARD_WIDTH_PX = homeSectionColumnWidthPx(
   BEST_PRODUCTS_CARD_COUNT,
   BEST_PRODUCTS_CARD_GAP_PX,
@@ -57,23 +57,25 @@ function scaleProductCardPx(value: number): number {
 export const HOME_PRODUCT_CARD_RADIUS_PX = scaleProductCardPx(30);
 export const HOME_PRODUCT_CARD_BG = '#f9e490';
 
-export const HOME_PRODUCT_CARD_IMAGE_LEFT_PX = scaleProductCardPx(22);
-export const HOME_PRODUCT_CARD_IMAGE_TOP_PX = scaleProductCardPx(-53);
-export const HOME_PRODUCT_CARD_IMAGE_WIDTH_PX = scaleProductCardPx(306);
-export const HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX = scaleProductCardPx(245);
-export const HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX = scaleProductCardPx(6);
-export const HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX = scaleProductCardPx(-71);
-export const HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX = scaleProductCardPx(338);
-export const HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX = scaleProductCardPx(270);
+/** Figma `352:672` — full-bleed product photo (object-cover). */
+export const HOME_PRODUCT_CARD_IMAGE_LEFT_PX = scaleProductCardPx(-8);
+export const HOME_PRODUCT_CARD_IMAGE_TOP_PX = scaleProductCardPx(-48);
+export const HOME_PRODUCT_CARD_IMAGE_WIDTH_PX = scaleProductCardPx(363);
+export const HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX = scaleProductCardPx(545);
+export const HOME_PRODUCT_CARD_IMAGE_HOVER_LEFT_PX = scaleProductCardPx(-24);
+export const HOME_PRODUCT_CARD_IMAGE_HOVER_TOP_PX = scaleProductCardPx(-66);
+export const HOME_PRODUCT_CARD_IMAGE_HOVER_WIDTH_PX = scaleProductCardPx(395);
+export const HOME_PRODUCT_CARD_IMAGE_HOVER_HEIGHT_PX = scaleProductCardPx(570);
 
+/** Figma `352:647` — white info panel. */
 export const HOME_PRODUCT_CARD_PANEL_WIDTH_PX = scaleProductCardPx(330);
-export const HOME_PRODUCT_CARD_PANEL_HEIGHT_PX = scaleProductCardPx(178);
-export const HOME_PRODUCT_CARD_PANEL_TOP_PX = scaleProductCardPx(186);
+export const HOME_PRODUCT_CARD_PANEL_HEIGHT_PX = scaleProductCardPx(170);
+export const HOME_PRODUCT_CARD_PANEL_TOP_PX = scaleProductCardPx(317);
 export const HOME_PRODUCT_CARD_PANEL_LEFT_COLUMN_WIDTH_PX = scaleProductCardPx(192);
 export const HOME_PRODUCT_CARD_PANEL_RADIUS_PX = scaleProductCardPx(25);
 
 export const HOME_PRODUCT_CARD_HEART_SIZE_PX = scaleProductCardPx(34);
-export const HOME_PRODUCT_CARD_HEART_TOP_PX = scaleProductCardPx(17);
+export const HOME_PRODUCT_CARD_HEART_TOP_PX = scaleProductCardPx(20);
 export const HOME_PRODUCT_CARD_HEART_RIGHT_PX = scaleProductCardPx(15);
 /** Figma `51:643` — mdi:heart-outline inactive fill. */
 export const HOME_PRODUCT_CARD_HEART_INACTIVE_FILL_OPACITY = 0.35;
@@ -95,7 +97,7 @@ export const HOME_PRODUCT_CARD_HOVER_EASING = 'cubic-bezier(0, 0, 0.58, 1)';
 export const HOME_PRODUCT_CARD_HOVER_BG = '#bbaa66';
 export const HOME_PRODUCT_CARD_LIFT_PX = scaleProductCardPx(18);
 
-export const HOME_PRODUCT_CARD_SIZES_TOP_PX = scaleProductCardPx(138);
+export const HOME_PRODUCT_CARD_SIZES_TOP_PX = scaleProductCardPx(275);
 export const HOME_PRODUCT_CARD_SIZE_BADGE_WIDTH_PX = scaleProductCardPx(46);
 export const HOME_PRODUCT_CARD_SIZE_BADGE_HEIGHT_PX = scaleProductCardPx(34);
 export const HOME_PRODUCT_CARD_SIZE_BADGE_RADIUS_PX = scaleProductCardPx(14);
@@ -111,8 +113,8 @@ export const HOME_PRODUCT_CARD_SIZE_INACTIVE_TEXT = '#555555';
 export const HOME_PRODUCT_CARD_SWATCH_SIZE_PX = 24;
 export const HOME_PRODUCT_CARD_SWATCH_GAP_PX = 8;
 
-export const HOME_PRODUCT_CARD_ACTIONS_GAP_PX = 66;
-export const HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX = 50;
+export const HOME_PRODUCT_CARD_ACTIONS_GAP_PX = 48;
+export const HOME_PRODUCT_CARD_ACTIONS_HOVER_GAP_PX = 36;
 
 export const HOME_PRODUCT_CARD_CART_SIZE_PX = 56;
 export const HOME_PRODUCT_CARD_CART_SIZE_HOVER_PX = 69;
