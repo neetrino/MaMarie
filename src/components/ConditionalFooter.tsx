@@ -8,7 +8,11 @@ import { DesktopFluidFrame } from './DesktopFluidFrame';
 import { Footer } from './Footer';
 import { LazyWhenVisible } from './LazyWhenVisible';
 
-export function ConditionalFooter() {
+interface ConditionalFooterProps {
+  storesPageEnabled?: boolean;
+}
+
+export function ConditionalFooter({ storesPageEnabled = true }: ConditionalFooterProps) {
   const pathname = usePathname();
   if (
     pathname?.startsWith('/supersudo') ||
@@ -36,6 +40,7 @@ export function ConditionalFooter() {
           <Footer
             topGapPx={isAuthFormPage ? 0 : undefined}
             gapBgColor={isProfilePage ? PROFILE_DESKTOP_PAGE_BG : undefined}
+            storesPageEnabled={storesPageEnabled}
           />
         </LazyWhenVisible>
       </div>

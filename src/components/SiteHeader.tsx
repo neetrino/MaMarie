@@ -19,7 +19,7 @@ import {
   HEADER_PILL_APPEAR_DURATION_MS,
   HEADER_PILL_SHELL_HEIGHT_PX,
 } from '../constants/header';
-import { MOBILE_MENU_NAV_LINKS, type NavLinkItem } from '../constants/nav-links';
+import { type NavLinkItem } from '../constants/nav-links';
 import { BrandLogoLink } from './BrandLogoLink';
 import { DesktopFluidFrame } from './DesktopFluidFrame';
 import {
@@ -37,6 +37,7 @@ import { useHeaderScrolled } from './header/useHomeHeaderScrolled';
 
 export interface SiteHeaderProps {
   navLinks: readonly NavLinkItem[];
+  mobileNavLinks: readonly NavLinkItem[];
 }
 
 const headerPillTransitionStyle = {
@@ -151,7 +152,7 @@ function MobileHeaderBar({
       <MobileMenuModal
         isOpen={menuOpen}
         onClose={onMenuClose}
-        navLinks={MOBILE_MENU_NAV_LINKS}
+        navLinks={navLinks}
         menuId={menuId}
       />
     </>
@@ -198,7 +199,7 @@ function DesktopHeaderBar({
   );
 }
 
-export function SiteHeader({ navLinks }: SiteHeaderProps) {
+export function SiteHeader({ navLinks, mobileNavLinks }: SiteHeaderProps) {
   const isScrolled = useHeaderScrolled();
   const [menuOpen, setMenuOpen] = useState(false);
   const [pillFrozen, setPillFrozen] = useState<boolean | null>(null);
@@ -235,7 +236,7 @@ export function SiteHeader({ navLinks }: SiteHeaderProps) {
     >
       <MobileHeaderBar
         showPill={showPill}
-        navLinks={navLinks}
+        navLinks={mobileNavLinks}
         menuOpen={menuOpen}
         menuId={menuId}
         onMenuToggle={handleMenuToggle}

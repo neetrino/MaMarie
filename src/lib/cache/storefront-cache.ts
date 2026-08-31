@@ -1,5 +1,6 @@
 import { cacheService } from "@/lib/services/cache.service";
 import { invalidateServerReadCachePrefix } from "@/lib/cache/server-read-cache";
+import { invalidateStoresPageEnabledCache } from "@/lib/settings/stores-page-enabled";
 import { logger } from "@/lib/utils/logger";
 
 /** Next.js `unstable_cache` / `revalidateTag` tag for catalog product list + filters. */
@@ -130,6 +131,7 @@ export async function invalidateStorefrontAfterAdminSettingsUpdate(): Promise<vo
     cacheService.deletePattern("product:related:*"),
   ]);
   await invalidateStorefrontProductRelatedCaches();
+  invalidateStoresPageEnabledCache();
 }
 
 /** Invalidate split PDP caches (visual / details / related). */

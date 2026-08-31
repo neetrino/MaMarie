@@ -4,6 +4,11 @@ import {
   invalidateServerReadCache,
   withServerReadCache,
 } from "@/lib/cache/server-read-cache";
+import {
+  STORES_PAGE_ENABLED_DEFAULT,
+  STORES_PAGE_ENABLED_SETTING_KEY,
+  invalidateStoresPageEnabledCache,
+} from "@/lib/settings/stores-page-enabled";
 
 const SETTINGS_CACHE_TTL_MS = 60_000;
 
@@ -40,7 +45,14 @@ class AdminSettingsService {
       const settings = await db.settings.findMany({
         where: {
           key: {
-            in: ['globalDiscount', 'categoryDiscounts', 'brandDiscounts', 'defaultCurrency', 'currencyRates'],
+            in: [
+              'globalDiscount',
+              'categoryDiscounts',
+              'brandDiscounts',
+              'defaultCurrency',
+              'currencyRates',
+              STORES_PAGE_ENABLED_SETTING_KEY,
+            ],
           },
         },
         select: { key: true, value: true },
@@ -51,6 +63,9 @@ class AdminSettingsService {
       const brandDiscountsSetting = settings.find((s) => s.key === 'brandDiscounts');
       const defaultCurrencySetting = settings.find((s) => s.key === 'defaultCurrency');
       const currencyRatesSetting = settings.find((s) => s.key === 'currencyRates');
+      const storesPageEnabledSetting = settings.find(
+        (s) => s.key === STORES_PAGE_ENABLED_SETTING_KEY,
+      );
 
       return {
         globalDiscount: globalDiscountSetting ? Number(globalDiscountSetting.value) : 0,
@@ -60,6 +75,10 @@ class AdminSettingsService {
         currencyRates: currencyRatesSetting
           ? (currencyRatesSetting.value as Record<string, number>)
           : { ...DEFAULT_CURRENCY_RATES },
+        storesPageEnabled:
+          storesPageEnabledSetting != null
+            ? Boolean(storesPageEnabledSetting.value)
+            : STORES_PAGE_ENABLED_DEFAULT,
       };
     });
   }
@@ -155,6 +174,24 @@ class AdminSettingsService {
         },
       });
       logger.debug('✅ [ADMIN SERVICE] Currency rates updated:', data.currencyRates);
+    }
+
+    if (data.storesPageEnabled !== undefined) {
+      const storesPageEnabledValue = Boolean(data.storesPageEnabled);
+      await db.settings.upsert({
+        where: { key: STORES_PAGE_ENABLED_SETTING_KEY },
+        update: {
+          value: storesPageEnabledValue,
+          updatedAt: new Date(),
+        },
+        create: {
+          key: STORES_PAGE_ENABLED_SETTING_KEY,
+          value: storesPageEnabledValue,
+          description: 'Show partner stores (Խանութներ) page on the storefront',
+        },
+      });
+      invalidateStoresPageEnabledCache();
+      logger.debug('✅ [ADMIN SERVICE] Stores page enabled updated:', storesPageEnabledValue);
     }
 
     invalidateServerReadCache('admin:settings:full');

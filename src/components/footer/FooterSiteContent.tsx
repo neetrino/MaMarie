@@ -19,9 +19,16 @@ import { FooterBrandColumn } from './FooterBrandColumn';
 import { FooterContactColumn } from './FooterContactColumn';
 import { FooterLinksColumn } from './FooterLinksColumn';
 
-export function FooterSiteContent() {
+interface FooterSiteContentProps {
+  storesPageEnabled?: boolean;
+}
+
+export function FooterSiteContent({ storesPageEnabled = true }: FooterSiteContentProps) {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
+  const companyLinks = storesPageEnabled
+    ? FOOTER_COMPANY_LINKS
+    : FOOTER_COMPANY_LINKS.filter((link) => link.href !== '/stores');
 
   return (
     <div className="relative z-10 flex w-full flex-col items-center" style={{ gap: FOOTER_CONTENT_GAP_PX }}>
@@ -29,7 +36,7 @@ export function FooterSiteContent() {
         <FooterBrandColumn />
         <FooterLinksColumn
           titleKey="common.footer.companyTitle"
-          links={FOOTER_COMPANY_LINKS}
+          links={companyLinks}
           widthPx={FOOTER_COMPANY_COLUMN_WIDTH_PX}
         />
         <FooterLinksColumn

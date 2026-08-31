@@ -7,7 +7,12 @@ import { ConditionalMobileBottomNav } from '../components/ConditionalMobileBotto
 import { ConditionalHeader } from '../components/ConditionalHeader';
 import { ConditionalFooter } from '../components/ConditionalFooter';
 import { MainContent } from '../components/MainContent';
-import { NAV_LINKS } from '../constants/nav-links';
+import {
+  filterNavLinksByStoresPageEnabled,
+  MOBILE_MENU_NAV_LINKS,
+  NAV_LINKS,
+} from '../constants/nav-links';
+import { getStoresPageEnabled } from '../lib/settings/stores-page-enabled';
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
@@ -47,21 +52,28 @@ export const viewport: Viewport = {
   interactiveWidget: 'resizes-content',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const storesPageEnabled = await getStoresPageEnabled();
+  const navLinks = filterNavLinksByStoresPageEnabled(NAV_LINKS, storesPageEnabled);
+  const mobileNavLinks = filterNavLinksByStoresPageEnabled(
+    MOBILE_MENU_NAV_LINKS,
+    storesPageEnabled,
+  );
+
   return (
     <html lang="hy" className="h-full overflow-x-clip" suppressHydrationWarning>
       <body
         className={`${montserrat.variable} ${notoSansArmenian.variable} font-sans bg-white text-gray-900 antialiased min-h-full`}
       >        <Suspense fallback={null}>
           <ClientProviders>
-            <ConditionalHeader navLinks={NAV_LINKS} />
+            <ConditionalHeader navLinks={navLinks} mobileNavLinks={mobileNavLinks} />
             <div className="layout-shell-mobile-bottom-clearance flex min-h-screen flex-col max-lg:min-w-0 max-lg:max-w-full max-lg:overflow-x-hidden lg:pb-0">
               <MainContent>{children}</MainContent>
-              <ConditionalFooter />
+              <ConditionalFooter storesPageEnabled={storesPageEnabled} />
             </div>
             <ConditionalMobileBottomNav />
           </ClientProviders>
