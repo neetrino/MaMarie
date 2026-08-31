@@ -6,7 +6,6 @@ import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 import {
   HOME_PRODUCT_CARD_ASSETS,
-  HOME_PRODUCT_CARD_BG,
   HOME_PRODUCT_CARD_CART_BG,
   HOME_PRODUCT_CARD_CART_ICON_SIZE_HOVER_PX,
   HOME_PRODUCT_CARD_COMPARE_COLOR,
@@ -169,18 +168,16 @@ function HomeProductCardListRowComponent({
       }}
     >
       <div
-        className="flex h-full w-full overflow-hidden border-solid"
+        className="flex h-full w-full overflow-hidden border-solid border-gray-200"
         style={{
           borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
           borderWidth: PRODUCTS_CATALOG_LIST_ROW_BORDER_WIDTH_PX,
-          borderColor: HOME_PRODUCT_CARD_BG,
         }}
       >
         <div
-          className="relative shrink-0 overflow-hidden"
+          className="relative shrink-0 overflow-hidden bg-white"
           style={{
             width: PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX,
-            backgroundColor: HOME_PRODUCT_CARD_BG,
             borderRadius: PRODUCTS_CATALOG_LIST_ROW_RADIUS_PX,
           }}
         >
@@ -196,7 +193,7 @@ function HomeProductCardListRowComponent({
                 priority={imagePriority}
                 loading={imagePriority ? 'eager' : 'lazy'}
                 sizes={`${PRODUCTS_CATALOG_LIST_IMAGE_WIDTH_PX}px`}
-                className="object-contain"
+                className="object-cover"
                 unoptimized
                 onError={() => setImageError(true)}
               />
