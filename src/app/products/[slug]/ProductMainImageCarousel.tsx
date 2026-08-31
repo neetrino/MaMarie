@@ -39,8 +39,6 @@ export function ProductMainImageCarousel({
   const currentIndexRef = useRef(currentImageIndex);
   const releaseTimerRef = useRef<number | null>(null);
 
-  currentIndexRef.current = currentImageIndex;
-
   const lockProgrammaticScroll = () => {
     isProgrammaticScrollRef.current = true;
     if (releaseTimerRef.current !== null) {
@@ -73,6 +71,7 @@ export function ProductMainImageCarousel({
   };
 
   useEffect(() => {
+    currentIndexRef.current = currentImageIndex;
     syncScrollToIndex(currentImageIndex, 'smooth');
 
     return () => {
