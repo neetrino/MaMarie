@@ -2,7 +2,6 @@ import { BRAND_COLORS } from './brand';
 import { HOME_PRODUCT_CARD_ASSETS } from './home-sections';
 import { resolveHomeProductCardHeightPx, homeProductCardLayoutPx } from '../lib/home-product-card-layout';
 import {
-  HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX,
   HOME_PRODUCT_CARD_IMAGE_TOP_PX,
 } from './home-sections';
 import { MOBILE_BOTTOM_NAV_SHELL_HEIGHT_PX } from './mobile-bottom-nav';
@@ -91,7 +90,7 @@ export const MOBILE_HOME_SECTION_TITLE_SIZE_PX = 35;
 export const MOBILE_HOME_SECTION_TITLE_LINE_HEIGHT_PX = 45;
 export const MOBILE_HOME_SECTION_TITLE_COLOR = 'rgba(0, 0, 0, 0.72)';
 /** Space between section heading row and product carousel. */
-export const MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX = 1;
+export const MOBILE_HOME_SECTION_TITLE_TO_CARDS_GAP_PX = 0;
 /** Figma `74:789` — white see-all pill next to section title. */
 export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_SIZE_PX = 40;
 export const MOBILE_HOME_SECTION_SEE_ALL_BUTTON_RADIUS_PX = 20;
@@ -100,16 +99,10 @@ export const MOBILE_HOME_SECTION_SEE_ALL_ARROW_SIZE_PX = 20;
 
 export const MOBILE_HOME_PRODUCT_CARD_WIDTH_PX = 240;
 
-/** Product photo bleed above card — matches HomeProductCard image frame offsets. */
-const HOME_PRODUCT_CARD_IMAGE_INNER_TOP_BLEED_RATIO = 0.2148;
-
+/** Product photo bleed above card — only the negative image-top offset. */
 function mobileHomeProductCardTopBleedPx(widthPx: number): number {
   const imageWrapTopPx = homeProductCardLayoutPx(HOME_PRODUCT_CARD_IMAGE_TOP_PX, widthPx);
-  const imageWrapHeightPx = homeProductCardLayoutPx(HOME_PRODUCT_CARD_IMAGE_HEIGHT_PX, widthPx);
-
-  return Math.ceil(
-    Math.abs(imageWrapTopPx) + imageWrapHeightPx * HOME_PRODUCT_CARD_IMAGE_INNER_TOP_BLEED_RATIO,
-  );
+  return Math.ceil(Math.abs(Math.min(0, imageWrapTopPx)));
 }
 
 export const MOBILE_HOME_PRODUCT_CARD_TOP_BLEED_PX = mobileHomeProductCardTopBleedPx(
@@ -132,6 +125,12 @@ export const MOBILE_HOME_TESTIMONIAL_CARD_RADIUS_PX = 30;
 export const MOBILE_HOME_TESTIMONIAL_BLUE_BG = '#c2ddf9';
 export const MOBILE_HOME_TESTIMONIAL_YELLOW_BG = BRAND_COLORS.yellow;
 export const MOBILE_HOME_TESTIMONIAL_PROMO_BG = BRAND_COLORS.pink;
+
+/** Copyright under mobile home banners — mirrors site footer copy. */
+export const MOBILE_HOME_COPYRIGHT_PADDING_TOP_PX = 28;
+export const MOBILE_HOME_COPYRIGHT_FONT_SIZE_PX = 12;
+export const MOBILE_HOME_COPYRIGHT_LINE_HEIGHT_PX = 18;
+export const MOBILE_HOME_COPYRIGHT_COLOR = 'rgba(29, 28, 22, 0.55)';
 
 export const MOBILE_HOME_ASSETS = {
   /** Figma `74:750` — material-symbols:search-rounded. */

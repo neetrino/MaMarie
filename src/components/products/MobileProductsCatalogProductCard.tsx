@@ -186,28 +186,54 @@ function MobileProductsCatalogProductCardComponent({
           paddingRight: lp(MOBILE_PRODUCTS_CATALOG_CARD_CONTENT_PADDING_X_PX),
         }}
       >
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <p
-              className="block truncate font-medium"
-              style={{
-                color: MOBILE_PRODUCTS_CATALOG_CARD_TEXT_DARK,
-                fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_TITLE_SIZE_PX),
-                lineHeight: `${lp(MOBILE_PRODUCTS_CATALOG_CARD_TITLE_LINE_HEIGHT_PX)}px`,
-              }}
-            >
-              {product.title}
-            </p>
-            <p
-              className="truncate font-normal"
-              style={{
-                color: MOBILE_PRODUCTS_CATALOG_CARD_TEXT_MUTED,
-                fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_SUBTITLE_SIZE_PX),
-                lineHeight: `${lp(MOBILE_PRODUCTS_CATALOG_CARD_SUBTITLE_LINE_HEIGHT_PX)}px`,
-              }}
-            >
-              {subtitle}
-            </p>
+        <p
+          className="block truncate font-medium"
+          style={{
+            color: MOBILE_PRODUCTS_CATALOG_CARD_TEXT_DARK,
+            fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_TITLE_SIZE_PX),
+            lineHeight: `${lp(MOBILE_PRODUCTS_CATALOG_CARD_TITLE_LINE_HEIGHT_PX)}px`,
+          }}
+        >
+          {product.title}
+        </p>
+
+        <p
+          className="truncate font-normal"
+          style={{
+            color: MOBILE_PRODUCTS_CATALOG_CARD_TEXT_MUTED,
+            fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_SUBTITLE_SIZE_PX),
+            lineHeight: `${lp(MOBILE_PRODUCTS_CATALOG_CARD_SUBTITLE_LINE_HEIGHT_PX)}px`,
+          }}
+        >
+          {subtitle}
+        </p>
+
+        <MobileProductsCatalogColorSwatches
+          colors={product.colors}
+          layoutWidthPx={cardWidthPx}
+        />
+
+        <div
+          className="flex items-center justify-between gap-2"
+          style={{ marginTop: lp(4) }}
+        >
+          <div
+            className="flex min-w-0 items-center"
+            style={{
+              gap: lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_STAR_TEXT_GAP_PX),
+              color: MOBILE_PRODUCTS_CATALOG_CARD_RATING_COLOR,
+              fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_SIZE_PX),
+              lineHeight: `${lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_LINE_HEIGHT_PX)}px`,
+            }}
+          >
+            <Image
+              src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.star}
+              alt=""
+              width={lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_STAR_SIZE_PX)}
+              height={lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_STAR_SIZE_PX)}
+              className="shrink-0"
+            />
+            <span className="font-normal">{ratingLabel}</span>
           </div>
 
           <div className="shrink-0 text-right">
@@ -234,31 +260,6 @@ function MobileProductsCatalogProductCardComponent({
               </p>
             ) : null}
           </div>
-        </div>
-
-        <MobileProductsCatalogColorSwatches
-          colors={product.colors}
-          layoutWidthPx={cardWidthPx}
-        />
-
-        <div
-          className="flex items-center"
-          style={{
-            marginTop: lp(6),
-            gap: lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_STAR_TEXT_GAP_PX),
-            color: MOBILE_PRODUCTS_CATALOG_CARD_RATING_COLOR,
-            fontSize: lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_SIZE_PX),
-            lineHeight: `${lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_LINE_HEIGHT_PX)}px`,
-          }}
-        >
-          <Image
-            src={MOBILE_PRODUCTS_CATALOG_CARD_ASSETS.star}
-            alt=""
-            width={lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_STAR_SIZE_PX)}
-            height={lp(MOBILE_PRODUCTS_CATALOG_CARD_RATING_STAR_SIZE_PX)}
-            className="shrink-0"
-          />
-          <span className="font-normal">{ratingLabel}</span>
         </div>
       </div>
 

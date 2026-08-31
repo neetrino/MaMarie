@@ -12,7 +12,7 @@ interface MobileProductsCatalogProductGridProps {
   addToCartLabel: string;
 }
 
-/** Figma mobile shop — two-column product grid with yellow catalog cards. */
+/** Mobile shop — two-column product grid matching wishlist card layout. */
 export function MobileProductsCatalogProductGrid({
   products,
   addToCartLabel,

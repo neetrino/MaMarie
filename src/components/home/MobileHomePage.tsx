@@ -8,6 +8,7 @@ import {
 } from '../../constants/mobile-home';
 import type { HomeProductCardData } from './HomeProductCard';
 import { MobileHomeHero } from './mobile/MobileHomeHero';
+import { MobileHomeCopyright } from './mobile/MobileHomeCopyright';
 import { MobileHomeProductSection } from './mobile/MobileHomeProductSection';
 import { MobileHomeTestimonialsCarousel } from './mobile/MobileHomeTestimonialsCarousel';
 
@@ -16,9 +17,6 @@ interface MobileHomePageProps {
 }
 
 export function MobileHomePage({ products }: MobileHomePageProps) {
-  const firstRow = products.slice(0, 3);
-  const secondRow = products.length > 3 ? products.slice(3) : products.slice(0, 3);
-
   return (
     <div
       className="mobile-home-page w-full max-w-full overflow-x-hidden lg:hidden"
@@ -34,9 +32,11 @@ export function MobileHomePage({ products }: MobileHomePageProps) {
           paddingBottom: MOBILE_HOME_BOTTOM_CONTENT_PADDING_PX,
         }}
       >
-        <MobileHomeProductSection products={firstRow} />
-        <MobileHomeTestimonialsCarousel />
-        <MobileHomeProductSection products={secondRow} />
+        <MobileHomeProductSection products={products} />
+        <div className="flex flex-col">
+          <MobileHomeTestimonialsCarousel />
+          <MobileHomeCopyright />
+        </div>
       </div>
     </div>
   );
