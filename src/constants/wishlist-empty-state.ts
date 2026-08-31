@@ -6,11 +6,11 @@ import {
 import { PRODUCTS_CATALOG_CARD_COLUMN_GAP_PX } from './products-catalog';
 import { resolveHomeProductCardHeightPx } from '../lib/home-product-card-layout';
 
-/** Figma `66:506` — empty wishlist illustration width (px). */
-export const WISHLIST_EMPTY_ILLUSTRATION_WIDTH_PX = 328;
+/** Empty wishlist illustration — slightly smaller than Figma `66:506`. */
+export const WISHLIST_EMPTY_ILLUSTRATION_WIDTH_PX = 260;
 
-/** Figma `66:506` — empty wishlist illustration height (px). */
-export const WISHLIST_EMPTY_ILLUSTRATION_HEIGHT_PX = 299;
+/** Empty wishlist illustration height (px). */
+export const WISHLIST_EMPTY_ILLUSTRATION_HEIGHT_PX = 237;
 
 /** Figma `66:505`→`66:507` — gap between illustration and copy block (px). */
 export const WISHLIST_EMPTY_ILLUSTRATION_TO_COPY_GAP_PX = 16;
@@ -52,7 +52,7 @@ export const WISHLIST_EMPTY_CTA_ARROW_SIZE_PX = 20;
 export const WISHLIST_EMPTY_SECTION_PADDING_TOP_PX = 0;
 
 /** Gap below page title when wishlist is empty (px). */
-export const WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX = 16;
+export const WISHLIST_EMPTY_TITLE_MARGIN_BOTTOM_PX = 4;
 
 /** Wishlist page title — pink section style, slightly smaller than best products (px). */
 export const WISHLIST_PAGE_TITLE_FONT_SIZE_PX = 40;
@@ -63,7 +63,7 @@ export const WISHLIST_PAGE_HEADING_MIN_HEIGHT_PX = 52;
 export const WISHLIST_PAGE_MOBILE_TITLE_FONT_SIZE_PX = 26;
 export const WISHLIST_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX = 32;
 export const WISHLIST_PAGE_MOBILE_TITLE_MAX_LINES = 2;
-export const WISHLIST_PAGE_MOBILE_HEADING_MIN_HEIGHT_PX = 78;
+export const WISHLIST_PAGE_MOBILE_HEADING_MIN_HEIGHT_PX = 40;
 
 /** Tailwind `max-w-7xl` (1280) minus `lg:px-8` horizontal padding (32×2). */
 export const WISHLIST_PAGE_CONTENT_WIDTH_PX = 1280 - 64;
