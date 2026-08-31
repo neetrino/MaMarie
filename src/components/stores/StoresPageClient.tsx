@@ -27,6 +27,7 @@ import {
   STORES_PAGE_HORIZONTAL_PADDING_LEFT_PX,
   STORES_PAGE_HORIZONTAL_PADDING_RIGHT_PX,
   STORES_PAGE_MAX_WIDTH_PX,
+  STORES_PAGE_MOBILE_BG,
   STORES_PAGE_MOBILE_PADDING_PX,
   STORES_PAGE_MOBILE_TITLE_FONT_SIZE_PX,
   STORES_PAGE_MOBILE_TITLE_LINE_HEIGHT_PX,
@@ -103,15 +104,16 @@ export function StoresPageClient() {
   );
 
   const pageInsetStyle = {
-    backgroundColor: STORES_PAGE_BG,
     maxWidth: STORES_PAGE_MAX_WIDTH_PX,
+    ['--stores-page-bg' as string]: STORES_PAGE_BG,
+    ['--stores-page-mobile-bg' as string]: STORES_PAGE_MOBILE_BG,
     ['--stores-page-padding-left' as string]: `${STORES_PAGE_HORIZONTAL_PADDING_LEFT_PX}px`,
     ['--stores-page-padding-right' as string]: `${STORES_PAGE_HORIZONTAL_PADDING_RIGHT_PX}px`,
     ['--stores-page-padding-x-mobile' as string]: `${STORES_PAGE_MOBILE_PADDING_PX}px`,
   };
 
   const pageInsetClassName =
-    'max-lg:px-[var(--stores-page-padding-x-mobile)] lg:pl-[var(--stores-page-padding-left)] lg:pr-[var(--stores-page-padding-right)]';
+    'max-lg:bg-[var(--stores-page-mobile-bg)] max-lg:px-[var(--stores-page-padding-x-mobile)] lg:bg-[var(--stores-page-bg)] lg:pl-[var(--stores-page-padding-left)] lg:pr-[var(--stores-page-padding-right)]';
 
   if (loading) {
     return (

@@ -17,18 +17,19 @@ export const NAV_LINKS: readonly NavLinkItem[] = [
   { href: '/contact', labelKey: 'contact' },
 ] as const;
 
-/** Burger menu — Home & Shop are on the mobile bottom nav. */
+/** Burger menu — Home is on the mobile bottom nav. */
 export const MOBILE_MENU_NAV_LINKS: readonly NavLinkItem[] = [
+  { href: '/products', labelKey: 'catalog' },
   { href: '/about', labelKey: 'about' },
   { href: '/stores', labelKey: 'stores' },
   { href: '/contact', labelKey: 'contact' },
   { href: '/legal', labelKey: 'policy' },
 ] as const;
 
-/** Mobile menu bottom CTA — label from `common.buttons.shopNow`. */
+/** Mobile menu bottom CTA — label from `common.buttons.login`. */
 export const MOBILE_MENU_CTA = {
-  href: '/products',
-  translationKey: 'common.buttons.shopNow',
+  href: '/login',
+  translationKey: 'common.buttons.login',
 } as const;
 
 /** Maps nav item to translation path in locale files. */
