@@ -57,8 +57,10 @@
   },
   "payment": {
     "cashOnDelivery": "Наличными при доставке",
+    "cashOnPickup": "Наличная оплата",
     "cashShort": "Наличные",
     "cashOnDeliveryDescription": "Оплатите при получении заказа",
+    "cashOnPickupDescription": "Оплатите при самовывозе заказа из магазина",
     "idram": "Idram",
     "idramDescription": "Оплатите кошельком Idram или картой",
     "card": "Картой",
@@ -123,6 +125,7 @@
     "cvvRequired": "CVV обязателен",
     "cardHolderNameRequired": "Имя держателя карты обязательно",
     "fillShippingAddress": "Пожалуйста, заполните все поля адреса доставки",
+    "pickupCashOnly": "При самовывозе доступна только оплата наличными",
     "cartEmpty": "Корзина пуста",
     "failedToLoadCart": "Не удалось загрузить корзину",
     "failedToCreateOrder": "Не удалось создать заказ. Пожалуйста, попробуйте снова."

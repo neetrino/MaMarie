@@ -57,8 +57,10 @@
   },
   "payment": {
     "cashOnDelivery": "Cash on Delivery",
+    "cashOnPickup": "Cash payment",
     "cashShort": "Cash",
     "cashOnDeliveryDescription": "Pay when you receive the order",
+    "cashOnPickupDescription": "Pay when you pick up your order at the store",
     "idram": "Idram",
     "idramDescription": "Pay with Idram wallet or card",
     "card": "By card",
@@ -123,6 +125,7 @@
     "cvvRequired": "CVV is required",
     "cardHolderNameRequired": "Card holder name is required",
     "fillShippingAddress": "Please fill in all shipping address fields",
+    "pickupCashOnly": "Store pickup is available with cash payment only",
     "cartEmpty": "Cart is empty",
     "failedToLoadCart": "Failed to load cart",
     "failedToCreateOrder": "Failed to create order. Please try again."

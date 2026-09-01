@@ -28,7 +28,6 @@ export function useCheckout() {
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
 
-  const paymentMethods = usePaymentMethods();
   const checkoutSchema = useCheckoutSchema();
 
   const {
@@ -60,6 +59,8 @@ export function useCheckout() {
   const cashChangeFor = watch('cashChangeFor');
   const shippingMethod = watch('shippingMethod');
   const shippingCity = watch('shippingCity');
+
+  const paymentMethods = usePaymentMethods(shippingMethod);
 
   const { deliveryPrice, loadingDeliveryPrice } = useDeliveryPrice(shippingMethod, shippingCity);
   const { cart, loading, fetchCart, setCart } = useCart(isLoggedIn);
