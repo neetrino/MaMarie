@@ -10,15 +10,20 @@ export interface PaymentMethod {
   logo: string | null;
 }
 
-export function usePaymentMethods(): PaymentMethod[] {
+export function usePaymentMethods(shippingMethod: 'pickup' | 'delivery'): PaymentMethod[] {
   const { t } = useTranslation();
+  const isPickup = shippingMethod === 'pickup';
 
   return [
     {
       id: 'cash_on_delivery',
-      name: t('checkout.payment.cashOnDelivery'),
+      name: isPickup
+        ? t('checkout.payment.cashOnPickup')
+        : t('checkout.payment.cashOnDelivery'),
       shortName: t('checkout.payment.cashShort'),
-      description: t('checkout.payment.cashOnDeliveryDescription'),
+      description: isPickup
+        ? t('checkout.payment.cashOnPickupDescription')
+        : t('checkout.payment.cashOnDeliveryDescription'),
       logo: null,
     },
     {

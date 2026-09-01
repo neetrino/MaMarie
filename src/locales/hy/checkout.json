@@ -57,8 +57,10 @@
   },
   "payment": {
     "cashOnDelivery": "Կանխիկ առաքման պահին",
+    "cashOnPickup": "Կանխիկ վճարում",
     "cashShort": "Կանխիկ",
     "cashOnDeliveryDescription": "Վճարեք պատվերը ստանալիս:",
+    "cashOnPickupDescription": "Վճարեք պատվերը խանութից վերցնելիս",
     "idram": "Idram",
     "idramDescription": "Վճարեք Idram դրամապանակով կամ քարտով",
     "card": "Քարտով",
@@ -123,6 +125,7 @@
     "cvvRequired": "CVV-ն պարտադիր է",
     "cardHolderNameRequired": "Քարտի տիրոջ անունը պարտադիր է",
     "fillShippingAddress": "Խնդրում ենք լրացնել բոլոր առաքման հասցեի դաշտերը",
+    "pickupCashOnly": "Խանութից վերցնելիս հասանելի է միայն կանխիկ վճարում",
     "cartEmpty": "Զամբյուղը դատարկ է",
     "failedToLoadCart": "Չհաջողվեց բեռնել զամբյուղը",
     "failedToCreateOrder": "Չհաջողվեց ստեղծել պատվերը: Խնդրում ենք կրկին փորձել:"

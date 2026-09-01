@@ -221,7 +221,7 @@ export function ShippingAddressModal({
               {paymentMethod === 'cash_on_delivery' && (
                 <div className={`border border-green-200 bg-green-50 p-4 ${CHECKOUT_FORM_ALERT_CLASS}`}>
                   <p className="text-sm text-green-800">
-                    <strong>{t('checkout.payment.cashOnDelivery')}:</strong>{' '}
+                    <strong>{t('checkout.payment.cashOnPickup')}:</strong>{' '}
                     {t('checkout.messages.cashOnDeliveryPickup')}
                   </p>
                 </div>
