@@ -1,15 +1,17 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { ImageResponse } from 'next/og';
-import { BRAND_ASSETS } from '../constants/brand';
+import { BRAND_ASSETS, BRAND_COLORS } from '../constants/brand';
 
 const OG_IMAGE_WIDTH_PX = 1200;
 const OG_IMAGE_HEIGHT_PX = 630;
-const OG_LOGO_DISPLAY_PX = 500;
+/** Large centered wordmark — leaves soft sky padding like the share preview. */
+const OG_LOGO_WIDTH_PX = 920;
+const OG_LOGO_HEIGHT_PX = 518;
 
-/** White canvas with centered navbar wordmark — shared by Open Graph + Twitter images. */
+/** Soft sky canvas with large clay wordmark — shared by Open Graph + Twitter images. */
 export async function createBrandOgImageResponse(): Promise<ImageResponse> {
-  const logoPath = path.join(process.cwd(), 'public', BRAND_ASSETS.logoNavbar);
+  const logoPath = path.join(process.cwd(), 'public', BRAND_ASSETS.logoOg);
   const logoBuffer = await readFile(logoPath);
   const logoSrc = `data:image/png;base64,${logoBuffer.toString('base64')}`;
 
@@ -22,14 +24,14 @@ export async function createBrandOgImageResponse(): Promise<ImageResponse> {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#ffffff',
+          backgroundColor: BRAND_COLORS.sky,
         }}
       >
         <img
           src={logoSrc}
           alt=""
-          width={OG_LOGO_DISPLAY_PX}
-          height={OG_LOGO_DISPLAY_PX}
+          width={OG_LOGO_WIDTH_PX}
+          height={OG_LOGO_HEIGHT_PX}
           style={{ objectFit: 'contain' }}
         />
       </div>
