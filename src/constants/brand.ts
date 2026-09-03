@@ -31,6 +31,8 @@ export const BRAND_ASSETS = {
   logoNavbarMobile: '/assets/brand/mobile/logo-navbar.png',
   /** Admin sidebar — stacked ma/marie clay wordmark. */
   logoAdminSidebar: '/assets/brand/logo-admin-sidebar.webp',
+  /** Open Graph / Twitter share — clay wordmark on transparent (no baked bg). */
+  logoOg: '/assets/brand/logo-og.png',
   /** Figma `74:729` — mobile navbar action icons. */
   iconLanguageMobile: '/assets/brand/mobile/icon-language.svg',
   iconMenuMobile: '/assets/brand/mobile/icon-menu.svg',
