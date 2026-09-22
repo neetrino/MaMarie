@@ -126,12 +126,16 @@ export function useOrderSubmission({
         ...(cashChangeNote ? { notes: cashChangeNote } : {}),
       });
 
-      if (!isLoggedIn) {
+      if (!isLoggedIn && response.payment?.paymentUrl == null) {
         clearGuestCart();
       }
 
       if (response.payment?.paymentUrl) {
-        window.location.href = response.payment.paymentUrl;
+        const payParams = new URLSearchParams({
+          url: response.payment.paymentUrl,
+          order: response.order.number,
+        });
+        window.location.href = `/checkout/pay?${payParams.toString()}`;
         return;
       }
 

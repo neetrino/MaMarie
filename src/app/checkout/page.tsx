@@ -52,8 +52,6 @@ export default function CheckoutPage() {
     setLogoErrors,
     showShippingModal,
     setShowShippingModal,
-    showCardModal,
-    setShowCardModal,
     deliveryPrice,
     loadingDeliveryPrice,
     register,
@@ -141,8 +139,6 @@ export default function CheckoutPage() {
       <CheckoutModals
         showShippingModal={showShippingModal}
         setShowShippingModal={setShowShippingModal}
-        showCardModal={showCardModal}
-        setShowCardModal={setShowCardModal}
         register={register}
         setValue={setValue}
         handleSubmit={handleSubmit}
@@ -156,9 +152,6 @@ export default function CheckoutPage() {
         currency={currency}
         loadingDeliveryPrice={loadingDeliveryPrice}
         deliveryPrice={deliveryPrice}
-        logoErrors={logoErrors}
-        setLogoErrors={setLogoErrors}
-        isLoggedIn={isLoggedIn}
         onSubmit={onSubmit}
       />
     </CheckoutPageShell>

@@ -6,6 +6,10 @@ import { adminDeliveryService } from "./admin/admin-delivery.service";
 import { persistCheckoutOrder } from "./orders/persist-checkout-order";
 import { resolveCheckoutCartItems } from "./orders/resolve-checkout-cart-items";
 import { validateCheckoutFields } from "./orders/validate-checkout-fields";
+import {
+  initAmeriabankPayment,
+  isAmeriabankCheckoutMethod,
+} from "../payments/ameriabank/init-payment";
 
 type OrderItemWithVariant = Prisma.OrderItemGetPayload<{
   include: {
@@ -101,6 +105,12 @@ class OrdersService {
         total,
       });
 
+      let paymentUrl: string | null = null;
+      if (isAmeriabankCheckoutMethod(paymentMethod)) {
+        const init = await initAmeriabankPayment(order.order.id);
+        paymentUrl = init.paymentUrl;
+      }
+
       // Return order and payment info
       return {
         order: {
@@ -113,11 +123,11 @@ class OrdersService {
         },
         payment: {
           provider: order.payment.provider,
-          paymentUrl: null, // TODO: Generate payment URL for Idram/ArCa
-          expiresAt: null, // TODO: Set expiration if needed
+          paymentUrl,
+          expiresAt: null,
         },
         nextAction:
-          paymentMethod === "idram" || paymentMethod === "arca"
+          paymentMethod === "idram" || isAmeriabankCheckoutMethod(paymentMethod)
             ? "redirect_to_payment"
             : "view_order",
       };

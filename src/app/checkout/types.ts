@@ -11,10 +11,6 @@ export type CheckoutFormData = {
   cashChangeFor?: CashChangeFor;
   shippingAddress?: string;
   shippingCity?: string;
-  cardNumber?: string;
-  cardExpiry?: string;
-  cardCvv?: string;
-  cardHolderName?: string;
 };
 
 export interface CartItem {

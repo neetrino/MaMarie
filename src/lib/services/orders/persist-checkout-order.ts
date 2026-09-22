@@ -11,6 +11,10 @@ import type {
   CheckoutContactAddress,
   CheckoutShippingAddress,
 } from "./checkout-types";
+import {
+  AMERIABANK_PROVIDER,
+} from "../../payments/ameriabank/constants";
+import { isAmeriabankCheckoutMethod } from "../../payments/ameriabank/init-payment";
 
 const ORDER_SEQUENCE_FLOOR = FIRST_PUBLIC_ORDER_NUMBER - 1;
 
@@ -103,6 +107,10 @@ export async function persistCheckoutOrder(
     taxAmount,
     total,
   } = params;
+
+  const paymentProvider = isAmeriabankCheckoutMethod(paymentMethod)
+    ? AMERIABANK_PROVIDER
+    : paymentMethod;
 
   const result = await db.$transaction(
     async (tx: Prisma.TransactionClient) => {
@@ -215,7 +223,7 @@ export async function persistCheckoutOrder(
       const payment = await tx.payment.create({
         data: {
           orderId: newOrder.id,
-          provider: paymentMethod,
+          provider: paymentProvider,
           method: paymentMethod,
           amount: total,
           currency: "AMD",
@@ -230,7 +238,13 @@ export async function persistCheckoutOrder(
         },
       });
 
-      if (userId && cartId && cartId !== "guest-cart") {
+      // Online payments: clear cart only after paymentStatus = paid (callback).
+      if (
+        userId &&
+        cartId &&
+        cartId !== "guest-cart" &&
+        paymentMethod === "cash_on_delivery"
+      ) {
         await tx.cart.delete({
           where: { id: cartId },
         });

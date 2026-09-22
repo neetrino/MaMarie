@@ -30,6 +30,7 @@ export function getCheckoutPaymentMethodKey(
     case 'idram':
       return 'idram';
     case 'arca':
+    case 'ameriabank':
       return 'arca';
     default:
       return '';
