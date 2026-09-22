@@ -105,6 +105,22 @@
     "cashOnDeliveryPickup": "Cash on Delivery: You will pay cash when you pick up your order. Card details are not required.",
     "storePickupInfo": "Store Pickup: You will pick up your order from our store. Delivery is free."
   },
+  "paymentSuccess": {
+    "accent": "Confirmed",
+    "titleLine1": "Your payment was",
+    "titleLine2": "completed successfully",
+    "body": "Thank you. Your payment has been confirmed."
+  },
+  "paymentErrorTitle": "Payment failed",
+  "paymentErrorBody": "The bank did not complete the payment (often a test-environment or 3-D Secure error). Your cart is kept — try again, or ask Ameriabank support if it fails immediately without a card form.",
+  "paymentRedirectTitle": "Redirecting to bank",
+  "paymentRedirectBody": "Opening the secure Ameriabank payment page…",
+  "paymentRedirectMissingUrl": "Payment URL is missing. Please return to checkout and try again.",
+  "paymentRedirectInvalidUrl": "Invalid payment URL. Please return to checkout and try again.",
+  "tryAgain": "Back to checkout",
+  "viewOrder": "View order",
+  "home": "Home",
+
   "errors": {
     "firstNameRequired": "First name is required",
     "lastNameRequired": "Last name is required",

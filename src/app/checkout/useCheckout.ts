@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { handleRemoveItem } from '../cart/cart-handlers';
@@ -18,15 +17,13 @@ import { useOrderSummary } from './hooks/useOrderSummary';
 import type { CheckoutFormData } from './types';
 
 export function useCheckout() {
-  const router = useRouter();
   const { isLoggedIn, isLoading } = useAuth();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+  const [, setLanguage] = useState(DEFAULT_LANGUAGE);
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [showShippingModal, setShowShippingModal] = useState(false);
-  const [showCardModal, setShowCardModal] = useState(false);
 
   const checkoutSchema = useCheckoutSchema();
 
@@ -48,10 +45,6 @@ export function useCheckout() {
       cashChangeFor: DEFAULT_CASH_CHANGE_FOR,
       shippingAddress: '',
       shippingCity: '',
-      cardNumber: '',
-      cardExpiry: '',
-      cardCvv: '',
-      cardHolderName: '',
     },
   });
 
@@ -128,11 +121,6 @@ export function useCheckout() {
       }
     }
     
-    if (paymentMethod === 'arca' || paymentMethod === 'idram') {
-      setShowCardModal(true);
-      return;
-    }
-    
     if (!isLoggedIn) {
       setShowShippingModal(true);
       return;
@@ -162,8 +150,6 @@ export function useCheckout() {
     setLogoErrors,
     showShippingModal,
     setShowShippingModal,
-    showCardModal,
-    setShowCardModal,
     deliveryPrice,
     loadingDeliveryPrice,
     // Form

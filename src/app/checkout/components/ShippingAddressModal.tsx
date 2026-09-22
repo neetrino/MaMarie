@@ -12,7 +12,6 @@ import {
   CHECKOUT_SECONDARY_BUTTON_CLASS,
 } from '../constants/checkout-ui';
 import type { Cart, CheckoutFormData } from '../types';
-import { CardInputFields } from './CardInputFields';
 import { CheckoutDeliveryCitySelect } from './CheckoutDeliveryCitySelect';
 import { CheckoutInput } from './CheckoutInput';
 import { CheckoutPrimaryButton } from './CheckoutPrimaryButton';
@@ -155,20 +154,12 @@ export function ShippingAddressModal({
               )}
 
               {(paymentMethod === 'arca' || paymentMethod === 'idram') && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {t('checkout.payment.paymentDetails')} (
+                <div className={`border border-blue-200 bg-blue-50 p-4 ${CHECKOUT_FORM_ALERT_CLASS}`}>
+                  <p className="text-sm text-blue-800">
                     {paymentMethod === 'idram'
-                      ? t('checkout.payment.idram')
-                      : t('checkout.payment.arca')}
-                    )
-                  </h3>
-                  <CardInputFields
-                    register={register}
-                    setValue={setValue}
-                    errors={errors}
-                    isSubmitting={isSubmitting}
-                  />
+                      ? t('checkout.payment.idramDescription')
+                      : t('checkout.payment.cardDescription')}
+                  </p>
                 </div>
               )}
 
@@ -201,20 +192,12 @@ export function ShippingAddressModal({
               </div>
 
               {(paymentMethod === 'arca' || paymentMethod === 'idram') && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {t('checkout.payment.paymentDetails')} (
+                <div className={`border border-blue-200 bg-blue-50 p-4 ${CHECKOUT_FORM_ALERT_CLASS}`}>
+                  <p className="text-sm text-blue-800">
                     {paymentMethod === 'idram'
-                      ? t('checkout.payment.idram')
-                      : t('checkout.payment.arca')}
-                    )
-                  </h3>
-                  <CardInputFields
-                    register={register}
-                    setValue={setValue}
-                    errors={errors}
-                    isSubmitting={isSubmitting}
-                  />
+                      ? t('checkout.payment.idramDescription')
+                      : t('checkout.payment.cardDescription')}
+                  </p>
                 </div>
               )}
 
