@@ -234,9 +234,10 @@
     "phone": "+374XXXXXXXX",
     "email": "mamariestoree@gmail.com",
     "address": "42/1 Արամի փ., Երևան",
-    "copyrightPrefix": "Copyright © {year} | Բոլոր իրավունքները պաշտպանված են | Ստեղծվել է ",
-    "copyrightCompany": "Neetrino IT Company",
-    "copyrightSuffix": " կողմից",
+    "copyrightPrefix": "Copyright © {year} | All rights reserved | Created by ",
+    "copyrightMobilePrefix": "© {year} | Created by ",
+    "copyrightCompany": "Neetrino",
+    "copyrightSuffix": "",
     "social": {
       "facebook": "Facebook",
       "instagram": "Instagram",

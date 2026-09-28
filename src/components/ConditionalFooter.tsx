@@ -6,6 +6,7 @@ import { SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX } from '../constants/lazy-loading
 import { PROFILE_DESKTOP_PAGE_BG } from '../constants/profile-desktop-page';
 import { DesktopFluidFrame } from './DesktopFluidFrame';
 import { Footer } from './Footer';
+import { MobileSiteCopyright } from './footer/MobileSiteCopyright';
 import { LazyWhenVisible } from './LazyWhenVisible';
 
 interface ConditionalFooterProps {
@@ -29,21 +30,26 @@ export function ConditionalFooter({ storesPageEnabled = true }: ConditionalFoote
     : 'mt-auto hidden lg:flex';
 
   return (
-    <DesktopFluidFrame className={footerVisibilityClass} scaleOnTablet={scaleOnTablet}>
-      <div
-        style={{
-          ...(isAuthFormPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined),
-          ...(isProfilePage ? { backgroundColor: PROFILE_DESKTOP_PAGE_BG } : undefined),
-        }}
-      >
-        <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
-          <Footer
-            topGapPx={isAuthFormPage ? 0 : undefined}
-            gapBgColor={isProfilePage ? PROFILE_DESKTOP_PAGE_BG : undefined}
-            storesPageEnabled={storesPageEnabled}
-          />
-        </LazyWhenVisible>
+    <>
+      <div className="mt-auto lg:hidden">
+        <MobileSiteCopyright />
       </div>
-    </DesktopFluidFrame>
+      <DesktopFluidFrame className={footerVisibilityClass} scaleOnTablet={scaleOnTablet}>
+        <div
+          style={{
+            ...(isAuthFormPage ? { marginTop: -LOGIN_SECTION_FOOTER_OVERLAP_PX } : undefined),
+            ...(isProfilePage ? { backgroundColor: PROFILE_DESKTOP_PAGE_BG } : undefined),
+          }}
+        >
+          <LazyWhenVisible minHeightPx={SITE_FOOTER_PLACEHOLDER_MIN_HEIGHT_PX}>
+            <Footer
+              topGapPx={isAuthFormPage ? 0 : undefined}
+              gapBgColor={isProfilePage ? PROFILE_DESKTOP_PAGE_BG : undefined}
+              storesPageEnabled={storesPageEnabled}
+            />
+          </LazyWhenVisible>
+        </div>
+      </DesktopFluidFrame>
+    </>
   );
 }

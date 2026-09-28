@@ -231,8 +231,9 @@
     "phone": "+374XXXXXXXX",
     "email": "mamariestoree@gmail.com",
     "address": "ул. Арама 42/1, Ереван",
-    "copyrightPrefix": "Copyright © {year} | Все права защищены | Создано ",
-    "copyrightCompany": "Neetrino IT Company",
+    "copyrightPrefix": "Copyright © {year} | All rights reserved | Created by ",
+    "copyrightMobilePrefix": "© {year} | Created by ",
+    "copyrightCompany": "Neetrino",
     "copyrightSuffix": "",
     "social": {
       "facebook": "Facebook",
