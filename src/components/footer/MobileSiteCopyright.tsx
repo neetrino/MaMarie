@@ -1,26 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import { FOOTER_COPYRIGHT_COMPANY_HREF } from '../../../constants/footer';
+import { FOOTER_COPYRIGHT_COMPANY_HREF } from '../../constants/footer';
 import {
   MOBILE_HOME_COPYRIGHT_COLOR,
   MOBILE_HOME_COPYRIGHT_FONT_SIZE_PX,
   MOBILE_HOME_COPYRIGHT_LINE_HEIGHT_PX,
   MOBILE_HOME_COPYRIGHT_PADDING_TOP_PX,
   MOBILE_HOME_HORIZONTAL_PADDING_PX,
-} from '../../../constants/mobile-home';
-import { useTranslation } from '../../../lib/i18n-client';
+} from '../../constants/mobile-home';
+import { useTranslation } from '../../lib/i18n-client';
 
-/** Compact copyright under mobile home banners (site footer is desktop-only). */
-export function MobileHomeCopyright() {
+/** Compact mobile copyright — shown on every storefront page (desktop uses full footer). */
+export function MobileSiteCopyright() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
     <p
-      className="w-full text-center font-normal"
+      className="w-full text-center font-normal lg:hidden"
       style={{
         paddingTop: MOBILE_HOME_COPYRIGHT_PADDING_TOP_PX,
+        paddingBottom: MOBILE_HOME_COPYRIGHT_PADDING_TOP_PX,
         paddingLeft: MOBILE_HOME_HORIZONTAL_PADDING_PX,
         paddingRight: MOBILE_HOME_HORIZONTAL_PADDING_PX,
         color: MOBILE_HOME_COPYRIGHT_COLOR,
@@ -28,7 +29,7 @@ export function MobileHomeCopyright() {
         lineHeight: `${MOBILE_HOME_COPYRIGHT_LINE_HEIGHT_PX}px`,
       }}
     >
-      {t('common.footer.copyrightPrefix').replace('{year}', String(year))}
+      {t('common.footer.copyrightMobilePrefix').replace('{year}', String(year))}
       <Link
         href={FOOTER_COPYRIGHT_COMPANY_HREF}
         target="_blank"
@@ -37,7 +38,6 @@ export function MobileHomeCopyright() {
       >
         {t('common.footer.copyrightCompany')}
       </Link>
-      {t('common.footer.copyrightSuffix')}
     </p>
   );
 }

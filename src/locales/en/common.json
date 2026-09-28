@@ -235,7 +235,8 @@
     "email": "mamariestoree@gmail.com",
     "address": "42/1 Aram st., Yerevan",
     "copyrightPrefix": "Copyright © {year} | All rights reserved | Created by ",
-    "copyrightCompany": "Neetrino IT Company",
+    "copyrightMobilePrefix": "© {year} | Created by ",
+    "copyrightCompany": "Neetrino",
     "copyrightSuffix": "",
     "social": {
       "facebook": "Facebook",

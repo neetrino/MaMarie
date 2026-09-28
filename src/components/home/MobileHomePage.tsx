@@ -8,7 +8,6 @@ import {
 } from '../../constants/mobile-home';
 import type { HomeProductCardData } from './HomeProductCard';
 import { MobileHomeHero } from './mobile/MobileHomeHero';
-import { MobileHomeCopyright } from './mobile/MobileHomeCopyright';
 import { MobileHomeProductSection } from './mobile/MobileHomeProductSection';
 import { MobileHomeTestimonialsCarousel } from './mobile/MobileHomeTestimonialsCarousel';
 
@@ -33,10 +32,7 @@ export function MobileHomePage({ products }: MobileHomePageProps) {
         }}
       >
         <MobileHomeProductSection products={products} />
-        <div className="flex flex-col">
-          <MobileHomeTestimonialsCarousel />
-          <MobileHomeCopyright />
-        </div>
+        <MobileHomeTestimonialsCarousel />
       </div>
     </div>
   );
