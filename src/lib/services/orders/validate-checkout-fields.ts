@@ -1,3 +1,4 @@
+import { IDRAM_CHECKOUT_ENABLED } from "../../payments/idram-availability";
 import type { CheckoutData } from "../../types/checkout";
 import type { ValidatedCheckoutFields } from "./checkout-types";
 
@@ -42,6 +43,15 @@ export function validateCheckoutFields(params: {
       type: "https://api.shop.am/problems/validation-error",
       title: "Validation Error",
       detail: "First name and last name are required",
+    };
+  }
+
+  if (!IDRAM_CHECKOUT_ENABLED && paymentMethod === "idram") {
+    throw {
+      status: 400,
+      type: "https://api.shop.am/problems/validation-error",
+      title: "Validation Error",
+      detail: "Idram is temporarily unavailable",
     };
   }
 

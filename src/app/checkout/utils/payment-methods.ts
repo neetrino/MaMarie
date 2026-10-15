@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../lib/i18n-client';
+import { IDRAM_CHECKOUT_ENABLED } from '@/lib/payments/idram-availability';
 
 export type PaymentMethodId = 'idram' | 'arca' | 'cash_on_delivery';
 
@@ -14,7 +15,7 @@ export function usePaymentMethods(shippingMethod: 'pickup' | 'delivery'): Paymen
   const { t } = useTranslation();
   const isPickup = shippingMethod === 'pickup';
 
-  return [
+  const methods: PaymentMethod[] = [
     {
       id: 'cash_on_delivery',
       name: isPickup
@@ -41,4 +42,10 @@ export function usePaymentMethods(shippingMethod: 'pickup' | 'delivery'): Paymen
       logo: null,
     },
   ];
+
+  if (IDRAM_CHECKOUT_ENABLED) {
+    return methods;
+  }
+
+  return methods.filter((method) => method.id !== 'idram');
 }
