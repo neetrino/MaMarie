@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import type { AdminUserUpdateInput } from "@/lib/schemas/admin.schema";
+import { invalidateCachedAuthUser } from "@/lib/middleware/auth-user-cache";
 
 class AdminUsersService {
   /**
@@ -48,7 +49,7 @@ class AdminUsersService {
    * Update user
    */
   async updateUser(userId: string, data: AdminUserUpdateInput) {
-    return await db.user.update({
+    const updated = await db.user.update({
       where: { id: userId },
       data: {
         blocked: data.blocked,
@@ -66,6 +67,8 @@ class AdminUsersService {
         updatedAt: true,
       },
     });
+    invalidateCachedAuthUser(userId);
+    return updated;
   }
 
   /**
@@ -94,6 +97,7 @@ class AdminUsersService {
       },
       select: { id: true },
     });
+    invalidateCachedAuthUser(userId);
 
     return { success: true };
   }

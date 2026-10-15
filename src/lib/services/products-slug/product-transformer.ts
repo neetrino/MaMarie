@@ -1,6 +1,4 @@
-import { unstable_cache } from "next/cache";
-import { db } from "@white-shop/db";
-import { withServerReadCache } from "@/lib/cache/server-read-cache";
+import { getDiscountSettings } from "@/lib/settings/discount-settings";
 import {
   processImageUrl,
   smartSplitUrls,
@@ -18,53 +16,6 @@ import { logger } from "../../utils/logger";
 import { getOutOfStockLabel, pickTranslationByLocale } from "./utils";
 import type { ProductWithFullRelations, ProductVariantWithOptions } from "./types";
 import { sortVariantsForPresentation } from "../../products/select-default-variant";
-
-const DISCOUNT_SETTINGS_CACHE_TTL_MS = 30_000;
-const DISCOUNT_SETTINGS_REVALIDATE_SECONDS = 60;
-
-type DiscountSettings = {
-  globalDiscount: number;
-  categoryDiscounts: Record<string, number>;
-  brandDiscounts: Record<string, number>;
-};
-
-async function loadDiscountSettingsFromDb(): Promise<DiscountSettings> {
-  const discountSettings = await db.settings.findMany({
-    where: {
-      key: {
-        in: ["globalDiscount", "categoryDiscounts", "brandDiscounts"],
-      },
-    },
-  });
-
-  const globalDiscountSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "globalDiscount");
-  const globalDiscount = Number(globalDiscountSetting?.value) || 0;
-
-  const categoryDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "categoryDiscounts");
-  const categoryDiscounts = categoryDiscountsSetting ? (categoryDiscountsSetting.value as Record<string, number>) || {} : {};
-
-  const brandDiscountsSetting = discountSettings.find((s: { key: string; value: unknown }) => s.key === "brandDiscounts");
-  const brandDiscounts = brandDiscountsSetting ? (brandDiscountsSetting.value as Record<string, number>) || {} : {};
-
-  return { globalDiscount, categoryDiscounts, brandDiscounts };
-}
-
-const fetchDiscountSettingsCached = unstable_cache(
-  loadDiscountSettingsFromDb,
-  ["storefront-discount-settings-v1"],
-  { revalidate: DISCOUNT_SETTINGS_REVALIDATE_SECONDS },
-);
-
-/**
- * Discount settings — cross-request (unstable_cache) + in-process dedupe.
- */
-async function getDiscountSettings(): Promise<DiscountSettings> {
-  return withServerReadCache(
-    "storefront:discount-settings",
-    DISCOUNT_SETTINGS_CACHE_TTL_MS,
-    () => fetchDiscountSettingsCached(),
-  );
-}
 
 /**
  * Calculate actual discount with priority: productDiscount > categoryDiscount > brandDiscount > globalDiscount

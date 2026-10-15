@@ -1,15 +1,13 @@
 import { Prisma } from "@white-shop/db";
 import { db } from "@white-shop/db";
-import { withServerReadCache } from "@/lib/cache/server-read-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import { logger } from "../../../utils/logger";
 import { fetchAdminProductListRows } from "./list-query-batcher";
-
-const COUNT_CACHE_TTL_MS = 30_000;
 
 async function countProductsWithCache(where: Prisma.ProductWhereInput): Promise<number> {
   const cacheKey = `admin:products:count:${JSON.stringify(where)}`;
 
-  return withServerReadCache(cacheKey, COUNT_CACHE_TTL_MS, async () => {
+  return dedupeInflight(cacheKey, async () => {
     const COUNT_TIMEOUT_MS = 10_000;
     const countResult = await Promise.race([
       db.product.count({ where }),

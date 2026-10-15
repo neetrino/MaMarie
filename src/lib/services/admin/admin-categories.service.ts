@@ -1,8 +1,5 @@
 import { db } from "@white-shop/db";
-import {
-  invalidateAdminCategoriesCache,
-  withAdminCategoriesCache,
-} from "@/lib/cache/admin-reference-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import {
   getEffectiveParentIds,
   isRootCategory,
@@ -241,7 +238,7 @@ class AdminCategoriesService {
    * Get categories for admin
    */
   async getCategories() {
-    return withAdminCategoriesCache(async () => {
+    return dedupeInflight("admin:categories", async () => {
       const categories = await db.category.findMany({
         where: {
           deletedAt: null,
@@ -324,8 +321,6 @@ class AdminCategoriesService {
         });
       }
     }
-
-    invalidateAdminCategoriesCache();
 
     return {
       data: formatCategoryResponse(category),
@@ -549,8 +544,6 @@ class AdminCategoriesService {
       },
     });
 
-    invalidateAdminCategoriesCache();
-
     return {
       data: formatCategoryResponse(updatedCategory),
     };
@@ -633,7 +626,6 @@ class AdminCategoriesService {
     });
 
     logger.debug('✅ [ADMIN SERVICE] Category deleted:', categoryId);
-    invalidateAdminCategoriesCache();
     return { success: true };
   }
 }

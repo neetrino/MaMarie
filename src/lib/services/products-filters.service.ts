@@ -1,14 +1,10 @@
-import { withServerReadCache, invalidateServerReadCache } from '@/lib/cache/server-read-cache';
+import { dedupeInflight } from '@/lib/cache/inflight-dedup';
 import { DEFAULT_LANGUAGE } from '@/lib/language';
-import { hasLoadedFilterFacets } from '@/lib/products/has-loaded-filter-facets';
 import { adminService } from './admin.service';
 import { loadCatalogFilterFacets } from './products-filters-facets';
 import { buildStorefrontFiltersCacheKey } from './products-filters-cache-key';
 import { buildWhereClause } from './products-find-query/query-builder';
 import { logger } from '../utils/logger';
-
-const FILTERS_PROCESS_CACHE_TTL_MS = 60_000;
-
 const EMPTY_FILTERS = {
   colors: [] as Array<{ value: string; label: string; count: number; imageUrl?: string | null; colors?: string[] | null }>,
   sizes: [] as Array<{ value: string; count: number }>,
@@ -38,17 +34,8 @@ class ProductsFiltersService {
       lang: filters.lang || DEFAULT_LANGUAGE,
     });
     try {
-      const result = await withServerReadCache(
-        cacheKey,
-        FILTERS_PROCESS_CACHE_TTL_MS,
-        () => this.fetchFiltersUncached(filters)
-      );
-      if (!hasLoadedFilterFacets(result)) {
-        invalidateServerReadCache(cacheKey);
-      }
-      return result;
+      return await dedupeInflight(cacheKey, () => this.fetchFiltersUncached(filters));
     } catch (error) {
-      invalidateServerReadCache(cacheKey);
       logger.error('Products filters aggregation failed', { error, filters });
       throw error;
     }

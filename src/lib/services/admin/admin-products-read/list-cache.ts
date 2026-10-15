@@ -1,11 +1,9 @@
+import { dedupeInflight } from '@/lib/cache/inflight-dedup';
 import {
   invalidateServerReadCache,
   invalidateServerReadCachePrefix,
-  withServerReadCache,
 } from '@/lib/cache/server-read-cache';
 import type { ProductFilters } from './types';
-
-const ADMIN_PRODUCTS_LIST_CACHE_TTL_MS = 20_000;
 
 /** Stable server cache key for admin product list reads. */
 export function buildAdminProductsListCacheKey(filters: ProductFilters): string {
@@ -24,21 +22,16 @@ export function buildAdminProductsListCacheKey(filters: ProductFilters): string 
   return `admin:products:list:${JSON.stringify(normalized)}`;
 }
 
-/** Cached admin product list read (short TTL, invalidated on writes). */
+/** Admin product list read — always fresh from DB, concurrent identical requests share one query. */
 export async function withAdminProductsListCache<T>(
   filters: ProductFilters,
   fetcher: () => Promise<T>
 ): Promise<T> {
-  return withServerReadCache(
-    buildAdminProductsListCacheKey(filters),
-    ADMIN_PRODUCTS_LIST_CACHE_TTL_MS,
-    fetcher
-  );
+  return dedupeInflight(buildAdminProductsListCacheKey(filters), fetcher);
 }
 
-/** Call after any admin product mutation. */
+/** Call after any admin product mutation — drops dashboard aggregates derived from products. */
 export function invalidateAdminProductsListCache(): void {
-  invalidateServerReadCachePrefix('admin:products:list:');
   invalidateServerReadCachePrefix('admin:dashboard:');
   invalidateServerReadCache('admin:stats');
 }

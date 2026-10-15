@@ -1,6 +1,7 @@
 import { db } from "@white-shop/db";
 import * as bcrypt from "bcryptjs";
 import { PROFILE_DASHBOARD_RECENT_ORDERS_LIMIT } from "../../constants/profile-dashboard";
+import { invalidateCachedAuthUser } from "../middleware/auth-user-cache";
 
 class UsersService {
   /**
@@ -81,6 +82,7 @@ class UsersService {
           locale: true,
         },
       });
+      invalidateCachedAuthUser(userId);
 
       return {
         id: user.id,
@@ -304,6 +306,7 @@ class UsersService {
     }
 
     await this.permanentlyDeleteUserById(userId);
+    invalidateCachedAuthUser(userId);
 
     return { success: true };
   }

@@ -3,18 +3,16 @@ import {
   HOME_FEATURED_CACHE_KEY_PREFIX,
   HOME_FEATURED_CACHE_TAG,
 } from '@/lib/cache/home-featured-cache';
-import { withServerReadCache } from '@/lib/cache/server-read-cache';
+import { dedupeInflight } from '@/lib/cache/inflight-dedup';
 import type { HomeProductCardData } from '../../components/home/HomeProductCard';
 import { logger } from '../utils/logger';
 import { fetchHomeFeaturedProductCards } from './home-featured-products-loader';
 
 const HOME_FEATURED_REVALIDATE_SECONDS = 600;
-const HOME_FEATURED_PROCESS_CACHE_TTL_MS = 300_000;
 
 async function loadHomeFeaturedProducts(lang: string): Promise<HomeProductCardData[]> {
-  return withServerReadCache(
+  return dedupeInflight(
     `${HOME_FEATURED_CACHE_KEY_PREFIX}${lang}`,
-    HOME_FEATURED_PROCESS_CACHE_TTL_MS,
     async () => {
       try {
         return await fetchHomeFeaturedProductCards(lang);
@@ -27,7 +25,7 @@ async function loadHomeFeaturedProducts(lang: string): Promise<HomeProductCardDa
 }
 
 /**
- * Cached featured-products fetch (unstable_cache + in-process cache for dev).
+ * Cached featured-products fetch (unstable_cache + in-flight dedupe).
  */
 export const getHomeFeaturedProductsCached = unstable_cache(
   loadHomeFeaturedProducts,

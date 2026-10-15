@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import * as jwt from "jsonwebtoken";
 import { db } from "@white-shop/db";
+import { resolveCachedAuthUser } from "./auth-user-cache";
 
 export interface AuthUser {
   id: string;
@@ -8,6 +9,33 @@ export interface AuthUser {
   phone: string | null;
   locale: string;
   roles: string[];
+}
+
+async function loadAuthUser(userId: string): Promise<AuthUser | null> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      phone: true,
+      locale: true,
+      roles: true,
+      blocked: true,
+      deletedAt: true,
+    },
+  });
+
+  if (!user || user.blocked || user.deletedAt) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    phone: user.phone,
+    locale: user.locale,
+    roles: user.roles,
+  };
 }
 
 /**
@@ -33,30 +61,7 @@ export async function authenticateToken(
       userId: string;
     };
 
-    const user = await db.user.findUnique({
-      where: { id: decoded.userId },
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        locale: true,
-        roles: true,
-        blocked: true,
-        deletedAt: true,
-      },
-    });
-
-    if (!user || user.blocked || user.deletedAt) {
-      return null;
-    }
-
-    return {
-      id: user.id,
-      email: user.email,
-      phone: user.phone,
-      locale: user.locale,
-      roles: user.roles,
-    };
+    return await resolveCachedAuthUser(token, decoded.userId, () => loadAuthUser(decoded.userId));
   } catch (error) {
     if (
       error instanceof jwt.JsonWebTokenError ||

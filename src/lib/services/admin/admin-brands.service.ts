@@ -1,10 +1,7 @@
 import { db } from "@white-shop/db";
 import { toSlug } from "@/lib/utils/slug";
 import { logger } from "@/lib/utils/logger";
-import {
-  invalidateAdminBrandsCache,
-  withAdminBrandsCache,
-} from "@/lib/cache/admin-reference-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import {
   brandLocaleNameMapFromRows,
   pickPrimaryBrandName,
@@ -95,7 +92,7 @@ function formatBrandResponse(brand: {
 
 class AdminBrandsService {
   async getBrands() {
-    return withAdminBrandsCache(async () => {
+    return dedupeInflight("admin:brands", async () => {
       const brands = await db.brand.findMany({
         where: { deletedAt: null },
         include: { translations: true },
@@ -138,7 +135,6 @@ class AdminBrandsService {
       include: { translations: true },
     });
 
-    invalidateAdminBrandsCache();
     return { data: formatBrandResponse(brand) };
   }
 
@@ -238,7 +234,6 @@ class AdminBrandsService {
       include: { translations: true },
     });
 
-    invalidateAdminBrandsCache();
     return { data: formatBrandResponse(updatedBrand!) };
   }
 
@@ -284,7 +279,6 @@ class AdminBrandsService {
     });
 
     logger.debug("✅ [ADMIN SERVICE] Brand deleted:", brandId);
-    invalidateAdminBrandsCache();
     return { success: true };
   }
 }

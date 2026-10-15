@@ -1,16 +1,11 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
-import {
-  invalidateServerReadCache,
-  withServerReadCache,
-} from "@/lib/cache/server-read-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import {
   STORES_PAGE_ENABLED_DEFAULT,
   STORES_PAGE_ENABLED_SETTING_KEY,
   invalidateStoresPageEnabledCache,
 } from "@/lib/settings/stores-page-enabled";
-
-const SETTINGS_CACHE_TTL_MS = 60_000;
 
 const DEFAULT_CURRENCY_RATES = {
   USD: 1,
@@ -22,10 +17,10 @@ const DEFAULT_CURRENCY_RATES = {
 
 class AdminSettingsService {
   /**
-   * Lightweight currency rates read (single settings row, cached in-process).
+   * Lightweight currency rates read (single settings row).
    */
   async getCurrencyRates(): Promise<Record<string, number>> {
-    return withServerReadCache("admin:currency-rates", SETTINGS_CACHE_TTL_MS, async () => {
+    return dedupeInflight("admin:currency-rates", async () => {
       const row = await db.settings.findUnique({
         where: { key: "currencyRates" },
         select: { value: true },
@@ -41,7 +36,7 @@ class AdminSettingsService {
    * Get settings
    */
   async getSettings() {
-    return withServerReadCache("admin:settings:full", SETTINGS_CACHE_TTL_MS, async () => {
+    return dedupeInflight("admin:settings:full", async () => {
       const settings = await db.settings.findMany({
         where: {
           key: {
@@ -194,8 +189,6 @@ class AdminSettingsService {
       logger.debug('✅ [ADMIN SERVICE] Stores page enabled updated:', storesPageEnabledValue);
     }
 
-    invalidateServerReadCache('admin:settings:full');
-    invalidateServerReadCache('admin:currency-rates');
 
     return { success: true };
   }
@@ -204,7 +197,7 @@ class AdminSettingsService {
    * Get price filter settings
    */
   async getPriceFilterSettings() {
-    return withServerReadCache('admin:settings:price-filter', SETTINGS_CACHE_TTL_MS, async () => {
+    return dedupeInflight('admin:settings:price-filter', async () => {
       logger.debug('⚙️ [ADMIN SERVICE] Fetching price filter settings...');
       const setting = await db.settings.findUnique({
         where: { key: 'price-filter' },
@@ -311,7 +304,6 @@ class AdminSettingsService {
     });
 
     logger.debug('✅ [ADMIN SERVICE] Price filter settings updated:', setting);
-    invalidateServerReadCache('admin:settings:price-filter');
     const stored = setting.value as {
       minPrice?: number;
       maxPrice?: number;

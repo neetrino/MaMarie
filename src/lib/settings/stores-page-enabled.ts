@@ -1,15 +1,12 @@
 import { db } from '@white-shop/db';
-import { unstable_noStore as noStore } from 'next/cache';
-import {
-  invalidateServerReadCache,
-  withServerReadCache,
-} from '@/lib/cache/server-read-cache';
+import { revalidateTag, unstable_cache } from 'next/cache';
+import { logger } from '@/lib/utils/logger';
 
 /** Settings key — when false, storefront hides `/stores` and its nav links. */
 export const STORES_PAGE_ENABLED_SETTING_KEY = 'storesPageEnabled';
 
-const STORES_PAGE_ENABLED_CACHE_KEY = 'settings:stores-page-enabled';
-const STORES_PAGE_ENABLED_CACHE_TTL_MS = 60_000;
+const STORES_PAGE_ENABLED_CACHE_TAG = 'settings:stores-page-enabled';
+const STORES_PAGE_ENABLED_REVALIDATE_SECONDS = 60;
 
 /** Default on so existing shops keep the partners page visible. */
 export const STORES_PAGE_ENABLED_DEFAULT = true;
@@ -27,27 +24,39 @@ function parseStoresPageEnabled(value: unknown): boolean {
   return STORES_PAGE_ENABLED_DEFAULT;
 }
 
-/** Cached storefront read — used by layout and `/stores` page. */
+async function loadStoresPageEnabled(): Promise<boolean> {
+  const row = await db.settings.findUnique({
+    where: { key: STORES_PAGE_ENABLED_SETTING_KEY },
+    select: { value: true },
+  });
+
+  if (!row) {
+    return STORES_PAGE_ENABLED_DEFAULT;
+  }
+
+  return parseStoresPageEnabled(row.value);
+}
+
+const getStoresPageEnabledCached = unstable_cache(
+  loadStoresPageEnabled,
+  ['settings-stores-page-enabled-v1'],
+  { revalidate: STORES_PAGE_ENABLED_REVALIDATE_SECONDS, tags: [STORES_PAGE_ENABLED_CACHE_TAG] },
+);
+
+/**
+ * Cached storefront read — used by root layout and `/stores` page.
+ * Must stay request-agnostic (no `noStore`/cookies) so storefront pages can be ISR.
+ * Errors fall back to the default without being cached, so a DB blip never breaks the layout.
+ */
 export async function getStoresPageEnabled(): Promise<boolean> {
-  noStore();
-  return withServerReadCache(
-    STORES_PAGE_ENABLED_CACHE_KEY,
-    STORES_PAGE_ENABLED_CACHE_TTL_MS,
-    async () => {
-      const row = await db.settings.findUnique({
-        where: { key: STORES_PAGE_ENABLED_SETTING_KEY },
-        select: { value: true },
-      });
-
-      if (!row) {
-        return STORES_PAGE_ENABLED_DEFAULT;
-      }
-
-      return parseStoresPageEnabled(row.value);
-    },
-  );
+  try {
+    return await getStoresPageEnabledCached();
+  } catch (error: unknown) {
+    logger.error('Failed to read storesPageEnabled setting', { error });
+    return STORES_PAGE_ENABLED_DEFAULT;
+  }
 }
 
 export function invalidateStoresPageEnabledCache(): void {
-  invalidateServerReadCache(STORES_PAGE_ENABLED_CACHE_KEY);
+  revalidateTag(STORES_PAGE_ENABLED_CACHE_TAG, { expire: 0 });
 }

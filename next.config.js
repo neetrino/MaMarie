@@ -16,6 +16,9 @@ if (
   );
 }
 
+const ROUTER_STALE_TIME_DYNAMIC_SECONDS = 30;
+const ROUTER_STALE_TIME_STATIC_SECONDS = 180;
+
 /** Private LAN hosts — allow phone/tablet to load /_next/* in `next dev` (see allowedDevOrigins). */
 const DEV_LAN_ALLOWED_ORIGINS = [
   '192.168.*.*',
@@ -49,6 +52,13 @@ const r2ImageRemotePattern = resolveR2ImageRemotePattern();
 const nextConfig = {
   reactStrictMode: true,
   allowedDevOrigins: DEV_LAN_ALLOWED_ORIGINS,
+  // Client router reuses RSC payloads on back/forward and repeat navigation (seconds).
+  experimental: {
+    staleTimes: {
+      dynamic: ROUTER_STALE_TIME_DYNAMIC_SECONDS,
+      static: ROUTER_STALE_TIME_STATIC_SECONDS,
+    },
+  },
   // Скрыть индикатор "Compiling..." в углу в dev — не мешает на экране
   devIndicators: false,
   transpilePackages: ['@shop/ui', '@shop/design-tokens', '@white-shop/db'],
