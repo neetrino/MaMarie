@@ -35,7 +35,7 @@ function convertPriceToDefaultCurrency(
     return 0;
   }
   const priceNum = typeof price === 'number' ? price : parseFloat(String(price || '0'));
-  return convertPrice(priceNum, 'USD', defaultCurrency);
+  return convertPrice(priceNum, 'AMD', defaultCurrency);
 }
 
 /**

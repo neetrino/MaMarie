@@ -57,7 +57,7 @@ export function OrderDetailsSummary({
                 const totalAMD = computeOrderTotalAmd(orderDetails.totals);
                 const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency as CurrencyCode);
                 return formatPriceInCurrency(totalDisplay, currency as CurrencyCode);
-              })() : formatCurrency(orderDetails.total, (orderDetails.currency || 'AMD') as CurrencyCode, 'USD')}
+              })() : formatCurrency(orderDetails.total, (orderDetails.currency || 'AMD') as CurrencyCode, 'AMD')}
             </dd>
 
             <dt className="font-medium text-gray-500 whitespace-nowrap">

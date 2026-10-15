@@ -710,6 +710,8 @@
     "paid": "Վճարված",
     "pendingPayment": "Սպասվում է",
     "failed": "Ձախողված",
+    "paymentCancelled": "Չեղարկված",
+    "refunded": "Վերադարձված",
     "statusUpdated": "Կարգավիճակը հաջողությամբ թարմացվեց",
     "paymentStatusUpdated": "Վճարման կարգավիճակը հաջողությամբ թարմացվեց",
     "failedToUpdateStatus": "Չհաջողվեց թարմացնել կարգավիճակը: Խնդրում ենք կրկին փորձել:",

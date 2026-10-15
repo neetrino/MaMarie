@@ -29,8 +29,8 @@ export function useOrderSummary({
       };
     }
 
-    const subtotalAMD = convertPrice(cart.totals.subtotal, 'USD', 'AMD');
-    const taxAMD = convertPrice(cart.totals.tax, 'USD', 'AMD');
+    const subtotalAMD = cart.totals.subtotal;
+    const taxAMD = cart.totals.tax;
     const shippingAMD = shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
     const totalAMD = subtotalAMD + taxAMD + shippingAMD;
     

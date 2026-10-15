@@ -220,10 +220,10 @@ export function useProductVariantConversion({
             ? parseVariantNumber(variant.compareAtPrice)
             : null;
         const priceInDefaultCurrency =
-          rawPrice > 0 ? convertPrice(rawPrice, 'USD', defaultCurrency) : 0;
+          rawPrice > 0 ? convertPrice(rawPrice, 'AMD', defaultCurrency) : 0;
         const compareAtPriceInDefaultCurrency =
           rawCompareAt !== null && rawCompareAt > 0
-            ? convertPrice(rawCompareAt, 'USD', defaultCurrency)
+            ? convertPrice(rawCompareAt, 'AMD', defaultCurrency)
             : null;
         const stockValue = parseVariantNumber(variant.stock);
 

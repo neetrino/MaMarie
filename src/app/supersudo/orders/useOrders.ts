@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { apiClient } from '../../../lib/api-client';
+import { apiClient, ApiError } from '../../../lib/api-client';
 import {
   buildAdminListQueryKey,
   fetchAdminList,
@@ -227,34 +227,11 @@ export function useOrders() {
     }
   }, []);
 
-  const formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string = (amount: number, orderCurrency: string = 'AMD', fromCurrency: CurrencyCode = 'USD') => {
-    // Use the selected display currency instead of order currency
-    const displayCurrency = currency;
-    
-    // Order subtotal and tax are stored in USD, but shipping and total are in AMD
-    // We need to handle conversion based on the source currency
-    if (displayCurrency === 'AMD') {
-      if (fromCurrency === 'USD') {
-        // Convert USD to AMD
-        const convertedAmount = convertPrice(amount, 'USD', 'AMD');
-        return formatPriceInCurrency(convertedAmount, 'AMD');
-      } else {
-        // Already in AMD, no conversion needed
-        return formatPriceInCurrency(amount, 'AMD');
-      }
-    } else {
-      // Convert from fromCurrency to display currency
-      if (fromCurrency === 'USD') {
-        // First convert USD to AMD, then to display currency
-        const amdAmount = convertPrice(amount, 'USD', 'AMD');
-        const convertedAmount = convertPrice(amdAmount, 'AMD', displayCurrency);
-        return formatPriceInCurrency(convertedAmount, displayCurrency);
-      } else {
-        // Already in AMD, convert to display currency
-        const convertedAmount = convertPrice(amount, 'AMD', displayCurrency);
-        return formatPriceInCurrency(convertedAmount, displayCurrency);
-      }
+  const formatCurrency: (amount: number, orderCurrency?: string, fromCurrency?: CurrencyCode) => string = (amount: number, _orderCurrency: string = 'AMD', _fromCurrency: CurrencyCode = 'AMD') => {
+    if (currency === 'AMD') {
+      return formatPriceInCurrency(amount, 'AMD');
     }
+    return formatPriceInCurrency(convertPrice(amount, 'AMD', currency), currency);
   };
 
 
@@ -453,9 +430,10 @@ export function useOrders() {
       setTimeout(() => setUpdateMessage(null), 3000);
     } catch (err) {
       console.error('❌ [ADMIN] Error updating order payment status:', err);
+      const detail = err instanceof ApiError ? err.message : '';
       setUpdateMessage({ 
         type: 'error', 
-        text: t('admin.orders.failedToUpdatePaymentStatus')
+        text: detail || t('admin.orders.failedToUpdatePaymentStatus')
       });
       setTimeout(() => setUpdateMessage(null), 5000);
     } finally {

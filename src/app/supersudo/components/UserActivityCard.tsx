@@ -85,7 +85,7 @@ export function UserActivityCard({ userActivity, userActivityLoading }: UserActi
                     <p className="text-xs text-gray-600">{user.email || user.phone || 'N/A'}</p>
                     <p className="mt-1 text-xs text-gray-500">
                       {t('admin.dashboard.ordersCount').replace('{count}', user.orderCount.toString())} •{' '}
-                      {formatCurrency(user.totalSpent, 'USD')}
+                      {formatCurrency(user.totalSpent, 'AMD')}
                     </p>
                   </div>
                 ))

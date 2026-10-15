@@ -108,7 +108,7 @@ export function OrderDetailsAddresses({ orderDetails, formatCurrency }: OrderDet
                 : formatCurrency(
                     orderDetails.payment.amount,
                     orderDetails.payment.currency || 'AMD',
-                    'USD',
+                    'AMD',
                   )}
             </dd>
             <dt className="font-medium text-gray-500 whitespace-nowrap">

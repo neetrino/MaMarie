@@ -13,6 +13,9 @@ export const AMERIABANK_CURRENCY_AMD = '051';
 /** Ameriabank test merchant constraint (bank email). */
 export const AMERIABANK_TEST_AMOUNT_AMD = 10;
 
+/** Live vPOS rejects a zero amount (response "Empty amount"). */
+export const AMERIABANK_MIN_CHARGE_AMD = 1;
+
 /** Ameriabank test OrderID range (bank email). */
 export const AMERIABANK_TEST_ORDER_ID_MIN = 4_614_001;
 export const AMERIABANK_TEST_ORDER_ID_MAX = 4_615_000;
@@ -26,3 +29,6 @@ export const AMERIABANK_INIT_SUCCESS_CODE = 1;
 export const AMERIABANK_DETAILS_SUCCESS_PREFIX = '00';
 
 export const AMERIABANK_CALLBACK_PATH = '/api/v1/payments/ameriabank/callback';
+
+/** CancelPayment is accepted only within this window after InitPayment. */
+export const AMERIABANK_CANCEL_WINDOW_HOURS = 72;

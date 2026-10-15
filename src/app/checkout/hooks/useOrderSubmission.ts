@@ -6,7 +6,7 @@ import {
   preloadOrderSuccessIllustration,
   saveOrderSuccessPending,
 } from '../../orders/[number]/utils/order-success-pending';
-import { convertPrice } from '../../../lib/currency';
+import { isSafeAmeriaPayUrl } from '../utils/ameria-pay-url';
 import { clearGuestCart } from '../checkoutUtils';
 import {
   DEFAULT_CASH_CHANGE_FOR,
@@ -68,8 +68,8 @@ export function useOrderSubmission({
         : undefined;
 
       const shippingAmount = data.shippingMethod === 'delivery' && deliveryPrice !== null ? deliveryPrice : 0;
-      const subtotalAmd = convertPrice(cart.totals.subtotal, 'USD', 'AMD');
-      const taxAmd = convertPrice(cart.totals.tax, 'USD', 'AMD');
+      const subtotalAmd = cart.totals.subtotal;
+      const taxAmd = cart.totals.tax;
       const orderTotalAmd = subtotalAmd + taxAmd + shippingAmount;
 
       const cashChangeFor: CashChangeFor | undefined =
@@ -131,11 +131,11 @@ export function useOrderSubmission({
       }
 
       if (response.payment?.paymentUrl) {
-        const payParams = new URLSearchParams({
-          url: response.payment.paymentUrl,
-          order: response.order.number,
-        });
-        window.location.href = `/checkout/pay?${payParams.toString()}`;
+        if (!isSafeAmeriaPayUrl(response.payment.paymentUrl)) {
+          setError(t('checkout.paymentRedirectInvalidUrl'));
+          return;
+        }
+        window.location.assign(response.payment.paymentUrl);
         return;
       }
 

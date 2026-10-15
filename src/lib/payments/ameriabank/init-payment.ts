@@ -2,6 +2,7 @@ import { db } from '@white-shop/db';
 import type { Prisma } from '@white-shop/db';
 import { getAppUrl } from '@/lib/payments/app-url';
 import { logger } from '@/lib/utils/logger';
+import { resolveLiveChargeAmountAmd } from './charge-amount';
 import { buildPayPageUrl, callInitPayment } from './client';
 import { getAmeriabankConfig } from './config';
 import {
@@ -110,7 +111,7 @@ export async function initAmeriabankPayment(orderId: string): Promise<{
 
   const amount = config.testMode
     ? AMERIABANK_TEST_AMOUNT_AMD
-    : Math.round(order.total);
+    : await resolveLiveChargeAmountAmd(order);
 
   const lang = resolveLang(order.customerLocale);
   const backUrl = `${getAppUrl()}${AMERIABANK_CALLBACK_PATH}`;
@@ -149,8 +150,10 @@ export async function initAmeriabankPayment(orderId: string): Promise<{
         ),
         errorMessage: message,
         failedAt: new Date(),
+        amount,
         providerResponse: mergeProviderResponse(payment.providerResponse, {
           ameriaOrderId,
+          chargedAmountAmd: amount,
           initResponse,
         }) as Prisma.InputJsonValue,
       },
@@ -183,12 +186,14 @@ export async function initAmeriabankPayment(orderId: string): Promise<{
     where: { id: payment.id },
     data: {
       status: 'pending',
+      amount,
       providerTransactionId: paymentId,
       errorCode: null,
       errorMessage: null,
       failedAt: null,
       providerResponse: mergeProviderResponse(payment.providerResponse, {
         ameriaOrderId,
+        chargedAmountAmd: amount,
         paymentId,
         initResponse,
       }) as Prisma.InputJsonValue,
@@ -208,6 +213,7 @@ export async function initAmeriabankPayment(orderId: string): Promise<{
     orderId: order.id,
     orderNumber: order.number,
     ameriaOrderId,
+    amountAmd: amount,
     paymentId,
   });
 

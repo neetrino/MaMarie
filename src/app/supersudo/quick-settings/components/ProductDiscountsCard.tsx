@@ -46,7 +46,7 @@ export function ProductDiscountsCard({
   const { t } = useTranslation();
   const PAGE_CHUNK_SIZE = 3;
 
-  const formatPrice = (price: number) => formatPriceInCurrency(price, 'USD');
+  const formatPrice = (price: number) => formatPriceInCurrency(price, 'AMD');
 
   const paginationWindow = useMemo(() => {
     if (productsTotalPages <= 10) {

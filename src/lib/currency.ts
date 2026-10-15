@@ -115,25 +115,10 @@ export function setStoredCurrency(currency: CurrencyCode): void {
 }
 
 /**
- * Format price with currency conversion
- * Uses cached rates from API if available, otherwise falls back to default rates
- * Works both on client and server side
+ * Format a price stored in AMD for the selected display currency.
  */
-export function formatPrice(price: number, currency: CurrencyCode = 'USD'): string {
-  const currencyInfo = CURRENCIES[currency];
-  
-  // Use cached rates if available (client-side only), otherwise use default rates
-  // On server-side, currencyRatesCache will be null, so it will use default rates
-  let rate: number;
-  if (typeof window !== 'undefined' && currencyRatesCache && currencyRatesCache[currency] !== undefined) {
-    rate = currencyRatesCache[currency];
-  } else {
-    rate = currencyInfo.rate;
-  }
-  
-  const convertedPrice = price * rate;
-
-  return formatAmountWithCurrencySymbol(convertedPrice, currency);
+export function formatPrice(price: number, currency: CurrencyCode = 'AMD'): string {
+  return formatStorefrontPrice(price, currency);
 }
 
 /**

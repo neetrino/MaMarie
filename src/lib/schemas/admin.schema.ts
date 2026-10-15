@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const orderStatusSchema = z.enum(["pending", "processing", "completed", "cancelled"]);
-const paymentStatusSchema = z.enum(["pending", "paid", "failed", "refunded"]);
+const paymentStatusSchema = z.enum(["pending", "paid", "failed", "refunded", "cancelled"]);
 const fulfillmentStatusSchema = z.enum(["unfulfilled", "fulfilled", "shipped", "delivered"]);
 
 export const adminOrderUpdateSchema = z
