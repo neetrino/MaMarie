@@ -21,7 +21,10 @@ interface CheckoutPaymentMethodOptionProps {
   onSelect: (methodId: PaymentMethod['id']) => void;
 }
 
-function paymentOptionClass(isSelected: boolean): string {
+function paymentOptionClass(isSelected: boolean, unavailable: boolean): string {
+  if (unavailable) {
+    return `${CHECKOUT_OPTION_BASE_CLASS} cursor-not-allowed opacity-40 grayscale`;
+  }
   return `${CHECKOUT_OPTION_BASE_CLASS} ${
     isSelected ? CHECKOUT_PAYMENT_OPTION_SELECTED_CLASS : CHECKOUT_OPTION_DEFAULT_CLASS
   }`;
@@ -37,6 +40,8 @@ export function CheckoutPaymentMethodOption({
   onSelect,
 }: CheckoutPaymentMethodOptionProps) {
   const isCardMethod = method.id === 'arca';
+  const unavailable = method.unavailable === true;
+  const optionClass = paymentOptionClass(isSelected, unavailable);
   const idramLogoError = logoErrors[method.id] ?? false;
   const onIdramLogoError = () => onLogoError(method.id);
 
@@ -51,13 +56,16 @@ export function CheckoutPaymentMethodOption({
 
   if (isCardMethod) {
     return (
-      <label className={paymentOptionClass(isSelected)}>
+      <label className={optionClass} aria-disabled={unavailable}>
         <CheckoutRadio
           {...register('paymentMethod')}
           value={method.id}
-          checked={isSelected}
-          onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
-          disabled={isSubmitting}
+          checked={isSelected && !unavailable}
+          onChange={(e) => {
+            if (unavailable) return;
+            onSelect(e.target.value as PaymentMethod['id']);
+          }}
+          disabled={isSubmitting || unavailable}
           className="self-center"
         />
 
@@ -78,13 +86,16 @@ export function CheckoutPaymentMethodOption({
   }
 
   return (
-    <label className={paymentOptionClass(isSelected)}>
+    <label className={optionClass} aria-disabled={unavailable}>
       <CheckoutRadio
         {...register('paymentMethod')}
         value={method.id}
-        checked={isSelected}
-        onChange={(e) => onSelect(e.target.value as PaymentMethod['id'])}
-        disabled={isSubmitting}
+        checked={isSelected && !unavailable}
+        onChange={(e) => {
+          if (unavailable) return;
+          onSelect(e.target.value as PaymentMethod['id']);
+        }}
+        disabled={isSubmitting || unavailable}
       />
 
       <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
