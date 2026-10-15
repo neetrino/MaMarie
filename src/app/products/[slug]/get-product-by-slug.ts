@@ -1,11 +1,12 @@
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
-import { withServerReadCache } from '@/lib/cache/server-read-cache';
+import { dedupeInflight } from '@/lib/cache/inflight-dedup';
 import {
   readJsonCache,
   writeJsonCache,
   STOREFRONT_CACHE_KEYS,
   STOREFRONT_CACHE_TTL,
+  STOREFRONT_PRODUCTS_CACHE_TAG,
 } from '@/lib/cache/storefront-cache';
 import { buildProductQuery } from '@/lib/services/products-slug/product-query-builder';
 import { measurePdpStep } from '@/lib/services/products-slug/pdp-timing';
@@ -15,8 +16,7 @@ import type { Review } from '@/components/ProductReviews/utils';
 import { DEFAULT_LANGUAGE, type LanguageCode } from '@/lib/language';
 import type { Product } from './types';
 
-/** In-process + Next data cache for PDP SSR (seconds). */
-const PDP_SERVER_CACHE_TTL_MS = 30_000;
+/** Next data cache for PDP SSR (seconds). */
 const PDP_UNSTABLE_REVALIDATE_SECONDS = 30;
 
 async function fetchProductPayload(slug: string, lang: LanguageCode): Promise<Product | null> {
@@ -82,24 +82,18 @@ async function fetchProductPageCorePayload(slug: string, lang: LanguageCode): Pr
 
 const fetchProductPayloadCached = unstable_cache(
   async (slug: string, lang: LanguageCode): Promise<Product | null> =>
-    withServerReadCache(
-      `storefront:pdp:product:${lang}:${slug}`,
-      PDP_SERVER_CACHE_TTL_MS,
-      () => fetchProductPayload(slug, lang),
-    ),
+    dedupeInflight(`storefront:pdp:product:${lang}:${slug}`, () => fetchProductPayload(slug, lang)),
   ['storefront-pdp-product-v1'],
-  { revalidate: PDP_UNSTABLE_REVALIDATE_SECONDS },
+  { revalidate: PDP_UNSTABLE_REVALIDATE_SECONDS, tags: [STOREFRONT_PRODUCTS_CACHE_TAG] },
 );
 
 const fetchProductPageCoreCached = unstable_cache(
   async (slug: string, lang: LanguageCode): Promise<ProductPageCore | null> =>
-    withServerReadCache(
-      `storefront:pdp:core:${lang}:${slug}`,
-      PDP_SERVER_CACHE_TTL_MS,
-      () => fetchProductPageCorePayload(slug, lang),
+    dedupeInflight(`storefront:pdp:core:${lang}:${slug}`, () =>
+      fetchProductPageCorePayload(slug, lang),
     ),
   ['storefront-pdp-core-v1'],
-  { revalidate: PDP_UNSTABLE_REVALIDATE_SECONDS },
+  { revalidate: PDP_UNSTABLE_REVALIDATE_SECONDS, tags: [STOREFRONT_PRODUCTS_CACHE_TAG] },
 );
 
 /** Cached PDP payload — deduped per request (metadata + page share one fetch). */

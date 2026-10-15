@@ -1,18 +1,13 @@
 import { db } from "@white-shop/db";
 import { logger } from "@/lib/utils/logger";
-import {
-  invalidateServerReadCache,
-  withServerReadCache,
-} from "@/lib/cache/server-read-cache";
-
-const DELIVERY_CACHE_TTL_MS = 60_000;
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 
 class AdminDeliveryService {
   /**
    * Get delivery settings
    */
   async getDeliverySettings() {
-    return withServerReadCache('admin:delivery', DELIVERY_CACHE_TTL_MS, async () => {
+    return dedupeInflight('admin:delivery', async () => {
       const setting = await db.settings.findUnique({
         where: { key: 'delivery-locations' },
       });
@@ -118,7 +113,6 @@ class AdminDeliveryService {
       },
     });
 
-    invalidateServerReadCache('admin:delivery');
 
     return {
       locations: locationsWithIds,

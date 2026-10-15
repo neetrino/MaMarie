@@ -1,12 +1,9 @@
-import { withServerReadCache } from "@/lib/cache/server-read-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import { buildWhereClause } from "./products-find-query/query-builder";
 import { buildStorefrontFindQueryCacheKey } from "./products-find-query/cache-key";
 import { executeProductQuery } from "./products-find-query/query-executor";
 import { db } from "@white-shop/db";
 import type { ProductFilters, ProductWithRelations } from "./products-find-query/types";
-
-const STOREFRONT_FIND_QUERY_CACHE_TTL_MS = 60_000;
-
 /**
  * Service for building and executing product find queries
  */
@@ -19,10 +16,8 @@ class ProductsFindQueryService {
     bestsellerProductIds: string[];
     total?: number;
   }> {
-    return withServerReadCache(
-      buildStorefrontFindQueryCacheKey(filters),
-      STOREFRONT_FIND_QUERY_CACHE_TTL_MS,
-      () => this.fetchProductsUncached(filters)
+    return dedupeInflight(buildStorefrontFindQueryCacheKey(filters), () =>
+      this.fetchProductsUncached(filters)
     );
   }
 

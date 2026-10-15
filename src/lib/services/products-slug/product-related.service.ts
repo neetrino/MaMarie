@@ -6,7 +6,7 @@ import {
   STOREFRONT_CACHE_TTL,
   writeJsonCache,
 } from "@/lib/cache/storefront-cache";
-import { withServerReadCache } from "@/lib/cache/server-read-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import { logger } from "../../utils/logger";
 import { getBaseWhere } from "./product-query-builder";
 import {
@@ -14,8 +14,6 @@ import {
   type RelatedCardPayload,
   type RelatedProductRow,
 } from "./product-related-transform";
-
-const RELATED_PROCESS_CACHE_TTL_MS = 30_000;
 const RELATED_CANDIDATE_LIMIT = 14;
 
 /** Card payload only — variant `attributes` JSON, no option/attribute joins. */
@@ -140,10 +138,8 @@ async function loadRelatedForStorefront(
   productId: string,
   categoryId: string | null | undefined,
 ): Promise<RelatedProductsResult> {
-  return withServerReadCache(
-    `storefront:pdp:related:${lang}:${slug}`,
-    RELATED_PROCESS_CACHE_TTL_MS,
-    () => findRelatedByProductId(productId, lang, categoryId),
+  return dedupeInflight(`storefront:pdp:related:${lang}:${slug}`, () =>
+    findRelatedByProductId(productId, lang, categoryId),
   );
 }
 

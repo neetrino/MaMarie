@@ -5,7 +5,6 @@ import {
   type ProductContentLocale,
 } from '@/constants/product-content-locales';
 import { slugifyAttributeValue } from '@/lib/admin/attribute-locale-helpers';
-import { invalidateAdminAttributesCache } from '@/lib/cache/admin-reference-cache';
 import { logger } from '../../../utils/logger';
 import { ensureColorsColumnsExist } from './migration';
 import { formatAttribute } from './utils';
@@ -129,7 +128,6 @@ export async function addAttributeValue(
     },
   });
 
-  invalidateAdminAttributesCache();
   return loadFormattedAttribute(attributeId);
 }
 
@@ -225,6 +223,5 @@ export async function updateAttributeValue(
     });
   }
 
-  invalidateAdminAttributesCache();
   return loadFormattedAttribute(attributeId);
 }

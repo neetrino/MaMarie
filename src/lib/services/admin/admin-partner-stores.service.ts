@@ -1,10 +1,7 @@
 import { db } from "@white-shop/db";
 import { toSlug } from "@/lib/utils/slug";
 import { logger } from "@/lib/utils/logger";
-import {
-  invalidateAdminPartnerStoresCache,
-  withAdminPartnerStoresCache,
-} from "@/lib/cache/admin-reference-cache";
+import { dedupeInflight } from "@/lib/cache/inflight-dedup";
 import { invalidatePartnerStoresStorefrontCache } from "@/lib/cache/storefront-cache";
 import { geocodePartnerStoreAddress } from "@/lib/partner-stores/geocode-address";
 
@@ -66,7 +63,7 @@ async function generateUniqueSlug(name: string): Promise<string> {
 
 class AdminPartnerStoresService {
   async getPartnerStores(locale = "en") {
-    return withAdminPartnerStoresCache(async () => {
+    return dedupeInflight(`admin:partner-stores:${locale}`, async () => {
       const stores = await db.partnerStore.findMany({
         where: { deletedAt: null },
         include: { translations: true },
@@ -108,7 +105,6 @@ class AdminPartnerStoresService {
       include: { translations: true },
     });
 
-    invalidateAdminPartnerStoresCache();
     await invalidatePartnerStoresStorefrontCache();
 
     return { data: mapPartnerStore(store, locale) };
@@ -193,7 +189,6 @@ class AdminPartnerStoresService {
       include: { translations: true },
     });
 
-    invalidateAdminPartnerStoresCache();
     await invalidatePartnerStoresStorefrontCache();
 
     return { data: mapPartnerStore(updatedStore!, locale) };
@@ -217,7 +212,6 @@ class AdminPartnerStoresService {
       data: { deletedAt: new Date(), published: false },
     });
 
-    invalidateAdminPartnerStoresCache();
     await invalidatePartnerStoresStorefrontCache();
 
     return { success: true };

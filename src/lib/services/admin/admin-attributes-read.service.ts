@@ -5,7 +5,7 @@ import {
   resolveDisplayName,
 } from '@/lib/admin/attribute-locale-helpers';
 import { logger } from '@/lib/utils/logger';
-import { withAdminAttributesCache } from '@/lib/cache/admin-reference-cache';
+import { dedupeInflight } from '@/lib/cache/inflight-dedup';
 import { parseColors } from './admin-attributes-write/utils';
 
 type AttributeValueRow = {
@@ -32,7 +32,7 @@ function mapAttributeValue(value: AttributeValueRow) {
 class AdminAttributesReadService {
   /** Get attributes (columns managed via Prisma migrations). */
   async getAttributes() {
-    return withAdminAttributesCache(async () => this.fetchAttributes());
+    return dedupeInflight('admin:attributes', async () => this.fetchAttributes());
   }
 
   private async fetchAttributes() {

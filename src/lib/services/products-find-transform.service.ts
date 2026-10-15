@@ -1,4 +1,3 @@
-import { db } from "@white-shop/db";
 import { translations } from "../translations";
 import {
   resolveCatalogProductCardImage,
@@ -13,63 +12,7 @@ import {
   selectCatalogPresentationVariant,
 } from "../products/catalog-presentation-variant";
 import type { ProductFilters } from "./products-find-query.service";
-
-const DISCOUNT_SETTINGS_CACHE_TTL_MS = 60_000;
-
-interface DiscountSettingsSnapshot {
-  globalDiscount: number;
-  categoryDiscounts: Record<string, number>;
-  brandDiscounts: Record<string, number>;
-}
-
-let discountSettingsCache: { expiresAt: number; value: DiscountSettingsSnapshot } | null = null;
-
-async function getDiscountSettingsSnapshot(): Promise<DiscountSettingsSnapshot> {
-  const now = Date.now();
-  if (discountSettingsCache && discountSettingsCache.expiresAt > now) {
-    return discountSettingsCache.value;
-  }
-
-  const discountSettings = await db.settings.findMany({
-    where: {
-      key: {
-        in: ["globalDiscount", "categoryDiscounts", "brandDiscounts"],
-      },
-    },
-  });
-
-  const globalDiscount =
-    Number(
-      discountSettings.find((s: { key: string; value: unknown }) => s.key === "globalDiscount")?.value
-    ) || 0;
-
-  const categoryDiscountsSetting = discountSettings.find(
-    (s: { key: string; value: unknown }) => s.key === "categoryDiscounts"
-  );
-  const categoryDiscounts = categoryDiscountsSetting
-    ? (categoryDiscountsSetting.value as Record<string, number>) || {}
-    : {};
-
-  const brandDiscountsSetting = discountSettings.find(
-    (s: { key: string; value: unknown }) => s.key === "brandDiscounts"
-  );
-  const brandDiscounts = brandDiscountsSetting
-    ? (brandDiscountsSetting.value as Record<string, number>) || {}
-    : {};
-
-  const value: DiscountSettingsSnapshot = {
-    globalDiscount,
-    categoryDiscounts,
-    brandDiscounts,
-  };
-
-  discountSettingsCache = {
-    expiresAt: now + DISCOUNT_SETTINGS_CACHE_TTL_MS,
-    value,
-  };
-
-  return value;
-}
+import { getDiscountSettings } from "@/lib/settings/discount-settings";
 
 const getOutOfStockLabel = (lang: string = "en"): string => {
   const langKey = lang as keyof typeof translations;
@@ -95,7 +38,7 @@ class ProductsFindTransformService {
     });
     const [{ globalDiscount, categoryDiscounts, brandDiscounts }, reviewStatsByProductId] =
       await Promise.all([
-        getDiscountSettingsSnapshot(),
+        getDiscountSettings(),
         reviewsService.getProductReviewStatsBatch(products.map((product) => product.id)),
       ]);
 

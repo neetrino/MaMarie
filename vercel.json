@@ -2,6 +2,7 @@
   "buildCommand": "corepack pnpm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
+  "regions": ["fra1"],
   "installCommand": "corepack pnpm install --frozen-lockfile",
   "devCommand": "corepack pnpm run dev -- --port $PORT",
   "functions": {

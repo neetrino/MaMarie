@@ -1,14 +1,12 @@
 import { cacheService } from "@/lib/services/cache.service";
-import { invalidateServerReadCachePrefix } from "@/lib/cache/server-read-cache";
+import { revalidateTag } from "next/cache";
+import { invalidateHomeFeaturedProductsCache } from "@/lib/cache/home-featured-cache";
+import { invalidateDiscountSettingsCache } from "@/lib/settings/discount-settings";
 import { invalidateStoresPageEnabledCache } from "@/lib/settings/stores-page-enabled";
 import { logger } from "@/lib/utils/logger";
 
 /** Next.js `unstable_cache` / `revalidateTag` tag for catalog product list + filters. */
 export const STOREFRONT_PRODUCTS_CACHE_TAG = "products";
-
-/** In-process server-read cache key prefixes for storefront catalog. */
-export const STOREFRONT_PRODUCTS_SERVER_READ_PREFIX = "storefront:products:";
-export const STOREFRONT_FILTERS_SERVER_READ_PREFIX = "storefront:filters:";
 
 /**
  * Central TTLs (seconds) for public storefront HTTP responses stored in Redis / in-memory fallback.
@@ -111,8 +109,6 @@ export async function invalidateCurrencyRatesCache(): Promise<void> {
  * Clears nav previews and filter aggregates.
  */
 export async function invalidateStorefrontProductRelatedCaches(): Promise<void> {
-  invalidateServerReadCachePrefix(STOREFRONT_PRODUCTS_SERVER_READ_PREFIX);
-  invalidateServerReadCachePrefix(STOREFRONT_FILTERS_SERVER_READ_PREFIX);
   await Promise.all([
     cacheService.deletePattern("categories:navigation-previews:*"),
     invalidateStorefrontProductFilterCaches(),
@@ -132,6 +128,9 @@ export async function invalidateStorefrontAfterAdminSettingsUpdate(): Promise<vo
   ]);
   await invalidateStorefrontProductRelatedCaches();
   invalidateStoresPageEnabledCache();
+  invalidateDiscountSettingsCache();
+  invalidateHomeFeaturedProductsCache();
+  revalidateTag(STOREFRONT_PRODUCTS_CACHE_TAG, { expire: 0 });
 }
 
 /** Invalidate split PDP caches (visual / details / related). */

@@ -1,6 +1,5 @@
 import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
-import { withServerReadCache } from '@/lib/cache/server-read-cache';
 import { dedupeInflight } from '@/lib/cache/inflight-dedup';
 import {
   readJsonCache,
@@ -13,7 +12,6 @@ import {
 import { productsFiltersService } from './products-filters.service';
 import { hasLoadedFilterFacets } from '@/lib/products/has-loaded-filter-facets';
 
-const SERVER_READ_CACHE_TTL_MS = 60_000;
 const UNSTABLE_REVALIDATE_SECONDS = 60;
 
 export interface StorefrontProductsFiltersInput {
@@ -77,11 +75,7 @@ async function fetchFiltersPayload(
 const fetchFiltersByStableKey = unstable_cache(
   async (stableKey: string, inputJson: string): Promise<StorefrontProductsFiltersResult> => {
     const input = JSON.parse(inputJson) as StorefrontProductsFiltersInput;
-    return withServerReadCache(
-      buildInflightKey(stableKey),
-      SERVER_READ_CACHE_TTL_MS,
-      () => fetchFiltersPayload(input)
-    );
+    return fetchFiltersPayload(input);
   },
   ['storefront-products-filters-v5'],
   { revalidate: UNSTABLE_REVALIDATE_SECONDS, tags: [STOREFRONT_PRODUCTS_CACHE_TAG] }

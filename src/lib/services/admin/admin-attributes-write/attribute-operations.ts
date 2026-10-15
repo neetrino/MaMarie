@@ -8,7 +8,6 @@ import {
   resolveAttributeKeyFromNames,
   type AttributeLocaleTextMap,
 } from '@/lib/admin/attribute-locale-helpers';
-import { invalidateAdminAttributesCache } from '@/lib/cache/admin-reference-cache';
 import { logger } from '../../../utils/logger';
 import { formatAttribute } from './utils';
 
@@ -141,7 +140,6 @@ export async function createAttribute(data: {
       },
     });
 
-    invalidateAdminAttributesCache();
     return formatAttribute(attribute);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -211,6 +209,5 @@ export async function updateAttributeTranslation(
     ),
   );
 
-  invalidateAdminAttributesCache();
   return loadFormattedAttribute(attributeId);
 }
