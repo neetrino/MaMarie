@@ -9,6 +9,8 @@ export interface PaymentMethod {
   shortName: string;
   description: string;
   logo: string | null;
+  /** Shown, but the customer cannot select it. */
+  unavailable?: boolean;
 }
 
 export function usePaymentMethods(shippingMethod: 'pickup' | 'delivery'): PaymentMethod[] {
@@ -33,6 +35,7 @@ export function usePaymentMethods(shippingMethod: 'pickup' | 'delivery'): Paymen
       shortName: t('checkout.payment.idram'),
       description: t('checkout.payment.idramDescription'),
       logo: '/assets/payments/idram.png',
+      unavailable: !IDRAM_CHECKOUT_ENABLED,
     },
     {
       id: 'arca',
@@ -43,9 +46,5 @@ export function usePaymentMethods(shippingMethod: 'pickup' | 'delivery'): Paymen
     },
   ];
 
-  if (IDRAM_CHECKOUT_ENABLED) {
-    return methods;
-  }
-
-  return methods.filter((method) => method.id !== 'idram');
+  return methods;
 }

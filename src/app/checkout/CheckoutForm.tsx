@@ -213,6 +213,7 @@ export function CheckoutForm({
                 }}
                 register={register}
                 onSelect={(methodId) => {
+                  if (method.unavailable) return;
                   setValue('paymentMethod', methodId);
                   if (methodId === 'cash_on_delivery' && !cashChangeFor) {
                     setValue('cashChangeFor', DEFAULT_CASH_CHANGE_FOR);
