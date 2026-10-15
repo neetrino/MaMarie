@@ -1,9 +1,12 @@
 import { logger } from '@/lib/utils/logger';
 import type {
+  AmeriabankOperationResponseBody,
+  CancelPaymentRequestBody,
   GetPaymentDetailsRequestBody,
   GetPaymentDetailsResponseBody,
   InitPaymentRequestBody,
   InitPaymentResponseBody,
+  RefundPaymentRequestBody,
 } from './types';
 
 const JSON_HEADERS = {
@@ -66,6 +69,28 @@ export async function callGetPaymentDetails(
     `${baseUrl}/api/VPOS/GetPaymentDetails`,
     body,
     'GetPaymentDetails'
+  );
+}
+
+export async function callCancelPayment(
+  baseUrl: string,
+  body: CancelPaymentRequestBody
+): Promise<AmeriabankOperationResponseBody> {
+  return postJson<AmeriabankOperationResponseBody>(
+    `${baseUrl}/api/VPOS/CancelPayment`,
+    body,
+    'CancelPayment'
+  );
+}
+
+export async function callRefundPayment(
+  baseUrl: string,
+  body: RefundPaymentRequestBody
+): Promise<AmeriabankOperationResponseBody> {
+  return postJson<AmeriabankOperationResponseBody>(
+    `${baseUrl}/api/VPOS/RefundPayment`,
+    body,
+    'RefundPayment'
   );
 }
 

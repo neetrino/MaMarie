@@ -1,18 +1,17 @@
 import {
   convertPrice,
-  formatPrice,
   formatPriceInCurrency,
   formatStorefrontPrice,
 } from '../../lib/currency';
 import type { CurrencyCode } from '../../lib/currency';
 import type { Cart } from './types';
 
-/** Formats a cart line/subtotal amount stored in USD into the storefront currency. */
+/** Formats a cart line stored in AMD into the storefront currency. */
 export function formatCartLineAmountInCurrency(
-  amountUsd: number,
+  amountAmd: number,
   currencyCode: CurrencyCode,
 ): string {
-  return formatPrice(amountUsd, currencyCode);
+  return formatStorefrontPrice(amountAmd, currencyCode);
 }
 
 /** Formats a cart amount stored in AMD into the storefront currency. */
@@ -44,8 +43,9 @@ export function buildCartShippingAndTotalLabels({
   const shippingAmd = shippingAmdResolved ? deliveryPriceAMD : 0;
   const shippingLabel = formatCartAmountInCurrency(shippingAmd, currencyCode);
 
-  const subtotalUsd = cart.totals.subtotal - cart.totals.discount;
-  const subtotalInDisplay = convertPrice(subtotalUsd, 'USD', currencyCode);
+  const subtotalAmd = cart.totals.subtotal - cart.totals.discount;
+  const subtotalInDisplay =
+    currencyCode === 'AMD' ? subtotalAmd : convertPrice(subtotalAmd, 'AMD', currencyCode);
   const shippingInDisplay =
     currencyCode === 'AMD' ? shippingAmd : convertPrice(shippingAmd, 'AMD', currencyCode);
   const totalLabel = formatPriceInCurrency(subtotalInDisplay + shippingInDisplay, currencyCode);

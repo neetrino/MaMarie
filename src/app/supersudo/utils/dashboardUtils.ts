@@ -4,7 +4,6 @@
 
 import {
   CURRENCIES,
-  convertPrice,
   formatPriceInCurrency,
   type CurrencyCode,
 } from '../../../lib/currency';
@@ -24,11 +23,8 @@ export function formatCurrency(amount: number, currency: string = 'USD'): string
   }).format(amount);
 }
 
-/**
- * Order/item amounts in admin stats are stored in USD; dashboard always shows AMD.
- */
-export function formatDashboardAmdFromUsd(amountUsd: number): string {
-  const amountAmd = convertPrice(amountUsd, 'USD', 'AMD');
+/** Dashboard money is stored in AMD. */
+export function formatDashboardAmdFromUsd(amountAmd: number): string {
   return formatPriceInCurrency(amountAmd, 'AMD');
 }
 

@@ -3,21 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { useTranslation } from '../../../lib/i18n-client';
-
-const REDIRECT_DELAY_MS = 800;
-
-function isSafeAmeriaPayUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return (
-      (parsed.protocol === 'https:' || parsed.protocol === 'http:') &&
-      parsed.hostname.endsWith('ameriabank.am') &&
-      parsed.pathname.includes('/Payments/Pay')
-    );
-  } catch {
-    return false;
-  }
-}
+import { isSafeAmeriaPayUrl } from '../utils/ameria-pay-url';
 
 function CheckoutPayRedirectContent() {
   const { t } = useTranslation();
@@ -44,27 +30,24 @@ function CheckoutPayRedirectContent() {
       return;
     }
 
-    const timer = window.setTimeout(() => {
-      window.location.assign(decoded);
-    }, REDIRECT_DELAY_MS);
-
-    return () => window.clearTimeout(timer);
+    window.location.replace(decoded);
   }, [searchParams, t]);
+
+  if (!error) {
+    return null;
+  }
 
   return (
     <main className="mx-auto flex min-h-[50vh] max-w-lg flex-col items-center justify-center gap-4 px-4 py-16 text-center">
-      <h1 className="font-serif text-3xl text-stone-900">
-        {error ? t('checkout.paymentErrorTitle') : t('checkout.paymentRedirectTitle')}
-      </h1>
-      <p className="text-stone-600">
-        {error ?? t('checkout.paymentRedirectBody')}
-      </p>
+      <h1 className="font-serif text-3xl text-stone-900">{t('checkout.paymentErrorTitle')}</h1>
+      <p className="text-stone-600">{error}</p>
     </main>
   );
 }
 
 /**
- * Intermediate page before bank Pay/3DS — shows status, then redirects to Ameriabank.
+ * Legacy pay handoff. Checkout now opens the bank URL directly.
+ * This route only remains so an old link still jumps straight to 3-D Secure.
  */
 export default function CheckoutPayRedirectPage() {
   return (

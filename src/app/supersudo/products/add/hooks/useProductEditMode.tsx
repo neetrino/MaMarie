@@ -125,10 +125,10 @@ export function useProductEditMode({
                   ? variant.compareAtPrice
                   : 0;
               firstPrice =
-                firstPriceUSD > 0 ? String(convertPrice(firstPriceUSD, 'USD', defaultCurrency)) : '';
+                firstPriceUSD > 0 ? String(convertPrice(firstPriceUSD, 'AMD', defaultCurrency)) : '';
               firstCompareAtPrice =
                 firstCompareAtPriceUSD > 0
-                  ? String(convertPrice(firstCompareAtPriceUSD, 'USD', defaultCurrency))
+                  ? String(convertPrice(firstCompareAtPriceUSD, 'AMD', defaultCurrency))
                   : '';
               firstSku = variant.sku || '';
             }
@@ -246,7 +246,7 @@ export function useProductEditMode({
                         typeof firstVariant.price === 'number'
                           ? firstVariant.price
                           : parseFloat(String(firstVariant.price || '0')),
-                        'USD',
+                        'AMD',
                         defaultCurrency
                       )
                     )
@@ -257,7 +257,7 @@ export function useProductEditMode({
                         typeof firstVariant.compareAtPrice === 'number'
                           ? firstVariant.compareAtPrice
                           : parseFloat(String(firstVariant.compareAtPrice || '0')),
-                        'USD',
+                        'AMD',
                         defaultCurrency
                       )
                     )

@@ -40,14 +40,20 @@ function normalizeResponseCode(raw: string | number | undefined): string {
   return String(raw).trim();
 }
 
-export function isDetailsResponseCodeOk(
-  body: GetPaymentDetailsResponseBody
+export function isAmeriabankResponseCodeOk(
+  raw: string | number | undefined
 ): boolean {
-  const code = normalizeResponseCode(body.ResponseCode ?? body.responseCode);
+  const code = normalizeResponseCode(raw);
   return (
     code === AMERIABANK_DETAILS_SUCCESS_PREFIX ||
     code.startsWith(AMERIABANK_DETAILS_SUCCESS_PREFIX)
   );
+}
+
+export function isDetailsResponseCodeOk(
+  body: GetPaymentDetailsResponseBody
+): boolean {
+  return isAmeriabankResponseCodeOk(body.ResponseCode ?? body.responseCode);
 }
 
 function isSuccessfulPaymentState(raw: string | number | undefined): boolean {

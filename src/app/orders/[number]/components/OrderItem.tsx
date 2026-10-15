@@ -36,13 +36,13 @@ export function OrderItem({ item, currency }: OrderItemProps) {
   };
 
   const itemPriceDisplay = (() => {
-    const priceAMD = convertPrice(item.price, 'USD', 'AMD');
+    const priceAMD = item.price;
     const priceDisplay = currency === 'AMD' ? priceAMD : convertPrice(priceAMD, 'AMD', currency);
     return formatPriceInCurrency(priceDisplay, currency);
   })();
 
   const itemTotalDisplay = (() => {
-    const totalAMD = convertPrice(item.total, 'USD', 'AMD');
+    const totalAMD = item.total;
     const totalDisplay = currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
     return formatPriceInCurrency(totalDisplay, currency);
   })();

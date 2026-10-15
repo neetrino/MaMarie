@@ -2,21 +2,16 @@
  * Order utilities - helper functions for order status colors and formatting
  */
 
-import { convertPrice } from '../../../../lib/currency';
-
 export type CheckoutPaymentMethodKey = 'cashOnDelivery' | 'idram' | 'arca';
 
-/** Subtotal/discount/tax are USD; shipping is AMD. Returns grand total in AMD. */
+/** Order amounts are stored in AMD. */
 export function computeOrderTotalAmd(totals: {
   subtotal: number;
   discount: number;
   shipping: number;
   tax: number;
 }): number {
-  const subtotalAmd = convertPrice(totals.subtotal, 'USD', 'AMD');
-  const discountAmd = convertPrice(totals.discount, 'USD', 'AMD');
-  const taxAmd = convertPrice(totals.tax, 'USD', 'AMD');
-  return subtotalAmd - discountAmd + totals.shipping + taxAmd;
+  return totals.subtotal - totals.discount + totals.shipping + totals.tax;
 }
 
 /** i18n segment under `checkout.payment.*`, or empty if unknown (caller shows raw method). */
@@ -60,6 +55,10 @@ export function getPaymentStatusColor(paymentStatus: string): string {
       return '!border-yellow-200 !bg-yellow-100 !text-yellow-800';
     case 'failed':
       return '!border-red-200 !bg-red-100 !text-red-800';
+    case 'refunded':
+      return '!border-purple-200 !bg-purple-100 !text-purple-800';
+    case 'cancelled':
+      return '!border-red-200 !bg-red-100 !text-red-800';
     default:
       return '!border-gray-200 !bg-gray-100 !text-gray-800';
   }
@@ -69,6 +68,8 @@ const ADMIN_PAYMENT_STATUS_I18N_KEYS: Record<string, string> = {
   paid: 'admin.orders.paid',
   pending: 'admin.orders.pendingPayment',
   failed: 'admin.orders.failed',
+  refunded: 'admin.orders.refunded',
+  cancelled: 'admin.orders.paymentCancelled',
 };
 
 /** Admin UI label for order payment status (paid / pending / failed). */
@@ -97,6 +98,8 @@ export function getAdminPaymentStatusSelectOptions(
     { value: 'paid', label: t('admin.orders.paid') },
     { value: 'pending', label: t('admin.orders.pendingPayment') },
     { value: 'failed', label: t('admin.orders.failed') },
+    { value: 'cancelled', label: t('admin.orders.paymentCancelled') },
+    { value: 'refunded', label: t('admin.orders.refunded') },
   ];
 }
 

@@ -55,9 +55,32 @@ export type GetPaymentDetailsResponseBody = {
   [key: string]: unknown;
 };
 
+export type AmeriabankOperationResponseBody = {
+  ResponseCode?: string | number;
+  responseCode?: string | number;
+  ResponseMessage?: string;
+  responseMessage?: string;
+  Opaque?: string;
+  opaque?: string;
+};
+
+export type CancelPaymentRequestBody = {
+  PaymentID: string;
+  Username: string;
+  Password: string;
+};
+
+export type RefundPaymentRequestBody = CancelPaymentRequestBody & {
+  Amount: number;
+};
+
 export type AmeriabankProviderResponse = {
   ameriaOrderId?: number;
+  /** Whole AMD sent to InitPayment. */
+  chargedAmountAmd?: number;
   paymentId?: string;
   initResponse?: InitPaymentResponseBody;
   detailsResponse?: GetPaymentDetailsResponseBody;
+  cancelResponse?: AmeriabankOperationResponseBody;
+  refundResponse?: AmeriabankOperationResponseBody;
 };

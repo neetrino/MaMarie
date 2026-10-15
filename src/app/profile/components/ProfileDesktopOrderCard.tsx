@@ -35,16 +35,16 @@ interface ProfileDesktopOrderCardProps {
 
 function orderTotalDisplay(order: ProfileOrderCardItem, currency: CurrencyCode): string {
   if (order.subtotal !== undefined && order.discountAmount !== undefined && order.taxAmount !== undefined) {
-    const subtotalAMD = convertPrice(order.subtotal, 'USD', 'AMD');
-    const discountAMD = convertPrice(order.discountAmount, 'USD', 'AMD');
-    const taxAMD = convertPrice(order.taxAmount, 'USD', 'AMD');
+    const subtotalAMD = order.subtotal;
+    const discountAMD = order.discountAmount;
+    const taxAMD = order.taxAmount;
     const totalWithoutShippingAMD = subtotalAMD - discountAMD + taxAMD;
     const totalDisplay =
       currency === 'AMD' ? totalWithoutShippingAMD : convertPrice(totalWithoutShippingAMD, 'AMD', currency);
     return formatPriceInCurrency(totalDisplay, currency);
   }
 
-  const totalAMD = convertPrice(order.total, 'USD', 'AMD');
+  const totalAMD = order.total;
   const shippingAMD = order.shippingAmount || 0;
   const totalWithoutShippingAMD = totalAMD - shippingAMD;
   const totalDisplay =

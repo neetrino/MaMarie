@@ -29,12 +29,12 @@ export function OrderDetailsTotals({
       <div className="space-y-3">
         <div className="flex justify-between text-sm text-gray-700">
           <span>{t('orders.orderSummary.subtotal')}</span>
-          <span>{formatCurrency(orderDetails.totals.subtotal, (orderDetails.totals.currency || 'AMD') as CurrencyCode, 'USD')}</span>
+          <span>{formatCurrency(orderDetails.totals.subtotal, (orderDetails.totals.currency || 'AMD') as CurrencyCode, 'AMD')}</span>
         </div>
         {orderDetails.totals.discount > 0 && (
           <div className="flex justify-between text-sm text-gray-700">
             <span>{t('orders.orderSummary.discount')}</span>
-            <span>-{formatCurrency(orderDetails.totals.discount, (orderDetails.totals.currency || 'AMD') as CurrencyCode, 'USD')}</span>
+            <span>-{formatCurrency(orderDetails.totals.discount, (orderDetails.totals.currency || 'AMD') as CurrencyCode, 'AMD')}</span>
           </div>
         )}
         <div className="flex justify-between gap-4 text-sm text-gray-700">
@@ -56,7 +56,7 @@ export function OrderDetailsTotals({
               {formatCurrency(
                 orderDetails.totals.tax,
                 (orderDetails.totals.currency || 'AMD') as CurrencyCode,
-                'USD'
+                'AMD'
               )}
             </span>
           </div>

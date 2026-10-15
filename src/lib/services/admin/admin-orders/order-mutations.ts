@@ -1,5 +1,6 @@
 import { db } from "@white-shop/db";
 import { logger } from "../../../utils/logger";
+import { syncAmeriabankPaymentStatus } from "../../../payments/ameriabank/reverse-payment";
 import type { UpdateOrderData } from "./types";
 
 /**
@@ -144,7 +145,7 @@ export async function updateOrder(orderId: string, data: UpdateOrderData) {
 
     // Validate status values
     const validStatuses = ['pending', 'processing', 'completed', 'cancelled'];
-    const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
+    const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded', 'cancelled'];
     const validFulfillmentStatuses = ['unfulfilled', 'fulfilled', 'shipped', 'delivered'];
 
     if (data.status !== undefined && !validStatuses.includes(data.status)) {
@@ -197,6 +198,15 @@ export async function updateOrder(orderId: string, data: UpdateOrderData) {
     }
     if (data.paymentStatus === 'paid' && existing.paymentStatus !== 'paid') {
       updateData.paidAt = new Date();
+    }
+    if (
+      (data.paymentStatus === 'cancelled' || data.paymentStatus === 'refunded') &&
+      data.paymentStatus !== existing.paymentStatus
+    ) {
+      await syncAmeriabankPaymentStatus({
+        orderId,
+        nextStatus: data.paymentStatus,
+      });
     }
 
     const order = await db.order.update({

@@ -175,15 +175,15 @@ export function OrderDetailsModal({
                         {t('profile.orderDetails.quantity')}: {item.quantity} ×{' '}
                         {formatPriceInCurrency(
                           currency === 'AMD'
-                            ? convertPrice(item.price, 'USD', 'AMD')
-                            : convertPrice(convertPrice(item.price, 'USD', 'AMD'), 'AMD', currency),
+                            ? item.price
+                            : convertPrice(item.price, 'AMD', currency),
                           currency,
                         )}{' '}
                         ={' '}
                         {formatPriceInCurrency(
                           currency === 'AMD'
-                            ? convertPrice(item.total, 'USD', 'AMD')
-                            : convertPrice(convertPrice(item.total, 'USD', 'AMD'), 'AMD', currency),
+                            ? item.total
+                            : convertPrice(item.total, 'AMD', currency),
                           currency,
                         )}
                       </p>
@@ -205,9 +205,9 @@ export function OrderDetailsModal({
                   <span>
                     {formatPriceInCurrency(
                       currency === 'AMD'
-                        ? convertPrice(order.totals.subtotal, 'USD', 'AMD')
+                        ? order.totals.subtotal
                         : convertPrice(
-                            convertPrice(order.totals.subtotal, 'USD', 'AMD'),
+                            order.totals.subtotal,
                             'AMD',
                             currency,
                           ),
@@ -222,9 +222,9 @@ export function OrderDetailsModal({
                       -
                       {formatPriceInCurrency(
                         currency === 'AMD'
-                          ? convertPrice(order.totals.discount, 'USD', 'AMD')
+                          ? order.totals.discount
                           : convertPrice(
-                              convertPrice(order.totals.discount, 'USD', 'AMD'),
+                              order.totals.discount,
                               'AMD',
                               currency,
                             ),
@@ -253,10 +253,10 @@ export function OrderDetailsModal({
                   <span>{t('profile.orderDetails.total')}</span>
                   <span>
                     {(() => {
-                      const subtotalAMD = convertPrice(order.totals.subtotal, 'USD', 'AMD');
-                      const discountAMD = convertPrice(order.totals.discount, 'USD', 'AMD');
+                      const subtotalAMD = order.totals.subtotal;
+                      const discountAMD = order.totals.discount;
                       const totalAMD =
-                        subtotalAMD - discountAMD + order.totals.shipping + convertPrice(order.totals.tax, 'USD', 'AMD');
+                        subtotalAMD - discountAMD + order.totals.shipping + order.totals.tax;
                       const totalDisplay =
                         currency === 'AMD' ? totalAMD : convertPrice(totalAMD, 'AMD', currency);
                       return formatPriceInCurrency(totalDisplay, currency);
