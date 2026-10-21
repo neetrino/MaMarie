@@ -1,7 +1,7 @@
 import { db } from "@white-shop/db";
 import { logger } from "../utils/logger";
-import { extractMediaUrl } from "../utils/extractMediaUrl";
 import { pickProductContentTranslation } from "@/constants/product-content-locales";
+import { resolveCartLineImage } from "./cart-line-image";
 
 class CartService {
   private extractSelectedOption(
@@ -154,6 +154,7 @@ class CartService {
         variant: {
           id: string;
           sku: string | null;
+          imageUrl?: string | null;
           stock: number;
           price: number;
           compareAtPrice?: number | null;
@@ -177,7 +178,12 @@ class CartService {
           locale,
         );
 
-        const imageUrl = extractMediaUrl(product?.media, product?.id);
+        const imageUrl = resolveCartLineImage(
+          product?.id ?? "",
+          variant?.id ?? item.variantId,
+          variant?.imageUrl,
+          product?.media,
+        );
 
         const productDiscount = product?.discountPercent ?? 0;
         let appliedDiscount = 0;

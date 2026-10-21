@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@white-shop/db";
-import { extractMediaUrl } from "@/lib/utils/extractMediaUrl";
+import { resolveCartLineImage } from "@/lib/services/cart-line-image";
 import { logger } from "@/lib/utils/logger";
 import { pickProductContentTranslation } from "@/constants/product-content-locales";
 
@@ -62,10 +62,6 @@ interface GuestCartResponse {
     itemsCount: number;
   } | null;
   normalizedItems: GuestCartItemInput[];
-}
-
-function pickFirstImage(productId: string, media: unknown): string | null {
-  return extractMediaUrl(media, productId);
 }
 
 function sanitizeItems(items: GuestCartItemInput[] | undefined): GuestCartItemInput[] {
@@ -151,6 +147,7 @@ export async function POST(req: NextRequest) {
           select: {
             id: true,
             sku: true,
+            imageUrl: true,
             price: true,
             compareAtPrice: true,
             stock: true,
@@ -191,8 +188,7 @@ export async function POST(req: NextRequest) {
         return;
       }
 
-      const selectedVariant =
-        product.variants.find((variant) => variant.id === item.variantId) ?? product.variants[0];
+      const selectedVariant = product.variants.find((variant) => variant.id === item.variantId);
 
       if (!selectedVariant) {
         return;
@@ -227,7 +223,12 @@ export async function POST(req: NextRequest) {
             id: product.id,
             title: preferredTranslation?.title || "Product",
             slug: productSlug,
-            image: pickFirstImage(product.id, product.media),
+            image: resolveCartLineImage(
+              product.id,
+              selectedVariant.id,
+              selectedVariant.imageUrl,
+              product.media,
+            ),
           },
         },
         quantity: item.quantity,

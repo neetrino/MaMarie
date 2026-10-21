@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { fetchCart } from '../../app/cart/cart-fetcher';
 import { handleRemoveItem, handleUpdateQuantity } from '../../app/cart/cart-handlers';
 import type { Cart, CartItem } from '../../app/cart/types';
@@ -8,88 +8,102 @@ import type { CartUpdatedDetail } from '../../lib/cart-events';
 import { CART_UPDATED_EVENT, dispatchCartUpdated } from '../../lib/cart-events';
 import { getStoredCurrency, DEFAULT_CURRENCY } from '../../lib/currency';
 import {
+  clearLegacyCartProductSnapshot,
   filterRemovedCartItems,
   getInstantCartDisplay,
   getGuestCartFromStorage,
-  readCartSnapshot,
-  writeCartSnapshot,
+  persistCartBadgeFromCart,
   clearGuestCartItems,
 } from '../../lib/guest-cart-storage';
 import { useAuth } from '../../lib/auth/AuthContext';
 import { useTranslation } from '../../lib/i18n-client';
+import { getCartDisplayEpoch, writeLoggedInCartDisplay } from '../../lib/cart-display-cache';
+import { upsertOptimisticCartItem } from './optimistic-cart';
 
 interface UseCartStateOptions {
   enabled: boolean;
 }
 
-function buildSingleItemCart(item: CartItem, cartSummary?: CartUpdatedDetail['cartSummary']): Cart {
-  const subtotal = cartSummary?.total ?? item.total;
-  return {
-    id: 'optimistic-cart',
-    items: [item],
-    totals: {
-      subtotal,
-      discount: 0,
-      shipping: 0,
-      tax: 0,
-      total: subtotal,
-      currency: 'AMD',
-    },
-    itemsCount: cartSummary?.itemsCount ?? item.quantity,
-  };
+type SetCart = Dispatch<SetStateAction<Cart | null>>;
+type SetLoading = Dispatch<SetStateAction<boolean>>;
+
+interface CartRequest {
+  silent: boolean;
+  isCurrent: () => boolean;
+  setLoading: SetLoading;
+  clearOptimistic: () => void;
 }
 
-function isSameCartLine(item: CartItem, optimisticItem: CartItem): boolean {
-  return (
-    item.id === optimisticItem.id ||
-    (
-      item.variant.id === optimisticItem.variant.id &&
-      item.variant.product.id === optimisticItem.variant.product.id
-    )
-  );
-}
-
-function upsertOptimisticCartItem(
-  cart: Cart | null,
-  optimisticItem: CartItem,
-  cartSummary?: CartUpdatedDetail['cartSummary'],
-): Cart {
-  if (!cart) {
-    return buildSingleItemCart(optimisticItem, cartSummary);
+async function loadGuestCartView(
+  request: CartRequest,
+  productLabel: string,
+  setCart: SetCart,
+  syncLocal: () => void,
+  translate: (key: string) => string,
+): Promise<void> {
+  syncLocal();
+  const instantCart = getGuestCartFromStorage(productLabel);
+  if (!request.silent && !instantCart) {
+    request.setLoading(true);
   }
 
-  const hasItem = cart.items.some((item) => isSameCartLine(item, optimisticItem));
-  const items = hasItem
-    ? cart.items.map((item) => {
-      if (!isSameCartLine(item, optimisticItem)) {
-        return item;
-      }
+  try {
+    const cartData = await fetchCart(false, translate);
+    if (!request.isCurrent()) {
+      return;
+    }
 
-      if (!optimisticItem.id.startsWith('optimistic-')) {
-        return optimisticItem;
-      }
+    setCart(cartData);
+    dispatchCartUpdated({
+      localOnly: true,
+      cartSummary: {
+        itemsCount: cartData?.itemsCount ?? 0,
+        total: cartData?.totals.total ?? 0,
+      },
+    });
+  } catch {
+    if (request.isCurrent()) {
+      syncLocal();
+    }
+  } finally {
+    finishCartRequest(request);
+  }
+}
 
-      const quantity = item.quantity + optimisticItem.quantity;
-      return {
-        ...optimisticItem,
-        id: item.id,
-        quantity,
-        total: optimisticItem.price * quantity,
-      };
-    })
-    : [...cart.items, optimisticItem];
-  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+async function loadLoggedInCartView(
+  request: CartRequest,
+  setCartFromServer: (cart: Cart) => void,
+  translate: (key: string) => string,
+): Promise<void> {
+  const epoch = getCartDisplayEpoch();
+  if (!request.silent) {
+    request.setLoading(true);
+  }
 
-  return {
-    ...cart,
-    items,
-    totals: {
-      ...cart.totals,
-      subtotal,
-      total: subtotal + cart.totals.tax + cart.totals.shipping - cart.totals.discount,
-    },
-    itemsCount: cartSummary?.itemsCount ?? items.reduce((sum, item) => sum + item.quantity, 0),
-  };
+  try {
+    const cartData = await fetchCart(true, translate);
+    const isStale = !request.isCurrent() || getCartDisplayEpoch() !== epoch;
+    if (isStale || !cartData) {
+      return;
+    }
+
+    setCartFromServer(cartData);
+  } catch {
+    return;
+  } finally {
+    finishCartRequest(request);
+  }
+}
+
+function finishCartRequest(request: CartRequest): void {
+  if (!request.isCurrent()) {
+    return;
+  }
+
+  if (!request.silent) {
+    request.setLoading(false);
+  }
+  request.clearOptimistic();
 }
 
 export function useCartState({ enabled }: UseCartStateOptions) {
@@ -97,7 +111,13 @@ export function useCartState({ enabled }: UseCartStateOptions) {
   const { t } = useTranslation();
   const productLabel = t('common.messages.product');
 
-  const [cart, setCart] = useState<Cart | null>(null);
+  const [cart, setCart] = useState<Cart | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    return getInstantCartDisplay(isLoggedIn, productLabel);
+  });
   const [loading, setLoading] = useState(false);
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const cartLoadRequestRef = useRef(0);
@@ -128,7 +148,8 @@ export function useCartState({ enabled }: UseCartStateOptions) {
     }
     clearGuestCartItems();
     setCart(filtered);
-    writeCartSnapshot(filtered);
+    writeLoggedInCartDisplay(filtered);
+    persistCartBadgeFromCart(filtered);
     dispatchCartUpdated({
       localOnly: true,
       cartSummary: {
@@ -139,107 +160,36 @@ export function useCartState({ enabled }: UseCartStateOptions) {
   }, []);
 
   const loadCart = useCallback(
-    async (silent = false, skipInstantSync = false) => {
+    async (silent = false) => {
       const requestId = cartLoadRequestRef.current + 1;
       cartLoadRequestRef.current = requestId;
-      const isCurrentRequest = () => cartLoadRequestRef.current === requestId;
+      const request: CartRequest = {
+        silent,
+        isCurrent: () => cartLoadRequestRef.current === requestId,
+        setLoading,
+        clearOptimistic: () => {
+          hasPendingOptimisticCartRef.current = false;
+        },
+      };
 
       if (!isLoggedIn) {
-        syncCartFromLocal();
-
-        const instantCart = getGuestCartFromStorage(productLabel);
-        if (!silent && !instantCart) {
-          setLoading(true);
-        }
-
-        try {
-          const cartData = await fetchCart(isLoggedIn, t);
-          if (!isCurrentRequest()) {
-            return;
-          }
-
-          if (cartData) {
-            setCart(cartData);
-            dispatchCartUpdated({
-              localOnly: true,
-              cartSummary: {
-                itemsCount: cartData.itemsCount,
-                total: cartData.totals.total,
-              },
-            });
-          } else {
-            setCart(null);
-            dispatchCartUpdated({ localOnly: true, cartSummary: { itemsCount: 0, total: 0 } });
-          }
-        } catch {
-          if (!isCurrentRequest()) {
-            return;
-          }
-
-          syncCartFromLocal();
-        } finally {
-          if (!silent && isCurrentRequest()) {
-            setLoading(false);
-          }
-          if (isCurrentRequest()) {
-            hasPendingOptimisticCartRef.current = false;
-          }
-        }
-
+        await loadGuestCartView(request, productLabel, setCart, syncCartFromLocal, t);
         return;
       }
 
-      const instantCart = getInstantCartDisplay(isLoggedIn, productLabel);
-
-      if (instantCart && !skipInstantSync) {
-        setCart(instantCart);
-      } else if (!silent) {
-        setLoading(true);
-      }
-
-      try {
-        const cartData = await fetchCart(isLoggedIn, t);
-        if (!isCurrentRequest()) {
-          return;
-        }
-
-        if (cartData) {
-          applyServerCart(cartData);
-        } else {
-          writeCartSnapshot(null);
-          setCart(null);
-          dispatchCartUpdated({ localOnly: true, cartSummary: { itemsCount: 0, total: 0 } });
-        }
-      } catch {
-        if (!isCurrentRequest()) {
-          return;
-        }
-
-        if (instantCart) {
-          setCart(instantCart);
-        } else {
-          syncCartFromLocal();
-        }
-      } finally {
-        if (!silent && isCurrentRequest()) {
-          setLoading(false);
-        }
-        if (isCurrentRequest()) {
-          hasPendingOptimisticCartRef.current = false;
-        }
-      }
+      await loadLoggedInCartView(request, applyServerCart, t);
     },
     [applyServerCart, isLoggedIn, productLabel, syncCartFromLocal, t],
   );
 
   const refreshCart = useCallback((silent = true) => {
     if (isLoggedIn && hasPendingOptimisticCartRef.current) {
-      void loadCart(silent, true);
+      void loadCart(silent);
       return;
     }
 
     const instantCart = syncCartFromLocal();
-    void loadCart(silent && Boolean(instantCart));
+    void loadCart(silent || Boolean(instantCart));
   }, [isLoggedIn, loadCart, syncCartFromLocal]);
 
   useEffect(() => {
@@ -251,9 +201,13 @@ export function useCartState({ enabled }: UseCartStateOptions) {
       return;
     }
 
-    const instantCart = getInstantCartDisplay(isLoggedIn, productLabel);
-    if (instantCart) {
-      setCart(instantCart);
+    if (isLoggedIn) {
+      clearLegacyCartProductSnapshot();
+    } else {
+      const instantCart = getGuestCartFromStorage(productLabel);
+      if (instantCart) {
+        setCart(instantCart);
+      }
     }
 
     void loadCart(true);
@@ -274,7 +228,6 @@ export function useCartState({ enabled }: UseCartStateOptions) {
         return;
       }
 
-      let instantCart: Cart | null = null;
       if (detail?.optimisticItem) {
         hasPendingOptimisticCartRef.current = true;
         setCart((prevCart) => upsertOptimisticCartItem(
@@ -283,17 +236,18 @@ export function useCartState({ enabled }: UseCartStateOptions) {
           detail.cartSummary,
         ));
       } else {
-        instantCart = syncCartFromLocal();
+        syncCartFromLocal();
       }
 
       if (isLoggedIn) {
-        void loadCart(Boolean(instantCart || detail?.optimisticItem), Boolean(detail?.optimisticItem));
+        void loadCart(Boolean(detail?.optimisticItem));
       }
     };
 
     const handleAuthUpdate = () => {
-      const instantCart = getInstantCartDisplay(isLoggedIn, productLabel);
-      setCart(instantCart);
+      if (!isLoggedIn) {
+        setCart(getGuestCartFromStorage(productLabel));
+      }
       void loadCart(true);
     };
 
@@ -309,11 +263,14 @@ export function useCartState({ enabled }: UseCartStateOptions) {
   }, [enabled, isLoggedIn, productLabel, loadCart, syncCartFromLocal]);
 
   const onRemoveItem = async (itemId: string) => {
-    pendingRemovedItemIdsRef.current.add(itemId);
+    if (isLoggedIn) {
+      pendingRemovedItemIdsRef.current.add(itemId);
+    }
     cartLoadRequestRef.current += 1;
     const removed = await handleRemoveItem(itemId, isLoggedIn, setCart, () => loadCart(true), productLabel);
-    if (!removed) {
+    if (!removed && isLoggedIn) {
       pendingRemovedItemIdsRef.current.delete(itemId);
+      void loadCart(true);
     }
   };
 

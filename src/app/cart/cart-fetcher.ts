@@ -1,32 +1,16 @@
 import { apiClient } from '../../lib/api-client';
 import {
   buildCartFromGuestStorage,
+  persistCartBadgeFromCart,
   readGuestCartItems,
   reconcileGuestItemsWithApiCart,
   writeGuestCartItems,
 } from '../../lib/guest-cart-storage';
-import { extractMediaUrl } from '../../lib/utils/extractMediaUrl';
+import { getCartDisplayEpoch, writeLoggedInCartDisplay } from '../../lib/cart-display-cache';
+import { isClientLoggedIn } from '../../lib/storageCounts';
 import { logger } from '../../lib/utils/logger';
 import { getStoredLanguage } from '../../lib/language';
-import type { Cart, CartItem, GuestCartItem } from './types';
-
-/**
- * Product data from API
- */
-interface ProductData {
-  id: string;
-  slug: string;
-  translations?: Array<{ title: string; locale: string }>;
-  media?: Array<{ url?: string; src?: string } | string>;
-  variants?: Array<{
-    _id: string;
-    id: string;
-    sku: string;
-    price: number;
-    originalPrice?: number | null;
-    stock?: number;
-  }>;
-}
+import type { Cart, GuestCartItem } from './types';
 
 /**
  * Guest cart item from batch API
@@ -36,101 +20,58 @@ interface GuestCartBatchResponse {
   normalizedItems: GuestCartItem[];
 }
 
+function guestLineKey(productId: string, variantId: string): string {
+  return `${productId}:${variantId}`;
+}
+
+function hasSameGuestLineIds(left: GuestCartItem[], right: GuestCartItem[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  const rightKeys = new Set(right.map((item) => guestLineKey(item.productId, item.variantId)));
+  return left.every((item) => rightKeys.has(guestLineKey(item.productId, item.variantId)));
+}
+
+function productWasFound(
+  item: GuestCartItem,
+  normalized: GuestCartItem[],
+  cart: Cart | null,
+): boolean {
+  if (normalized.some((line) => line.productId === item.productId)) {
+    return true;
+  }
+
+  return Boolean(cart?.items.some((line) => line.variant.product.id === item.productId));
+}
+
 /** Re-export for instant cart drawer reads. */
 export { getGuestCartFromStorage } from '../../lib/guest-cart-storage';
 
-/**
- * Fetch guest cart items with product details
- */
-async function fetchGuestCartItems(
-  guestCart: GuestCartItem[],
-  t: (key: string) => string
-): Promise<Array<{ item: CartItem | null; shouldRemove: boolean }>> {
-  return Promise.all(
-    guestCart.map(async (item, index) => {
-      try {
-        // If productSlug is missing, product cannot be fetched (API expects slug)
-        if (!item.productSlug) {
-          logger.warn(`Product ${item.productId} does not have slug, removing from cart`);
-          return { item: null, shouldRemove: true };
-        }
+function applyGuestBatch(
+  itemsAtStart: GuestCartItem[],
+  batch: GuestCartBatchResponse,
+  productLabel: string,
+): Cart | null {
+  const current = readGuestCartItems();
+  if (current.length === 0) {
+    return null;
+  }
 
-        // Get product data by slug
-        const productData = await apiClient.get<ProductData>(`/api/v1/products/${item.productSlug}`);
+  if (!hasSameGuestLineIds(itemsAtStart, current)) {
+    return buildCartFromGuestStorage(current, productLabel);
+  }
 
-        const variant = productData.variants?.find(v => 
-          (v._id?.toString() || v.id) === item.variantId
-        ) || productData.variants?.[0];
-
-        if (!variant) {
-          logger.warn(`Variant ${item.variantId} not found for product ${item.productId}`);
-          return { item: null, shouldRemove: true };
-        }
-
-        const translation = productData.translations?.[0];
-        const imageUrl = extractMediaUrl(productData.media);
-
-        return {
-          item: {
-            id: `${item.productId}-${item.variantId}-${index}`,
-            variant: {
-              id: variant._id?.toString() || variant.id,
-              sku: variant.sku || '',
-              stock: variant.stock !== undefined ? variant.stock : undefined,
-              product: {
-                id: productData.id,
-                title: translation?.title || t('common.messages.product'),
-                slug: productData.slug,
-                image: imageUrl,
-              },
-            },
-            quantity: item.quantity,
-            price: variant.price,
-            originalPrice: variant.originalPrice || null,
-            total: variant.price * item.quantity,
-            selectedColor: item.selectedColor ?? null,
-            selectedSize: item.selectedSize ?? null,
-          },
-          shouldRemove: false,
-        };
-      } catch (error: unknown) {
-        // If product not found (404), remove it from localStorage
-        const errorObj = error as { status?: number; statusCode?: number };
-        if (errorObj?.status === 404 || errorObj?.statusCode === 404) {
-          logger.warn(`Product ${item.productId} not found (404), removing from cart`);
-          return { item: null, shouldRemove: true };
-        }
-        logger.error(`Error fetching product ${item.productId}`, { error });
-        return { item: null, shouldRemove: false };
-      }
-    })
-  );
+  const normalized = Array.isArray(batch.normalizedItems) ? batch.normalizedItems : [];
+  const confirmed = current.filter((item) => productWasFound(item, normalized, batch.cart));
+  const reconciled = reconcileGuestItemsWithApiCart(confirmed, batch.cart, normalized);
+  writeGuestCartItems(reconciled);
+  return buildCartFromGuestStorage(reconciled, productLabel);
 }
 
 /**
- * Build cart from valid items
- */
-function buildCartFromItems(validItems: CartItem[]): Cart {
-  const subtotal = validItems.reduce((sum, item) => sum + item.total, 0);
-  const itemsCount = validItems.reduce((sum, item) => sum + item.quantity, 0);
-
-  return {
-    id: 'guest-cart',
-    items: validItems,
-    totals: {
-      subtotal,
-      discount: 0,
-      shipping: 0,
-      tax: 0,
-      total: subtotal,
-      currency: 'AMD',
-    },
-    itemsCount,
-  };
-}
-
-/**
- * Fetch guest cart
+ * Fetch guest cart. Membership changed during the request stays local,
+ * so a stale response cannot restore a removed line or swap in another product.
  */
 export async function fetchGuestCart(
   t: (key: string) => string
@@ -140,79 +81,19 @@ export async function fetchGuestCart(
   }
 
   const productLabel = t('common.messages.product');
+  const itemsAtStart = readGuestCartItems();
+  if (itemsAtStart.length === 0) {
+    return null;
+  }
 
   try {
-    const guestCartAtStart = readGuestCartItems();
-
-    if (guestCartAtStart.length === 0) {
-      return null;
-    }
-
-    try {
-      const batch = await apiClient.post<GuestCartBatchResponse>('/api/v1/cart/guest', {
-        items: guestCartAtStart,
-        lang: getStoredLanguage(),
-      });
-
-      // User may have added/removed lines while the batch request was in flight.
-      const guestCartNow = readGuestCartItems();
-      if (guestCartNow.length === 0) {
-        return null;
-      }
-
-      const normalized = Array.isArray(batch.normalizedItems) ? batch.normalizedItems : [];
-      const reconciled = reconcileGuestItemsWithApiCart(
-        guestCartNow,
-        batch.cart,
-        normalized,
-      );
-      writeGuestCartItems(reconciled);
-      return buildCartFromGuestStorage(reconciled, productLabel);
-    } catch (batchError: unknown) {
-      logger.warn('[CART] Guest batch fetch failed, using localStorage snapshot', { error: batchError });
-    }
-
-    const guestCartNow = readGuestCartItems();
-    const localCart = buildCartFromGuestStorage(guestCartNow, productLabel);
-    if (localCart) {
-      return localCart;
-    }
-
-    if (guestCartNow.length === 0) {
-      return null;
-    }
-
-    // Get product details from API
-    const itemsWithDetails = await fetchGuestCartItems(guestCartNow, t);
-
-    // Remove items that were not found — only touch indices still present locally.
-    const latestBeforeWrite = readGuestCartItems();
-    const itemsToRemove = itemsWithDetails
-      .map((result, index) => (result.shouldRemove ? index : -1))
-      .filter((index) => index !== -1);
-
-    if (itemsToRemove.length > 0) {
-      const updatedCart = latestBeforeWrite.filter((_, index) => !itemsToRemove.includes(index));
-      writeGuestCartItems(updatedCart);
-    }
-
-    const currentAfterCleanup = readGuestCartItems();
-    const fromStorage = buildCartFromGuestStorage(currentAfterCleanup, productLabel);
-    if (fromStorage) {
-      return fromStorage;
-    }
-
-    if (currentAfterCleanup.length === 0) {
-      return null;
-    }
-
-    const validItems = itemsWithDetails
-      .map((result) => result.item)
-      .filter((item): item is CartItem => item !== null);
-
-    return validItems.length > 0 ? buildCartFromItems(validItems) : null;
+    const batch = await apiClient.post<GuestCartBatchResponse>('/api/v1/cart/guest', {
+      items: itemsAtStart,
+      lang: getStoredLanguage(),
+    });
+    return applyGuestBatch(itemsAtStart, batch, productLabel);
   } catch (error: unknown) {
-    logger.error('Error loading guest cart', { error });
+    logger.warn('[CART] Guest batch fetch failed, showing the local cart', { error });
     return buildCartFromGuestStorage(readGuestCartItems(), productLabel);
   }
 }
@@ -228,6 +109,23 @@ export async function fetchLoggedInCart(): Promise<Cart | null> {
     logger.error('Error fetching cart', { error });
     return null;
   }
+}
+
+/** Loads the logged-in cart before the drawer opens, so the first paint is not empty. */
+export function prefetchLoggedInCartDisplay(): void {
+  if (!isClientLoggedIn()) {
+    return;
+  }
+
+  const epoch = getCartDisplayEpoch();
+  void fetchLoggedInCart().then((cart) => {
+    if (!cart || getCartDisplayEpoch() !== epoch) {
+      return;
+    }
+
+    writeLoggedInCartDisplay(cart);
+    persistCartBadgeFromCart(cart);
+  });
 }
 
 /**

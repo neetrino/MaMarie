@@ -14,14 +14,14 @@ import { ProductInfoAndActions } from './ProductInfoAndActions';
 import { ProductPageFrame } from './ProductPageFrame';
 import { ProductPageShell } from './ProductPageShell';
 import { useProductPage } from './useProductPage';
+import { replaceLoggedInCartDisplay, readLoggedInCartDisplay } from '../../../lib/cart-display-cache';
 import { dispatchCartUpdated } from '../../../lib/cart-events';
+import { upsertOptimisticCartItem } from '../../../components/cart/optimistic-cart';
 import {
   clearCartSnapshot,
   clearGuestCartItems,
-  readCartSnapshot,
   readGuestCartItems,
-  upsertCartSnapshotItem,
-  writeCartSnapshot,
+  writeCartBadgeSummary,
   writeGuestCartItems,
 } from '../../../lib/guest-cart-storage';
 import type { CartItem, GuestCartItem } from '../../../app/cart/types';
@@ -196,12 +196,12 @@ export function ProductPageClient({
           selectedSize: selectedSize ?? null,
         };
 
-        const nextSnapshot = upsertCartSnapshotItem(
-          readCartSnapshot(),
+        writeCartBadgeSummary(response.cartSummary);
+        replaceLoggedInCartDisplay(upsertOptimisticCartItem(
+          readLoggedInCartDisplay(),
           optimisticItem,
-          response.cartSummary.itemsCount,
-        );
-        writeCartSnapshot(nextSnapshot);
+          response.cartSummary,
+        ));
         clearGuestCartItems();
         dispatchCartUpdated({
           optimisticItem,
