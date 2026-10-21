@@ -267,7 +267,14 @@ export function useCartState({ enabled }: UseCartStateOptions) {
       pendingRemovedItemIdsRef.current.add(itemId);
     }
     cartLoadRequestRef.current += 1;
-    const removed = await handleRemoveItem(itemId, isLoggedIn, setCart, () => loadCart(true), productLabel);
+    const removed = await handleRemoveItem(
+      itemId,
+      isLoggedIn,
+      cart,
+      setCart,
+      () => loadCart(true),
+      productLabel,
+    );
     if (!removed && isLoggedIn) {
       pendingRemovedItemIdsRef.current.delete(itemId);
       void loadCart(true);
@@ -280,6 +287,7 @@ export function useCartState({ enabled }: UseCartStateOptions) {
       itemId,
       quantity,
       isLoggedIn,
+      cart,
       setCart,
       loadCart,
       t,
