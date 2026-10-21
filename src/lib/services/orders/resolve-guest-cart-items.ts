@@ -1,6 +1,6 @@
 import { db } from "@white-shop/db";
 import type { Prisma } from "@white-shop/db";
-import { extractMediaUrl } from "../../utils/extractMediaUrl";
+import { resolveCartLineImage } from "../cart-line-image";
 import type { CheckoutCartItem } from "./checkout-types";
 
 type GuestCheckoutItem = {
@@ -79,7 +79,12 @@ export async function resolveGuestCartItems(
         )
         .join(", ") ?? undefined;
     const imageUrl =
-      extractMediaUrl(variant.product.media, variant.product.id) ?? undefined;
+      resolveCartLineImage(
+        variant.product.id,
+        variant.id,
+        variant.imageUrl,
+        variant.product.media,
+      ) ?? undefined;
     return {
       variantId: variant.id,
       productId: variant.product.id,

@@ -2,12 +2,13 @@ import type { Dispatch, SetStateAction } from 'react';
 import { apiClient } from '../../lib/api-client';
 import { dispatchCartUpdated } from '../../lib/cart-events';
 import { logger } from '../../lib/utils/logger';
+import { replaceLoggedInCartDisplay } from '../../lib/cart-display-cache';
 import {
   buildCartFromGuestStorage,
   clearCartSnapshot,
   clearGuestCartItems,
   readGuestCartItems,
-  writeCartSnapshot,
+  persistCartBadgeFromCart,
   writeGuestCartItems,
 } from '../../lib/guest-cart-storage';
 import type { Cart, CartItem, GuestCartItem } from './types';
@@ -120,7 +121,7 @@ async function syncLoggedInQuantity(
 ): Promise<void> {
   try {
     await apiClient.patch(`/api/v1/cart/items/${itemId}`, { quantity });
-    dispatchCartUpdated({ localOnly: true });
+    await fetchCart(true);
   } catch (error: unknown) {
     const errorObj = error as { detail?: string; message?: string };
     logger.error('Error updating quantity', { error, itemId });
@@ -193,7 +194,8 @@ export async function handleRemoveItem(
 
   const cartAfterRemove: Cart = removedCart;
   clearGuestCartItems();
-  writeCartSnapshot(cartAfterRemove);
+  replaceLoggedInCartDisplay(cartAfterRemove);
+  persistCartBadgeFromCart(cartAfterRemove);
   dispatchCartUpdated({
     localOnly: true,
     cartSummary: {
@@ -204,10 +206,10 @@ export async function handleRemoveItem(
 
   try {
     await apiClient.delete(`/api/v1/cart/items/${itemId}`);
+    await fetchCart();
     return true;
   } catch (error: unknown) {
     logger.error('Error removing item', { error, itemId });
-    await fetchCart();
     return false;
   }
 }
@@ -273,7 +275,8 @@ export function handleUpdateQuantity(
       itemsCount: newItemsCount,
     };
 
-    writeCartSnapshot(updatedCart);
+    replaceLoggedInCartDisplay(updatedCart);
+    persistCartBadgeFromCart(updatedCart);
     clearGuestCartItems();
     return updatedCart;
   });

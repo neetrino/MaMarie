@@ -40,7 +40,7 @@ export async function fetchCartForGuest(): Promise<Cart | null> {
 
         const variant = productData.variants?.find(v =>
           (v._id?.toString() || v.id) === item.variantId
-        ) || productData.variants?.[0];
+        );
 
         if (!variant) {
           return { item: null, shouldRemove: true };

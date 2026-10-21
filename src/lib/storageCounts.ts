@@ -1,6 +1,6 @@
 'use client';
 
-import { readCartSnapshot, readGuestCartItems } from './guest-cart-storage';
+import { readCartBadgeSummary, readGuestCartItems } from './guest-cart-storage';
 
 /**
  * Shared storage keys used to keep wishlist, compare and cart data in localStorage.
@@ -67,7 +67,7 @@ interface GuestCartLine {
   quantity?: number;
 }
 
-function isClientLoggedIn(): boolean {
+export function isClientLoggedIn(): boolean {
   if (typeof window === 'undefined') {
     return false;
   }
@@ -93,7 +93,7 @@ export function getCartCount(): number {
     );
 
     if (isClientLoggedIn()) {
-      return readCartSnapshot()?.itemsCount ?? 0;
+      return readCartBadgeSummary()?.itemsCount ?? 0;
     }
 
     return guestCount;

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { CART_DRAWER_OPEN_EVENT } from '../constants/cart-drawer';
 import { SEARCH_MODAL_OPEN_EVENT } from '../constants/search-modal';
+import { prefetchLoggedInCartDisplay } from '../app/cart/cart-fetcher';
 
 interface OverlayInitialOpenProps {
   initialOpen?: boolean;
@@ -56,13 +57,20 @@ function useLazyOverlay<T extends OverlayInitialOpenProps>(
   return { Overlay, shouldRender, initialOpen };
 }
 
-/** Loads cart drawer chunk on first open; preloads during idle time. */
+const CART_DRAWER_PRELOAD_TIMEOUT_MS = 0;
+
+/** Loads cart drawer chunk on first open and starts the cart request immediately. */
 export function LazyCartDrawer() {
+  useEffect(() => {
+    void import('./cart/CartDrawer');
+    prefetchLoggedInCartDisplay();
+  }, []);
+
   const { Overlay, shouldRender, initialOpen } = useLazyOverlay(
     () => import('./cart/CartDrawer'),
     'CartDrawer',
     CART_DRAWER_OPEN_EVENT,
-    5000,
+    CART_DRAWER_PRELOAD_TIMEOUT_MS,
   );
 
   if (!shouldRender || !Overlay) {
