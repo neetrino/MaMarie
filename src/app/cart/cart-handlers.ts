@@ -75,6 +75,41 @@ function calculateCartTotals(items: CartItem[], existingTotals: Cart['totals']):
   };
 }
 
+function withCartItems(cart: Cart, items: CartItem[]): Cart {
+  return {
+    ...cart,
+    items,
+    totals: calculateCartTotals(items, cart.totals),
+    itemsCount: items.reduce((sum, item) => sum + item.quantity, 0),
+  };
+}
+
+function withoutCartLine(cart: Cart, itemId: string): Cart {
+  return withCartItems(cart, cart.items.filter((item) => item.id !== itemId));
+}
+
+function withLineQuantity(cart: Cart, itemId: string, quantity: number): Cart {
+  return withCartItems(
+    cart,
+    cart.items.map((item) =>
+      item.id === itemId ? { ...item, quantity, total: item.price * quantity } : item,
+    ),
+  );
+}
+
+function persistLoggedInCart(cart: Cart): void {
+  clearGuestCartItems();
+  replaceLoggedInCartDisplay(cart);
+  persistCartBadgeFromCart(cart);
+  dispatchCartUpdated({
+    localOnly: true,
+    cartSummary: {
+      itemsCount: cart.itemsCount,
+      total: cart.totals.total,
+    },
+  });
+}
+
 /**
  * Remove item from guest cart in localStorage
  */
@@ -137,11 +172,14 @@ async function syncLoggedInQuantity(
 }
 
 /**
- * Handle remove item from cart
+ * Handle remove item from cart.
+ * `currentCart` must be the rendered cart: the decision to call the API cannot
+ * depend on a state updater, because React may run it after this function returns.
  */
 export async function handleRemoveItem(
   itemId: string,
   isLoggedIn: boolean,
+  currentCart: Cart | null,
   setCart: SetCartState,
   fetchCart: () => Promise<void>,
   productLabel: string,
@@ -163,46 +201,12 @@ export async function handleRemoveItem(
     return true;
   }
 
-  let removedCart: Cart | null = null;
-
-  setCart((prevCart) => {
-    if (!prevCart) {
-      return prevCart;
-    }
-
-    const itemToRemove = prevCart.items.find((item) => item.id === itemId);
-    if (!itemToRemove) {
-      return prevCart;
-    }
-
-    const updatedItems = prevCart.items.filter((item) => item.id !== itemId);
-    const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-
-    removedCart = {
-      ...prevCart,
-      items: updatedItems,
-      totals: calculateCartTotals(updatedItems, prevCart.totals),
-      itemsCount: newItemsCount,
-    };
-
-    return removedCart;
-  });
-
-  if (!removedCart) {
+  if (!currentCart?.items.some((item) => item.id === itemId)) {
     return false;
   }
 
-  const cartAfterRemove: Cart = removedCart;
-  clearGuestCartItems();
-  replaceLoggedInCartDisplay(cartAfterRemove);
-  persistCartBadgeFromCart(cartAfterRemove);
-  dispatchCartUpdated({
-    localOnly: true,
-    cartSummary: {
-      itemsCount: cartAfterRemove.itemsCount,
-      total: cartAfterRemove.totals.total,
-    },
-  });
+  setCart((prevCart) => (prevCart ? withoutCartLine(prevCart, itemId) : prevCart));
+  persistLoggedInCart(withoutCartLine(currentCart, itemId));
 
   try {
     await apiClient.delete(`/api/v1/cart/items/${itemId}`);
@@ -221,17 +225,18 @@ export function handleUpdateQuantity(
   itemId: string,
   quantity: number,
   isLoggedIn: boolean,
+  currentCart: Cart | null,
   setCart: SetCartState,
   fetchCart: (silent?: boolean) => Promise<void>,
   t: (key: string) => string,
   productLabel: string,
 ): void {
   if (quantity < 1) {
-    void handleRemoveItem(itemId, isLoggedIn, setCart, () => fetchCart(true), productLabel);
+    void handleRemoveItem(itemId, isLoggedIn, currentCart, setCart, () => fetchCart(true), productLabel);
     return;
   }
 
-  const cartItem = readCartItemForUpdate(itemId, isLoggedIn, setCart, productLabel);
+  const cartItem = readCartItemForUpdate(itemId, isLoggedIn, currentCart, productLabel);
   if (!cartItem) {
     return;
   }
@@ -258,37 +263,19 @@ export function handleUpdateQuantity(
     return;
   }
 
-  setCart((prevCart) => {
-    if (!prevCart) {
-      return prevCart;
-    }
+  if (!currentCart) {
+    return;
+  }
 
-    const updatedItems = prevCart.items.map((item) =>
-      item.id === itemId ? { ...item, quantity, total: item.price * quantity } : item,
-    );
-    const newItemsCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-
-    const updatedCart = {
-      ...prevCart,
-      items: updatedItems,
-      totals: calculateCartTotals(updatedItems, prevCart.totals),
-      itemsCount: newItemsCount,
-    };
-
-    replaceLoggedInCartDisplay(updatedCart);
-    persistCartBadgeFromCart(updatedCart);
-    clearGuestCartItems();
-    return updatedCart;
-  });
-
-  dispatchCartUpdated({ localOnly: true });
+  setCart((prevCart) => (prevCart ? withLineQuantity(prevCart, itemId, quantity) : prevCart));
+  persistLoggedInCart(withLineQuantity(currentCart, itemId, quantity));
   void syncLoggedInQuantity(itemId, quantity, fetchCart, t);
 }
 
 function readCartItemForUpdate(
   itemId: string,
   isLoggedIn: boolean,
-  setCart: SetCartState,
+  currentCart: Cart | null,
   productLabel: string,
 ): CartItem | undefined {
   if (!isLoggedIn) {
@@ -322,10 +309,5 @@ function readCartItemForUpdate(
     };
   }
 
-  let cartItem: CartItem | undefined;
-  setCart((prevCart) => {
-    cartItem = prevCart?.items.find((item) => item.id === itemId);
-    return prevCart ?? null;
-  });
-  return cartItem;
+  return currentCart?.items.find((item) => item.id === itemId);
 }

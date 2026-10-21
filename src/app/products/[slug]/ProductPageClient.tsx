@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useLayoutEffect, type ReactNode } from 'react';
 import { apiClient } from '../../../lib/api-client';
+import { ApiError } from '../../../lib/api-client/types';
+import { logger } from '../../../lib/utils/logger';
 import { t } from '../../../lib/i18n';
 import { useAuth } from '../../../lib/auth/AuthContext';
 import { RelatedProducts } from '../../../components/RelatedProducts';
@@ -42,6 +44,8 @@ interface ProductPageClientProps {
   /** Streamed related row from the server (Suspense). */
   relatedSection?: ReactNode;
 }
+
+const HTTP_UNPROCESSABLE_ENTITY = 422;
 
 export function ProductPageClient({
   slugParam,
@@ -208,8 +212,13 @@ export function ProductPageClient({
           cartSummary: response.cartSummary,
         });
       }
-    } catch {
-      setShowMessage(t(language, 'product.errorAddingToCart'));
+    } catch (error: unknown) {
+      logger.error('Add to cart failed', { error, productId: product.id, variantId: currentVariant.id });
+      const isStockError = error instanceof ApiError && error.status === HTTP_UNPROCESSABLE_ENTITY;
+      setShowMessage(t(
+        language,
+        isStockError ? 'common.alerts.noMoreStockAvailable' : 'product.errorAddingToCart',
+      ));
       setTimeout(() => setShowMessage(null), 2000);
     } finally {
       setIsAddingToCart(false);

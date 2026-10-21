@@ -134,9 +134,21 @@ export function useCheckout() {
   };
 
   const handleRemoveCartItem = useCallback(
-    (itemId: string) =>
-      handleRemoveItem(itemId, isLoggedIn, setCart, fetchCart, t('common.messages.product')),
-    [fetchCart, isLoggedIn, setCart, t],
+    async (itemId: string) => {
+      const removed = await handleRemoveItem(
+        itemId,
+        isLoggedIn,
+        cart,
+        setCart,
+        fetchCart,
+        t('common.messages.product'),
+      );
+      if (!removed) {
+        await fetchCart();
+      }
+      return removed;
+    },
+    [cart, fetchCart, isLoggedIn, setCart, t],
   );
 
   return {
